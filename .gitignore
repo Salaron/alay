@@ -1,0 +1,6 @@
+node_modules/*
+compile/*
+tsconfig.tsbuildinfo
+
+data/*
+!data/db/live_notes.db_
