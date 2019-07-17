@@ -9,15 +9,3 @@ export default <Database>{
   password: "",
   database: ""
 }
-
-interface Database {
-  autoReconnect: boolean
-  autoReconnectDelay: number
-  autoReconnectMaxAttempt: number
-  connectionLimit: number
-  dateStrings: boolean
-  host: string
-  user: string
-  password: string
-  database: string
-}

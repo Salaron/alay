@@ -9,15 +9,3 @@ export default <LLclient>{
   public_key: "",
   links_from_prod_server: false
 }
-
-interface LLclient {
-  host: string
-  application_key: string
-  base_key: string
-  login_key: string
-  login_passwd: string
-  client_version: string
-  bundle_version: string
-  public_key: string
-  links_from_prod_server: boolean
-}

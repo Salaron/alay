@@ -16,7 +16,7 @@ export async function init() {
     let connection = await MySQLconnection.get()
     try {
       let tokens = await connection.query("SELECT * FROM auth_tokens WHERE expire <= CURRENT_TIMESTAMP")
-      await tokens.forEachAsync(async (token: any) => {
+      await tokens.forEachAsync(async (token) => {
         await connection.query("DELETE FROM auth_tokens WHERE token=:token", { token: token.token })
       })
       await connection.commit()

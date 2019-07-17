@@ -55,34 +55,3 @@ export default <LBonus>{
     }
   }
 }
-
-interface LBonus {
-  calendar_generator: {
-    cards_query: string
-    card_limit: number
-    special_flag_types: number[]
-    items: item[]
-  }
-  total_login_bonus: {
-    [day: string]: {
-      name: string
-      amount: number
-      item_id?: number
-    }
-  }
-}
-type itemName = "loveca" | "bt_ticket" | "green_ticket" | "game_coin" | "friend_pts" | "unit" | "exchange_point" | "sis"
-type item = {
-  name: itemName
-  item_id?: number
-  min_amount: number
-  max_amount: number
-} | {
-  name: itemName
-  item_id?: number
-  amount: number[]
-} | {
-  name: itemName
-  item_id?: number
-  amount: number
-}

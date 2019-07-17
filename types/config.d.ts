@@ -1,0 +1,138 @@
+interface Client {
+  application_version: string
+  application_id: string
+  application_key: string
+  XMC_base: string
+  consumer_key: string
+}
+interface Database {
+  autoReconnect: boolean
+  autoReconnectDelay: number
+  autoReconnectMaxAttempt: number
+  connectionLimit: number
+  dateStrings: boolean
+  host: string
+  user: string
+  password: string
+  database: string
+}
+interface I18n {
+  supportedLanguages: string[]
+  langCodes: langCodes
+  defaultLanguage: string
+}
+interface langCodes {
+  [langName: string]: string
+}
+
+interface LBonus {
+  calendar_generator: {
+    cards_query: string
+    card_limit: number
+    special_flag_types: number[]
+    items: item[]
+  }
+  total_login_bonus: {
+    [day: string]: {
+      name: string
+      amount: number
+      item_id?: number
+    }
+  }
+}
+type itemName = "loveca" | "bt_ticket" | "green_ticket" | "game_coin" | "friend_pts" | "unit" | "exchange_point" | "sis"
+type item = {
+  name: itemName
+  item_id?: number
+  min_amount: number
+  max_amount: number
+} | {
+  name: itemName
+  item_id?: number
+  amount: number[]
+} | {
+  name: itemName
+  item_id?: number
+  amount: number
+}
+
+interface LLclient {
+  host: string
+  application_key: string
+  base_key: string
+  login_key: string
+  login_passwd: string
+  client_version: string
+  bundle_version: string
+  public_key: string
+  links_from_prod_server: boolean
+}
+
+interface Modules {
+  auth: {
+    auth_logging: boolean
+  }
+  award: {
+    unlockAll: boolean
+  }
+  background: {
+    unlockAll: boolean
+  }
+  download: {
+    microDLurl: string
+  }
+  live: {
+    unlockAll: boolean
+    continueAttemptsCount: number
+  }
+  liveSe: {
+    list: number[]
+  }
+  liveIcon: {
+    list: number[]
+  }
+  personalNotice: {
+    welcomeMessageEnabled: boolean
+    welcomeMessageType: number
+    welcomeMessageTitle: string
+    welcomeMessageContents: string
+  }
+  festival: {
+    max_reset_setlist: number
+    setlist_type: number
+    reset_cost_type: number
+    reset_cost_value: number
+  }
+  duel: {
+    saveLiveResult: boolean
+  }
+  unit: {
+    removeFromDatabase: boolean
+  }
+  user: {
+    setBirthOnlyOnce: boolean
+    userSessionExpire: number
+  }
+}
+
+interface Server {
+  port: number
+  host: string
+  maintenance: boolean
+  bypass_maintenance: number[]
+  server_version: string
+  XMC_check: boolean
+  API_request_limit: number
+  log_level: import("../src/core/log").default.LEVEL // https://stackoverflow.com/questions/39040108/import-class-in-definition-file-d-ts
+  debug_mode: boolean
+  admin_ids: number[]
+  admin_pass: string
+  PRIVATE_KEY: string
+  PUBLIC_KEY: string
+  release_info: ReleaseInfo[]
+  request_logging: boolean
+}
+interface ReleaseInfo {
+  key: string
+  id: number
+}
