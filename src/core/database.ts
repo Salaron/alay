@@ -5,12 +5,12 @@ import { promisify } from "util"
 import sqlite3 from "./sqlite3"
 import { existsSync } from "fs"
 
-const log = new Log.Create(Log.LEVEL.VERBOSE, "Database")
+const log = new Log.Create(logLevel, "Database")
 interface PoolConfig extends mysql.PoolConfig {
-  autoReconnect: boolean;
-  autoReconnectMaxAttempt: number;
-  autoReconnectDelay: number;
-  disconnected: Function;
+  autoReconnect: boolean
+  autoReconnectMaxAttempt: number
+  autoReconnectDelay: number
+  disconnected: Function
 }
 
 export class Database {
@@ -107,7 +107,7 @@ export class Database {
     })
   }
 
-  public async query(query: string, values: any = {}, connection?: mysql.PoolConnection): Promise<any> {
+  public async query(query: string, values: any = {}, connection?: mysql.PoolConnection): Promise<any[]> {
     return new Promise(async (res, rej) => {
       let transaction = false
       try {
@@ -144,7 +144,7 @@ export class Database {
         }
         if (typeof result === "object" && Array.isArray(result)) {
           if (result.length > 0) result = result[0]
-          else result = []
+          else result = undefined
         }
         res(result)
       })
@@ -334,11 +334,6 @@ export class Sqlite3 {
 }
 
 (<any>global).MySQLconnection = Connection
-declare global {
-  const MySQLconnection: typeof Connection
-  const MySQLdatabase: Database
-  const sqlite3: Sqlite3
-}
 
 export function formatQuery(query: string, values: any) {
   if (!values) return query
