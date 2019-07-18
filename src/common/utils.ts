@@ -11,10 +11,13 @@ export async function init() {
     let connection = await MySQLconnection.get()
     try {
       let tokens = await connection.query("SELECT * FROM auth_tokens WHERE expire <= CURRENT_TIMESTAMP")
+      let count = 0
       await tokens.forEachAsync(async (token) => {
         await connection.query("DELETE FROM auth_tokens WHERE token=:token", { token: token.token })
+        count += 1
       })
       await connection.commit()
+      log.verbose(`Removed ${count} temporary auth tokens`)
     } catch (err) {
       connection.rollback()
       log.error(err)

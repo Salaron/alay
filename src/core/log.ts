@@ -168,7 +168,7 @@ namespace Log {
       if (this.level >= LEVEL.ERROR) {
         this.writeOutput(label, message)
         if (message instanceof Error) await util.promisify(appendFile)(`${rootDir}/logs/error.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message.stack}`)
-        else await util.promisify(appendFile)(`./logs/error.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message}`)
+        else await util.promisify(appendFile)(`${rootDir}/logs/error.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message}`)
       }
     }
     public fatal(message: any, label: Label | string = this.options.label.fatal) {

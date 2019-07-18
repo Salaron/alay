@@ -1,12 +1,12 @@
 import "./core/config"
 import { resolve } from "path"
-import * as db from "./core/database"
+import * as Database from "./core/database"
 import Log from "./core/log"
+import ReadLine from "./core/readLine"
 import http from "http"
 import requestHandler from "./handlers/requestHandler"
 
 import * as modules from "./common"
-console.log(modules)
 
 const log = new Log.Create(logLevel, "Setup");
 (<any>global).rootDir = `${resolve(__dirname)}/../`;
@@ -15,15 +15,18 @@ const log = new Log.Create(logLevel, "Setup");
 (async() => {
   try { 
     // Load config
-    await Config.prepareConfig();
-    // Prepare sqlite databases
-    (<any>global).sqlite3 = new db.Sqlite3()
-    // tests
-    let live = sqlite3.getLive()
-    console.log(await live.get(`SELECT * FROM live_setting_m WHERE live_setting_id = :ls`, { ls: 1 }))
-    await live.close()
-    live = sqlite3.getLive()
-    console.log(await live.get(`SELECT * FROM live_setting_m WHERE live_setting_id = ?`, [1]))
+    await Config.prepareConfig()
+    // Init readline interface
+    ReadLine()
+    // Connect to MySQL database
+    await Database.MySQLConnect();
+    // Prepare sqlite3 databases
+    (<any>global).sqlite3 = new Database.Sqlite3()
+    // Prepare common modules
+    // execute init function if exists
+    for (let module in modules) {
+      if ((<any>modules)[module].init) await (<any>modules)[module].init()
+    }
 
     let server = http.createServer(requestHandler)
     server.listen(Config.server.port, Config.server.host, () => {

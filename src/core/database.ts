@@ -47,8 +47,8 @@ export class database {
 
         let connection = await Connection.get()
         await Promise.all([
-          connection.query(`SET names UTF8`),
-          connection.query(`SET SESSION group_concat_max_len = 4294967295`),
+          connection.query(`SET names utf8`),
+          connection.query(`SET SESSION group_concat_max_len = 4294967295`), // max of int32
           connection.query(`SET @@sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""))`)
         ])
         await connection.commit()
@@ -352,3 +352,28 @@ export function formatQuery(query: string, values: any) {
     return txt
   })
 }
+
+let reconnectAttempts = 0
+export async function MySQLConnect() {
+  try {
+    (<any>global).MySQLdatabase = new database(extend({
+      disconnected: async function () {
+        log.fatal("Lost connection to MySQL Database")
+        process.exit(0)
+      },
+    }, Config.database))
+    await MySQLdatabase.connect()
+    reconnectAttempts = 0
+  } catch (e) {
+    reconnectAttempts += 1
+    if (e.code === "ECONNREFUSED") log.error(`Unable to connect to MySQL Database [ECONNREFUSED] ${reconnectAttempts}/${Config.database.autoReconnectMaxAttempt}`)
+    else log.error(e.message)
+    if (reconnectAttempts >= Config.database.autoReconnectMaxAttempt) {
+      log.fatal(`Max reconnect attempts reached`)
+      process.exit(0)
+    }
+    await promisify(setTimeout)(Config.database.autoReconnectDelay)
+    await MySQLConnect()
+  }
+}
+
