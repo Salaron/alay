@@ -25,9 +25,10 @@ export default class Sqlite3 {
   }
   public async exec(query: string, values?: any): Promise<void> {
     this.checkIfClosed()
-    this.lastQuery = formatQuery(query, values)
+    let preparedQuery = formatQuery(query, values)
+    this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
-      this.database.exec(formatQuery(query, values), (err) => {
+      this.database.exec(preparedQuery, (err) => {
         if (err) return rej(err)
         res()
       })
@@ -35,9 +36,10 @@ export default class Sqlite3 {
   }
   public async run(query: string, values?: any): Promise<void> {
     this.checkIfClosed()
-    this.lastQuery = formatQuery(query, values)
+    let preparedQuery = formatQuery(query, values)
+    this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
-      this.database.run(formatQuery(query, values), (err) => {
+      this.database.run(preparedQuery, (err) => {
         if (err) return rej(err)
         res()
       })
@@ -45,9 +47,10 @@ export default class Sqlite3 {
   }
   public async get(query: string, values?: any): Promise<any> {
     this.checkIfClosed()
-    this.lastQuery = formatQuery(query, values)
+    let preparedQuery = formatQuery(query, values)
+    this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
-      this.database.get(formatQuery(query, values), (err, row) => {
+      this.database.get(preparedQuery, (err, row) => {
         if (err) return rej(err)
         res(row)
       })
@@ -55,9 +58,10 @@ export default class Sqlite3 {
   }
   public async all(query: string, values?: any): Promise<any> {
     this.checkIfClosed()
-    this.lastQuery = formatQuery(query, values)
+    let preparedQuery = formatQuery(query, values)
+    this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
-      this.database.all(formatQuery(query, values), (err, rows) => {
+      this.database.all(preparedQuery, (err, rows) => {
         if (err) return rej(err)
         res(rows)
       })

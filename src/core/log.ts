@@ -159,7 +159,7 @@ namespace Log {
         label = new Label(label, this.options.label.warn.size, this.options.label.warn.color)
       if (this.level >= LEVEL.WARN) {
         this.writeOutput(label, message)
-        await util.promisify(appendFile)(`./logs/warn.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message}`)
+        await util.promisify(appendFile)(`${rootDir}/logs/warn.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message}`)
       }    
     }
     public async error(message: any, label: Label | string = this.options.label.error) {
@@ -167,7 +167,7 @@ namespace Log {
         label = new Label(label, this.options.label.error.size, this.options.label.error.color)
       if (this.level >= LEVEL.ERROR) {
         this.writeOutput(label, message)
-        if (message instanceof Error) await util.promisify(appendFile)(`./logs/error.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message.stack}`)
+        if (message instanceof Error) await util.promisify(appendFile)(`${rootDir}/logs/error.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message.stack}`)
         else await util.promisify(appendFile)(`./logs/error.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message}`)
       }
     }

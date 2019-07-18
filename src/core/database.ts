@@ -13,7 +13,7 @@ interface PoolConfig extends mysql.PoolConfig {
   disconnected: Function
 }
 
-export class Database {
+export class database {
   public config: PoolConfig
   public pool: mysql.Pool
   public reconnectAttempts: number
@@ -292,43 +292,43 @@ export class Sqlite3 {
     }
   }
   public getUnit() {
-    if (!this.unit) return this.unit = new sqlite3(rootDir + "data/db/unit.db_", "ro")
+    if (!this.unit || this.unit.closed) return this.unit = new sqlite3(rootDir + "data/db/unit.db_", "ro")
     else return this.unit
   }
   public getLive() {
-    if (!this.live) return this.live = new sqlite3(rootDir + "data/db/live.db_", "ro")
+    if (!this.live || this.live.closed) return this.live = new sqlite3(rootDir + "data/db/live.db_", "ro")
     else return this.live
   }
   public getDuty() {
-    if (!this.duty) return this.duty = new sqlite3(rootDir + "data/db/team_duty.db_", "ro")
+    if (!this.duty || this.duty.closed) return this.duty = new sqlite3(rootDir + "data/db/team_duty.db_", "ro")
     else return this.duty
   }
   public getFestival() {
-    if (!this.festival) return this.festival = new sqlite3(rootDir + "data/db/festival.db_", "ro")
+    if (!this.festival || this.festival.closed) return this.festival = new sqlite3(rootDir + "data/db/festival.db_", "ro")
     else return this.festival
   }
   public getMarathon() {
-    if (!this.marathon) return this.marathon = new sqlite3(rootDir + "data/db/exchange.db_", "ro")
+    if (!this.marathon || this.marathon.closed) return this.marathon = new sqlite3(rootDir + "data/db/exchange.db_", "ro")
     else return this.marathon
   }
   public getNotes() {
-    if (!this.notes) return this.notes = new sqlite3(rootDir + "data/db/live_notes.db_", "ro")
+    if (!this.notes || this.notes.closed) return this.notes = new sqlite3(rootDir + "data/db/live_notes.db_", "ro")
     else return this.notes
   }
   public getExchange() {
-    if (!this.exchange) return this.exchange = new sqlite3(rootDir + "data/db/exchange.db_", "ro")
+    if (!this.exchange || this.exchange.closed) return this.exchange = new sqlite3(rootDir + "data/db/exchange.db_", "ro")
     else return this.exchange
   }
   public getItem() {
-    if (!this.item) return this.item = new sqlite3(rootDir + "data/db/item.db_", "ro")
+    if (!this.item || this.item.closed) return this.item = new sqlite3(rootDir + "data/db/item.db_", "ro")
     else return this.item
   }
   public getSecretbox() {
-    if (!this.secretbox) return this.secretbox = new sqlite3(rootDir + "data/db/secretbox.db_", "ro")
+    if (!this.secretbox || this.secretbox.closed) return this.secretbox = new sqlite3(rootDir + "data/db/secretbox.db_", "ro")
     else return this.secretbox
   }
   public getOther() {
-    if (!this.other) return this.other = new sqlite3(rootDir + "data/db/other.db_", "ro")
+    if (!this.other || this.other.closed) return this.other = new sqlite3(rootDir + "data/db/other.db_", "ro")
     else return this.other
   }
 }

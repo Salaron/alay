@@ -1,0 +1,24 @@
+export enum AUTH_LEVEL {
+  NONE,
+  BANNED,
+  SESSION_EXPIRED,
+  REJECTED,
+  PRE_LOGIN,
+  UPDATE,
+  CONFIRMED_USER,
+  ADMIN
+}
+export enum REQUEST_TYPE {
+  BOTH,
+  SINGLE,
+  MULTI
+}
+export enum RESPONSE_TYPE {
+  SINGLE,
+  MULTI
+}
+export enum HANDLER_TYPE {
+  MAIN,
+  WEBAPI,
+  WEBVIEW
+}

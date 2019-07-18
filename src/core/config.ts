@@ -9,9 +9,10 @@ import LLclient from "../config/LLclient"
 import Modules from "../config/modules"
 import I18n from "../config/i18n"
 
-const log = new Log.Create(Server.log_level, "Config Manager")
+const log = new Log.Create(Server.log_level, "Config Manager");
+(<any>global).logLevel = Server.log_level
 
-export class Config_ {
+export class config {
   public lbonus: typeof LBonus
   public server: typeof Server
   public client: typeof Client
@@ -20,7 +21,7 @@ export class Config_ {
   public llsifclient: typeof LLclient
   public i18n: typeof I18n
 
-  public specialKey: null | Buffer
+  public specialKey: string | Buffer = ""
   constructor() {
     this.server = Server
     this.client = Client
@@ -29,8 +30,6 @@ export class Config_ {
     this.llsifclient = LLclient
     this.lbonus = LBonus
     this.i18n = I18n
-
-    this.specialKey = null
   }
 
   async prepareConfig(): Promise<void> {
@@ -78,5 +77,4 @@ export class Config_ {
     await this.prepareConfig()
   }
 }
-(<any>global).Config = new Config_();
-(<any>global).logLevel = Server.log_level
+(<any>global).Config = new config()

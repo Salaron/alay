@@ -1,14 +1,9 @@
 import Log from "../core/log"
-import * as fs from "fs"
 import crypto from "crypto"
-import { promisify } from "util"
 import { Connection } from "../core/database"
 import moment from "moment"
 
 const log = new Log.Create(logLevel, "Utils")
-
-export let RSA_PRIVATE_KEY = ""
-export let RSA_PUBLIC_KEY = ""
 
 export async function init() {
   // Handle Clearing Temp Auth Tokens every 15 sec
@@ -27,7 +22,7 @@ export async function init() {
   }, 1500)
 }
 
-export class Utils_ {
+export class Utils {
   connection: Connection
   constructor(connection: Connection) {
     this.connection = connection
@@ -85,8 +80,7 @@ export class Utils_ {
     return 0
   }
 
-  // AES-128-CBC Encryption for login v5 support
-  static encryptAES(key: any, data: any, iv: any) {
+  static AESEncrypt(key: any, data: any, iv: any) {
     if (!Buffer.isBuffer(data)) { data = Buffer.from(data) }
     if (!Buffer.isBuffer(key)) { key = Buffer.from(key, "base64") }
     let cipher = crypto.createCipheriv("aes-128-cbc", key, iv)
@@ -94,25 +88,26 @@ export class Utils_ {
     encrypted = Buffer.concat([encrypted, cipher.final()])
     return Buffer.concat([iv, encrypted]).toString("base64")
   }
-
-  // AES-128-CBC Decryption for login v5 support
-  static decryptAES(key: any, data: any) {
-    data = Buffer.from(data, "base64")
-    key = Buffer.from(key, "base64")
-    let iv = data.slice(0, 16)
-    let decipher = crypto.createDecipheriv("aes-128-cbc", key, iv)
-    let decrypted = decipher.update(data.slice(16, data.length))
+  static AESDecrypt(key: string, data: string) {
+    let dataBuf = Buffer.from(data, "base64")
+    let keyBuf = Buffer.from(key, "base64")
+    let iv = dataBuf.slice(0, 16)
+    let decipher = crypto.createDecipheriv("aes-128-cbc", keyBuf, iv)
+    let decrypted = decipher.update(dataBuf.slice(16, dataBuf.length))
     return Buffer.concat([decrypted, decipher.final()]).toString("utf8")
   }
 
-  // RSA-1024 decryption for login v5 support
-  static privateDecrypt(data: any) {
-    data = Buffer.from(data, "base64")
-    let buffer = Buffer.from(data)
+  static RSADecrypt(data: string) {
+    let buffer = Buffer.from(Buffer.from(data, "base64"))
     return crypto.privateDecrypt({ 
-      key: RSA_PRIVATE_KEY, 
+      key: Config.server.PRIVATE_KEY, 
       padding: crypto.constants.RSA_PKCS1_PADDING 
     }, buffer).toString("base64")
+  }
+  static RSASign(data: string) {
+    let sign = crypto.createSign("RSA-SHA1")
+    sign.update(data)
+    return sign.sign(Config.server.PUBLIC_KEY, "base64")
   }
 
   // Bitwise XOR two values
@@ -132,31 +127,23 @@ export class Utils_ {
     return Buffer.from(res)
   }
 
-  // HMAC-SHA1 for calculating XMC
-  static HMACSHA1(data: any, key: any) {
-    let hmacsha1 = crypto.createHmac("sha1", Buffer.from(key, "base64"))
+  static hmacSHA1(data: string, key: string | Buffer) {
+    if (typeof key ===  "string") key = Buffer.from(key, "base64")
+    let hmacsha1 = crypto.createHmac("sha1", key)
     hmacsha1.update(data)
     return hmacsha1.digest("hex")
   }
-
-  static HASHSHA1(data: any) {
+  static hashSHA1(data: string | number) {
     if (typeof data != "string") data = data.toString()
     let sum = crypto.createHash("sha1")
     sum.update(data)
     return sum.digest("hex")
   }
 
-  static rsaSign(data: string) {
-    let sign = crypto.createSign("RSA-SHA1")
-    sign.update(data)
-    return sign.sign(RSA_PRIVATE_KEY, "base64")
-  }
-
-  static randomNumber(min: number, max: number) { // min and max included
+  static getRndNumber(min: number, max: number) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
-
-  static createCopy(object: any) {
+  static createObjCopy(object: any) {
     return JSON.parse(JSON.stringify(object))
   }
 
@@ -177,7 +164,6 @@ export class Utils_ {
   async destroyToken(token: string): Promise<void> {
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: token })
   }
-
   static randomString(length: number, options?: string) {
     let result = ""
     let base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -187,25 +173,12 @@ export class Utils_ {
     }
     return result
   }
-  
-  async checkIfAdmin(userId: number, withTime = false) {
-    if (withTime === false) return Config.server.admin_ids.includes(userId)
-    let user = await this.connection.first(`SELECT last_admin_access FROM user_login WHERE user_id = :user`, {
-      user: userId
-    })
-    return (
-      Config.server.admin_ids.includes(userId) && (
-        user.last_admin_access != null && moment(Date.now()).diff(moment(user.last_admin_access), "s") < 1200
-      )
-    )
-  }
-
   static mergeArrayDedupe(array: any) {
     return [...new Set([].concat(...array))]
   }
-  static toJPtimezone(date?: string | Date) {
+  static toSpecificTimezone(utcOffset: number = 9, date?: string | Date) {
     if (!date) date = new Date()
-    return moment(date).utcOffset("+0900").format("YYYY-MM-DD HH:mm:SS")
+    return moment(date).utcOffset(`+0${utcOffset}00`).format("YYYY-MM-DD HH:mm:SS")
   }
 }
-(global as any).Utils = Utils_
+(global as any).Utils = Utils
