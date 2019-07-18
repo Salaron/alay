@@ -1,8 +1,8 @@
 node_modules/*
 compile/*
-data/*
-src/config/*
 
+src/config/*
 tsconfig.tsbuildinfo
 
+data/**/*.db_
 !data/db/live_notes.db_
