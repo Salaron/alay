@@ -13,7 +13,7 @@ interface PoolConfig extends mysql.PoolConfig {
   disconnected: Function
 }
 
-export class database {
+export class ConnectionPool {
   public config: PoolConfig
   public pool: mysql.Pool
   public reconnectAttempts: number
@@ -21,7 +21,8 @@ export class database {
   public createdConnections: mysql.PoolConnection[]
   public acquiringConnections: mysql.PoolConnection[]
   private debugInterval: any
-  constructor(config: any) {
+  private available = false
+  constructor(config: Database) {
     this.config = extend({
       autoReconnect: true,
       autoReconnectDelay: 1000,
@@ -36,29 +37,29 @@ export class database {
     this.reconnectAttempts = 0
   }
 
-  public async connect() {
+  public async connect(): Promise<void> {
     return new Promise(async (res, rej) => {
       try {
         this.pool = mysql.createPool(this.config)
         this.pool.on("error", async (err) => {
-          log.error(err)
-          await this.handleDisconnect(err)
+          await this.handleError(err)
         })
 
         let connection = await Connection.get()
         await Promise.all([
           connection.query(`SET names utf8`),
-          connection.query(`SET SESSION group_concat_max_len = 4294967295`), // max of int32
-          connection.query(`SET @@sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""))`)
+          connection.query(`SET SESSION group_concat_max_len = 4294967295`) // max of int32
         ])
         await connection.commit()
 
+        this.available = true
         this.reconnectAttempts = 0
         this.freeConnections = (<any>this.pool)._freeConnections
         this.createdConnections = (<any>this.pool)._allConnections
         this.acquiringConnections = (<any>this.pool)._acquiringConnections
         res()
       } catch (err) {
+        await this.handleError(err)
         rej(err)
       }
     })
@@ -69,11 +70,12 @@ export class database {
       try {
         if (connection === undefined) connection = await this.getConnection()
       } catch (err) {
+        if (connection != undefined && this.freeConnections.indexOf(connection) === -1) connection.release()
         return rej(err)
       }
       connection.beginTransaction(async (err) => {
         if (err) {
-          await this.handleDisconnect(err)
+          if (connection != undefined && this.freeConnections.indexOf(connection) === -1) connection.release()
           return rej(err)
         }
         res(connection)
@@ -84,8 +86,7 @@ export class database {
     return new Promise(async (res, rej) => {
       connection.commit(async (err) => {
         if (err) {
-          if (this.freeConnections.indexOf(connection) === -1) connection.release()
-          await this.handleDisconnect(err)
+          if (this.freeConnections.indexOf(connection) === -1 && release == true) connection.release()
           return rej(err)
         }
         if (release == true) connection.release()
@@ -97,8 +98,7 @@ export class database {
     return new Promise(async (res, rej) => {
       connection.rollback(async (err) => {
         if (err) {
-          if (this.freeConnections.indexOf(connection) === -1) connection.release()
-          await this.handleDisconnect(err)
+          if (this.freeConnections.indexOf(connection) === -1 && release == true) connection.release()
           return rej(err)
         }
         if (release == true) connection.release()
@@ -114,13 +114,13 @@ export class database {
         if (connection == undefined) connection = await this.getConnection()
         else transaction = true
       } catch (err) {
-        rej(err)
+        if (connection != undefined && this.freeConnections.indexOf(connection) === -1 && !transaction) connection.release()
+        return rej(err)
       }
       (<mysql.PoolConnection>connection).query(query, values, async (err, result) => {
         if (!transaction) (<mysql.PoolConnection>connection).release()
         if (err) {
           log.error(`The error has occurred while performing a query:\n"${query}" with this values: ${JSON.stringify(values)}`)
-          await this.handleDisconnect(err)
           return rej(err)
         }
         res(result)
@@ -130,8 +130,13 @@ export class database {
   public async first(query: string, values: any = {}, connection?: mysql.PoolConnection): Promise<any> {
     return new Promise(async (res, rej) => {
       let transaction = false
-      if (connection == undefined) connection = await this.getConnection()
-      else transaction = true
+      try {
+        if (connection == undefined) connection = await this.getConnection()
+        else transaction = true
+      } catch (err) {
+        if (connection != undefined && this.freeConnections.indexOf(connection) === -1 && !transaction) connection.release()
+        return rej(err)
+      }
 
       if (query.slice(-1) === ";") query = query.slice(0, -1) // remove ";" -- the end of query
       // select only 1 element 
@@ -139,7 +144,6 @@ export class database {
         if (!transaction) (<mysql.PoolConnection>connection).release()
         if (err) {
           log.error(`The error has occurred while performing a query:\n"${query}" with this values: ${JSON.stringify(values)}`)
-          await this.handleDisconnect(err)
           return rej(err)
         }
         if (typeof result === "object" && Array.isArray(result)) {
@@ -155,7 +159,7 @@ export class database {
     if (typeof this.debugInterval === "undefined" && log.level >= Log.LEVEL.DEBUG) {
       log.debug(`Pool Connection Debug Info Enabled`)
       this.debugInterval = setInterval(() => {
-        log.debug(`Pool connection limit: ${MySQLdatabase.config.connectionLimit}`)
+        log.debug(`Pool connection limit: ${MySQLconnectionPool.config.connectionLimit}`)
         log.debug(`Created connections: ${this.createdConnections.length}`)
         log.debug(`Free connections: ${this.freeConnections.length}`)
         log.debug(`Active connections: ${this.acquiringConnections.length}`)
@@ -169,31 +173,22 @@ export class database {
 
   private async getConnection(): Promise<mysql.PoolConnection> {
     return new Promise((res, rej) => {
-      this.pool.getConnection((err, connection) => {
-        if (err) return rej(err)
+      this.pool.getConnection(async(err, connection) => {
+        if (err) {
+          await this.handleError(err)
+          rej(err)
+        }
         res(connection)
       })
     })
   }
 
-  private async handleDisconnect(error: mysql.MysqlError, hideMessage: boolean = false): Promise<void> {
-    if (!hideMessage) log.error(error.message + " [" + error.code + "]")
+  private async handleError(error: mysql.MysqlError): Promise<void> {
+    log.error(error.message + " [" + error.code + "]")
     switch (error.code) {
       case "ECONNREFUSED":
       case "PROTOCOL_CONNECTION_LOST": {
-        if (this.config.autoReconnect != true) this.config.disconnected.call(this, error, "Auto-Reconnect Disabled")
-        if (this.config.autoReconnectMaxAttempt < this.reconnectAttempts) this.config.disconnected.call(this, error, "Max Reconnect Attempts")
-        this.reconnectAttempts += 1
-        try {
-          await promisify(this.connect)()
-          log.info("Reconnected")
-        } catch (err) {
-          let t = this
-          setTimeout(function () {
-            t.handleDisconnect(err, false)
-          }, this.config.autoReconnectDelay)
-        }
-        break
+        this.config.disconnected.call(this, error, "Auto-Reconnect Disabled") // TODO
       }
     }
   }
@@ -210,7 +205,7 @@ export class Connection {
     this.connection = connection
   }
   static async get() {
-    let connection = await MySQLdatabase.beginTransaction()
+    let connection = await MySQLconnectionPool.beginTransaction()
     return new Connection(connection)
   }
 
@@ -218,28 +213,28 @@ export class Connection {
     this.checkIfReleased()
 
     if (releaseConnection === true) {
-      await MySQLdatabase.commit(this.connection, true)
+      await MySQLconnectionPool.commit(this.connection, true)
       this.released = true
     } else {
-      await MySQLdatabase.commit(this.connection, false)
-      await MySQLdatabase.beginTransaction(this.connection)
+      await MySQLconnectionPool.commit(this.connection, false)
+      await MySQLconnectionPool.beginTransaction(this.connection)
     }
   }
   async rollback() {
     this.checkIfReleased()
-    await MySQLdatabase.rollback(this.connection)
+    await MySQLconnectionPool.rollback(this.connection)
     this.released = true
   }
 
   async query(query: string, values: any = {}) {
     this.checkIfReleased()
     this.lastQuery = query
-    return await MySQLdatabase.query(query, values, this.connection)
+    return await MySQLconnectionPool.query(query, values, this.connection)
   }
   async first(query: string, values: any = {}) {
     this.checkIfReleased()
     this.lastQuery = query
-    return await MySQLdatabase.first(query, values, this.connection)
+    return await MySQLconnectionPool.first(query, values, this.connection)
   }
 
   private checkIfReleased() {
@@ -356,13 +351,14 @@ export function formatQuery(query: string, values: any) {
 let reconnectAttempts = 0
 export async function MySQLConnect() {
   try {
-    (<any>global).MySQLdatabase = new database(extend({
+    (<any>global).MySQLconnectionPool = new ConnectionPool(extend({
       disconnected: async function () {
         log.fatal("Lost connection to MySQL Database")
         process.exit(0)
       },
     }, Config.database))
-    await MySQLdatabase.connect()
+    await MySQLconnectionPool.connect()
+    log.info("Connected to MySQL Database")
     reconnectAttempts = 0
   } catch (e) {
     reconnectAttempts += 1

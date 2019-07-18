@@ -1,4 +1,3 @@
-
 export class ErrorCode extends Error {
   public code: number
   public response: any

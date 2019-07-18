@@ -52,7 +52,7 @@ export class config {
     }
 
     log.info("Server version: " + Config.server.server_version)
-    log.info("Сlient app version: " + Config.client.application_version)
+    log.info("Bundle version: " + Config.client.application_version)
   }
 
   async reloadConfig() {
@@ -72,7 +72,8 @@ export class config {
     this.lbonus = <typeof LBonus><unknown>(await import("../config/lbonus")).default
     this.llsifclient = <typeof LLclient><unknown>(await import("../config/LLclient")).default
     this.modules = <typeof Modules><unknown>(await import("../config/modules")).default
-    this.i18n = <typeof I18n><unknown>(await import("../config/i18n")).default
+    this.i18n = <typeof I18n><unknown>(await import("../config/i18n")).default;
+    (<any>global).logLevel = this.server.log_level
 
     await this.prepareConfig()
   }

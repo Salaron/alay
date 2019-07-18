@@ -30,7 +30,18 @@ export default function initReadLine() {
 
 const commands = {
   connectionDebug: async function() {
-    MySQLdatabase.connectionDebug(arguments[0])
+    try {
+      MySQLconnectionPool.connectionDebug(arguments[0])
+    } catch (err) {
+      log.error(err)
+    }
+  },
+  reloadConfig: async function() {
+    try {
+      await Config.reloadConfig()
+    } catch (err) {
+      log.error(err)
+    }
   },
   exit: async function() {
     process.exit(0)

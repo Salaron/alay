@@ -1,4 +1,4 @@
-import { Connection as Connection_, database, Sqlite3 } from "../src/core/database"
+import { Connection as Connection_, ConnectionPool, Sqlite3 } from "../src/core/database"
 import Log from "../src/core/log"
 import { config } from "../src/core/config"
 import { ErrorCode as errorCode } from "../src/handlers/errorHandler"
@@ -9,7 +9,7 @@ declare global {
   const rootDir: string
   // database stuff
   const MySQLconnection: typeof Connection_
-  const MySQLdatabase: database
+  const MySQLconnectionPool: ConnectionPool
   const sqlite3: Sqlite3
   // log level
   const logLevel: Log.LEVEL

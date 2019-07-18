@@ -13,6 +13,7 @@ interface Database {
   dateStrings: boolean
   host: string
   user: string
+  port?: number
   password: string
   database: string
 }
