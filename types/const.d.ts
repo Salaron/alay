@@ -22,3 +22,16 @@ export enum HANDLER_TYPE {
   WEBAPI,
   WEBVIEW
 }
+export enum PERMISSION {
+  NOXMC,
+  XMC,
+  STATIC
+}
+export enum TYPE {
+  INT,
+  FLOAT,
+  NUMBER, // INT or FLOAT
+  BOOLEAN,
+  STRING,
+  NULL
+}

@@ -6,6 +6,7 @@ import mainHandler from "./mainHandler"
 import webviewHandler from "./webviewHandler"
 import webapiHandler from "./webapihandler"
 import resourcesHandler from "./resourcesHandler"
+import { writeJsonResponse } from "./apiHandler"
 
 const log = new Log.Create(logLevel, "Request Handler")
 
@@ -28,6 +29,23 @@ export default async function requestHandler(request: IncomingMessage, response:
             request.headers["authorize"] &&
             request.headers["x-message-code"])
         ) return sendError(`[main.php] Invalid request`)
+
+        if (
+          Config.server.maintenance === true &&
+          ![ // allow access to login stuff
+            "login/authkey",
+            "login/login"
+          ].includes(`${urlSplit[2]}/${urlSplit[3]}`) &&
+          !Config.server.bypass_maintenance.includes(parseInt(<string>request.headers["user-id"])) // check if this user can bypass maintenance
+        ) {
+          return writeJsonResponse(response, { maintenanceFlag: true })
+        }
+
+        // Bundle is outdate
+        if (Utils.versionCompare(<string>request.headers["bundle-version"], Config.client.application_version) === -1) {
+          return writeJsonResponse(response, { clientUpdateFlag: true })
+        }
+
         await mainHandler(request, response)
       }
       case "webview.php": {

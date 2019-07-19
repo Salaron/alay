@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http"
+import { IncomingForm } from "formidable"
 import querystring from "querystring"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../../types/const"
 import Log from "../core/log"
@@ -13,16 +14,18 @@ export default class RequestData {
   public auth_header: Authorize
   public headers: any
   public request: IncomingMessage
-  public type: HANDLER_TYPE
+  public handlerType: HANDLER_TYPE
   public connection: Connection
   public formData: any
 
   private raw_request_data: any // JSON parse remove some symbols from fromData
   private auth_level_check = false
+  private response: ServerResponse
   constructor (request: IncomingMessage, response: ServerResponse, formData: any, hType: HANDLER_TYPE) {
     this.headers = request.headers
     this.request = request
-    this.type = hType
+    this.response = response
+    this.handlerType = hType
 
     if (this.headers.authorize && this.headers["user-id"]) {
       this.user_id = parseInt(this.headers["user-id"])
@@ -60,7 +63,8 @@ export default class RequestData {
       }
     }
   }
-  static async Create(request: IncomingMessage, response: ServerResponse, formData: any, type: HANDLER_TYPE) {
+  static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {
+    let formData = await formidableParseAsync(request)
     let rd = new RequestData(request, response, formData, type)
     rd.connection = await MySQLconnection.get()
     return rd
@@ -121,4 +125,14 @@ export default class RequestData {
 
     return xmc === this.headers["x-message-code"]
   }
+}
+
+async function formidableParseAsync(request: IncomingMessage): Promise<any> {
+  return new Promise((res, rej) => {
+    let form = new IncomingForm()
+    form.parse(request, (err, fields) => {
+      if (err) return rej(err)
+      res(fields)
+    })
+  })
 }

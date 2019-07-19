@@ -1,8 +1,10 @@
 import { Connection as Connection_, ConnectionPool, Sqlite3 } from "../src/core/database"
 import Log from "../src/core/log"
 import { config } from "../src/core/config"
-import { ErrorCode as errorCode } from "../src/handlers/errorHandler"
+import { ErrorCode as errorCode, ErrorUser as errorUser } from "../src/handlers/errorHandler"
 import { Utils as utils } from "../src/common/utils"
+import { Type as type_ } from "../src/common/type"
+import { TYPE as type } from "../types/const"
 
 declare global {
   // make project root dir global (for easy access to root files)
@@ -17,6 +19,9 @@ declare global {
   const Config: config
   const Utils: typeof utils
   const ErrorCode: typeof errorCode
+  const ErrorUser: typeof errorUser
+  const TYPE: typeof type
+  const Type: typeof type_
 
   type Connection = Connection_
 

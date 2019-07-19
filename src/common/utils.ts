@@ -187,5 +187,9 @@ export class Utils {
     if (!date) date = new Date()
     return moment(date).utcOffset(`+0${utcOffset}00`).format("YYYY-MM-DD HH:mm:SS")
   }
+
+  static timeStamp() {
+    return Math.floor(Date.now() / 1000)
+  }
 }
 (global as any).Utils = Utils
