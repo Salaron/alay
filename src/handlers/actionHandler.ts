@@ -7,10 +7,10 @@ let cache = <any>{}
 
 interface Options {
   xmc?: string
-  responseType: RESPONSE_TYPE
+  responseType?: RESPONSE_TYPE
 }
 
-export default async function executeAction(module: string, action: string, requestData: RequestData, options: Options) {
+export default async function executeAction(module: string, action: string, requestData: RequestData, options: Options = {}) {
   if (module.length === 0 || action.length === 0) throw new ErrorUser(`Module or Action was not provided (${module}/${action})`, requestData.user_id)
   module = module.replace(/\s/g, "X").toLowerCase()
   action = action.replace(/\s/g, "X").toLowerCase()

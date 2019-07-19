@@ -33,15 +33,17 @@ export default class RequestData {
         this.auth_token = this.auth_header.token
       }
     }
-    if (this.headers["user-id"]) this.user_id = parseInt(this.headers["user-id"])
+    if (this.headers["user-id"]) this.user_id = parseInt(this.headers["user-id"]) || null
     if (hType === HANDLER_TYPE.WEBVIEW) {
       // for webview available additional variants: queryString and cookie
       // queryString:
-      let queryString = querystring.parse(this.request.url!.split(/[?]+/)[1])
-      if (queryString.user_id && queryString.token) {
-        // TODO
+      this.formData = querystring.parse(this.request.url!.split(/[?]+/)[1])
+      if (this.formData.user_id && this.formData.token) {
+        this.user_id = parseInt(this.formData.user_id) || null
+        this.auth_token = this.formData.token
       } else { // cookie
-        // TODO
+        this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id")) || null
+        this.auth_token = getCookie(<string>this.headers["cookie"] || "", "token")
       }
       if (this.user_id != null && this.auth_token != null) {
         response.setHeader("Set-Cookie", [
@@ -51,7 +53,7 @@ export default class RequestData {
       }
     }
 
-    if (formData && formData.request_data) {
+    if (formData && formData.request_data && hType === HANDLER_TYPE.MAIN) {
       try {
         this.raw_request_data = formData.request_data
         this.formData = JSON.parse(formData.request_data)
@@ -136,4 +138,18 @@ async function formidableParseAsync(request: IncomingMessage): Promise<any> {
       res(fields)
     })
   })
+}
+function getCookie(cheader: string, cname: string) {
+  let name = cname + "="
+  let cArray = cheader.split(";")
+  for(let i = 0; i < cArray.length; i++) {
+    let c = cArray[i]
+    while (c.charAt(0) == " ") {
+      c = c.substring(1)
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length)
+    }
+  }
+  return null
 }

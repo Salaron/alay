@@ -1,4 +1,5 @@
 import "./core/config"
+import "./handlers/errorHandler"
 import { resolve } from "path"
 import * as Database from "./core/database"
 import { Log } from "./core/log"

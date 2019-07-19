@@ -55,8 +55,7 @@ export default async function requestHandler(request: IncomingMessage, response:
           !(urlSplit.length >= 3 &&
             request.method === "GET")
         ) return sendError(`[webview.php] Invalid request`)
-        return sendError(`Not implemented yet.`)
-        await webviewHandler(request, response)
+        return await webviewHandler(request, response)
       }
       case "webapi": {
         if (
@@ -71,8 +70,18 @@ export default async function requestHandler(request: IncomingMessage, response:
         await webapiHandler(request, response)
       }
       case "resources": {
-        return sendError(`Not implemented yet.`)
-        await resourcesHandler(request, response)
+        if (urlSplit[3] === "update.php") {
+          response.statusCode = 302
+          response.setHeader("Location", "../../webview.php/static/index?id=12")
+          return response.end()
+        } else if (urlSplit[3] === "maintenance.php") {
+          request.url = "resources/maintenance/maintenance.html"
+        } else if (urlSplit[3] === "maintenance.php") {
+          response.statusCode = 302
+          response.setHeader("Location", "../../webview.php/login/startUp") // todo
+          return response.end()
+        }
+        return await resourcesHandler(request, response)
       }
       default: { // Not support
         return sendError()
