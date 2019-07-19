@@ -1,4 +1,4 @@
-import Log from "./log"
+import { Log } from "./log"
 
 // import config files
 import Server from "../config/server"
@@ -8,9 +8,7 @@ import LBonus from "../config/lbonus"
 import LLclient from "../config/LLclient"
 import Modules from "../config/modules"
 import I18n from "../config/i18n"
-
-const log = new Log.Create(Server.log_level, "Config Manager");
-(<any>global).logLevel = Server.log_level
+import Maintenance from "../config/maintenance"
 
 export class config {
   public lbonus: typeof LBonus
@@ -20,6 +18,7 @@ export class config {
   public modules: typeof Modules
   public llsifclient: typeof LLclient
   public i18n: typeof I18n
+  public maintenance: typeof Maintenance
 
   public specialKey: string | Buffer = ""
   constructor() {
@@ -30,18 +29,16 @@ export class config {
     this.llsifclient = LLclient
     this.lbonus = LBonus
     this.i18n = I18n
+    this.maintenance = Maintenance
   }
 
   async prepareConfig(): Promise<void> {
-    log.level = this.server.log_level
-
+    const log = new Log("Config Manager")  
     if (this.server.debug_mode) this.server.XMC_check = false
 
     this.specialKey = Buffer.concat([Utils.xor(this.client.application_key.slice(0, 16), this.client.XMC_base.slice(16, 32)), Utils.xor(this.client.application_key.slice(16, 32), this.client.XMC_base.slice(0, 16))])
 
-    if (Config.server.maintenance) {
-      log.warn("Maintenance mode enabled")
-    }
+    if (Config.maintenance.force_enabled) log.warn("Maintenance mode enabled")
     if (Config.client.application_key.length != 32 && Config.server.XMC_check === true) {
       log.warn("Application key is missing. XMC verifying will be disabled")
       Config.server.XMC_check = false
@@ -66,6 +63,7 @@ export class config {
     delete require.cache[require.resolve("../config/LLclient")]
     delete require.cache[require.resolve("../config/modules")]
     delete require.cache[require.resolve("../config/i18n")]
+    delete require.cache[require.resolve("../config/maintenance")]
 
     // and import again
     this.server = <typeof Server><unknown>(await import("../config/server")).default
@@ -74,7 +72,8 @@ export class config {
     this.lbonus = <typeof LBonus><unknown>(await import("../config/lbonus")).default
     this.llsifclient = <typeof LLclient><unknown>(await import("../config/LLclient")).default
     this.modules = <typeof Modules><unknown>(await import("../config/modules")).default
-    this.i18n = <typeof I18n><unknown>(await import("../config/i18n")).default;
+    this.i18n = <typeof I18n><unknown>(await import("../config/i18n")).default
+    this.maintenance = <typeof Maintenance><unknown>(await import("../config/maintenance")).default;
     (<any>global).logLevel = this.server.log_level
 
     await this.prepareConfig()

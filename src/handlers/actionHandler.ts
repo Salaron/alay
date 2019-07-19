@@ -1,8 +1,8 @@
 import RequestData from "../core/requestData"
 import { HANDLER_TYPE, REQUEST_TYPE, PERMISSION, TYPE, RESPONSE_TYPE } from "../types/const"
-import Log from "../core/log"
+import { Log } from "../core/log"
 
-const log = new Log.Create(logLevel, "Action Handler")
+const log = new Log("Action Handler")
 let cache = <any>{}
 
 interface Options {

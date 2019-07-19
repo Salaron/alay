@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http"
-import Log from "../core/log"
+import { Log } from "../core/log"
 
 // Various handlers
 import mainHandler from "./mainHandler"
@@ -8,7 +8,7 @@ import webapiHandler from "./webapihandler"
 import resourcesHandler from "./resourcesHandler"
 import { writeJsonResponse } from "./apiHandler"
 
-const log = new Log.Create(logLevel, "Request Handler")
+const log = new Log("Request Handler")
 
 export default async function requestHandler(request: IncomingMessage, response: ServerResponse): Promise<void> {
   try {
@@ -31,12 +31,14 @@ export default async function requestHandler(request: IncomingMessage, response:
         ) return sendError(`[main.php] Invalid request`)
 
         if (
-          Config.server.maintenance === true &&
+          Config.maintenance.force_enabled === true &&
           ![ // allow access to login stuff
             "login/authkey",
             "login/login"
           ].includes(`${urlSplit[2]}/${urlSplit[3]}`) &&
-          !Config.server.bypass_maintenance.includes(parseInt(<string>request.headers["user-id"])) // check if this user can bypass maintenance
+          // check if this user can bypass maintenance
+          (!Config.maintenance.bypass.includes(parseInt(<string>request.headers["user-id"])) && 
+           !Config.server.admin_ids.includes(parseInt(<string>request.headers["user-id"])))
         ) {
           return writeJsonResponse(response, { maintenanceFlag: true })
         }

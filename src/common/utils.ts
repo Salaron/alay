@@ -1,9 +1,9 @@
-import Log from "../core/log"
+import { Log } from "../core/log"
 import crypto from "crypto"
 import { Connection } from "../core/database"
 import moment from "moment"
 
-const log = new Log.Create(logLevel, "Utils")
+const log = new Log("Utils")
 
 export async function init() {
   // Handle Clearing Temp Auth Tokens every 15 sec

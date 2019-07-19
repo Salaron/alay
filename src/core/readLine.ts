@@ -1,7 +1,7 @@
 import readline from "readline"
-import Log from "./log"
+import { Log } from "./log"
 
-const log = new Log.Create(logLevel, "ReadLine")
+const log = new Log("ReadLine")
 const readLineInterface = readline.createInterface({
   input: process.stdin,
   output: process.stdout

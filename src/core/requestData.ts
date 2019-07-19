@@ -2,10 +2,10 @@ import { IncomingMessage, ServerResponse } from "http"
 import { IncomingForm } from "formidable"
 import querystring from "querystring"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../types/const"
-import Log from "../core/log"
+import { Log } from "../core/log"
 import chalk from "chalk"
 
-const log = new Log.Create(logLevel, "Request Data")
+const log = new Log("Request Data")
 
 export default class RequestData {
   public user_id: number | null = null

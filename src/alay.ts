@@ -1,14 +1,14 @@
 import "./core/config"
 import { resolve } from "path"
 import * as Database from "./core/database"
-import Log from "./core/log"
+import { Log } from "./core/log"
 import ReadLine from "./core/readLine"
 import http from "http"
 import requestHandler from "./handlers/requestHandler"
 
 import * as modules from "./common"
 
-const log = new Log.Create(logLevel, "Setup");
+const log = new Log("Setup");
 (<any>global).rootDir = `${resolve(__dirname)}/../`;
 
 // Entry point

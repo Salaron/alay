@@ -3,10 +3,10 @@ import { IncomingMessage, ServerResponse } from "http"
 import { writeJsonResponse } from "../handlers/apiHandler"
 import executeAction from "../handlers/actionHandler"
 import RequestData from "../core/requestData"
-import Log from "../core/log"
+import { Log } from "../core/log"
 import chalk from "chalk"
 
-const log = new Log.Create(logLevel, "Main Handler")
+const log = new Log("Main Handler")
 
 export default async function moduleHandler(request: IncomingMessage, response: ServerResponse) {
   let requestData = await RequestData.Create(request, response, HANDLER_TYPE.MAIN)

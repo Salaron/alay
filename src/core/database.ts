@@ -1,11 +1,11 @@
 import * as mysql from "mysql"
-import Log from "./log"
+import { Log, LEVEL } from "./log"
 import extend from "extend"
 import { promisify } from "util"
 import sqlite3 from "./sqlite3"
 import { existsSync } from "fs"
 
-const log = new Log.Create(logLevel, "Database")
+const log = new Log("Database")
 interface PoolConfig extends mysql.PoolConfig {
   autoReconnect: boolean
   autoReconnectMaxAttempt: number
@@ -156,7 +156,7 @@ export class ConnectionPool {
   }
 
   public connectionDebug(interval = 3000) {
-    if (typeof this.debugInterval === "undefined" && log.level >= Log.LEVEL.DEBUG) {
+    if (typeof this.debugInterval === "undefined" && Config.server.log_level >= LEVEL.DEBUG) {
       log.debug(`Pool Connection Debug Info Enabled`)
       this.debugInterval = setInterval(() => {
         log.debug(`Pool connection limit: ${MySQLconnectionPool.config.connectionLimit}`)

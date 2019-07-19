@@ -1,5 +1,4 @@
 import { Connection as Connection_, ConnectionPool, Sqlite3 } from "../core/database"
-import Log from "../core/log"
 import { config } from "../core/config"
 import { ErrorCode as errorCode, ErrorUser as errorUser } from "../handlers/errorHandler"
 import { Utils as utils } from "../common/utils"
@@ -12,8 +11,6 @@ declare global {
   const MySQLconnection: typeof Connection_
   const MySQLconnectionPool: ConnectionPool
   const sqlite3: Sqlite3
-  // log level
-  const logLevel: Log.LEVEL
   // various modules
   const Config: config
   const Utils: typeof utils

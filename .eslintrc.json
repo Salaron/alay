@@ -49,7 +49,6 @@
     "@typescript-eslint/no-angle-bracket-type-assertion": "off",
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-triple-slash-reference": "off",
-    "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/member-delimiter-style": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-object-literal-type-assertion": "off",
