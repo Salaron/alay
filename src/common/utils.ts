@@ -93,8 +93,8 @@ export class Utils {
     let encrypted = cipher.update(data, "utf8")
     encrypted = Buffer.concat([encrypted, cipher.final()])
     return Buffer.concat([iv, encrypted]).toString("base64")
-  }
-  static AESDecrypt(key: string, data: string) {
+  } 
+  static AESDecrypt(key: any, data: any) {
     let dataBuf = Buffer.from(data, "base64")
     let keyBuf = Buffer.from(key, "base64")
     let iv = dataBuf.slice(0, 16)
@@ -153,23 +153,6 @@ export class Utils {
     return JSON.parse(JSON.stringify(object))
   }
 
-  async createToken(loginKey: string, loginPasswd: string, token: string, sessionKey: string, expire: number) {
-    let data = await this.connection.first("SELECT token FROM auth_tokens WHERE token = :token", { token: token })
-    if (data.length != 0) return false
-
-    await this.connection.query("INSERT INTO auth_tokens (token, expire, session_key, login_key, login_passwd) VALUES (:token, :expire, :sk, :lk, :lp)", {
-      token: token,
-      expire: Utils.parseDate(expire),
-      sk: sessionKey,
-      lk: loginKey,
-      lp: loginPasswd
-    })
-    return token
-  }
-
-  async destroyToken(token: string): Promise<void> {
-    await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: token })
-  }
   static randomString(length: number, options?: string) {
     let result = ""
     let base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"

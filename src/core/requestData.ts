@@ -17,8 +17,8 @@ export default class RequestData {
   public handlerType: HANDLER_TYPE
   public connection: Connection
   public formData: any
-
-  private raw_request_data: any // JSON parse remove some symbols from fromData
+  public raw_request_data: any // JSON parse remove some symbols from fromData
+  
   private auth_level_check = false
   private response: ServerResponse
   constructor(request: IncomingMessage, response: ServerResponse, formData: any, hType: HANDLER_TYPE) {
