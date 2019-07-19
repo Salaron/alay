@@ -14,7 +14,7 @@ export enum REQUEST_TYPE {
   MULTI
 }
 export enum RESPONSE_TYPE {
-  SINGLE,
+  SINGLE = 1,
   MULTI
 }
 export enum HANDLER_TYPE {

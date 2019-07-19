@@ -18,7 +18,6 @@ export async function init() {
           count += 1
         })
         await connection.commit()
-        log.verbose(`Removed ${count} temporary auth tokens`)
       } catch (err) {
         connection.rollback()
         log.error(err)
@@ -26,7 +25,7 @@ export async function init() {
     } catch (err) {
       log.error(err)
     }    
-  }, 1500)
+  }, 10000)
 }
 
 export class Utils {
@@ -114,7 +113,7 @@ export class Utils {
   static RSASign(data: string) {
     let sign = crypto.createSign("RSA-SHA1")
     sign.update(data)
-    return sign.sign(Config.server.PUBLIC_KEY, "base64")
+    return sign.sign(Config.server.PRIVATE_KEY, "base64")
   }
 
   // Bitwise XOR two values

@@ -1,6 +1,8 @@
 import RequestData from "../core/requestData"
-import { HANDLER_TYPE, REQUEST_TYPE, PERMISSION, TYPE, RESPONSE_TYPE } from "../../types/const"
+import { HANDLER_TYPE, REQUEST_TYPE, PERMISSION, TYPE, RESPONSE_TYPE } from "../types/const"
+import Log from "../core/log"
 
+const log = new Log.Create(logLevel, "Action Handler")
 let cache = <any>{}
 
 interface Options {
@@ -9,19 +11,19 @@ interface Options {
 }
 
 export default async function executeAction(module: string, action: string, requestData: RequestData, options: Options) {
+  if (module.length === 0 || action.length === 0) throw new ErrorUser(`Module or Action was not provided (${module}/${action})`, requestData.user_id)
+  module = module.replace(/\s/g, "X").toLowerCase()
+  action = action.replace(/\s/g, "X").toLowerCase()
+
+  let moduleFolder = "../modules/"
+  switch (requestData.handlerType) {
+    case HANDLER_TYPE.MAIN: moduleFolder += "main"; break
+    case HANDLER_TYPE.WEBAPI: moduleFolder += "webapi"; break
+    case HANDLER_TYPE.WEBVIEW: moduleFolder += "webview"; break
+    default: throw new Error(`Unknown handler type`)
+  }
+
   try {
-    if (module.length === 0 || action.length === 0) throw new ErrorUser(`Module or Action was not provided (${module}/${action})`, requestData.user_id)
-    module = module.replace(/\s/g, "X").toLowerCase()
-    action = action.replace(/\s/g, "X").toLowerCase()
-  
-    let moduleFolder = "../modules/"
-    switch (requestData.handlerType) {
-      case HANDLER_TYPE.MAIN: moduleFolder += "main"; break
-      case HANDLER_TYPE.WEBAPI: moduleFolder += "webapi"; break
-      case HANDLER_TYPE.WEBVIEW: moduleFolder += "webview"; break
-      default: throw new Error(`Unknown handler type`)
-    }
-  
     // load action
     if (!require.cache[require.resolve(`${moduleFolder}/${module}/${action}`)]) {
       let loaded = await import(`${moduleFolder}/${module}/${action}`)
@@ -42,16 +44,18 @@ export default async function executeAction(module: string, action: string, requ
     }
 
     if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUser(`No permissions`, requestData.user_id)
-    checkParams(requestData.formData, body.params)
+    if (body.paramTypes) checkParamTypes(requestData.formData, body.paramTypes())
+    if (body.paramCheck) body.paramCheck()
     return await body.execute()
   } catch (err) {
-
+    // handle module errors
+    throw err
+  } finally {
+    if (Config.server.debug_mode) delete require.cache[require.resolve(`${moduleFolder}/${module}/${action}`)]
   }
-  
-
 }
 
-function checkParams(input: any, inputTypes: any) {
+function checkParamTypes(input: any, inputTypes: any) {
   function checkType(value: any, type: TYPE) {
     if (!type) return true
     if (Array.isArray(type)) type = type[0]
@@ -69,12 +73,12 @@ function checkParams(input: any, inputTypes: any) {
   // input is array
   if (Array.isArray(input)) {
     input.forEach(value => {
-      if (typeof value === "object") checkParams(value, inputTypes)
+      if (typeof value === "object") checkParamTypes(value, inputTypes)
       else if (checkType(value, inputTypes) === false) throw new Error(`Expected ${TYPE[inputTypes] || TYPE[inputTypes[0]]}`)
     })
   } else if (typeof input === "object") {
     Object.keys(input).forEach(field => {
-      if (typeof inputTypes[field] === "object") checkParams(input[field], inputTypes[field])
+      if (typeof inputTypes[field] === "object") checkParamTypes(input[field], inputTypes[field])
       else if (inputTypes[field] && checkType(input[field], inputTypes[field]) === false) throw new Error(`Expected ${TYPE[inputTypes[field]]} for ${field}`)
     })
   } else {

@@ -124,7 +124,7 @@ interface Server {
   server_version: string
   XMC_check: boolean
   API_request_limit: number
-  log_level: import("../src/core/log").default.LEVEL // https://stackoverflow.com/questions/39040108/import-class-in-definition-file-d-ts
+  log_level: import("../core/log").default.LEVEL // https://stackoverflow.com/questions/39040108/import-class-in-definition-file-d-ts
   debug_mode: boolean
   admin_ids: number[]
   admin_pass: string

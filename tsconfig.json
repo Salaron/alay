@@ -7,6 +7,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./compile/",
+    "rootDir": "./src/",
     "preserveSymlinks": true,
     "removeComments": true,
     "strict": true,
@@ -14,12 +15,5 @@
     "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
-  },
-  "include": [
-    "src/**/*.ts",
-    "types/*"
-  ],
-  "exclude": [
-    "src/default_config/*" // exclude def config
-  ]
+  }
 }

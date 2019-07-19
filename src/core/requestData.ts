@@ -1,15 +1,15 @@
 import { IncomingMessage, ServerResponse } from "http"
 import { IncomingForm } from "formidable"
 import querystring from "querystring"
-import { AUTH_LEVEL, HANDLER_TYPE } from "../../types/const"
+import { AUTH_LEVEL, HANDLER_TYPE } from "../types/const"
 import Log from "../core/log"
 import chalk from "chalk"
 
 const log = new Log.Create(logLevel, "Request Data")
 
 export default class RequestData {
-  public user_id: number | null
-  public auth_token: string | null
+  public user_id: number | null = null
+  public auth_token: string | null = null
   public auth_level: AUTH_LEVEL = AUTH_LEVEL.NONE
   public auth_header: Authorize
   public headers: any
@@ -21,19 +21,20 @@ export default class RequestData {
   private raw_request_data: any // JSON parse remove some symbols from fromData
   private auth_level_check = false
   private response: ServerResponse
-  constructor (request: IncomingMessage, response: ServerResponse, formData: any, hType: HANDLER_TYPE) {
+  constructor(request: IncomingMessage, response: ServerResponse, formData: any, hType: HANDLER_TYPE) {
     this.headers = request.headers
     this.request = request
     this.response = response
     this.handlerType = hType
 
-    if (this.headers.authorize && this.headers["user-id"]) {
-      this.user_id = parseInt(this.headers["user-id"])
+    if (this.headers.authorize) {
       this.auth_header = <any>querystring.parse(this.headers.authorize)
       if (this.auth_header.token && (<string>this.auth_header.token).match(/^[a-z0-9]{70,90}$/gi)) {
         this.auth_token = this.auth_header.token
       }
-    } if (hType === HANDLER_TYPE.WEBVIEW) {
+    }
+    if (this.headers["user-id"]) this.user_id = parseInt(this.headers["user-id"])
+    if (hType === HANDLER_TYPE.WEBVIEW) {
       // for webview available additional variants: queryString and cookie
       // queryString:
       let queryString = querystring.parse(this.request.url!.split(/[?]+/)[1])
@@ -44,16 +45,16 @@ export default class RequestData {
       }
       if (this.user_id != null && this.auth_token != null) {
         response.setHeader("Set-Cookie", [
-          `user_id=${this.user_id}; expires=${new Date(new Date().getTime()+86409000).toUTCString()}; path=/;`, 
-          `token=${this.auth_token}; expires=${new Date(new Date().getTime()+86409000).toUTCString()}; path=/;`
-        ])  
+          `user_id=${this.user_id}; expires=${new Date(new Date().getTime() + 86409000).toUTCString()}; path=/;`,
+          `token=${this.auth_token}; expires=${new Date(new Date().getTime() + 86409000).toUTCString()}; path=/;`
+        ])
       }
     }
 
     if (formData && formData.request_data) {
       try {
         this.raw_request_data = formData.request_data
-        this.formData = JSON.parse(this.formData.request_data)
+        this.formData = JSON.parse(formData.request_data)
         this.formData.precise_score_log = undefined // Remove it for now
         let url = <string>this.request.url
         log.info(chalk["bgWhite"](chalk["black"]((url))) + " " + JSON.stringify(this.formData), "User #" + this.user_id)
@@ -115,9 +116,9 @@ export default class RequestData {
       if (!key) return false
       xmc = Utils.hmacSHA1(this.raw_request_data, key.session_key)
     } else if (this.auth_level >= AUTH_LEVEL.CONFIRMED_USER) {
-      let key = await this.connection.first(`SELECT session_key FROM user_login WHERE user_id = :user AND login_token = :token`, { 
-        user: this.user_id, 
-        token: this.auth_level 
+      let key = await this.connection.first(`SELECT session_key FROM user_login WHERE user_id = :user AND login_token = :token`, {
+        user: this.user_id,
+        token: this.auth_level
       })
       if (!key) return false
       return xmc = Utils.hmacSHA1(this.raw_request_data, key.session_key)

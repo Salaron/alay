@@ -46,7 +46,7 @@ export default async function requestHandler(request: IncomingMessage, response:
           return writeJsonResponse(response, { clientUpdateFlag: true })
         }
 
-        await mainHandler(request, response)
+        return await mainHandler(request, response)
       }
       case "webview.php": {
         if (
@@ -83,5 +83,7 @@ export default async function requestHandler(request: IncomingMessage, response:
     }
   } catch (err) {
     log.error(err)
+    response.statusCode = 500
+    response.end()
   }
 }
