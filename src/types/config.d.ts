@@ -137,8 +137,9 @@ interface ReleaseInfo {
 
 interface Maintenance {
   force_enabled: boolean
-  ticker: boolean
+  notice: boolean
   start_date: string
   end_date: string
+  time_zone: string
   bypass: number[]
 }

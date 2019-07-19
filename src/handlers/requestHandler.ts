@@ -74,11 +74,9 @@ export default async function requestHandler(request: IncomingMessage, response:
           response.statusCode = 302
           response.setHeader("Location", "../../webview.php/static/index?id=12")
           return response.end()
-        } else if (urlSplit[3] === "maintenance.php") {
-          request.url = "resources/maintenance/maintenance.html"
-        } else if (urlSplit[3] === "maintenance.php") {
+        } else if (request.url!.includes("maintenace/maintenance.php")) {
           response.statusCode = 302
-          response.setHeader("Location", "../../webview.php/login/startUp") // todo
+          response.setHeader("Location", "../../webview.php/static/index?id=10") // custom
           return response.end()
         }
         return await resourcesHandler(request, response)

@@ -55,10 +55,8 @@ export default async function executeAction(module: string, action: string, requ
   }
 }
 
-function checkParamTypes(input: any, inputTypes: any) {
+function checkParamTypes(input: any, inputType: any) {
   function checkType(value: any, type: TYPE) {
-    if (!type) return true
-    if (Array.isArray(type)) type = type[0]
     switch (type) {
       case TYPE.INT: return Type.isInt(value)
       case TYPE.FLOAT: return Type.isFloat(value)
@@ -70,18 +68,15 @@ function checkParamTypes(input: any, inputTypes: any) {
     }
   }
 
-  // input is array
-  if (Array.isArray(input)) {
-    input.forEach(value => {
-      if (typeof value === "object") checkParamTypes(value, inputTypes)
-      else if (checkType(value, inputTypes) === false) throw new Error(`Expected ${TYPE[inputTypes] || TYPE[inputTypes[0]]}`)
-    })
-  } else if (typeof input === "object") {
-    Object.keys(input).forEach(field => {
-      if (typeof inputTypes[field] === "object") checkParamTypes(input[field], inputTypes[field])
-      else if (inputTypes[field] && checkType(input[field], inputTypes[field]) === false) throw new Error(`Expected ${TYPE[inputTypes[field]]} for ${field}`)
+  if (Array.isArray(inputType)) {
+    log.warn("Checking arrays is not support")
+  } else if (typeof inputType === "object") {
+    Object.keys(inputType).forEach(field => {
+      if (typeof inputType[field] === "object") checkParamTypes(input[field], inputType[field])
+      else if (!input[field]) throw new Error(`Field "${field}" is missing in input`)
+      else if (!checkType(input[field], inputType[field])) throw new Error(`Expected type "${TYPE[inputType[field]]}" in "${field}" field`)
     })
   } else {
-    if (checkType(input, inputTypes) === false) throw new Error(`Expected ${TYPE[inputTypes]}`)
+    if (!checkType(input, inputType)) throw new Error(`Expected ${TYPE[inputType]}`)
   }
 }

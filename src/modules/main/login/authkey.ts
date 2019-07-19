@@ -71,7 +71,8 @@ export default class {
           key: authData[1],
           pass: authData[2]
         })
-        if (!id) id.user_id = 0
+        if (!id) id = { user_id: 0 }
+
         let assertation = JSON.parse(Buffer.from(authData[3], "base64").toString()) // check if it is correct JSON
 
         if (Config.modules.auth.auth_logging) {
