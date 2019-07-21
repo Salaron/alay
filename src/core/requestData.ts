@@ -10,15 +10,15 @@ const log = new Log("Request Data")
 export default class RequestData {
   public user_id: number | null = null
   public auth_token: string | null = null
+  public formData: any = null
   public auth_level: AUTH_LEVEL = AUTH_LEVEL.NONE
   public auth_header: Authorize
   public headers: any
   public request: IncomingMessage
   public handlerType: HANDLER_TYPE
   public connection: Connection
-  public formData: any
   public raw_request_data: any // JSON parse remove some symbols from fromData
-  
+
   private auth_level_check = false
   private response: ServerResponse
   constructor(request: IncomingMessage, response: ServerResponse, formData: any, hType: HANDLER_TYPE) {
@@ -58,12 +58,16 @@ export default class RequestData {
         this.raw_request_data = formData.request_data
         this.formData = JSON.parse(formData.request_data)
         this.formData.precise_score_log = undefined // Remove it for now
-        let url = <string>this.request.url
-        log.info(chalk["bgWhite"](chalk["black"]((url))) + " " + JSON.stringify(this.formData), "User #" + this.user_id)
       } catch (e) {
         log.error(e)
         this.auth_level = AUTH_LEVEL.REJECTED
       }
+    }
+    if (formData && hType === HANDLER_TYPE.WEBAPI) this.formData = formData
+
+    if (this.formData != null && Object.keys(this.formData).length > 0) {
+      let url = <string>this.request.url!.split(/[?]+/)[0]
+      log.info(chalk["bgWhite"](chalk["black"]((url))) + " " + JSON.stringify(this.formData), "User #" + this.user_id)
     }
   }
   static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {
@@ -128,6 +132,24 @@ export default class RequestData {
 
     return xmc === this.headers["x-message-code"]
   }
+
+  public getWebapiHeaders() {
+    let authorizeHeader = {
+      consumerKey: Config.client.consumer_key.length > 0 ? Config.client.consumer_key : "lovelive_test",
+      timeStamp: Utils.timeStamp(),
+      version: "1.1",
+      nonce: "WA0",
+      token: this.auth_token
+    }
+    let headers = {
+      "user-id": this.user_id!.toString(),
+      "bundle-version": this.headers["bundle-version"] || Config.client.application_version,
+      "client-version": this.headers["client-version"] || Config.server.server_version,
+      "application-id": this.headers["application-id"] || Config.client.application_id,
+      "authorize": querystring.stringify(authorizeHeader)
+    }
+    return headers
+  }
 }
 
 async function formidableParseAsync(request: IncomingMessage): Promise<any> {
@@ -142,7 +164,7 @@ async function formidableParseAsync(request: IncomingMessage): Promise<any> {
 function getCookie(cheader: string, cname: string) {
   let name = cname + "="
   let cArray = cheader.split(";")
-  for(let i = 0; i < cArray.length; i++) {
+  for (let i = 0; i < cArray.length; i++) {
     let c = cArray[i]
     while (c.charAt(0) == " ") {
       c = c.substring(1)

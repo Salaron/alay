@@ -1,0 +1,10 @@
+{
+  "common": {
+    "announce": "News",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "annouce-index": {
+    "more": "More..."
+  }
+}

@@ -64,7 +64,7 @@ function checkParamTypes(input: any, inputType: any) {
       case TYPE.STRING: return Type.isString(value)
       case TYPE.FLOAT: return Type.isBoolean(value)
       case TYPE.NULL: return Type.isNull(value)
-      default: throw new Error(`pidor`)
+      default: throw new Error(`Unsupported type provided`)
     }
   }
 

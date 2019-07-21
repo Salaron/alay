@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>SunLight WebView</title>
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=880, target-densitydpi=device-dpi, user-scalable=no">
+
+  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
+</head>
+
+<body>
+  <div id="outer">
+    <div id="inner">
+      <div id="header">
+        <div class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
+          uk-sticky="bottom: #offset">
+          <nav class="uk-navbar">
+            <div class="uk-navbar-center" id="navbar">
+              <ul class="uk-navbar-nav">
+                <li class="uk-active"><a href="/webview.php/announce/index" onclick="return false;">{{announce}}</a>
+                </li>
+                <li><a href="/webview.php/profile/index">{{profile}}</a></li>
+                <li><a href="/webview.php/settings/index">{{settings}}</a></li>
+                {{#if isAdmin}}
+                <li><a href="/webview.php/admin/index">APanel</a></li>
+                {{/if}}
+              </ul>
+            </div>
+
+            <div class="uk-navbar-right">
+              <ul class="uk-navbar-nav">
+                <li><a uk-icon="users">{{currentOnline}}</a></li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      <div id="body">
+      </div>
+    </div>
+  </div>
+
+  <!-- JS FILES -->
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/handlebars.runtime.min.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
+
+  <script type="text/javascript" src="/resources/templates/announce-index.js"></script>
+  <script>
+    var langSettings = JSON.parse(escapeJSON('{{{language}}}'))
+    var headers = JSON.parse(escapeJSON('{{{headers}}}'))
+    var announceTotal = 1 // Start from 1 so that we can load the list
+    var loadAttempt = 0 // Just in case, in order not to overload the server
+    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
+    var announceTemplate = Handlebars.templates["announce-index"]
+
+    $(document).ready(function () {
+      loadNews(function () {
+        // check if current url contains query string
+        var queryString = window.location.href.split("?")[1]
+        if (!queryString) return
+
+        // if it is we check if it also contains 'id' element
+        var queryObject = parseQueryString(queryString)
+        if (!queryObject.id) return
+
+        // send request to server to make sure this record is in the database
+        checkIfExists(queryObject.id, function (result) {
+          if (result != true) return
+
+          function loadUntil() {
+            if ($("#announce-" + queryObject.id).length != 0) {
+              $('#body,html').animate({
+                scrollTop: $("#announce-" + queryObject.id).offset().top
+              }, 'slow')
+              return
+            }
+            loadNews(loadUntil)
+          }
+          loadUntil()
+        })
+      })
+    })
+    $("#body").on('ps-y-reach-end', () => {
+      loadNews()
+    })
+
+    function loadNews(callback) {
+      if (loadAttempt > 3 || $(".uk-card-header").length === announceTotal) return
+      let before = $(".uk-card-header").length
+      $.when(sendRequest({
+        module: "announce",
+        action: "list",
+        offset: parseInt($(".uk-card-header").length),
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        announceTotal = response.total
+        response.more = langSettings.more
+        $("#body").append(announceTemplate(response))
+        ps.update()
+        if (before === $(".uk-card-header").length) loadAttempt += 1
+        else loadAttempt = 0
+        callback()
+      })
+    }
+
+    function checkIfExists(announceId, callback) {
+      $.when(sendRequest({
+        module: "announce",
+        action: "check",
+        id: parseInt(announceId),
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        callback(response)
+      })
+    }
+  </script>
+</body>
+
+</html>

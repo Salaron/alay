@@ -13,6 +13,7 @@ const log = new Log("Request Handler")
 export default async function requestHandler(request: IncomingMessage, response: ServerResponse): Promise<void> {
   try {
     response.setHeader("X-Powered-By", "SunLight Project v3 (Alay)")
+    request.url = request.url!.split("../").join("")
     if (request.url!.includes("favicon.ico")) return response.end() // ignore favicon.ico
     log.verbose(request.method + " " + request.url)
     let urlSplit = request.url!.toLowerCase().split("/")
@@ -59,15 +60,14 @@ export default async function requestHandler(request: IncomingMessage, response:
       }
       case "webapi": {
         if (
-          !(urlSplit.length == 2 &&
+          !(urlSplit.length >= 3 &&
             request.method === "POST" &&
             request.headers["client-version"] &&
             request.headers["authorize"] &&
             request.headers["user-id"]) &&
             request.headers["x-requested-with"] === "XMLHttpRequest"
         ) return sendError(`[webapi] Invalid request`)
-        return sendError(`Not implemented yet.`)
-        await webapiHandler(request, response)
+        return await webapiHandler(request, response)
       }
       case "resources": {
         if (urlSplit[3] === "update.php") {

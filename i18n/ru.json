@@ -1,11 +1,10 @@
 {
   "common": {
-    
+    "announce": "Новости",
+    "settings": "Настройки",
+    "profile": "Профиль"
   },
-  "webview": {
-
-  },
-  "modules": {
-  
+  "annouce-index": {
+    "more": "Читать далее..."
   }
 }

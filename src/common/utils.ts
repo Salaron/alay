@@ -2,6 +2,9 @@ import { Log } from "../core/log"
 import crypto from "crypto"
 import { Connection } from "../core/database"
 import moment from "moment"
+import { promisify } from "util"
+import { readFile } from "fs"
+import extend from "extend"
 
 const log = new Log("Utils")
 
@@ -24,7 +27,7 @@ export async function init() {
       }
     } catch (err) {
       log.error(err)
-    }    
+    }
   }, 10000)
 }
 
@@ -93,7 +96,7 @@ export class Utils {
     let encrypted = cipher.update(data, "utf8")
     encrypted = Buffer.concat([encrypted, cipher.final()])
     return Buffer.concat([iv, encrypted]).toString("base64")
-  } 
+  }
   static AESDecrypt(key: any, data: any) {
     let dataBuf = Buffer.from(data, "base64")
     let keyBuf = Buffer.from(key, "base64")
@@ -105,9 +108,9 @@ export class Utils {
 
   static RSADecrypt(data: string) {
     let buffer = Buffer.from(Buffer.from(data, "base64"))
-    return crypto.privateDecrypt({ 
-      key: Config.server.PRIVATE_KEY, 
-      padding: crypto.constants.RSA_PKCS1_PADDING 
+    return crypto.privateDecrypt({
+      key: Config.server.PRIVATE_KEY,
+      padding: crypto.constants.RSA_PKCS1_PADDING
     }, buffer).toString("base64")
   }
   static RSASign(data: string) {
@@ -134,7 +137,7 @@ export class Utils {
   }
 
   static hmacSHA1(data: string, key: string | Buffer) {
-    if (typeof key ===  "string") key = Buffer.from(key, "base64")
+    if (typeof key === "string") key = Buffer.from(key, "base64")
     let hmacsha1 = crypto.createHmac("sha1", key)
     hmacsha1.update(data)
     return hmacsha1.digest("hex")
@@ -172,6 +175,33 @@ export class Utils {
 
   static timeStamp() {
     return Math.floor(Date.now() / 1000)
+  }
+
+  public async getCurrentOnline() {
+    return (await this.connection.first("SELECT COUNT(*) as cnt FROM user_login WHERE last_activity>:now", {
+      now: moment(new Date()).subtract(10, "minutes").format("YYYY-MM-DD HH:mm:ss")
+    })).cnt
+  }
+  public async loadLocalization(section: string) {
+    let result: any = {}
+    let defaultStr = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${Config.i18n.defaultLanguage}.json`, `utf-8`))
+
+    for (let langName in Config.i18n.langCodes) {
+      let langCode = Config.i18n.langCodes[langName]
+      let file
+      try {
+        file = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${langCode}.json`, `utf-8`))
+      } catch (err) {
+        err.message = `Can't parse file with strings for '${langName}' language`
+        throw err
+      }
+      result[langCode] = {}
+      extend(true, result[langCode], defaultStr[section], defaultStr["common"] || {}, file[section], file["common"])
+    }
+    return result
+  }
+  public async getUserLangCode(userId: number): Promise<string> {
+    return (await this.connection.first("SELECT language FROM users WHERE user_id=:user", { user: userId })).language
   }
 }
 (global as any).Utils = Utils
