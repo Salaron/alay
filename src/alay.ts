@@ -7,22 +7,22 @@ import ReadLine from "./core/readLine"
 import http from "http"
 import requestHandler from "./handlers/requestHandler"
 
-import * as modules from "./common"
-
 const log = new Log("Setup");
 (<any>global).rootDir = `${resolve(__dirname)}/../`;
+// Prepare sqlite3 databases
+(<any>global).sqlite3 = new Database.Sqlite3()
+// Import common modules (!)after sqlite3
+import * as modules from "./common";
 
 // Entry point
-(async() => {
-  try { 
+(async () => {
+  try {
     // Load config
     await Config.prepareConfig()
     // Init readline interface
     ReadLine()
     // Connect to MySQL database
-    await Database.MySQLConnect();
-    // Prepare sqlite3 databases
-    (<any>global).sqlite3 = new Database.Sqlite3()
+    await Database.MySQLConnect()
     // Prepare common modules
     // execute init function if exists
     for (let module in modules) {
@@ -45,7 +45,7 @@ const log = new Log("Setup");
 })()
 
 // like 'forEach' but async
-Array.prototype.forEachAsync = async function(callback: <T>(element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void> {
+Array.prototype.forEachAsync = async function (callback: <T>(element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void> {
   let array = this
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array)

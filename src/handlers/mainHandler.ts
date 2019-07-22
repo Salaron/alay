@@ -45,8 +45,8 @@ export default async function moduleHandler(request: IncomingMessage, response: 
         let xmcStatus = await requestData.checkXMC(false)
         if (xmcStatus === false) throw new ErrorUser(`[mainHandler] Invalid X-Message-Code; user #${requestData.user_id}`, requestData.user_id)
 
-        await apiList.forEachAsync(async (data: any) => {
-          await log.verbose(chalk.yellow(data.module + "/" + data.action), "api/multirequest")
+        await apiList.forEachAsync(async (data: any, i: number) => {
+          await log.verbose(chalk.yellow(`${data.module}/${data.action} [${i + 1}/${apiList.length}]`), "api/multirequest")
           let response: MultiResponse = {
             result: {},
             timeStamp: Utils.timeStamp(),
@@ -84,6 +84,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
       }
 
       default: {
+        if (!urlSplit[3]) throw new Error(`Invalid action (${urlSplit[3]})`)
         const action = urlSplit[3].replace(/[^a-z]/g, "")
         let result: ActionResult = await executeAction(module, action, requestData, {
           responseType: RESPONSE_TYPE.SINGLE,

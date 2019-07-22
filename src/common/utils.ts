@@ -6,7 +6,7 @@ import { promisify } from "util"
 import { readFile } from "fs"
 import extend from "extend"
 
-const log = new Log("Utils")
+const log = new Log("Common: Utils")
 
 export async function init() {
   // Handle Clearing Temp Auth Tokens every 15 sec

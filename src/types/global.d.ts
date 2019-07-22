@@ -4,9 +4,10 @@ import { ErrorCode as errorCode, ErrorUser as errorUser } from "../handlers/erro
 import { Utils as utils } from "../common/utils"
 import { Type as type } from "../common/type"
 import { User as user } from "../common/user"
+import { Live as live } from "../common/live"
 
 declare global {
-  // make project root dir global (for easy access to root files)
+  // make project root dir global (for easy access to files outside of 'compile' folder)
   const rootDir: string
   // database stuff
   const MySQLconnection: typeof Connection_
@@ -19,6 +20,7 @@ declare global {
   const ErrorUser: typeof errorUser
   const Type: typeof type
   const User: typeof user
+  const Live: typeof live
 
   type Connection = Connection_
 
