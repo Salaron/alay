@@ -25,14 +25,13 @@ export default async function executeAction(module: string, action: string, requ
 
   try {
     // load action
-    if (!require.cache[require.resolve(`${moduleFolder}/${module}/${action}`)]) {
+    if (!cache[`${moduleFolder}/${module}/${action}`]) {
       let loaded = await import(`${moduleFolder}/${module}/${action}`)
       if (loaded.init) await loaded.init()
-      if (!cache[module]) cache[module] = {}
-      cache[module][action] = loaded
+      cache[`${moduleFolder}/${module}/${action}`] = loaded
     }
   
-    let body = new cache[module][action].default(requestData)
+    let body = new cache[`${moduleFolder}/${module}/${action}`].default(requestData)
     // Main related things
     if (requestData.handlerType === HANDLER_TYPE.MAIN) {
       if (options.responseType != body.requestType && body.requestType != REQUEST_TYPE.BOTH) throw new Error(`Invalid request type (action: ${body.requestType}, param: ${options.responseType}) on ${module}/${action}`)
@@ -51,7 +50,10 @@ export default async function executeAction(module: string, action: string, requ
     // handle module errors
     throw err
   } finally {
-    if (Config.server.debug_mode) delete require.cache[require.resolve(`${moduleFolder}/${module}/${action}`)]
+    if (Config.server.debug_mode) {
+      delete require.cache[require.resolve(`${moduleFolder}/${module}/${action}`)]
+      delete cache[`${moduleFolder}/${module}/${action}`]
+    }
   }
 }
 
@@ -73,7 +75,7 @@ function checkParamTypes(input: any, inputType: any) {
   } else if (typeof inputType === "object") {
     Object.keys(inputType).forEach(field => {
       if (typeof inputType[field] === "object") checkParamTypes(input[field], inputType[field])
-      else if (!input[field]) throw new Error(`Field "${field}" is missing in input`)
+      else if (Type.isNullDef(input[field])) throw new Error(`Field "${field}" is missing in input`)
       else if (!checkType(input[field], inputType[field])) throw new Error(`Expected type "${TYPE[inputType[field]]}" in "${field}" field`)
     })
   } else {

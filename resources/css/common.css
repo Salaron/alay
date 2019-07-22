@@ -58,7 +58,7 @@ html, body {
 }
 
 #body {
-  height: 459px;
+  height: 80vh;
   margin: 5px 3px 5px;
   padding: 0 19px 0 13px;
   position: relative;

@@ -92,7 +92,10 @@ export default async function requestHandler(request: IncomingMessage, response:
     }
   } catch (err) {
     log.error(err)
-    response.statusCode = 500
-    response.end()
+    await writeJsonResponse(response, {
+      responseData: Config.server.debug_mode ? { message: err.message } : { message: "Internal Server Error" },
+      direct: true,
+      httpStatusCode: 500
+    })
   }
 }

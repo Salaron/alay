@@ -2,6 +2,7 @@ import { ServerResponse } from "http"
 import querystring from "querystring"
 import { promisify } from "util"
 import { gzip } from "zlib"
+import { LEVEL } from "../../compile/core/log"
 
 export async function writeJsonResponse(response: ServerResponse, options: Options = {}) {
   response.setHeader("Content-Type", "application/json")
@@ -35,6 +36,7 @@ export async function writeJsonResponse(response: ServerResponse, options: Optio
 
   if (Config.server.PRIVATE_KEY.length != 0) response.setHeader("X-Message-Sign", Utils.RSASign(JSON.stringify(result) + options.xmc))
   if (options.connection && options.connection.released === false) await options.connection.commit()
+  if (Config.server.log_level >= LEVEL.DEBUG) console.log(JSON.stringify(result))
 
   if (options.encoding && options.encoding.indexOf("gzip") != -1) {
     response.setHeader("Content-Encoding", "gzip")

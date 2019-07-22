@@ -49,12 +49,11 @@
   <!-- JS FILES -->
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/handlebars.runtime.min.js"></script>
+  <script type="text/javascript" src="/resources/templates/announce-index.js"></script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
-
-  <script type="text/javascript" src="/resources/templates/announce-index.js"></script>
   <script>
     var langSettings = JSON.parse(escapeJSON('{{{language}}}'))
     var headers = JSON.parse(escapeJSON('{{{headers}}}'))
@@ -103,9 +102,9 @@
         offset: parseInt($(".uk-card-header").length),
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
-        announceTotal = response.total
-        response.more = langSettings.more
-        $("#body").append(announceTemplate(response))
+        announceTotal = response.response_data.total
+        response.response_data.more = langSettings.more
+        $("#body").append(announceTemplate(response.response_data))
         ps.update()
         if (before === $(".uk-card-header").length) loadAttempt += 1
         else loadAttempt = 0

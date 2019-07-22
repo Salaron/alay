@@ -15,5 +15,8 @@
     "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
-  }
+  },
+  "exclude": [
+    "**/default_config/"
+  ]
 }
