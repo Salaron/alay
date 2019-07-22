@@ -16,7 +16,9 @@ export default async function moduleHandler(request: IncomingMessage, response: 
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
       return await writeJsonResponse(response, {
         httpStatusCode: 403,
-        connection: requestData.connection
+        connection: requestData.connection,
+        responseData: "Rejected",
+        direct: true
       })
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {
@@ -29,21 +31,21 @@ export default async function moduleHandler(request: IncomingMessage, response: 
     }
 
     // "extract" module & action
-    const urlSplit = request.url!.toLowerCase().split("/")
+    const urlSplit = request.url!.toLowerCase().split(/[?]+/)[0].split("/")
+    if (!urlSplit[2]) throw new Error(`Invalid module (${urlSplit[2]})`)
     const module = urlSplit[2].replace(/[^a-z]/g, "")
-    const action = urlSplit[3].replace(/[^a-z]/g, "")
 
     switch (module) {
       case "api": {
-        let api = JSON.parse(requestData.formData)
-        if (api.length > Config.server.API_request_limit) throw new ErrorUser(`[mainHandler] API request limit reached ${api.length}/${Config.server.API_request_limit}`, requestData.user_id)
+        let apiList = requestData.formData
+        if (apiList.length > Config.server.API_request_limit) throw new ErrorUser(`[mainHandler] API request limit reached ${apiList.length}/${Config.server.API_request_limit}`, requestData.user_id)
 
         let responseData: any[] = []
 
         let xmcStatus = await requestData.checkXMC(false)
         if (xmcStatus === false) throw new ErrorUser(`[mainHandler] Invalid X-Message-Code; user #${requestData.user_id}`, requestData.user_id)
 
-        await api.forEachAsync(async (data: any) => {
+        await apiList.forEachAsync(async (data: any) => {
           await log.verbose(chalk.yellow(data.module + "/" + data.action), "api/multirequest")
           let response: MultiResponse = {
             result: {},
@@ -82,6 +84,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
       }
 
       default: {
+        const action = urlSplit[3].replace(/[^a-z]/g, "")
         let result: ActionResult = await executeAction(module, action, requestData, {
           responseType: RESPONSE_TYPE.SINGLE,
           xmc: <string>request.headers["x-message-code"]
