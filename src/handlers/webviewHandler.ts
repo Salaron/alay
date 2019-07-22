@@ -10,9 +10,15 @@ export default async function webviewHandler(request: IncomingMessage, response:
     // get auth level
     await requestData.getAuthLevel()
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
+      response.setHeader("Set-Cookie", [
+        `user_id=; expires=${new Date(new Date().getTime() - 600000).toUTCString()}; path=/;`,
+        `token=; expires=${new Date(new Date().getTime() - 600000).toUTCString()}; path=/;`
+      ])
       return await writeJsonResponse(response, {
         httpStatusCode: 403,
-        connection: requestData.connection
+        connection: requestData.connection,
+        responseData: "Rejected",
+        direct: true
       })
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {

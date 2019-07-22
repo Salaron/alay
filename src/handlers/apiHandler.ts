@@ -2,7 +2,7 @@ import { ServerResponse } from "http"
 import querystring from "querystring"
 import { promisify } from "util"
 import { gzip } from "zlib"
-import { LEVEL } from "../../compile/core/log"
+import { LEVEL } from "../core/log"
 
 export async function writeJsonResponse(response: ServerResponse, options: Options = {}) {
   response.setHeader("Content-Type", "application/json")

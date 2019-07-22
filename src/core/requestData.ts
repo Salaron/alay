@@ -38,17 +38,19 @@ export default class RequestData {
       // for webview available additional variants: queryString and cookie
       // queryString:
       this.formData = querystring.parse(this.request.url!.split(/[?]+/)[1])
-      if (this.formData.user_id && this.formData.token) {
-        this.user_id = parseInt(this.formData.user_id) || null
-        this.auth_token = this.formData.token
-      } else { // cookie
-        this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id")) || null
-        this.auth_token = getCookie(<string>this.headers["cookie"] || "", "token")
+      if (this.user_id === null && this.auth_token === null) {
+        if (this.formData.user_id && this.formData.token) {
+          this.user_id = parseInt(this.formData.user_id) || null
+          this.auth_token = this.formData.token
+        } else { // cookie
+          this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id")) || null
+          this.auth_token = getCookie(<string>this.headers["cookie"] || "", "token")
+        }
       }
       if (this.user_id != null && this.auth_token != null) {
         response.setHeader("Set-Cookie", [
-          `user_id=${this.user_id}; expires=${new Date(new Date().getTime() + 86409000).toUTCString()}; path=/;`,
-          `token=${this.auth_token}; expires=${new Date(new Date().getTime() + 86409000).toUTCString()}; path=/;`
+          `user_id=${this.user_id}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/;`,
+          `token=${this.auth_token}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/;`
         ])
       }
     }

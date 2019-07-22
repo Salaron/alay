@@ -56,9 +56,9 @@ html, body {
   padding: 3px;
   position: relative;
 }
-
+/* TODO: use screen media for height */
 #body {
-  height: 80vh;
+  height: 84vh;
   margin: 5px 3px 5px;
   padding: 0 19px 0 13px;
   position: relative;
