@@ -42,7 +42,7 @@ export default class {
         decks[s.unit_deck_id] = {
           unit_deck_id: s.unit_deck_id,
           deck_name: s.deck_name,
-          main_flag: s.unit_deck_id == mainDeck.deck,
+          main_flag: s.unit_deck_id == mainDeck,
           unit_owning_user_ids: []
         }
       }

@@ -149,7 +149,7 @@ export class Utils {
     return sum.digest("hex")
   }
 
-  static getRndNumber(min: number, max: number) { // min and max included
+  static getRandomNumber(min: number, max: number) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
   static createObjCopy(object: any) {

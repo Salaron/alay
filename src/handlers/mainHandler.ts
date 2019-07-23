@@ -90,6 +90,9 @@ export default async function moduleHandler(request: IncomingMessage, response: 
           responseType: RESPONSE_TYPE.SINGLE,
           xmc: <string>request.headers["x-message-code"]
         })
+        if (!Array.isArray(result.result) && result.status === 200 && Type.isUndefined(result.result.server_timestamp)) {
+          result.result.server_timestamp = Utils.timeStamp()
+        }
 
         return writeJsonResponse(response, {
           httpStatusCode: 200,
