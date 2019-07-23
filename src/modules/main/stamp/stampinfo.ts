@@ -57,7 +57,7 @@ export default class {
       user: this.user_id
     })
 
-    if (!data) { // Prepare decks if not exist
+    if (data.length === 0) { // Prepare decks if not exist
       let id_arr = [19, 20, 21, 22, 23, 24, 25, 26, 27, 119, 120, 121, 122, 123, 124, 125, 126, 127, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009]
 
       let insertDecks = []

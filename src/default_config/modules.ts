@@ -33,11 +33,12 @@ export default <Modules>{
     reset_cost_type: 3,
     reset_cost_value: 5000
   },
-  duel: {
-    saveLiveResult: false
-  },
   unit: {
     removeFromDatabase: false
+  },
+  unitSelect: {
+    museCenterUnits: [49, 50, 51, 52, 53, 54, 55, 56, 57],
+    aqoursCenterUnits: [788, 789, 790, 791, 792, 793, 794, 795, 796]
   },
   user: {
     setBirthOnlyOnce: true,

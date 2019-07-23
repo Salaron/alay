@@ -14,7 +14,7 @@ export class Unit {
       next_exp: unitData.next_exp,
       level: unitData.level,
       max_level: unitData.max_level,
-      rank: unitData.rank,
+      rank: unitData.unit_rank,
       max_rank: unitData.max_rank,
       love: unitData.love,
       max_love: unitData.max_love,

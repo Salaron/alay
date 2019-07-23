@@ -104,11 +104,12 @@ interface Modules {
     reset_cost_type: number
     reset_cost_value: number
   }
-  duel: {
-    saveLiveResult: boolean
-  }
   unit: {
     removeFromDatabase: boolean
+  }
+  unitSelect: {
+    museCenterUnits: number[]
+    aqoursCenterUnits: number[]
   }
   user: {
     setBirthOnlyOnce: boolean
