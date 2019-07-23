@@ -37,7 +37,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
 
     switch (module) {
       case "api": {
-        let apiList = requestData.formData
+        let apiList = requestData.params
         if (apiList.length > Config.server.API_request_limit) throw new ErrorUser(`[mainHandler] API request limit reached ${apiList.length}/${Config.server.API_request_limit}`, requestData.user_id)
 
         let responseData: any[] = []
@@ -53,7 +53,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
             status: 0,
             commandNum: false
           }
-          requestData.formData = data
+          requestData.params = data
           let result: ActionResult
           try {
             result = await executeAction(data.module, data.action, requestData, {

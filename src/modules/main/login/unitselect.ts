@@ -1,5 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
 
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -9,18 +9,23 @@ export default class {
   private user_id: number
   private connection: Connection
   private requestData: RequestData
-  private formData: any
+  private params: any
   constructor(requestData: RequestData) {
     this.user_id = <number>requestData.user_id
     this.connection = requestData.connection
-    this.formData = requestData.formData
+    this.params = requestData.params
     this.requestData = requestData
   }
 
   public paramTypes() {
-    return {}
+    return {
+      mgd: TYPE.INT,
+      unit_initial_set_id: TYPE.INT
+    }
   }
   public paramCheck() {
+    if (![1,2].includes(this.params.mgd)) throw new Error(`Invalid mgd`)
+    if (this.params.unit_initial_set_id % 10 < 0 || this.params.unit_initial_set_id % 10 > 9) throw new Error(`Invalid set id`)
     return true
   }
 

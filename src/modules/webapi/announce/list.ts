@@ -10,11 +10,11 @@ export default class {
   private user_id: number
   private connection: Connection
   private requestData: RequestData
-  private formData: any
+  private params: any
   constructor(requestData: RequestData) {
     this.user_id = <number>requestData.user_id
     this.connection = requestData.connection
-    this.formData = requestData.formData
+    this.params = requestData.params
     this.requestData = requestData
   }
 
@@ -32,7 +32,7 @@ export default class {
       announceList: [],
       total: (await this.connection.first(`SELECT COUNT(*) as cnt FROM webview_announce`)).cnt
     }
-    let list = await this.connection.query(`SELECT * FROM webview_announce ORDER BY insert_date DESC LIMIT ${this.formData.offset}, 30`)
+    let list = await this.connection.query(`SELECT * FROM webview_announce ORDER BY insert_date DESC LIMIT ${this.params.offset}, 30`)
     for (let i = 0; i < list.length; i++) {
       response.announceList.push({
         id: list[i].id,

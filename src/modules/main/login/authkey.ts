@@ -13,11 +13,11 @@ export default class {
   private user_id: number | null
   private connection: Connection
   private requestData: RequestData
-  private formData: any
+  private params: any
   constructor(requestData: RequestData) {
     this.user_id = requestData.user_id
     this.connection = requestData.connection
-    this.formData = requestData.formData
+    this.params = requestData.params
     this.requestData = requestData
   }
 
@@ -43,9 +43,9 @@ export default class {
 
     try {
       let serverKey = crypto.randomBytes(32).toString("base64")
-      let clientKey = Utils.RSADecrypt(this.formData.dummy_token)
+      let clientKey = Utils.RSADecrypt(this.params.dummy_token)
       let sessionKey = Utils.xor(Buffer.from(clientKey, "base64"), Buffer.from(serverKey, "base64")).toString("base64") // Generate session key by XORing client and server keys
-      let authData = JSON.parse(Utils.AESDecrypt(Buffer.from(clientKey, "base64").slice(0, 16), this.formData.auth_data)) // device info
+      let authData = JSON.parse(Utils.AESDecrypt(Buffer.from(clientKey, "base64").slice(0, 16), this.params.auth_data)) // device info
 
       let divineKey = Utils.xor(Buffer.from(Config.client.XMC_base), Buffer.from(Config.client.application_key))
       divineKey = Utils.xor(divineKey, Buffer.from(clientKey, "base64"))

@@ -13,11 +13,11 @@ export default class {
   private user_id: number | null
   private connection: Connection
   private requestData: RequestData
-  private formData: any
+  private params: any
   constructor(requestData: RequestData) {
     this.user_id = requestData.user_id
     this.connection = requestData.connection
-    this.formData = requestData.formData
+    this.params = requestData.params
     this.requestData = requestData
   }
 
@@ -46,7 +46,7 @@ export default class {
     // 12 -- android update
     // 13 -- banned
     let html
-    switch (this.formData.id) {
+    switch (this.params.id) {
       case "10": html = await promisify(readFile)(`${rootDir}/webview/static/maintenance.html`, "UTF-8"); break
       case "11":
       case "12": html = await promisify(readFile)(`${rootDir}/webview/static/update.html`, "UTF-8"); break

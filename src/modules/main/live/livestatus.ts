@@ -22,11 +22,11 @@ export default class {
   private user_id: number
   private connection: Connection
   private requestData: RequestData
-  private formData: any
+  private params: any
   constructor(requestData: RequestData) {
     this.user_id = <number>requestData.user_id
     this.connection = requestData.connection
-    this.formData = requestData.formData
+    this.params = requestData.params
     this.requestData = requestData
   }
 

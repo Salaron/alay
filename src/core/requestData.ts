@@ -10,7 +10,7 @@ const log = new Log("Request Data")
 export default class RequestData {
   public user_id: number | null = null
   public auth_token: string | null = null
-  public formData: any = null
+  public params: any = null
   public auth_level: AUTH_LEVEL = AUTH_LEVEL.NONE
   public auth_header: Authorize
   public headers: any
@@ -37,11 +37,11 @@ export default class RequestData {
     if (hType === HANDLER_TYPE.WEBVIEW) {
       // for webview available additional variants: queryString and cookie
       // queryString:
-      this.formData = querystring.parse(this.request.url!.split(/[?]+/)[1])
+      this.params = querystring.parse(this.request.url!.split(/[?]+/)[1])
       if (this.user_id === null && this.auth_token === null) {
-        if (this.formData.user_id && this.formData.token) {
-          this.user_id = parseInt(this.formData.user_id) || null
-          this.auth_token = this.formData.token
+        if (this.params.user_id && this.params.token) {
+          this.user_id = parseInt(this.params.user_id) || null
+          this.auth_token = this.params.token
         } else { // cookie
           this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id")) || null
           this.auth_token = getCookie(<string>this.headers["cookie"] || "", "token")
@@ -58,18 +58,18 @@ export default class RequestData {
     if (formData && formData.request_data && hType === HANDLER_TYPE.MAIN) {
       try {
         this.raw_request_data = formData.request_data
-        this.formData = JSON.parse(formData.request_data)
-        this.formData.precise_score_log = undefined // Remove it for now
+        this.params = JSON.parse(formData.request_data)
+        this.params.precise_score_log = undefined // Remove it for now
       } catch (e) {
         log.error(e)
         this.auth_level = AUTH_LEVEL.REJECTED
       }
     }
-    if (formData && hType === HANDLER_TYPE.WEBAPI) this.formData = formData
+    if (formData && hType === HANDLER_TYPE.WEBAPI) this.params = formData
 
-    if (this.formData != null && Object.keys(this.formData).length > 0) {
+    if (this.params != null && Object.keys(this.params).length > 0) {
       let url = <string>this.request.url!.split(/[?]+/)[0]
-      log.info(chalk["bgWhite"](chalk["black"]((url))) + " " + JSON.stringify(this.formData), "User #" + this.user_id)
+      log.info(chalk["bgWhite"](chalk["black"]((url))) + " " + JSON.stringify(this.params), "User #" + this.user_id)
     }
   }
   static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {

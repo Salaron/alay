@@ -12,11 +12,11 @@ export default class {
   private user_id: number
   private connection: Connection
   private requestData: RequestData
-  private formData: any
+  private params: any
   constructor(requestData: RequestData) {
     this.user_id = <number>requestData.user_id
     this.connection = requestData.connection
-    this.formData = requestData.formData
+    this.params = requestData.params
     this.requestData = requestData
   }
 
@@ -26,14 +26,14 @@ export default class {
     }
   }
   public paramCheck() {
-    if (!this.formData.name.match(/^.{1,20}$/)) throw new ErrorCode(1100)
+    if (!this.params.name.match(/^.{1,20}$/)) throw new ErrorCode(1100)
     return true
   }
 
   public async execute() {
     try {
       await this.connection.query("UPDATE users SET name=:name WHERE user_id=:user", {
-        name: this.formData.name, 
+        name: this.params.name, 
         user: this.user_id
       })
     } catch (err) {
@@ -44,7 +44,7 @@ export default class {
       status: 200,
       result: {
         before_name: "",
-        after_name: this.formData.name
+        after_name: this.params.name
       }
     }
   }

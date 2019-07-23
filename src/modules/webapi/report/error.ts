@@ -9,11 +9,11 @@ export default class {
   private user_id: number | null
   private connection: Connection
   private requestData: RequestData
-  private formData: any
+  private params: any
   constructor(requestData: RequestData) {
     this.user_id = requestData.user_id
     this.connection = requestData.connection
-    this.formData = requestData.formData
+    this.params = requestData.params
     this.requestData = requestData
   }
 
@@ -29,8 +29,8 @@ export default class {
   public async execute() {
     await this.connection.query(`INSERT INTO error_log (user_id, message, stacktrace) VALUES (:user, :msg, :stack)`, {
       user: this.user_id,
-      msg: this.formData.message,
-      stack: `Url: ${this.formData.url}\n\nStack:\n${this.formData.stacktrace || null}`
+      msg: this.params.message,
+      stack: `Url: ${this.params.url}\n\nStack:\n${this.params.stacktrace || null}`
     })
 
     return {

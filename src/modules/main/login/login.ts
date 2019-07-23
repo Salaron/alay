@@ -9,11 +9,11 @@ export default class {
   private user_id: number
   private connection: Connection
   private requestData: RequestData
-  private formData: any
+  private params: any
   constructor(requestData: RequestData) {
     this.user_id = <number>requestData.user_id
     this.connection = requestData.connection
-    this.formData = requestData.formData
+    this.params = requestData.params
     this.requestData = requestData
   }
 
@@ -33,8 +33,8 @@ export default class {
     })
     if (!token) throw new Error(`Token doesn't exists`)
 
-    let login_key = Utils.AESDecrypt(Buffer.from(token.session_key, "base64").slice(0, 16), this.formData.login_key)
-    let login_passwd = Utils.AESDecrypt(Buffer.from(token.session_key, "base64").slice(0, 16), this.formData.login_passwd)
+    let login_key = Utils.AESDecrypt(Buffer.from(token.session_key, "base64").slice(0, 16), this.params.login_key)
+    let login_passwd = Utils.AESDecrypt(Buffer.from(token.session_key, "base64").slice(0, 16), this.params.login_passwd)
 
     if (
       (typeof login_key != "string") ||
