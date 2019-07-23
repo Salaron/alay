@@ -5,7 +5,8 @@ import { Utils as utils } from "../common/utils"
 import { Type as type } from "../common/type"
 import { User as user } from "../common/user"
 import { Live as live } from "../common/live"
-import { Events as events_ } from "../common/event"
+import { Events as events } from "../common/event"
+import { Unit as unit } from "../common/unit"
 
 declare global {
   // make project root dir global (for easy access to files outside of 'compile' folder)
@@ -22,7 +23,8 @@ declare global {
   const Type: typeof type
   const User: typeof user
   const Live: typeof live
-  const Events: typeof events_
+  const Events: typeof events
+  const Unit: typeof unit
 
   type Connection = Connection_
 

@@ -92,7 +92,9 @@ export default class RequestData {
 
     if (this.user_id === null && this.auth_token != null) {
       // Has token but not user id: PreLogin
-      let checkToken = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, { token: this.auth_level })
+      let checkToken = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, { 
+        token: this.auth_token 
+      })
       if (!checkToken) return this.auth_level = AUTH_LEVEL.REJECTED // Token doesn't exist
       if (checkToken.expire < Utils.parseDate(Date.now())) return this.auth_level = AUTH_LEVEL.REJECTED // Token expired
 

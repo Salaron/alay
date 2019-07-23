@@ -45,7 +45,7 @@ export default class {
     }
 
     let events = await this.connection.query("SELECT * FROM events_list WHERE open_date < :now AND close_date > :now", {
-      now: Utils.toSpecificTimezone(9)
+      now: new Date(Utils.toSpecificTimezone(9))
     })
 
     for (let i = 0; i < events.length; i++) {
