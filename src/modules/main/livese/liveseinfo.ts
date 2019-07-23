@@ -25,10 +25,17 @@ export default class {
   }
 
   public async execute() {
+    let liveSE: number[] = [1, 99]
+    let list = Config.modules.liveSe.list
+    for (let i = 0; i < list.length; i++) {
+      let se = list[i]
+      if (se != <any>list[i]) return
+      if (!liveSE.includes(se)) liveSE.push(se)
+    }
     return {
       status: 200,
       result: {
-        unit_support_list: await new User(this.connection).getRemovableSkillInfo(this.user_id)
+        live_se_list: liveSE
       }
     }
   }

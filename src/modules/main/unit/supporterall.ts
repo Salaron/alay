@@ -27,7 +27,7 @@ export default class {
   public async execute() {
     return {
       status: 200,
-      response: {
+      result: {
         unit_support_list: await new User(this.connection).getSupportUnits(this.user_id)
       }
     }

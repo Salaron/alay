@@ -25,10 +25,17 @@ export default class {
   }
 
   public async execute() {
+    let liveIcon: number[] = [1, 2, 3]
+    let list = Config.modules.liveIcon.list
+    for (let i = 0; i < list.length; i++) {
+      let icon = list[i]
+      if (icon != <any>list[i]) return
+      if (!liveIcon.includes(icon)) liveIcon.push(icon)
+    }
     return {
       status: 200,
       result: {
-        unit_support_list: await new User(this.connection).getRemovableSkillInfo(this.user_id)
+        live_notes_icon_list: liveIcon
       }
     }
   }

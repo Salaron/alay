@@ -58,7 +58,7 @@ export default class {
 
     return {
       status: 200,
-      response: response
+      result: response
     }
   }
 }

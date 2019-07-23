@@ -28,7 +28,9 @@ export default class {
     return {
       status: 200,
       result: {
-        unit_support_list: await new User(this.connection).getRemovableSkillInfo(this.user_id)
+        exchange_point_list: await this.connection.query("SELECT rarity, exchange_point FROM user_exchange_point WHERE user_id=:user", { 
+          user: this.user_id 
+        })
       }
     }
   }
