@@ -140,6 +140,6 @@ interface Maintenance {
   notice: boolean
   start_date: string
   end_date: string
-  time_zone: string
+  time_zone: number
   bypass: number[]
 }
