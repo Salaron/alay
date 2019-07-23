@@ -34,7 +34,8 @@ export default class {
   public async execute() {
     if (this.requestData.auth_level > AUTH_LEVEL.UPDATE) throw new Error(`You're already logged in`)
     const trick = {
-      status: 200, responseData: {
+      status: 200, 
+      result: {
         authorize_token: Utils.randomString(80 + Math.floor(Math.random() * 10)),
         dummy_token: crypto.randomBytes(32).toString("base64")
       }

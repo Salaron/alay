@@ -28,7 +28,7 @@ export default class {
     let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().BATTLE)
     if (currentEvent.opened === false) return {
       status: 200,
-      responseData: []
+      result: []
     }
     return {
       status: 200,

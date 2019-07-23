@@ -56,7 +56,7 @@ export default class {
       if (awardExists === false) response.award_info[0].is_set = true 
       return {
         status: 200,
-        responseData: response
+        result: response
       }
     }
 

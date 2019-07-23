@@ -27,9 +27,7 @@ export default class {
   public async execute() {
     return {
       status: 200,
-      result: {
-        unit_support_list: await new User(this.connection).getRemovableSkillInfo(this.user_id)
-      }
+      result: await new User(this.connection).getRemovableSkillInfo(this.user_id)
     }
   }
 }

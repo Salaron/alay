@@ -28,7 +28,7 @@ export default class {
     let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().DUTY)
     if (currentEvent.opened === false) return {
       status: 200,
-      responseData: []
+      result: []
     }
     // remove user from existing rooms 
     await this.connection.query(`UPDATE event_duty_users SET status = 0 WHERE room_id IN (SELECT room_id FROM event_duty_rooms WHERE start_flag = 0 AND user_id = :user)`, {

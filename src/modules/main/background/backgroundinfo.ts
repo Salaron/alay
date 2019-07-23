@@ -54,7 +54,7 @@ export default class {
       if (bgExists === false) response.background_info[0].is_set = true 
       return {
         status: 200,
-        responseData: response
+        result: response
       }
     }
 

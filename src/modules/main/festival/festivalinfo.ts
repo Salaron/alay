@@ -28,7 +28,7 @@ export default class {
     let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().FESTIVAL)
     if (currentEvent.opened === false) return {
       status: 200,
-      responseData: []
+      result: []
     }
 
     let ranking = await this.connection.first("SELECT event_point FROM event_ranking WHERE user_id=:user AND event_id=:event", {
