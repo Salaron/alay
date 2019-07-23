@@ -90,7 +90,7 @@ export default class RequestData {
       return this.auth_level = AUTH_LEVEL.NONE
     }
 
-    if (this.user_id === null && this.auth_level != null) {
+    if (this.user_id === null && this.auth_token != null) {
       // Has token but not user id: PreLogin
       let checkToken = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, { token: this.auth_level })
       if (!checkToken) return this.auth_level = AUTH_LEVEL.REJECTED // Token doesn't exist
@@ -99,7 +99,7 @@ export default class RequestData {
       return this.auth_level = AUTH_LEVEL.PRE_LOGIN
     }
 
-    if (this.user_id != null && this.auth_level != null) {
+    if (this.user_id != null && this.auth_token != null) {
       // Has token and user id: Logged In
       let check = await this.connection.first(`SELECT last_activity FROM user_login WHERE user_id = :user AND login_token = :token`, {
         user: this.user_id,

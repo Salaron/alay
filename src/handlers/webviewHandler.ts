@@ -32,7 +32,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
 
     // "extract" module & action
     const urlSplit = request.url!.toLowerCase().split(/[?]+/)[0].split("/")
-    if (!urlSplit[2] || urlSplit[3]) throw new Error(`Invalid module/action (${urlSplit[2]}/${urlSplit[3]})`)
+    if (!urlSplit[2] || !urlSplit[3]) throw new Error(`Invalid module/action (${urlSplit[2]}/${urlSplit[3]})`)
     const module = urlSplit[2].replace(/[^a-z]/g, "")
     const action = urlSplit[3].replace(/[^a-z]/g, "")
 
