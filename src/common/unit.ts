@@ -227,6 +227,60 @@ export class Unit {
     }
   }
 
+  public async getUnitDetail(unitOwningUserId: number) {
+    let data = await this.connection.first(`SELECT * FROM units WHERE unit_owning_user_id = :uouid`, {
+      uouid: unitOwningUserId
+    })
+    if (!data) throw new Error(`Data for uouid is missing`)
+
+    data.removable_skill_ids = await this.getUnitSiS(unitOwningUserId)
+    return {
+      unit_owning_user_id: data.unit_owning_user_id,
+      unit_id: data.unit_id,
+      exp: data.exp,
+      next_exp: data.next_exp,
+      level: data.level,
+      max_level: data.max_level,
+      rank: data.unit_rank,
+      max_rank: data.max_rank,
+      love: data.love,
+      max_love: data.max_love,
+      unit_skill_level: data.unit_skill_level,
+      max_hp: data.max_hp,
+      favorite_flag: !!data.favorite_flag,
+      display_rank: data.favorite_flag,
+      unit_skill_exp: data.unit_skill_exp,
+      unit_removable_skill_capacity: data.removable_skill_capacity,
+      attribute: data.attribute,
+      smile: data.stat_smile,
+      cute: data.stat_pure,
+      cool: data.stat_cool,
+      is_rank_max: data.rank >= data.max_rank,
+      is_love_max: data.love >= data.max_love,
+      is_level_max: data.level >= data.max_level,
+      is_skill_level_max: data.unit_skill_level >= data.max_skill_level,
+      is_removable_skill_capacity_max: data.removable_skill_capacity >= data.max_removable_skill_capacity,
+      is_support_member: supportUnitList.includes(data.unit_id),
+      removable_skill_ids: data.removable_skill_ids,
+      total_smile: data.stat_smile, // TODO?
+      total_cute: data.stat_pure,
+      total_cool: data.stat_cool,
+      total_hp: data.max_hp
+    }
+  }
+
+  public async getUnitSiS(unitOwningUserId: number): Promise<number[]> {
+    let data = await this.connection.query(`
+    SELECT unit_removable_skill_id 
+    FROM user_unit_removable_skill_equip 
+    WHERE unit_owning_user_id = :id`, {
+      id: unitOwningUserId
+    })
+    if (!data) throw new Error(`Data for uouid is missing`)
+
+    return data.map((val: any) => { return val.unit_removable_skill_id })
+  }
+
   public static getSupportUnitList() {
     return supportUnitList
   }

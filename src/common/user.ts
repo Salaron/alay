@@ -63,5 +63,36 @@ export class User {
       is_visible: false
     }
   }
+
+  public async getCenterUnitInfo(userId: number) {
+    let data = await this.connection.first(`
+    SELECT units.unit_owning_user_id FROM users 
+    JOIN user_unit_deck ON users.user_id = user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id 
+    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
+    JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
+    WHERE users.user_id = :user
+    `, {
+      user: userId
+    })
+    return await new Unit(this.connection).getUnitDetail(data.unit_owning_user_id)
+  }
+  public async getNaviUnitInfo(userId: number) {
+    let data = await this.connection.first(`SELECT partner_unit FROM users WHERE user_id = :user`, {
+      user: userId
+    })
+    return await new Unit(this.connection).getUnitDetail(data.partner_unit)
+  }
+
+  public async getFriendStatus(currentUser: number, anotherUser: number) {
+    let friend = await this.connection.first(`SELECT * FROM user_friend WHERE (initiator_id = :user1 OR recipient_id = :user1) AND (initiator_id = :user2 OR recipient_id = :user2)`, {
+      user1: currentUser,
+      user2: anotherUser
+    })
+    if (!friend) return 0 // not a friend
+    if (friend.status === 1) return 1 // friend
+    if (friend.recipient_id === currentUser && friend.initiator_id === anotherUser) return 2 // approval wait
+    return 3 // pending
+
+  }
 }
 (global as any).User = User
