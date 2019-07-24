@@ -5,7 +5,7 @@ import { Log } from "../../../core/log"
 const log = new Log("reward/openAll")
 
 export default class {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH
+  public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 

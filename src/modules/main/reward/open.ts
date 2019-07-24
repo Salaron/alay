@@ -1,10 +1,8 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
 
-const unitDB = sqlite3.getUnit()
-
 export default class {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH
+  public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
