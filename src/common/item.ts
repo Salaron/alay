@@ -228,8 +228,17 @@ export class Item {
   }
 
   public async openPresent(userId: number, incentiveId: number) {
-    let present = await this.connection.first(`SELECT * FROM reward_table WHERe user_id=:user AND incentive_id=:id AND collected IS NULL`, { user: userId, id: incentiveId })
-    if (!present) throw new Error(`Present is already collected.`)
+    let present = await this.connection.first(`SELECT * FROM reward_table WHERe user_id=:user AND incentive_id=:id AND collected IS NULL`, { 
+      user: userId, 
+      id: incentiveId 
+    })
+    if (!present) throw new Error(`Present is already collected`)
+
+    await this.connection.query(`UPDATE reward_table SET collected = 1, opened_date = :now WHERE user_id = :user AND incentive_id = :id`, {
+      now: new Date(),
+      user: userId,
+      id: incentiveId
+    })
 
     let result: any = await this.addItemToUser(userId, { 
       type: present.item_type, 

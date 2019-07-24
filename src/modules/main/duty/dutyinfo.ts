@@ -40,7 +40,7 @@ export default class {
       event: currentEvent.id
     })
 
-    if (ranking.length === 0) {
+    if (!ranking) {
       await this.connection.query("INSERT INTO event_ranking (user_id, event_id, event_point) VALUES (:user, :event, 0)", {
         user: this.user_id,
         event: currentEvent.id

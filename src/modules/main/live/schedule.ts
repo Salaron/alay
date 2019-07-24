@@ -25,9 +25,9 @@ export default class {
   }
 
   public async execute() {
-    let response = {
-      event_list: <any>[],
-      live_list: <any>[],
+    let response: any = {
+      event_list: [],
+      live_list: [],
       limited_bonus_list: [],
       random_live_list: [],
       free_live_list: [],

@@ -123,7 +123,7 @@ export class Unit {
         next_exp: null,
         level: null,
         max_level: null,
-        rank: null,
+        unit_rank: null,
         max_rank: null,
         love: null,
         max_love: null,
@@ -140,15 +140,15 @@ export class Unit {
       insertData.unit_id = unitData.unit_id
       insertData.attribute = unitData.attribute_id
       insertData.max_rank = (unitData.disable_rank_up >= 1 ? 1 : 2)
-      insertData.rank = Math.min(insertData.max_rank, options.rank)
-      insertData.display_rank = insertData.rank
+      insertData.unit_rank = Math.min(insertData.max_rank, options.rank)
+      insertData.display_rank = insertData.unit_rank
       insertData.max_skill_level = (unitData.max_skill_level == null ? 1 : unitData.max_skill_level)
-      insertData.max_love = (insertData.rank == 2 ? unitData.after_love_max : unitData.before_love_max)
-      insertData.max_level = (insertData.rank == 2 ? unitData.after_level_max : unitData.before_level_max)
+      insertData.max_love = (insertData.unit_rank == 2 ? unitData.after_love_max : unitData.before_love_max)
+      insertData.max_level = (insertData.unit_rank == 2 ? unitData.after_level_max : unitData.before_level_max)
       insertData.level = Math.min(insertData.max_level, options.level)
       insertData.love = Math.min(insertData.max_love, options.love)
       insertData.unit_skill_level = 1
-      insertData.removable_skill_capacity = Math.min(unitData.max_removable_skill_capacity, insertData.rank == insertData.max_rank ? (unitData.default_removable_skill_capacity + 1) : unitData.default_removable_skill_capacity)
+      insertData.removable_skill_capacity = Math.min(unitData.max_removable_skill_capacity, insertData.unit_rank == insertData.max_rank ? (unitData.default_removable_skill_capacity + 1) : unitData.default_removable_skill_capacity)
       insertData.max_removable_skill_capacity = unitData.max_removable_skill_capacity
 
       let level = await unitDB.all("SELECT * FROM unit_level_up_pattern_m WHERE unit_level_up_pattern_id = ? AND (unit_level IN (?,?))", [
@@ -175,7 +175,7 @@ export class Unit {
         removable_skill_capacity, max_removable_skill_capacity, display_rank, \
         stat_smile, stat_pure, stat_cool, attribute \
       ) VALUES (\
-        :user_id, :unit_id, :exp, :next_exp, :level, :max_level,:rank, :max_rank, \
+        :user_id, :unit_id, :exp, :next_exp, :level, :max_level, :unit_rank, :max_rank, \
         :love, :max_love, :unit_skill_level, :max_skill_level, :max_hp, \
         :removable_skill_capacity, :max_removable_skill_capacity, :display_rank, \
         :stat_smile, :stat_pure, :stat_cool, :attribute \
@@ -225,7 +225,6 @@ export class Unit {
       }
       await this.connection.query("UPDATE user_unit_album SET rank_max_flag=:rank, love_max_flag=:love, rank_level_max_flag=:level,all_max_flag=:all,highest_love_per_unit=:lovemax,total_love=:lovetotal,favorite_point=:fav WHERE user_id=:user AND unit_id=:unit;", values)
     }
-
   }
 
   public static getSupportUnitList() {
