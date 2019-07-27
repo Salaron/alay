@@ -5,6 +5,7 @@ import * as unit from "./unit"
 import * as live from "./live"
 import * as event from "./event"
 import * as item from "./item"
+import * as secretbox from "./secretbox"
 
 export {
   item,
@@ -13,5 +14,6 @@ export {
   user,
   unit,
   live,
-  event
+  event,
+  secretbox
 }

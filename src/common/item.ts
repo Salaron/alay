@@ -225,6 +225,7 @@ export class Item {
     )`)
     if (!history) return (<any>res).insertId
 
+    return await this.openPresent(userId, (<any>res).insertId)
   }
 
   public async openPresent(userId: number, incentiveId: number) {

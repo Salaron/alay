@@ -19,7 +19,7 @@ export default class RequestData {
   public connection: Connection
   public raw_request_data: any // JSON parse remove some symbols from fromData
 
-  private auth_level_check = false
+  private auth_level_check_passed = false
   private response: ServerResponse
   constructor(request: IncomingMessage, response: ServerResponse, formData: any, hType: HANDLER_TYPE) {
     this.headers = request.headers
@@ -35,11 +35,10 @@ export default class RequestData {
     }
     if (this.headers["user-id"]) this.user_id = parseInt(this.headers["user-id"]) || null
     if (hType === HANDLER_TYPE.WEBVIEW) {
-      // for webview available additional variants: queryString and cookie
-      // queryString:
       this.params = querystring.parse(this.request.url!.split(/[?]+/)[1])
       if (this.user_id === null && this.auth_token === null) {
-        if (this.params.user_id && this.params.token) {
+        // for webview available additional variants: queryString and cookie
+        if (this.params.user_id && this.params.token) { // queryString
           this.user_id = parseInt(this.params.user_id) || null
           this.auth_token = this.params.token
         } else { // cookie
@@ -80,8 +79,8 @@ export default class RequestData {
   }
 
   public async getAuthLevel() {
-    if (this.auth_level_check) return this.auth_level
-    this.auth_level_check = true
+    if (this.auth_level_check_passed) return this.auth_level
+    this.auth_level_check_passed = true
     // TODO additional checks
 
     if (this.user_id === null && this.auth_token === null) {
@@ -131,7 +130,7 @@ export default class RequestData {
         token: this.auth_level
       })
       if (!key) return false
-      return xmc = Utils.hmacSHA1(this.raw_request_data, key.session_key)
+      xmc = Utils.hmacSHA1(this.raw_request_data, key.session_key)
     }
 
     return xmc === this.headers["x-message-code"]

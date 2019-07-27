@@ -3,7 +3,7 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
 import moment from "moment"
 
 export default class {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
+  public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH
   public permission: PERMISSION = PERMISSION.NOXMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
@@ -28,7 +28,7 @@ export default class {
   public async execute() {
     let museBanners = await this.connection.query(`
     SELECT * FROM (
-      SELECT banner_asset_name as asset_path, banner_se_asset_name as asset_path_se, box_id as target_id, 1 as banner_type, 0 as master_is_active_event, member_category, NULL as webview_url, start_date, end_date FROM box_list
+      SELECT banner_asset_name as asset_path, banner_se_asset_name as asset_path_se, secretbox_id as target_id, 1 as banner_type, 0 as master_is_active_event, member_category, NULL as webview_url, start_date, end_date FROM secretbox_list
       UNION
       SELECT banner_asset_name as asset_path, banner_se_asset_name as asset_path_se, event_id as target_id, 0 as banner_type, 1 as master_is_active_event, member_category, NULL as webview_url, open_date as start_date, close_date as end_date FROM events_list
     	UNION
@@ -38,7 +38,7 @@ export default class {
     })
     let aqoursBanners = await this.connection.query(`
     SELECT * FROM (
-      SELECT banner_asset_name as asset_path, banner_se_asset_name as asset_path_se, box_id as target_id, 1 as banner_type, 0 as master_is_active_event, member_category, NULL as webview_url, start_date, end_date FROM box_list
+      SELECT banner_asset_name as asset_path, banner_se_asset_name as asset_path_se, secretbox_id as target_id, 1 as banner_type, 0 as master_is_active_event, member_category, NULL as webview_url, start_date, end_date FROM secretbox_list
       UNION
       SELECT banner_asset_name as asset_path, banner_se_asset_name as asset_path_se, event_id as target_id, 0 as banner_type, 1 as master_is_active_event, member_category, NULL as webview_url, open_date as start_date, close_date as end_date FROM events_list
     	UNION

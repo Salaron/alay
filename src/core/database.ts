@@ -21,7 +21,6 @@ export class ConnectionPool {
   public createdConnections: mysql.PoolConnection[]
   public acquiringConnections: mysql.PoolConnection[]
   private debugInterval: any
-  private available = false
   constructor(config: Database) {
     this.config = extend({
       autoReconnect: true,
@@ -52,7 +51,6 @@ export class ConnectionPool {
         ])
         await connection.commit()
 
-        this.available = true
         this.reconnectAttempts = 0
         this.freeConnections = (<any>this.pool)._freeConnections
         this.createdConnections = (<any>this.pool)._allConnections

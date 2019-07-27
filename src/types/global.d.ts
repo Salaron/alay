@@ -8,6 +8,7 @@ import { Live as live } from "../common/live"
 import { Events as events } from "../common/event"
 import { Unit as unit } from "../common/unit"
 import { Item as item } from "../common/item"
+import { Secretbox as secretbox } from "../common/secretbox"
 
 declare global {
   // make project root dir global (for easy access to files outside of 'compile' folder)
@@ -27,6 +28,7 @@ declare global {
   const Events: typeof events
   const Unit: typeof unit
   const Item: typeof item
+  const Secretbox: typeof secretbox
 
   type Connection = connection
 
