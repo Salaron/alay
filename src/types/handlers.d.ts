@@ -15,4 +15,5 @@ interface MultiResponse {
 interface ActionResult {
   status: number
   result: any
+  headers?: any
 }

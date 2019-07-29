@@ -142,10 +142,10 @@ export default class RequestData {
       timeStamp: Utils.timeStamp(),
       version: "1.1",
       nonce: "WA0",
-      token: this.auth_token
+      token: this.auth_token || ""
     }
     let headers = {
-      "user-id": this.user_id!.toString(),
+      "user-id": this.user_id ? this.user_id.toString() : "",
       "bundle-version": this.headers["bundle-version"] || Config.client.application_version,
       "client-version": this.headers["client-version"] || Config.server.server_version,
       "application-id": this.headers["application-id"] || Config.client.application_id,

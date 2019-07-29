@@ -76,7 +76,7 @@ export default class {
 
         let assertation = JSON.parse(Buffer.from(authData[3], "base64").toString()) // check if it is correct JSON
 
-        if (Config.modules.auth.auth_logging) {
+        if (Config.modules.login.auth_logging) {
           await this.connection.query(`INSERT INTO auth_log(user_id, application_version, client_version, ip, device_info) VALUES (:user, :app_ver, :cl_ver, :ip, :device_info)`, {
             user: id.user_id,
             app_ver: this.requestData.headers["bundle-version"],
@@ -90,7 +90,7 @@ export default class {
       let token = Utils.randomString(80 + Math.floor(Math.random() * 10))
       await this.connection.query("INSERT INTO auth_tokens (token, expire, session_key, login_key, login_passwd) VALUES (:token, :expire, :sk, :lk, :lp)", {
         token: token,
-        expire: Utils.parseDate(Date.now() + 15000),
+        expire: Utils.parseDate(Date.now() + 1200000),
         sk: sessionKey,
         lk: loginKey,
         lp: loginPaswd

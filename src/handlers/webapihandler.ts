@@ -11,16 +11,20 @@ export default async function webapiHandler(request: IncomingMessage, response: 
     await requestData.getAuthLevel()
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
       return await writeJsonResponse(response, {
-        httpStatusCode: 403,
-        connection: requestData.connection
+        httpStatusCode: 600,
+        connection: requestData.connection,
+        responseData: {
+          message: "An error occurred while processing the request. Please close the current tab and try again"
+        }
       })
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {
       return await writeJsonResponse(response, {
-        httpStatusCode: 423,
+        httpStatusCode: 600,
         connection: requestData.connection,
-        responseData: {},
-        direct: true
+        responseData: {
+          message: "You have been banned on this server"
+        }
       })
     }
 
@@ -31,8 +35,13 @@ export default async function webapiHandler(request: IncomingMessage, response: 
     const action = urlSplit[3].replace(/[^a-z]/g, "")
 
     let result = await executeAction(module, action, requestData)
+    if (result.headers && Object.keys(result.headers).length > 0) {
+      for (let key of Object.keys(result.headers)) {
+        response.setHeader(key, result.headers[key])
+      }
+    }
     return writeJsonResponse(response, {
-      httpStatusCode: 200,
+      httpStatusCode: result.status,
       responseData: result.result,
       authToken: requestData.auth_token,
       userId: requestData.user_id,

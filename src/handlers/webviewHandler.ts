@@ -17,7 +17,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
       return await writeJsonResponse(response, {
         httpStatusCode: 403,
         connection: requestData.connection,
-        responseData: "Rejected",
+        responseData: "An error occurred while processing the request. Please close the current tab and try again",
         direct: true
       })
     }
@@ -25,7 +25,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
       return await writeJsonResponse(response, {
         httpStatusCode: 423,
         connection: requestData.connection,
-        responseData: {},
+        responseData: "You have been banned on this server.",
         direct: true
       })
     }
@@ -38,10 +38,21 @@ export default async function webviewHandler(request: IncomingMessage, response:
 
     let result: ActionResult = await executeAction(module, action, requestData)
     response.setHeader("Content-Type", "text/html; charset=utf-8")
+    if (result.headers && Object.keys(result.headers).length > 0) {
+      for (let key of Object.keys(result.headers)) {
+        response.setHeader(key, result.headers[key])
+      }
+    }
     response.end(result.result)
     await requestData.connection.commit()
   } catch (err) {
     await requestData.connection.rollback()
+    if (err.message.startsWith("No permissions")) return await writeJsonResponse(response, {
+      httpStatusCode: 403,
+      connection: requestData.connection,
+      responseData: "An error occurred while processing the request. Please close the current tab and try again",
+      direct: true
+    })
     throw err
   }
 }

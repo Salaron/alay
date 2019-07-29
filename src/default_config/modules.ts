@@ -1,7 +1,4 @@
 export default <Modules>{
-  auth: {
-    auth_logging: true
-  },
   award: {
     unlockAll: false
   },
@@ -20,6 +17,10 @@ export default <Modules>{
   },
   liveIcon: {
     list: []
+  },
+  login: {
+    auth_logging: true,
+    webview_login: true
   },
   personalNotice: {
     welcomeMessageEnabled: true,

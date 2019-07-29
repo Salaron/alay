@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>SunLight Login</title>
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
+</head>
+
+<style>
+  body {
+    background-image: url("/resources/img/login_bg.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+</style>
+
+<body
+  class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light"
+  data-uk-height-viewport>
+  <!-- overlay -->
+  <div class="uk-position-cover uk-overlay-primary"></div>
+  <!-- /overlay -->
+  <div class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade" style>
+    <!-- login -->
+    <form class="toggle-class" id="login_form">
+      <fieldset class="uk-fieldset">
+        <div class="uk-margin-small">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
+            <input id="user_id" class="uk-input uk-border-pill" required placeholder="User ID" type="text">
+          </div>
+        </div>
+        <div class="uk-margin-small">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+            <input id="password" class="uk-input uk-border-pill" required placeholder="Password/Handover" type="password">
+          </div>
+        </div>
+        <div class="uk-margin-bottom">
+          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="login()">LOG
+            IN</button>
+        </div>
+      </fieldset>
+    </form>
+    <!-- /login -->
+
+    <!-- recover password -->
+    <form class="toggle-class" hidden>
+      <div class="uk-margin-small">
+        <div class="uk-inline uk-width-1-1">
+          <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
+          <input class="uk-input uk-border-pill" placeholder="E-mail" required type="text">
+        </div>
+      </div>
+      <div class="uk-margin-bottom">
+        <button type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1">SEND PASSWORD</button>
+      </div>
+    </form>
+    <!-- /recover password -->
+
+    <!-- action buttons -->
+    <div>
+      <div class="uk-text-center">
+        <a class="uk-link-reset uk-text-small toggle-class"
+          data-uk-toggle="target: .toggle-class; animation: uk-animation-fade" hidden>Forgot your password?</a>
+        <a class="uk-link-reset uk-text-small toggle-class"
+          data-uk-toggle="target: .toggle-class; animation: uk-animation-fade" hidden><span
+            data-uk-icon="arrow-left"></span> Back to Login</a>
+      </div>
+    </div>
+    <!-- action buttons -->
+  </div>
+
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
+  <script>
+    var headers = JSON.parse(escapeJSON('{{{headers}}}'))
+    // RSA preparation
+    var publicKey = `{{{PublicKey}}}`
+    var RSAEncrypt = new JSEncrypt()
+    RSAEncrypt.setKey(publicKey)
+
+    function login() {
+      var userId = $("#user_id").val()
+      var pass = $("#password").val()
+
+      if (pass.length === 0) return sendNotification("Password can't be blank", "warning")
+      if (pass.length > 16) return sendNotification("Password can't be more than 16 symbols", "warning")
+      if (!checkPass(pass)) return sendNotification("Used forbidden characters", "warning")
+      if (!checkUser(userId)) return sendNotification("User ID should be integer", "warning")
+
+      $.when(sendRequest({
+        module: "login",
+        action: "login",
+        user_id: RSAEncrypt.encrypt(userId),
+        password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+        $("#login_form").hide()
+        sendNotification("Success. Close this window to enter the game", "success")
+      })
+    }
+  </script>
+</body>
+
+</html>

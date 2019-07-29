@@ -28,8 +28,8 @@ export default class {
   }
 
   public async execute() {
-    let token = await this.connection.first("SELECT * FROM auth_tokens WHERE token=:token", { 
-      token: this.requestData.auth_token 
+    let token = await this.connection.first("SELECT * FROM auth_tokens WHERE token=:token", {
+      token: this.requestData.auth_token
     })
     if (!token) throw new Error(`Token doesn't exists`)
 
@@ -50,7 +50,12 @@ export default class {
       key: login_key,
       pass: login_passwd
     })
-    if (!userData) return { status: 600, result: { error_code: 407 } } // Invalid key/pass
+    if (!userData) { // Invalid key/pass
+      if (Config.modules.login.webview_login) return { status: 200, result: {}, headers: {
+        maintenance: 1
+      }}
+      return { status: 600, result: { error_code: 407 } } 
+    }
     await this.connection.query("UPDATE user_login SET login_token = :token, session_key = :key WHERE user_id = :user", {
       token: newToken,
       key: token.session_key,
@@ -58,14 +63,14 @@ export default class {
     })
 
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })
-    return { 
-      status: 200, 
-      result: { 
-        authorize_token: newToken, 
-        user_id: userData.user_id, 
+    return {
+      status: 200,
+      result: {
+        authorize_token: newToken,
+        user_id: userData.user_id,
         review_version: "", // iOS feature?
-        server_timestamp: Utils.timeStamp() 
-      } 
+        server_timestamp: Utils.timeStamp()
+      }
     }
   }
 }

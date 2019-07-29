@@ -47,7 +47,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
 
         await apiList.forEachAsync(async (data: any, i: number) => {
           await log.verbose(chalk.yellow(`${data.module}/${data.action} [${i + 1}/${apiList.length}]`), "api/multirequest")
-          let response: MultiResponse = {
+          let res: MultiResponse = {
             result: {},
             timeStamp: Utils.timeStamp(),
             status: 0,
@@ -62,13 +62,17 @@ export default async function moduleHandler(request: IncomingMessage, response: 
             })
           } catch (err) {
             log.error(err)
-            response.status = 600
-            return responseData.push(response)
+            res.status = 600
+            return responseData.push(res)
           }
-
-          response.status = result.status
-          response.result = result.result
-          responseData.push(response)
+          if (result.headers && Object.keys(result.headers).length > 0) {
+            for (let key of Object.keys(result.headers)) {
+              response.setHeader(key, result.headers[key])
+            }
+          }
+          res.status = result.status
+          res.result = result.result
+          responseData.push(res)
         })
 
         return writeJsonResponse(response, {
@@ -92,6 +96,11 @@ export default async function moduleHandler(request: IncomingMessage, response: 
         })
         if (!Array.isArray(result.result) && result.status === 200 && Type.isUndefined(result.result.server_timestamp)) {
           result.result.server_timestamp = Utils.timeStamp()
+        }
+        if (result.headers && Object.keys(result.headers).length > 0) {
+          for (let key of Object.keys(result.headers)) {
+            response.setHeader(key, result.headers[key])
+          }
         }
 
         return writeJsonResponse(response, {

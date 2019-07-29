@@ -36,7 +36,7 @@ export default class {
       startTime: moment(Config.maintenance.start_date).format("HH:mm"),
       endTime: moment(Config.maintenance.end_date).format("HH:mm"),
       startDay: moment(Config.maintenance.start_date).format("D MMMM"),
-      endDay: moment(Config.maintenance.start_date).format("D MMMM"),
+      endDay: moment(Config.maintenance.end_date).format("D MMMM"),
       timeZone: Config.maintenance.time_zone,
       latestVersion: Config.client.application_version,
       clientVersion: this.requestData.request.headers["bundle-version"] || "N/A"

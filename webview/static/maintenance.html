@@ -6,7 +6,7 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=880, target-densitydpi=device-dpi, user-scalable=no">
+  <meta name="viewport" content="width=880, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
 </head>
@@ -15,9 +15,7 @@
   <div id="outer">
     <div id="inner">
       <div id="header">
-        <h1
-          style="margin: 0;background: linear-gradient(to left, #28a5f5, #1e87f0);border-radius: 9px;color: white;font-size: 32px;font-weight: bold;height: 57px;line-height: 57px;padding: 0 2px 0 50px;width: 846px; padding-left: 12px;text-align: center;">
-          Maintenance</h1>
+        <h1 class="title">Maintenance</h1>
       </div>
 
       <div id="body">
@@ -27,8 +25,8 @@
             На данный момент сервер находится на техническом обслуживании для обновления.
             <br>
             {{#if haveDate}}
-            Примерный период обновления: <br>
-            {{startDay}} {{startTime}} ~ {{endDay}} {{endTime}} (UTC{{timeZone}})
+            Ожидаемый период обновления: <br>
+            {{startDay}} {{startTime}} ~ {{endDay}} {{endTime}} (UTC+{{timeZone}})
             {{/if}}
             <br>
             Приносим извинения за неудобства и благодарим за терпение.
@@ -40,7 +38,7 @@
             <br>
             {{#if haveDate}}
             Estimated maintenance period: <br>
-            {{startDay}} {{startTime}} ~ {{endDay}} {{endTime}} (UTC{{timeZone}})
+            {{startDay}} {{startTime}} ~ {{endDay}} {{endTime}} (UTC+{{timeZone}})
             {{/if}}
             <br>
             We apologize for the inconvenience, and thank you for your patience.

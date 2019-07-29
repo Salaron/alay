@@ -70,9 +70,6 @@ interface LLclient {
 }
 
 interface Modules {
-  auth: {
-    auth_logging: boolean
-  }
   award: {
     unlockAll: boolean
   }
@@ -91,6 +88,10 @@ interface Modules {
   }
   liveIcon: {
     list: number[]
+  }
+  login: {
+    auth_logging: boolean,
+    webview_login: boolean
   }
   personalNotice: {
     welcomeMessageEnabled: boolean

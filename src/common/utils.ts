@@ -9,16 +9,14 @@ import extend from "extend"
 const log = new Log("Common: Utils")
 
 export async function init() {
-  // Handle Clearing Temp Auth Tokens every 15 sec
+  // Handle Clearing Temp Auth Tokens every 5 min
   setInterval(async () => {
     try {
       let connection = await MySQLconnection.get()
       try {
         let tokens = await connection.query("SELECT * FROM auth_tokens WHERE expire <= CURRENT_TIMESTAMP")
-        let count = 0
         await tokens.forEachAsync(async (token) => {
           await connection.query("DELETE FROM auth_tokens WHERE token=:token", { token: token.token })
-          count += 1
         })
         await connection.commit()
       } catch (err) {
@@ -28,7 +26,7 @@ export async function init() {
     } catch (err) {
       log.error(err)
     }
-  }, 10000)
+  }, 300000)
 }
 
 export class Utils {
@@ -124,14 +122,9 @@ export class Utils {
     if (!Buffer.isBuffer(a)) { a = Buffer.from(a) }
     if (!Buffer.isBuffer(b)) { b = Buffer.from(b) }
     let res = []
-    if (a.length > b.length) {
-      for (let i = 0; i < b.length; i++) {
-        res.push(a[i] ^ b[i])
-      }
-    } else {
-      for (let i = 0; i < a.length; i++) {
-        res.push(a[i] ^ b[i])
-      }
+    let max = a.length > b.length ? b.length : a.length
+    for (let i = 0; i < max; i++) {
+      res.push(a[i] ^ b[i])
     }
     return Buffer.from(res)
   }
@@ -175,6 +168,22 @@ export class Utils {
 
   static timeStamp() {
     return Math.floor(Date.now() / 1000)
+  }
+  static isUnderMaintenance() {
+    return (
+      (Utils.toSpecificTimezone(Config.maintenance.time_zone) < Config.maintenance.end_date && 
+      Utils.toSpecificTimezone(Config.maintenance.time_zone) >= Config.maintenance.start_date) || 
+      Config.maintenance.force_enabled
+    )
+  }
+  static canBypassMaintenance(userId: number) {
+    let admins = Config.server.admin_ids.map(Number)
+    let bypassList = Config.maintenance.bypass.map(Number)
+
+    return (
+      admins.includes(userId) ||
+      bypassList.includes(userId)
+    )
   }
 
   public async getCurrentOnline() {
