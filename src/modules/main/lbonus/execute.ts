@@ -142,11 +142,11 @@ export default class {
     }, `Login Bonus Reward! [${currentDay}.${currentMonth}.${currentMonth}]`, reward.amount)
 
     // Total Login Bonus
-    await Object.keys(Config.lbonus.total_login_bonus).forEachAsync(async(day: string) => {
+    await Object.keys(Config.lbonus.total_login_bonus).forEachAsync(async (day: string) => {
       if (response.total_login_info.login_count >= day) {
-        let check = await this.connection.first(`SELECT * FROM login_bonus_total WHERE user_id = :user AND days = :days`, { 
-          user: this.user_id, 
-          days: day 
+        let check = await this.connection.first(`SELECT * FROM login_bonus_total WHERE user_id = :user AND days = :days`, {
+          user: this.user_id,
+          days: day
         })
         if (check) return
 
@@ -155,7 +155,7 @@ export default class {
           name: Config.lbonus.total_login_bonus[day].name,
           id: Config.lbonus.total_login_bonus[day].item_id
         }, `Total Login Bonus Reward! [${day} day(s)]`, Config.lbonus.total_login_bonus[day].amount)
-      } else if (response.total_login_info.remaining_count == 0 ) {
+      } else if (response.total_login_info.remaining_count == 0) {
         let itemInfo = Item.nameToType(Config.lbonus.total_login_bonus[day].name)
         response.total_login_info.remaining_count = parseInt(day) - response.total_login_info.login_count
         response.total_login_info.reward.push({
@@ -173,21 +173,23 @@ export default class {
   }
 
   private async getSheets() {
-    let sheets = await this.connection.query(`SELECT * FROM login_bonus_sheets WHERE :now >= start_date AND :now <= end_date`, {
-      now: new Date(Utils.toSpecificTimezone(9))
+    let sheets = await this.connection.query(`SELECT * FROM login_bonus_sheets WHERE :now >= start_date AND :now < end_date`, {
+      now: Utils.toSpecificTimezone(9)
     })
     if (sheets.length === 0) return []
-    let result = []
+    let result: any[] = []
+    const item = new Item(this.connection)
 
     await sheets.forEachAsync(async (sheet: any) => {
-      let data: any = {
+      let data = {
         nlbonus_id: sheet.nlbonus_id,
         nlbonus_item_num: sheet.item_num,
         detail_text: sheet.detail_text,
         bg_asset: sheet.bg_asset,
         show_next_item: false,
-        items: [],
-        stamp_num: 0
+        items: <any>[],
+        stamp_num: 0,
+        get_item: <any>[]
       }
 
       let items = await this.connection.query(`
@@ -196,23 +198,65 @@ export default class {
         items.amount, items.seq, rec.insert_date, rec.user_id, rec.nlbonus_item_id AS received
       FROM login_bonus_sheets_items AS items 
         LEFT JOIN login_bonus_sheets_received AS rec ON items.nlbonus_item_id = rec.nlbonus_item_id AND rec.user_id = :user
-      WHERE nlbonus_id = :nlbonus`, { // TODO: order by
-        user: this.user_id,
-        nlbonus: sheet.nlbonus_id
-      })
+      WHERE nlbonus_id = :nlbonus ORDER BY seq ASC`, { user: this.user_id, nlbonus: sheet.nlbonus_id })
 
-      await items.forEachAsync(async (item: any) => {
-        // TODO
+      let lastSeq = 0 // never use seq 0
+      let getItemSeq = 0
+      let lastInsertDate = "0000-00-00 00:00:00"
+      await items.forEachAsync(async (seq: any) => {
+        if (lastSeq === seq.seq) {
+          data.items[data.items.length - 1].reward.push(this.parseRewardData(seq)) // "packet" reward
+        } else data.items.push({
+          seq: seq.seq,
+          nlbonus_item_id: seq.nlbonus_item_id,
+          reward: [this.parseRewardData(seq)]
+        })
+
+        if (seq.insert_date != null) {
+          // item is already collected
+          lastInsertDate = lastInsertDate < Utils.toSpecificTimezone(9, seq.insert_date) ? Utils.toSpecificTimezone(9, seq.insert_date) : lastInsertDate
+          if (lastSeq != seq.seq) data.stamp_num += 1
+        } else if (
+          lastInsertDate < moment(new Date()).utcOffset(9).startOf("day").format("YYYY-MM-DD HH:mm:SS") ||
+          getItemSeq === seq.seq
+        ) {
+          // new day -- new reward
+          lastInsertDate = Utils.toSpecificTimezone(9)
+          getItemSeq = seq.seq
+          data.get_item.push(this.parseRewardData(seq))
+          await this.connection.query(`INSERT INTO login_bonus_sheets_received (user_id, nlbonus_item_id) VALUES (:user, :id)`, {
+            user: this.user_id,
+            id: seq.nlbonus_item_id
+          })
+          await item.addPresent(this.user_id, {
+            type: seq.item_type,
+            id: seq.item_id || null
+          }, `Special Login Bonus Reward [${data.stamp_num + 1} day(s)]`, seq.amount)
+        }
+
+        if (seq.received === null) data.show_next_item = true
+        lastSeq = seq.seq
       })
+      if (data.get_item.length === 0) data.get_item = undefined
 
       result.push(data)
     })
+    return result
+  }
+  private parseRewardData(data: any) {
+    return {
+      unit_id: data.item_type === 1001 ? data.item_id : undefined,
+      item_id: data.item_type != 1001 ? data.item_id : undefined,
+      is_rank_max: data.item_type === 1001 ? false : undefined,
+      add_type: data.item_type,
+      amount: data.amount
+    }
   }
 
   private async getCalendar(year: string, month: string) {
-    let calendar = await this.connection.query("SELECT * FROM login_calendar_table WHERE year=:year AND month=:month", { 
-      year: year, 
-      month: month 
+    let calendar = await this.connection.query("SELECT * FROM login_calendar_table WHERE year=:year AND month=:month", {
+      year: year,
+      month: month
     })
     if (calendar.length > 0) return calendar
 
@@ -224,7 +268,7 @@ export default class {
     })
 
     let days = moment(month, "MM").daysInMonth()
-    for (let i = 0; i < days; i++){
+    for (let i = 0; i < days; i++) {
       let dayOfWeek = moment([year, parseInt(month, 10) - 1]).add(i, "days").day()
       let dayOfMonth = i + 1
 
@@ -253,9 +297,9 @@ export default class {
     }
 
     await this.connection.query(`INSERT INTO login_calendar_table (year, month, day_of_month, day_of_week, special_flag, item_type, item_id, amount) VALUES ${insertData.join(",")}`)
-    return await this.connection.query("SELECT * FROM login_calendar_table WHERE year=:year AND month=:month", { 
-      year: year, 
-      month: month 
+    return await this.connection.query("SELECT * FROM login_calendar_table WHERE year=:year AND month=:month", {
+      year: year,
+      month: month
     })
   }
 }

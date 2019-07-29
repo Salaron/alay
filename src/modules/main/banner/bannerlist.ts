@@ -34,7 +34,7 @@ export default class {
     	UNION
     	SELECT  asset_path, asset_path_se, target_id, banner_type, master_is_active_event, member_category, webview_url, start_date, end_date FROM banner_list
     ) as b WHERE asset_path IS NOT NULL AND asset_path_se IS NOT NULL AND start_date < :now AND end_date > :now ORDER BY member_category ASC, master_is_active_event DESC`, {
-      now: new Date(Utils.toSpecificTimezone(9))
+      now: Utils.toSpecificTimezone(9)
     })
     let aqoursBanners = await this.connection.query(`
     SELECT * FROM (
@@ -44,7 +44,7 @@ export default class {
     	UNION
     	SELECT  asset_path, asset_path_se, target_id, banner_type, master_is_active_event, member_category, webview_url, start_date, end_date FROM banner_list
     ) as b WHERE asset_path IS NOT NULL AND asset_path_se IS NOT NULL AND start_date < :now AND end_date > :now ORDER BY member_category DESC, master_is_active_event DESC`, {
-      now: new Date(Utils.toSpecificTimezone(9))
+      now: Utils.toSpecificTimezone(9)
     })
 
     let museCategory = {

@@ -51,9 +51,20 @@ export default class {
       pass: login_passwd
     })
     if (!userData) { // Invalid key/pass
-      if (Config.modules.login.webview_login) return { status: 200, result: {}, headers: {
-        maintenance: 1
-      }}
+      // let's check if login key already used
+      let check = await this.connection.first(`SELECT * FROM user_login WHERE login_key = :key`, { key: login_key })
+      if (check) { // login key alredy exists
+        // send error code 407 to client to reset keychain
+        return { status: 600, result: { error_code: 407 } }
+      }
+
+      if (Config.modules.login.webview_login) return { 
+        status: 200, 
+        result: {}, 
+        headers: {
+          maintenance: 1 // redirect to webview fake maintenance page
+        }
+      }
       return { status: 600, result: { error_code: 407 } } 
     }
     await this.connection.query("UPDATE user_login SET login_token = :token, session_key = :key WHERE user_id = :user", {

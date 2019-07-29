@@ -164,7 +164,7 @@ export class Utils {
   }
   static toSpecificTimezone(utcOffset: number = 9, date?: string | Date) {
     if (!date) date = new Date()
-    return moment(date).utcOffset(utcOffset).format("YYYY-MM-DD HH:mm:SS")
+    return moment(date).utcOffset(utcOffset).format("YYYY-MM-DD HH:mm:ss")
   }
 
   static timeStamp() {

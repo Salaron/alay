@@ -28,7 +28,15 @@ export default class {
   }
 
   public async execute() {
-    let token = await this.connection.first("SELECT * FROM auth_tokens WHERE token=:token", { 
+    if (Config.modules.login.webview_login) return { 
+      status: 200, 
+      result: {}, 
+      headers: {
+        maintenance: 1 // redirect to webview fake maintenance page
+      }
+    }
+    
+    let token = await this.connection.first("SELECT * FROM auth_tokens WHERE token = :token", { 
       token: this.requestData.auth_token 
     })
     if (!token) throw new Error(`Token doesn't exists`)

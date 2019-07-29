@@ -97,6 +97,32 @@ export class Item {
         }
       }
 
+      case "live":
+      case "lives": {
+        return {
+          itemType: 5000,
+          itemId: itemId || null
+        }
+      }
+
+      case "award":
+      case "awards":
+      case "badge": {
+        return {
+          itemType: 5100,
+          itemId: itemId || null
+        }
+      }
+
+      case "background":
+      case "backgrounds":
+      case "bg": {
+        return {
+          itemType: 5200,
+          itemId: itemId || null
+        }
+      }
+
       default: {
         throw new Error(`"${name}" is not support`)
       }
@@ -116,7 +142,10 @@ export class Item {
       case 3000: return "game_coin"
       case 3001: return "sns_coin"
       case 3002: return "social_point"
-      case 3005: return "exchange_point"
+      case 3006: return "exchange_point"
+      case 5000: return "live"
+      case 5100: return "award"
+      case 5200: return "background"
       case 5500: return "school_idol_skill"
       default: {
         throw new Error(`Unknown item_type: ${itemType}`)
@@ -176,11 +205,28 @@ export class Item {
         return result
       }
 
-      case 3005: {
+      case 3006: {
         await this.connection.query(`UPDATE user_exchange_point SET amount=amount + ${amount} WHERE user_id=${userId} AND rarity=${item.id}`)
         return
       }
 
+      case 5000: {
+        throw new Error(`Not implemented yet.`) // TODO
+      }
+      case 5100: {
+        await this.connection.query(`INSERT IGNORE INTO user_award_unlock (user_id, award_id) VALUES (:user, :award)`, {
+          user: userId,
+          award: item.id
+        })
+        return
+      }
+      case 5200: {
+        await this.connection.query(`INSERT IGNORE INTO user_background_unlock (user_id, background_id) VALUES (:user, :bg)`, {
+          user: userId,
+          bg: item.id
+        })
+        return
+      }
       case 5500: {
         await this.connection.query(`INSERT INTO user_unit_removable_skill_owning (user_id, unit_removable_skill_id, total_amount) VALUES (${userId}, ${item.id}, ${amount}) \
         ON DUPLICATE KEY UPDATE total_amount=total_amount + ${amount}`)
