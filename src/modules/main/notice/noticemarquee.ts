@@ -18,25 +18,21 @@ export default class {
     this.requestData = requestData
   }
 
-  public paramTypes() {
-    return {}
-  }
-  public paramCheck() {
-    return true
-  }
-
   public async execute() {
     let response = {
       item_count: 0,
       marquee_list: <any>[]
     }
-    if (Config.maintenance.notice) {
+    if (Config.maintenance.notice && moment(Config.maintenance.start_date).diff(moment(new Date()).utcOffset(Config.maintenance.time_zone), "h") < 3) {
+      let startDay = moment(Config.maintenance.start_date).format("D MMMM")
+      let startTime = moment(Config.maintenance.start_date).format("HH:mm")
+      let endDay = moment(Config.maintenance.end_date).format("D MMMM")
+      let endTime = moment(Config.maintenance.end_date).format("HH:mm")
       response.marquee_list.push({
-        marquee_id: -1,
-        text: `TODO`,
-        text_color: 0,
-        start_date: Utils.toSpecificTimezone(Config.maintenance.time_zone, Config.maintenance.start_date),
-        end_date: Utils.toSpecificTimezone(Config.maintenance.time_zone, Config.maintenance.start_date)
+        marquee_id: 1,
+        text: `В период с ${startDay} ${startTime} по ${endDay} ${endTime} UTC+${Config.maintenance.time_zone} сервер будет отключён для проведения обновления`,
+        start_date: Utils.toSpecificTimezone(9, new Date(new Date().setMinutes(new Date().getMinutes() - 1))),
+        end_date: Utils.toSpecificTimezone(9, Config.maintenance.start_date)
       })
       response.item_count += 1
     }
