@@ -503,6 +503,7 @@ export class Secretbox {
         if (!userPon) userPon = { pon_count: 0 }
         let currentStep = userPon.pon_count + 1
         if (stepSettings.reset_type === 1) currentStep = currentStep % stepSettings.end_step
+        if (currentStep === 0) currentStep = stepSettings.end_step
         return <stepInfo>{
           secret_box_type: secretBoxType,
           step: currentStep,
