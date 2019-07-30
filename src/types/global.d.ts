@@ -9,6 +9,7 @@ import { Events as events } from "../common/event"
 import { Unit as unit } from "../common/unit"
 import { Item as item } from "../common/item"
 import { Secretbox as secretbox } from "../common/secretbox"
+import { Notice as notice } from "../common/notice"
 
 declare global {
   // make project root dir global (for easy access to files outside of 'compile' folder)
@@ -17,11 +18,13 @@ declare global {
   const MySQLconnection: typeof connection
   const MySQLconnectionPool: ConnectionPool
   const sqlite3: Sqlite3
-  // various modules
+  type Connection = connection
   const Config: config
-  const Utils: typeof utils
+  // custom errors for better handling
   const ErrorCode: typeof errorCode
   const ErrorUser: typeof errorUser
+  // common modules
+  const Utils: typeof utils
   const Type: typeof type
   const User: typeof user
   const Live: typeof live
@@ -29,8 +32,7 @@ declare global {
   const Unit: typeof unit
   const Item: typeof item
   const Secretbox: typeof secretbox
-
-  type Connection = connection
+  const Notice: typeof notice
 
   interface Array<T> {
     forEachAsync(callback: (element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void>

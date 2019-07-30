@@ -54,7 +54,7 @@ export class Unit {
       next_exp: unitData.next_exp,
       level: unitData.level,
       max_level: unitData.max_level,
-      rank: unitData.unit_rank,
+      rank: unitData.rank,
       max_rank: unitData.max_rank,
       love: unitData.love,
       max_love: unitData.max_love,
@@ -123,7 +123,7 @@ export class Unit {
         next_exp: null,
         level: null,
         max_level: null,
-        unit_rank: null,
+        rank: null,
         max_rank: null,
         love: null,
         max_love: null,
@@ -140,15 +140,15 @@ export class Unit {
       insertData.unit_id = unitData.unit_id
       insertData.attribute = unitData.attribute_id
       insertData.max_rank = (unitData.disable_rank_up >= 1 ? 1 : 2)
-      insertData.unit_rank = Math.min(insertData.max_rank, options.rank)
-      insertData.display_rank = insertData.unit_rank
+      insertData.rank = Math.min(insertData.max_rank, options.rank)
+      insertData.display_rank = insertData.rank
       insertData.max_skill_level = (unitData.max_skill_level == null ? 1 : unitData.max_skill_level)
-      insertData.max_love = (insertData.unit_rank == 2 ? unitData.after_love_max : unitData.before_love_max)
-      insertData.max_level = (insertData.unit_rank == 2 ? unitData.after_level_max : unitData.before_level_max)
+      insertData.max_love = (insertData.rank == 2 ? unitData.after_love_max : unitData.before_love_max)
+      insertData.max_level = (insertData.rabk == 2 ? unitData.after_level_max : unitData.before_level_max)
       insertData.level = Math.min(insertData.max_level, options.level)
       insertData.love = Math.min(insertData.max_love, options.love)
       insertData.unit_skill_level = 1
-      insertData.removable_skill_capacity = Math.min(unitData.max_removable_skill_capacity, insertData.unit_rank == insertData.max_rank ? (unitData.default_removable_skill_capacity + 1) : unitData.default_removable_skill_capacity)
+      insertData.removable_skill_capacity = Math.min(unitData.max_removable_skill_capacity, insertData.rank == insertData.max_rank ? (unitData.default_removable_skill_capacity + 1) : unitData.default_removable_skill_capacity)
       insertData.max_removable_skill_capacity = unitData.max_removable_skill_capacity
 
       let level = await unitDB.all("SELECT * FROM unit_level_up_pattern_m WHERE unit_level_up_pattern_id = ? AND (unit_level IN (?,?))", [
@@ -170,12 +170,12 @@ export class Unit {
       }
       let result = await this.connection.query("\
       INSERT INTO units (\
-        user_id, unit_id, `exp`, next_exp, `level`, max_level, `unit_rank`, \
+        user_id, unit_id, `exp`, next_exp, `level`, max_level, `rank`, \
         max_rank, love, max_love, unit_skill_level, max_skill_level, max_hp, \
         removable_skill_capacity, max_removable_skill_capacity, display_rank, \
         stat_smile, stat_pure, stat_cool, attribute \
       ) VALUES (\
-        :user_id, :unit_id, :exp, :next_exp, :level, :max_level, :unit_rank, :max_rank, \
+        :user_id, :unit_id, :exp, :next_exp, :level, :max_level, :rank, :max_rank, \
         :love, :max_love, :unit_skill_level, :max_skill_level, :max_hp, \
         :removable_skill_capacity, :max_removable_skill_capacity, :display_rank, \
         :stat_smile, :stat_pure, :stat_cool, :attribute \
@@ -241,7 +241,7 @@ export class Unit {
       next_exp: data.next_exp,
       level: data.level,
       max_level: data.max_level,
-      rank: data.unit_rank,
+      rank: data.rank,
       max_rank: data.max_rank,
       love: data.love,
       max_love: data.max_love,

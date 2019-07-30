@@ -53,7 +53,7 @@ export default class {
     SELECT DISTINCT
       users.user_id, users.name, users.level, 
       units.unit_owning_user_id,  unit_id, units.exp as unit_exp, units.next_exp, units.level as unit_level, units.max_level, 
-      units.unit_rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
+      units.rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
       units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool,
       (SELECT status FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id) AND status = 1 LIMIT 1) as friend_status
     FROM users 
@@ -71,7 +71,7 @@ export default class {
     SELECT DISTINCT
       users.user_id, users.name, users.level, 
       units.unit_owning_user_id,  unit_id, units.exp as unit_exp, units.next_exp, units.level as unit_level, units.max_level, 
-      units.unit_rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
+      units.rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
       units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool,
       (SELECT status FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id) AND status = 1) as friend_status
     FROM users 
@@ -88,7 +88,7 @@ export default class {
     SELECT DISTINCT
       users.user_id, users.name, users.level, 
       units.unit_owning_user_id,  unit_id, units.exp as unit_exp, units.next_exp, units.level as unit_level, units.max_level, 
-      units.unit_rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
+      units.rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
       units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool,
       (SELECT status FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id) AND status = 1) as friend_status
     FROM users 
@@ -105,7 +105,7 @@ export default class {
     SELECT 
       users.user_id, users.name, users.level, 
       units.unit_owning_user_id,  unit_id, units.exp as unit_exp, units.next_exp, units.level as unit_level, units.max_level, 
-      units.unit_rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
+      units.rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
       units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool, 1 as friend_status 
     FROM users 
       JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id 
@@ -139,9 +139,9 @@ export default class {
         smile: data.stat_smile,
         cute: data.stat_pure,
         cool: data.stat_cool,
-        rank: data.unit_rank,
+        rank: data.rank,
         display_rank: data.display_rank,
-        is_rank_max: data.unit_rank >= data.max_rank,
+        is_rank_max: data.rank >= data.max_rank,
         is_love_max: data.love >= data.max_love,
         is_level_max: data.unit_level >= data.max_level,
         unit_skill_exp: data.unit_skill_exp,

@@ -6,5 +6,11 @@
   },
   "annouce-index": {
     "more": "More..."
+  },
+  "notice": {
+    "1": ":affectorName removed you from their friend list",
+    "2": ":affectorName sent you a friend request",
+    "3": ":affectorName rejected your friend request",
+    "4": ":affectorName accepted your friend request"
   }
 }

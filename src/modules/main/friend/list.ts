@@ -87,8 +87,8 @@ export default class {
         (SELECT last_activity FROM user_login WHERE user_id = :user) as last_activity,
         setting_award_id
       FROM users 
-      WHERE user_id = :user AND tutorial_state = -1`, { user: this.params.invite_code })
-
+      WHERE user_id = :user AND tutorial_state = -1`, { user: friendId })
+      if (!profile) continue
       let dateNow = moment(new Date())
       let dateLastLogin = moment(new Date(profile.last_activity || profile.last_login))
       let applied = moment(new Date(friend.agree_date || friend.insert_date))
@@ -104,7 +104,7 @@ export default class {
           elapsed_time_from_applied: appliedTime > 1440 ? ` ${Math.floor(appliedTime/1440)} day(s)` : appliedTime > 60 ? ` ${Math.floor(appliedTime/60)} hour(s)` : ` ${appliedTime} min(s)`,
           comment: profile.introduction
         },
-        center_unit_info: await user.getCenterUnitInfo(this.params.invite_code),
+        center_unit_info: await user.getCenterUnitInfo(friendId),
         setting_award_id: profile.setting_award_id
       })
     }

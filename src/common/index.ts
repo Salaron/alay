@@ -6,6 +6,7 @@ import * as live from "./live"
 import * as event from "./event"
 import * as item from "./item"
 import * as secretbox from "./secretbox"
+import * as notice from "./notice"
 
 export {
   item,
@@ -15,5 +16,6 @@ export {
   unit,
   live,
   event,
-  secretbox
+  secretbox,
+  notice
 }

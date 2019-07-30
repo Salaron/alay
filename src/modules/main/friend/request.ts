@@ -38,13 +38,14 @@ export default class {
         thisUser: this.user_id
       })
       isFriend = true
+      await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().ACCEPTED_FRIEND_REQUEST, this.params.user_id)
     } else {
       await this.connection.query(`INSERT INTO user_friend (initiator_id, recipient_id, status) VALUES (:init, :rec, 0)`, {
         init: this.user_id,
         rec: this.params.user_id
       })
+      await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().SEND_FRIEND_REQUEST, this.params.user_id)
     }
-    // TODO: notification
     return {
       status: 200,
       result: { 

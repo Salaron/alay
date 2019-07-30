@@ -28,7 +28,7 @@ export default class {
       thisUser: this.user_id,
       recUser: this.params.user_id
     })
-    // TODO: notification
+    await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().REMOVED_FROM_FRIENDS, this.params.user_id)
 
     return {
       status: 200,

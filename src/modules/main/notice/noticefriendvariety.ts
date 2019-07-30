@@ -42,6 +42,7 @@ export default class {
         filter_id,
         message,
         insert_date,
+        type_id,
         (
           SELECT 
             status 
@@ -55,13 +56,13 @@ export default class {
         ) as friend_status 
       FROM 
         user_notice 
-    ) s WHERE (receiver_id IS NULL AND friend_status = 1) OR (receiver_id = :user)`
+    ) s WHERE ((receiver_id IS NULL AND friend_status = 1) OR (receiver_id = :user))`
 
     if (this.params.filter_id === 0) {
       if (this.params.page === 0) list.push({
         notice_id: -1,
         filter_id: 99,
-        notice_template_id: 3,
+        notice_template_id: 0,
         message: `Your handover ID: ${(await this.connection.first("SELECT password FROM users WHERE user_id=:user", { user: this.user_id })).password}`,
         readed: true,
         insert_date: "Server",
@@ -89,17 +90,23 @@ export default class {
       let dateInsert = moment(new Date(notice.insert_date))
       let elapsedTime = Math.floor(moment.duration(dateNow.diff(dateInsert)).asMinutes())
       let readed = notice.receiver_id == null ? true : !!notice.readed
+      let affector = await this.getAffectorInfo(notice.affector_id)
+
+      if (notice.message === null) {
+        notice.message = await new Notice(this.connection).getPreparedMessage(this.user_id, notice.type_id, {
+          affectorName: affector.user_data.name
+        })
+      }
       list.push({
         notice_id: notice.notice_id,
         filter_id: notice.filter_id,
-        notice_template_id: 0,
+        notice_template_id: notice.filter_id,
         message: notice.message,
         readed: readed,
         insert_date: elapsedTime > 1440 ? ` ${Math.floor(elapsedTime/1440)} day(s) ago` : elapsedTime > 60 ? ` ${Math.floor(elapsedTime/60)} hour(s) ago` : ` ${elapsedTime} min(s) ago`,
         affector: await this.getAffectorInfo(notice.affector_id)
       })
     })
-
 
     return {
       status: 200,

@@ -32,8 +32,8 @@ export default class {
           init: this.params.user_id,
           rec: this.user_id
         })
+        await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().REJECTED_FRIEND_REQUEST, this.params.user_id)
         break
-
       }
       case 2: {
         // request accepted
@@ -41,6 +41,7 @@ export default class {
           init: this.params.user_id,
           rec: this.user_id
         })
+        await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().ACCEPTED_FRIEND_REQUEST, this.params.user_id)
         break
       }
       default: throw new ErrorUser(`Unknown status: ${this.params.status}`, this.user_id)

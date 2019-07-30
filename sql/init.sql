@@ -375,7 +375,7 @@ CREATE TABLE IF NOT EXISTS `units` (
   `next_exp` mediumint(8) unsigned NOT NULL DEFAULT '6',
   `level` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `max_level` tinyint(3) unsigned NOT NULL DEFAULT '30',
-  `unit_rank` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `rank` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `max_rank` tinyint(1) unsigned NOT NULL DEFAULT '2',
   `love` smallint(4) unsigned NOT NULL DEFAULT '0',
   `max_love` smallint(4) unsigned NOT NULL DEFAULT '25',
