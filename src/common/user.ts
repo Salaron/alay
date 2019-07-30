@@ -74,12 +74,14 @@ export class User {
     `, {
       user: userId
     })
+    if (!data) throw new Error(`Center unit data is missing`)
     return await new Unit(this.connection).getUnitDetail(data.unit_owning_user_id)
   }
   public async getNaviUnitInfo(userId: number) {
     let data = await this.connection.first(`SELECT partner_unit FROM users WHERE user_id = :user`, {
       user: userId
     })
+    if (!data) throw new Error(`Navi unit data is missing`)
     return await new Unit(this.connection).getUnitDetail(data.partner_unit)
   }
 

@@ -11,7 +11,12 @@ interface Options {
 }
 
 export default async function executeAction(module: string, action: string, requestData: RequestData, options: Options = {}) {
-  if (module.length === 0 || action.length === 0) throw new ErrorUser(`Module or Action was not provided (${module}/${action})`, requestData.user_id)
+  if (
+    !module || 
+    !action || 
+    module.length === 0 || 
+    action.length === 0
+  ) throw new ErrorUser(`Module or Action is not provided (${module}/${action})`, requestData.user_id)
   module = module.replace(/\s/g, "X").toLowerCase()
   action = action.replace(/\s/g, "X").toLowerCase()
 
@@ -48,6 +53,7 @@ export default async function executeAction(module: string, action: string, requ
     return await body.execute()
   } catch (err) {
     // handle module errors
+    if (err instanceof ErrorCode) return err.response
     throw err
   } finally {
     if (Config.server.debug_mode) {

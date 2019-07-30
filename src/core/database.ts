@@ -224,6 +224,11 @@ export class Connection {
     this.released = true
   }
 
+  async execute(query: string, values: any = {}): Promise<any> {
+    this.checkIfReleased()
+    this.lastQuery = query
+    return await MySQLconnectionPool.query(query, values, this.connection)
+  }
   async query(query: string, values: any = {}) {
     this.checkIfReleased()
     this.lastQuery = query
