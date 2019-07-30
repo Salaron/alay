@@ -4,10 +4,8 @@
     "@typescript-eslint"
   ],
   "extends": [
-    "plugin:@typescript-eslint"
   ],
   "env": {
-    "browser": true,
     "es6": true
   },
   "globals": {
