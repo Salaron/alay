@@ -73,7 +73,10 @@ export class Unit {
       is_removable_skill_capacity_max: unitData.removable_skill_capacity >= unitData.max_removable_skill_capacity,
       is_support_member: supportUnitList.includes(unitData.unit_id),
       item_category_id: 0,
-      insert_date: Utils.parseDate(unitData.insert_date)
+      insert_date: Utils.parseDate(unitData.insert_date),
+      stat_smile: unitData.stat_smile,
+      stat_pure: unitData.stat_pure,
+      stat_cool: unitData.stat_cool
     }
   }
 

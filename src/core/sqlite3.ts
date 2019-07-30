@@ -56,7 +56,7 @@ export default class Sqlite3 {
       })
     })
   }
-  public async all(query: string, values?: any): Promise<any> {
+  public async all(query: string, values?: any): Promise<any[]> {
     this.checkIfClosed()
     let preparedQuery = formatQuery(query, values)
     this.lastQuery = preparedQuery

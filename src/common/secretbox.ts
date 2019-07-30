@@ -47,7 +47,7 @@ export class Secretbox {
     const user = new User(this.connection)
 
     let [, beforeUserInfo, costSettings, secretBoxInfo, cost] = await Promise.all([
-      this.connection.query(`INSERT INTO secretbox_pon (user_id, secretbox_id, pon_count) VALUES (:user, :sbId, 1) ON DUPLICATE KEY UPDATE pon_count = pon_count + 0`, {
+      this.connection.query(`INSERT INTO secretbox_pon (user_id, secretbox_id, pon_count) VALUES (:user, :sbId, 0) ON DUPLICATE KEY UPDATE pon_count = pon_count + 0`, {
         user: userId,
         sbId: secretBoxId
       }),

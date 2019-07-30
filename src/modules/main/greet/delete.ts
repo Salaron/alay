@@ -10,7 +10,6 @@ export default class {
   private connection: Connection
   private requestData: RequestData
   private params: any
-  private User: any
   constructor(requestData: RequestData) {
     this.user_id = <number>requestData.user_id
     this.connection = requestData.connection

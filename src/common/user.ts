@@ -1,5 +1,12 @@
 import { Connection } from "../core/database"
 
+interface userParams {
+  vanish?: number,
+  mirror?: number,
+  hp?: number,
+  event?: number
+}
+
 export class User {
   connection: Connection
   constructor(connection: Connection) {
@@ -94,7 +101,23 @@ export class User {
     if (friend.status === 1) return 1 // friend
     if (friend.recipient_id === currentUser && friend.initiator_id === anotherUser) return 2 // approval wait
     return 3 // pending
+  }
 
+  public async getParams(userId: number, params: string[] = []): Promise<userParams> {
+    let userParams = await this.connection.query(`SELECT param_name as name, value FROM user_params WHERE user_id=:user`, {
+      user: userId
+    })
+
+    let result: any = {}
+
+    for (let i = 0; i < userParams.length; i++) {
+      if (params.includes(userParams[i].name)) {
+        result[userParams[i].name] = userParams[i].value
+      } else {
+        result[userParams[i].name] = userParams[i].value
+      }
+    }
+    return result
   }
 }
 (global as any).User = User
