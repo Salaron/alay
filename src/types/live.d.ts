@@ -29,3 +29,19 @@ interface rankInfo {
   rank_min: number
   rank_max: number
 }
+
+interface liveInfo {
+  live_difficulty_id: number
+  is_random: boolean
+  ac_flag: number
+  swing_flag: number
+}
+interface scoreInfo {
+  score: number
+  max_combo: number
+  perfect_cnt: number
+  great_cnt: number
+  good_cnt: number
+  bad_cnt: number
+  miss_cnt: number
+}

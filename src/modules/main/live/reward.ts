@@ -155,19 +155,38 @@ export default class {
       if (eventLive) {
         this.params.event_point = Events.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
       }
-      let status = await this.connection.first(`SELECT token_point FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
+      let userStatus = await this.connection.first(`SELECT token_point, score FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
         user: this.user_id,
         event: currentEvent.id
       })
       response.event_info = await event.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, this.params.event_point)
-      response.event_info.event_point_info.before_event_point = status.token_point
-      response.event_info.event_point_info.after_event_point = status.token_point
+      response.event_info.event_point_info.before_event_point = userStatus.token_point
+      response.event_info.event_point_info.after_event_point = userStatus.token_point
       if (!eventLive) {
-        response.event_info.event_point_info.after_event_point = status.token_point + this.params.event_point
+        response.event_info.event_point_info.after_event_point = userStatus.token_point + this.params.event_point
         await this.connection.execute("UPDATE event_ranking SET token_point = token_point + :val WHERE user_id = :user AND event_id = :id", {
           val: this.params.event_point,
           user: this.user_id,
           id: currentEvent.id
+        })
+      }
+
+      if (!userStatus.score || userStatus.score < totalScore) {
+        await event.writeHiScore(this.user_id, currentEvent.id, deck, [
+          {
+            live_difficulty_id: liveData.live_difficulty_id,
+            is_random: !!liveData.random_flag,
+            ac_flag: liveData.ac_flag,
+            swing_flag: liveData.swing_flag
+          }
+        ], {
+          score: totalScore,
+          max_combo: this.params.max_combo,
+          perfect_cnt: this.params.perfect_cnt,
+          great_cnt: this.params.great_cnt,
+          good_cnt: this.params.good_cnt,
+          bad_cnt: this.params.bad_cnt,
+          miss_cnt: this.params.miss_cnt
         })
       }
     }

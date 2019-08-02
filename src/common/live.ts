@@ -455,6 +455,10 @@ export class Live {
       case 3: scoreBonus += 0.04; break
       case 4: scoreBonus += 0.02; break
     }
+    return {
+      comboBonus,
+      scoreBonus
+    }
   }
   public static calculateMaxKizuna(maxCombo: number) {
     // Source: https://decaf.kouhi.me/lovelive/index.php?title=Gameplay#Kizuna

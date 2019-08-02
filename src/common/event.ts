@@ -187,6 +187,90 @@ export class Events {
     }
   }
 
+  public async writeHiScore(userId: number, eventId: number, deck: any, liveList: liveInfo[], scoreInfo: scoreInfo) {
+    let json = {
+      live_list: liveList,
+      score_info: scoreInfo,
+      deck: {
+        total_status: {
+          hp: 0,
+          smile: 0,
+          cute: 0,
+          cool: 0
+        },
+        center_bonus: {
+          hp: 0,
+          smile: 0,
+          cute: 0,
+          cool: 0
+        },
+        si_bonus: {
+          hp: 0,
+          smile: 0,
+          cute: 0,
+          cool: 0
+        },
+        units: <any>[]
+      }
+    }
+
+    for (const unit of deck) {
+      // total score for deck
+      json.deck.total_status.smile += unit.stat_smile
+      json.deck.total_status.cute += unit.stat_pure
+      json.deck.total_status.cool += unit.stat_cool
+      json.deck.total_status.hp += unit.max_hp
+      // center bonus for deck
+      json.deck.center_bonus.smile += unit.center_bonus_smile
+      json.deck.center_bonus.cute += unit.center_bonus_pure
+      json.deck.center_bonus.cool += unit.center_bonus_cool
+      // sis bonus for deck
+      json.deck.si_bonus.smile += unit.bonus_smile
+      json.deck.si_bonus.cute += unit.bonus_pure
+      json.deck.si_bonus.cool += unit.bonus_cool
+      // sis data for unit
+      unit.removable_skill_ids = await new Unit(this.connection).getUnitSiS(unit.unit_owning_user_id)
+      // total score for unit
+      unit.total_status = {
+        hp: unit.max_hp,
+        smile: unit.stat_smile,
+        cute: unit.stat_pure,
+        cool: unit.stat_cool
+      }
+      // sis bonus for unit
+      unit.si_bonus = {
+        hp: 0,
+        smile: unit.bonus_smile,
+        cute: unit.bonus_pure,
+        cool: unit.bonus_cool
+      }
+      // remove some shit
+      unit.unit_owning_user_id = undefined
+      unit.stat_smile = undefined
+      unit.stat_pure = undefined
+      unit.stat_cool = undefined
+      unit.center_bonus_smile = undefined
+      unit.center_bonus_pure = undefined
+      unit.center_bonus_cool = undefined
+      unit.bonus_smile = undefined
+      unit.bonus_pure = undefined
+      unit.bonus_cool = undefined
+      unit.before_love = undefined
+      unit.attribute = undefined
+      unit.max_love = undefined
+      unit.max_skill_level = undefined
+
+      json.deck.units.push(unit)
+    }
+
+    await this.connection.query(`INSERT INTO event_ranking (user_id, event_id, event_point, score, deck) VALUES (:user, :event, 0, :score, :deck) ON DUPLICATE KEY UPDATE score = :score, deck = :deck`, {
+      user: userId,
+      event: eventId,
+      score: json.score_info.score,
+      deck: JSON.stringify(json)
+    })
+  }
+
   public static getEventTypes() {
     return eventType
   }
