@@ -50,6 +50,7 @@ export default class {
     // check if live session is active
     let session = await this.connection.first("SELECT * FROM user_live_progress WHERE user_id = :user", { user: this.user_id })
     if (!session) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
+    if (session.live_difficulty_id != this.params.live_difficulty_id) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
 
     let currentEvent = await event.getEventStatus(Events.getEventTypes().TOKEN)
     if (currentEvent.active && Live.getMarathonLiveList(currentEvent.id).includes(this.params.live_difficulty_id)) eventLive = true
@@ -59,7 +60,7 @@ export default class {
     let maxKizuna = Live.calculateMaxKizuna(liveData.s_rank_combo)
     if (this.params.love_cnt > maxKizuna) throw new ErrorUser(`Overflow kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`, this.user_id)
     let deck = (await live.getUserDeck(this.user_id, session.deck_id, false, undefined, true)).deck
-    // TODO: apply kizuna bonus
+    deck = await live.applyKizunaBonusToDeck(this.user_id, deck!, this.params.love_cnt)
 
     await this.connection.execute(`INSERT INTO user_live_status VALUES (:user, :diff, :setting, 2, :score,:combo, clear_cnt + 1) 
     ON DUPLICATE KEY UPDATE clear_cnt=clear_cnt + 1`, {
@@ -144,7 +145,7 @@ export default class {
       special_reward_info: [],
       event_info: <any>[],
       daily_reward_info: [],
-      //can_send_friend_request: false,
+      can_send_friend_request: false,
       unit_support_list: await user.getSupportUnits(this.user_id),
       unite_info: [],
       class_system: User.getClassSystemStatus(this.user_id)
@@ -152,13 +153,31 @@ export default class {
 
     await this.connection.query(`DELETE FROM user_live_progress WHERE user_id = :user`, { user: this.user_id })
     if (currentEvent.active) {
-      if (eventLive) {
-        this.params.event_point = Events.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
-      }
       let userStatus = await this.connection.first(`SELECT token_point, score FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
         user: this.user_id,
         event: currentEvent.id
       })
+      if (eventLive) {
+        this.params.event_point = Events.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
+        if (!userStatus.score || userStatus.score < totalScore) {
+          await event.writeHiScore(this.user_id, currentEvent.id, deck, [
+            {
+              live_difficulty_id: liveData.live_difficulty_id,
+              is_random: !!liveData.random_flag,
+              ac_flag: liveData.ac_flag,
+              swing_flag: liveData.swing_flag
+            }
+          ], {
+            score: totalScore,
+            max_combo: this.params.max_combo,
+            perfect_cnt: this.params.perfect_cnt,
+            great_cnt: this.params.great_cnt,
+            good_cnt: this.params.good_cnt,
+            bad_cnt: this.params.bad_cnt,
+            miss_cnt: this.params.miss_cnt
+          })
+        }
+      }
       response.event_info = await event.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, this.params.event_point)
       response.event_info.event_point_info.before_event_point = userStatus.token_point
       response.event_info.event_point_info.after_event_point = userStatus.token_point
@@ -168,25 +187,6 @@ export default class {
           val: this.params.event_point,
           user: this.user_id,
           id: currentEvent.id
-        })
-      }
-
-      if (!userStatus.score || userStatus.score < totalScore) {
-        await event.writeHiScore(this.user_id, currentEvent.id, deck, [
-          {
-            live_difficulty_id: liveData.live_difficulty_id,
-            is_random: !!liveData.random_flag,
-            ac_flag: liveData.ac_flag,
-            swing_flag: liveData.swing_flag
-          }
-        ], {
-          score: totalScore,
-          max_combo: this.params.max_combo,
-          perfect_cnt: this.params.perfect_cnt,
-          great_cnt: this.params.great_cnt,
-          good_cnt: this.params.good_cnt,
-          bad_cnt: this.params.bad_cnt,
-          miss_cnt: this.params.miss_cnt
         })
       }
     }

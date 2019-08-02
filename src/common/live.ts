@@ -417,6 +417,52 @@ export class Live {
     return result
   }
 
+  public async applyKizunaBonusToDeck(userId: number, deck: any[], kizuna: number) {
+    for (let i = 0; i < deck.length; i++) {
+      deck[i].kizuna_add = 0
+      deck[i].fpt_add = 0
+    }
+
+    let centerKizuna = Math.ceil(kizuna * 5 / 10)
+    kizuna -= centerKizuna
+    deck[4].fpt_add = centerKizuna
+    while (deck[4].love + deck[4].kizuna_add < deck[4].max_love && centerKizuna > 0) {
+      deck[4].kizuna_add++
+      centerKizuna--
+    }
+    kizuna += centerKizuna // return back remain
+
+    while (kizuna > 0) {
+      for (let i = 0; i < deck.length; i++) {
+        if (i === 4) continue // skip center unit
+        if (deck[i].love + deck[i].kizuna_add < deck[i].max_love) {
+          deck[i].kizuna_add++
+          kizuna--
+        }
+      }
+    }
+
+    await deck.forEachAsync(async (unit) => {
+      unit.love = unit.love + unit.kizuna_add
+      await new Unit(this.connection).updateAlbum(userId, unit.unit_id, {
+        maxRank: unit.is_rank_max,
+        maxLove: unit.love + unit.kizuna_add === unit.max_love && unit.rank === unit.max_rank,
+        maxLevel: unit.is_level_max,
+        addLove: unit.kizuna_add,
+        addFavPt: unit.fpt_add
+      })
+      await this.connection.query("UPDATE units SET love=:love WHERE user_id=:user AND unit_owning_user_id=:id", {
+        love: Math.min(unit.love + unit.kizuna_add, unit.max_love),
+        user: userId,
+        id: unit.unit_owning_user_id
+      })
+      unit.kizuna_add = undefined
+      unit.fpt_add = undefined
+    })
+
+    return deck
+  }
+
   public static getAvailableLiveList() {
     return availableLiveList
   }
@@ -443,13 +489,13 @@ export class Live {
     let scoreBonus = 1
     // on the official server score bonus for S rank is 1.20 and 1.08 for S combo rank
     // but on this server this values inverted
-    switch(comboRank) {
+    switch (comboRank) {
       case 1: comboBonus += 0.20; break
       case 2: comboBonus += 0.15; break
       case 3: comboBonus += 0.10; break
       case 4: comboBonus += 0.05; break
     }
-    switch(scoreRank) {
+    switch (scoreRank) {
       case 1: scoreBonus += 0.08; break
       case 2: scoreBonus += 0.06; break
       case 3: scoreBonus += 0.04; break
@@ -462,11 +508,11 @@ export class Live {
   }
   public static calculateMaxKizuna(maxCombo: number) {
     // Source: https://decaf.kouhi.me/lovelive/index.php?title=Gameplay#Kizuna
-    return Math.floor(maxCombo / 10) + 
-    Math.floor(Math.max(0, maxCombo - 200) / 10) + 
-    4 * Math.floor(maxCombo / 50) - 
-    Math.floor(Math.max(0, maxCombo - 200) / 50) + 
-    5 * Math.floor(maxCombo / 100)
+    return Math.floor(maxCombo / 10) +
+      Math.floor(Math.max(0, maxCombo - 200) / 10) +
+      4 * Math.floor(maxCombo / 50) -
+      Math.floor(Math.max(0, maxCombo - 200) / 50) +
+      5 * Math.floor(maxCombo / 100)
   }
 }
 (global as any).Live = Live
