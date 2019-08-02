@@ -2,8 +2,6 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
 import assert from "assert"
 
-const liveDB = sqlite3.getLive()
-
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
@@ -24,15 +22,18 @@ export default class {
     return {
       party_user_id: TYPE.INT,
       unit_deck_id: TYPE.INT,
-      live_difficulty_id: TYPE.STRING
+      live_difficulty_id: TYPE.STRING,
+      lp_factor: TYPE.INT
     }
   }
   public paramCheck() {
     assert(!isNaN(parseInt(this.params.live_difficulty_id)), "live_difficulty_id is NaN")
+    if (this.params.lp_factor < 1 || this.params.lp_factor > 4) throw new Error(`invalid lp_factor`)
   }
 
   public async execute() {
     const live = new Live(this.connection)
+    let eventStatus = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
     // clear data about any previous live session
     await this.connection.query("DELETE FROM user_live_progress WHERE user_id=:user", { user: this.user_id })
     let guest = await this.connection.first(`
@@ -43,25 +44,34 @@ export default class {
     JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
     WHERE user_unit_deck.user_id=:user`, { user: this.params.party_user_id })
 
-
     let liveInfo = await live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    if (liveInfo.capital_type === 2) { // token live
+      if (!eventStatus.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
+      let eventLives = Live.getMarathonLiveList(eventStatus.id)
+      if (!eventLives.includes(liveInfo.live_difficulty_id)) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
+      let tokenCnt = await this.connection.first(`SELECT token_point FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
+        user: this.user_id,
+        event: eventStatus.id
+      })
+      if (!tokenCnt || !tokenCnt.token_point || tokenCnt.token_point - this.params.lp_factor * liveInfo.capital_value < 0) throw new ErrorCode(3412, "ERROR_CODE_LIVE_NOT_ENOUGH_EVENT_POINT")
+      await this.connection.execute("UPDATE event_ranking SET token_point = token_point - :val WHERE user_id = :user AND event_id = :id", {
+        val: this.params.lp_factor * liveInfo.capital_value,
+        user: this.user_id,
+        id: eventStatus.id
+      })
+    }
     let liveNotes = await live.getLiveNotes(this.user_id, liveInfo.live_setting_id)
     let deckInfo = await live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id)
 
-    await this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id) VALUES (:user, :difficulty, :setting_id, :deck)", {
+    await this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id, lp_factor) VALUES (:user, :difficulty, :setting_id, :deck, :factor)", {
       user: this.user_id,
       difficulty: this.params.live_difficulty_id,
       setting_id: liveInfo.live_setting_id,
-      deck: this.params.unit_deck_id
+      deck: this.params.unit_deck_id,
+      factor: this.params.lp_factor
     })
     let response = {
-      rank_info: [
-        { rank: 5, rank_min: 0, rank_max: liveInfo.c_rank_score - 1 },
-        { rank: 4, rank_min: liveInfo.c_rank_score, rank_max: liveInfo.b_rank_score - 1 },
-        { rank: 3, rank_min: liveInfo.b_rank_score, rank_max: liveInfo.a_rank_score - 1 },
-        { rank: 2, rank_min: liveInfo.a_rank_score, rank_max: liveInfo.s_rank_score - 1 },
-        { rank: 1, rank_min: liveInfo.s_rank_score, rank_max: 0 },
-      ],
+      rank_info: liveInfo.score_rank_info,
       energy_full_time: Utils.toSpecificTimezone(9),
       over_max_energy: 0,
       available_live_resume: true,
@@ -69,7 +79,7 @@ export default class {
         {
           live_info: {
             live_difficulty_id: liveInfo.live_difficulty_id,
-            is_random: false,
+            is_random: !!liveInfo.random_flag,
             ac_flag: liveInfo.ac_flag,
             swing_flag: liveInfo.swing_flag,
             notes_list: liveNotes
@@ -77,7 +87,8 @@ export default class {
           deck_info: deckInfo
         }
       ],
-      is_marathon_event: false,
+      is_marathon_event: liveInfo.capital_type === 2 ? false : eventStatus.active, 
+      marathon_event_id: eventStatus.active ? eventStatus.id : undefined,
       no_skill: false,
       can_activate_effect: true
     }

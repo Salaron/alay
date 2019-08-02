@@ -7,9 +7,7 @@ let awardList = [1, 23]
 
 export async function init(): Promise<void> {
   let awards = await itemDB.all(`SELECT award_id as id FROM award_m WHERE award_id NOT IN (${awardList.join(",")})`)
-  await awards.forEachAsync(function (award: any) {
-    awardList.push(award.id)
-  })
+  for (const award of awards) awardList.push(award)
 }
 
 export default class {

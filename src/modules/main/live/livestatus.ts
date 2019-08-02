@@ -1,5 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
+import { eventStatus } from "../../../common/event"
 
 const normalLiveUnlock = [
   1, 2, 3, 350,
@@ -13,6 +14,12 @@ const normalLiveUnlock = [
   1218, 1219, 1220, 1221,
   1222, 1223, 1224, 1225
 ]
+const marathonDB = sqlite3.getMarathon()
+enum liveType {
+  NORMAL,
+  SPECIAL,
+  MARATHON
+}
 
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
@@ -23,6 +30,10 @@ export default class {
   private connection: Connection
   private requestData: RequestData
   private params: any
+
+  private liveStatusList: any[]
+  private liveGoalList: any[]
+  private marathonEvent: eventStatus
   constructor(requestData: RequestData) {
     this.user_id = <number>requestData.user_id
     this.connection = requestData.connection
@@ -30,25 +41,7 @@ export default class {
     this.requestData = requestData
   }
 
-  public paramTypes() {
-    return {}
-  }
-  public paramCheck() {
-    return true
-  }
-
   public async execute() {
-    const config = Config.modules.live
-
-    let response: any = {
-      normal_live_status_list: [],
-      special_live_status_list: [],
-      marathon_live_status_list: [], // TODO 
-      training_live_status_list: [], // possible will be not implemented on this server
-      free_live_status_list: [], // quest event lives?
-      can_resume_live: true
-    }
-
     let [liveGoalResult, liveStatusList] = await Promise.all([
       this.connection.query("SELECT live_goal_reward_id, live_difficulty_id FROM user_live_goal_rewards WHERE user_id= :user;", {
         user: this.user_id
@@ -64,63 +57,88 @@ export default class {
       }
       liveGoalList[liveGoalResult[i].live_difficulty_id].push(liveGoalResult[i].live_goal_reward_id)
     }
-    function prepareLiveStatusList(liveList: any, responseString: string) {
-      let unlockedList = <any>{}
-      for (let i = 0; i < liveStatusList.length; i++) {
-        if ((liveStatusList[i].status > 0 && config.unlockAll) && liveList.includes(liveStatusList[i].live_difficulty_id)) {
-          unlockedList[liveStatusList[i].live_difficulty_id] = {
-            status: liveStatusList[i].status,
-            hi_score: liveStatusList[i].hi_score,
-            hi_combo: liveStatusList[i].hi_combo,
-            clear_cnt: liveStatusList[i].clear_cnt
-          }
-        }
-      }
+    this.liveStatusList = liveStatusList
+    this.liveGoalList = liveGoalList
+    this.marathonEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
 
-      if (responseString === "normal_live_status_list") {
-        for (let i = 0; i < normalLiveUnlock.length; i++) {
-          if (!unlockedList[normalLiveUnlock[i]]) {
-            unlockedList[normalLiveUnlock[i]] = {
-              status: 1,
-              hi_score: 0,
-              hi_combo: 0,
-              clear_cnt: 0
-            }
-          }
-        }
-      }
-
-      for (let i = 0; i < liveList.length; i++) {
-        if (config.unlockAll && !unlockedList[liveList[i]]) {
-          unlockedList[liveList[i]] = {
-            status: 1,
-            hi_score: 0,
-            hi_combo: 0,
-            clear_cnt: 0
-          }
-        }
-      }
-
-      for (let ldid in unlockedList) {
-        if (!unlockedList.hasOwnProperty(ldid)) continue
-        let status = unlockedList[ldid]
-
-        response[responseString].push({
-          live_difficulty_id: parseInt(ldid),
-          status: parseInt(status.status),
-          hi_score: parseInt(status.hi_score),
-          hi_combo_count: parseInt(status.hi_combo),
-          clear_cnt: parseInt(status.clear_cnt),
-          achieved_goal_id_list: liveGoalList[ldid] || []
-        })
-      }
-    }
-
-    prepareLiveStatusList(Live.getNormalLiveList(), "normal_live_status_list")
-    prepareLiveStatusList(Live.getSpecialLiveList(), "special_live_status_list")
     return {
       status: 200,
-      result: response
+      result: {
+        normal_live_status_list: await this.getLiveStatusList(Live.getNormalLiveList(), liveType.NORMAL),
+        special_live_status_list: await this.getLiveStatusList(Live.getSpecialLiveList(), liveType.SPECIAL),
+        marathon_live_status_list: await this.getLiveStatusList([], liveType.MARATHON),
+        training_live_status_list: [], // possible will be not implemented on this server
+        free_live_status_list: [], // quest event lives?
+        can_resume_live: true
+      }
     }
+  }
+
+  private async getLiveStatusList(liveList: number[], type: liveType) {
+    if (type === liveType.MARATHON && this.marathonEvent.active) {
+      liveList = (await marathonDB.all("SELECT live_difficulty_id FROM event_marathon_live_schedule_m WHERE event_id = :id", {
+        id: this.marathonEvent.id
+      })).map(live => live.live_difficulty_id)
+    }
+
+    let unlockedList = <any>{}
+    for (const live of this.liveStatusList) {
+      if (live.status > 0 && liveList.includes(live.live_difficulty_id)) {
+        unlockedList[live.live_difficulty_id] = {
+          status: live.status,
+          hi_score: live.hi_score,
+          hi_combo: live.hi_combo,
+          clear_cnt: live.clear_cnt
+        }
+      }
+    }
+
+    if (type === liveType.NORMAL) {
+      for (const live of normalLiveUnlock) {
+        if (!unlockedList[live]) unlockedList[live] = {
+          status: 1,
+          hi_score: 0,
+          hi_combo: 0,
+          clear_cnt: 0
+        }
+      }
+    } else if (type === liveType.MARATHON) {
+      for (const live of liveList) {
+        if (!unlockedList[live]) unlockedList[live] = {
+          status: 1,
+          hi_score: 0,
+          hi_combo: 0,
+          clear_cnt: 0
+        }
+      }
+    }
+
+    if (Config.modules.live.unlockAll) {
+      for (const live of liveList) {
+        if (!unlockedList[live]) unlockedList[live] = {
+          status: 1,
+          hi_score: 0,
+          hi_combo: 0,
+          clear_cnt: 0
+        }
+      }
+    }
+
+    let result = <any[]>[]
+    for (let ldid in unlockedList) {
+      if (!unlockedList.hasOwnProperty(ldid)) continue
+      let status = unlockedList[ldid]
+
+      result.push({
+        live_difficulty_id: parseInt(ldid),
+        status: parseInt(status.status),
+        hi_score: parseInt(status.hi_score),
+        hi_combo_count: parseInt(status.hi_combo),
+        clear_cnt: parseInt(status.clear_cnt),
+        achieved_goal_id_list: this.liveGoalList[parseInt(ldid)] || []
+      })
+    }
+
+    return result
   }
 }

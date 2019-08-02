@@ -119,5 +119,38 @@ export class User {
     }
     return result
   }
+
+  public async addExp(userId: number, amount: number, multiplier: number = 1) {
+    let result: { level: number, from_exp: number }[] = []
+
+    let userInfo = await this.connection.first(`SELECT level, previous_exp, next_exp, exp FROM users WHERE user_id = :user`, {
+      user: userId
+    })
+    let level = userInfo.level
+    let previousExp = userInfo.previous_exp
+    let userExp = userInfo.exp + (amount * multiplier)
+    let nextExp = userInfo.next_exp
+    while (userExp >= nextExp) {
+      // formula taken from AuahDark's private server (NPPS)
+      // https://github.com/MikuAuahDark/NPPS_2/blob/0f7200bccd193d717341bad2855594f6f7fa1075/modules/include.user.php#L543
+      previousExp = Math.round(21 + Math.pow(level, 2.12) / 2 + 0.5) 
+      level++
+      nextExp = Math.round(21 + Math.pow(level, 2.12) / 2 + 0.5)
+
+      result.push({
+        level: level,
+        from_exp: nextExp
+      })
+    }
+    await this.connection.query("UPDATE users SET level=:lvl, exp=:exp, previous_exp=:prev, next_exp=:next WHERE user_id=:user", {
+      lvl: level,
+      exp: userExp,
+      prev: previousExp,
+      next: nextExp,
+      user: userId
+    })
+
+    return result
+  }
 }
 (global as any).User = User

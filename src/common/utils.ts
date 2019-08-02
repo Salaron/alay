@@ -159,7 +159,7 @@ export class Utils {
     }
     return result
   }
-  static mergeArrayDedupe(array: any) {
+  static mergeArrayDedupe(array: any): any[] {
     return [...new Set([].concat(...array))]
   }
   static toSpecificTimezone(utcOffset: number = 9, date?: string | Date) {

@@ -256,6 +256,7 @@ export class Sqlite3 {
   private marathon: sqlite3
   private secretbox: sqlite3
   private other: sqlite3
+  private event: sqlite3
   constructor() {
     // check if all databases exists
     if (!existsSync(rootDir + "data/db/unit.db_")) {
@@ -288,6 +289,9 @@ export class Sqlite3 {
     if (!existsSync(rootDir + "data/db/other.db_")) {
       throw new Error("Required file 'data/db/other.db_' is missing")
     }
+    if (!existsSync(rootDir + "data/db/event_common.db_")) {
+      throw new Error("Required file 'data/db/event_common.db_' is missing")
+    }
   }
   public getUnit() {
     if (!this.unit || this.unit.closed) return this.unit = new sqlite3(rootDir + "data/db/unit.db_", "ro")
@@ -306,7 +310,7 @@ export class Sqlite3 {
     else return this.festival
   }
   public getMarathon() {
-    if (!this.marathon || this.marathon.closed) return this.marathon = new sqlite3(rootDir + "data/db/exchange.db_", "ro")
+    if (!this.marathon || this.marathon.closed) return this.marathon = new sqlite3(rootDir + "data/db/marathon.db_", "ro")
     else return this.marathon
   }
   public getNotes() {
@@ -328,6 +332,10 @@ export class Sqlite3 {
   public getOther() {
     if (!this.other || this.other.closed) return this.other = new sqlite3(rootDir + "data/db/other.db_", "ro")
     else return this.other
+  }
+  public getEvent() {
+    if (!this.event || this.event.closed) return this.event = new sqlite3(rootDir + "data/db/event_common.db_", "ro")
+    else return this.event
   }
 }
 

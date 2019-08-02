@@ -17,13 +17,6 @@ export default class {
     this.requestData = requestData
   }
 
-  public paramTypes() {
-    return { }
-  }
-  public paramCheck() {
-    return true
-  }
-
   public async execute() {
     let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().FESTIVAL)
     if (currentEvent.opened === false) return {
@@ -36,11 +29,14 @@ export default class {
       event: currentEvent.id
     })
 
-    if (ranking.length === 0){
+    if (!ranking){
       await this.connection.query("INSERT INTO event_ranking (user_id, event_id, event_point) VALUES (:user, :event, 0)", {
         user: this.user_id,
         event: currentEvent.id
       })
+      ranking = {
+        event_point: 0
+      }
     }
 
     // reset setlist after app restart
@@ -54,9 +50,9 @@ export default class {
         base_info: {
           event_id: currentEvent.id,
           asset_bgm_id: 201,
-          event_point: ranking.event_point || 0,
-          total_event_point: ranking.event_point || 0,
-          whole_event_point: ranking.event_point || 0,
+          event_point: ranking.event_point,
+          total_event_point: ranking.event_point,
+          whole_event_point: ranking.event_point,
           max_skill_activation_rate: 0
         }
       }

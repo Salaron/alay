@@ -7,9 +7,7 @@ let bgList = [1]
 
 export async function init(): Promise<void> {
   let backgrounds = await itemDB.all(`SELECT background_id as id FROM background_m WHERE background_id NOT IN (${bgList.join(",")})`)
-  await backgrounds.forEachAsync(function (background: any) {
-    bgList.push(background.id)
-  })
+  for (const background of backgrounds) bgList.push(background)
 }
 
 export default class {

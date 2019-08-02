@@ -1,16 +1,20 @@
 import { Connection } from "../core/database"
 import { Log } from "../core/log"
+import extend = require("extend");
 
 const log = new Log("Common: Live")
 
 const liveDB = sqlite3.getLive()
 const liveNotesDB = sqlite3.getNotes()
 const festDB = sqlite3.getFestival()
+const marathonDB = sqlite3.getMarathon()
 const unitDB = sqlite3.getUnit()
 
+const expTable = [0, 12, 26, 46, 65, 71, 84]
 let availableLiveList: number[] = []
 let normalLiveList: number[] = []
 let specialLiveList: number[] = []
+let marathonLiveList: { [eventId: number]: number[] } = {}
 export async function init() {
   let liveSettings = await liveNotesDB.all("SELECT DISTINCT live_setting_id FROM live_note")
   for (let i = 0; i < liveSettings.length; i++) {
@@ -37,6 +41,22 @@ export async function init() {
     }
   }
   log.info(`Found data for ${specialLiveList.length} special lives`)
+
+  let marathon = await marathonDB.all(`
+  SELECT 
+    event_id, live.live_difficulty_id, live_setting_id 
+  FROM 
+    event_marathon_live_m as live 
+  JOIN event_marathon_live_schedule_m as schedule 
+    ON schedule.live_difficulty_id = live.live_difficulty_id`)
+  for (const live of marathon) {
+    if (availableLiveList.includes(live.live_setting_id)) {
+      if (!marathonLiveList[live.event_id]) marathonLiveList[live.event_id] = []
+      marathonLiveList[live.event_id].push(live.live_difficulty_id)
+    } else {
+      log.verbose(`Missing Note Data for Marathon Live #${live.live_difficulty_id} (Setting #${live.live_setting_id})`)
+    }
+  }
 }
 
 export class Live {
@@ -68,27 +88,71 @@ export class Live {
     return notes
   }
 
-  // only for special or normal lives not event
-  public async getLiveDataByDifficultyId(liveDifficultyId: number) {
+  // only for special, normal lives or marathon lives not other
+  public async getLiveDataByDifficultyId(liveDifficultyId: number): Promise<liveData> {
     let data = await liveDB.get(`
     SELECT 
       c_rank_score, b_rank_score, a_rank_score, s_rank_score, 
       c_rank_combo, b_rank_combo, a_rank_combo, s_rank_combo, 
-      c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete,
-      difficulty, ac_flag, swing_flag, setting.live_setting_id, difficulty.live_difficulty_id
+      c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete, 
+      difficulty, ac_flag, swing_flag, setting.live_setting_id, difficulty.live_difficulty_id,
+      capital_type, capital_value
     FROM live_setting_m as setting INNER JOIN (
       SELECT 
-        live_setting_id, live_difficulty_id, 
+        live_setting_id, live_difficulty_id, capital_type, capital_value,
         c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete
       FROM special_live_m 
       UNION 
       SELECT 
-        live_setting_id, live_difficulty_id, 
+        live_setting_id, live_difficulty_id, capital_type, capital_value,
         c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete 
       FROM normal_live_m
     ) as difficulty ON setting.live_setting_id = difficulty.live_setting_id 
     WHERE live_difficulty_id = :ldid`, { ldid: liveDifficultyId })
-    if (!data) throw new Error(`Live Data for live difficulty id #${liveDifficultyId} is missing`)
+    if (!data) {
+      // Token live?
+      data = {
+        marathon_live: true
+      }
+      let tokenData = await marathonDB.get(`
+      SELECT 
+        live_difficulty_id, live_setting_id, capital_type, capital_value, random_flag,
+        c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete
+      FROM event_marathon_live_m
+      WHERE live_difficulty_id = :ldid`, { ldid: liveDifficultyId })
+      if (!tokenData) throw new Error(`Live data for live difficulty id #${liveDifficultyId} is missing`)
+      let settingData = await liveDB.get(`
+      SELECT 
+        c_rank_score, b_rank_score, a_rank_score, s_rank_score, 
+        c_rank_combo, b_rank_combo, a_rank_combo, s_rank_combo, 
+        difficulty, ac_flag, swing_flag, live_setting_id
+      FROM live_setting_m a WHERE live_setting_id = :lsid`, { lsid: tokenData.live_setting_id })
+      if (!settingData) throw new Error(`Live data for live setting id #${tokenData.live_setting_id} is missing`)
+      extend(true, data, tokenData, settingData)
+    }
+    if (!data.random_flag) data.random_flag = 0
+    if (!data.marathon_live) data.marathon_live = false
+    data.score_rank_info = [
+      { rank: 5, rank_min: 0, rank_max: data.c_rank_score - 1 },
+      { rank: 4, rank_min: data.c_rank_score, rank_max: data.b_rank_score - 1 },
+      { rank: 3, rank_min: data.b_rank_score, rank_max: data.a_rank_score - 1 },
+      { rank: 2, rank_min: data.a_rank_score, rank_max: data.s_rank_score - 1 },
+      { rank: 1, rank_min: data.s_rank_score, rank_max: 0 }
+    ]
+    data.combo_rank_info = [
+      { rank: 5, rank_min: 0, rank_max: data.c_rank_combo - 1 },
+      { rank: 4, rank_min: data.c_rank_combo, rank_max: data.b_rank_combo - 1 },
+      { rank: 3, rank_min: data.b_rank_combo, rank_max: data.a_rank_combo - 1 },
+      { rank: 2, rank_min: data.a_rank_combo, rank_max: data.s_rank_combo - 1 },
+      { rank: 1, rank_min: data.s_rank_combo, rank_max: 0 }
+    ]
+    data.complete_rank_info = [
+      { rank: 5, rank_min: 0, rank_max: data.c_rank_complete - 1 },
+      { rank: 4, rank_min: data.c_rank_complete, rank_max: data.b_rank_complete - 1 },
+      { rank: 3, rank_min: data.b_rank_complete, rank_max: data.a_rank_complete - 1 },
+      { rank: 2, rank_min: data.a_rank_complete, rank_max: data.s_rank_complete - 1 },
+      { rank: 1, rank_min: data.s_rank_complete, rank_max: 0 }
+    ]
     return data
   }
 
@@ -103,7 +167,30 @@ export class Live {
       ON units.unit_owning_user_id = user_unit_deck_slot.unit_owning_user_id
     WHERE user_unit_deck_slot.user_id = :user AND deck_id = :deck`, { user: userId, deck: deckId })
     if (deck.length === 0) throw new Error(`Deck doesn't exists`)
-    deck = deck.map(d => Unit.parseUnitData(d))
+    deck = deck.map(unit => {
+      return {
+        unit_owning_user_id: unit.unit_owning_user_id,
+        unit_id: unit.unit_id,
+        position: unit.slot_id,
+        level: unit.level,
+        unit_skill_level: unit.unit_skill_level,
+        before_love: unit.love,
+        love: unit.love,
+        max_love: unit.max_love,
+        max_skill_level: unit.max_skill_level,
+        max_hp: unit.max_hp,
+        unit_removable_skill_capacity: unit.max_removable_skill_capacity,
+        stat_smile: unit.stat_smile,
+        stat_pure: unit.stat_pure,
+        stat_cool: unit.stat_cool,
+        attribute: unit.attribute,
+        rank: unit.rank,
+        is_rank_max: unit.rank >= unit.max_rank,
+        is_love_max: unit.love >= unit.max_love,
+        is_level_max: unit.level >= unit.max_level,
+        is_skill_level_max: unit.unit_skill_level >= unit.max_skill_level
+      }
+    })
 
     if (calculateScore) {
       await this.calculateScoreBonus(userId, deck, guestUnitId, cleanup)
@@ -286,6 +373,50 @@ export class Live {
     return deck
   }
 
+  public async liveGoalAccomp(userId: number, liveDifficultyId: number, scoreRank: number, comboRank: number, completeRank: number) {
+    const item = new Item(this.connection)
+
+    let result = {
+      achieved_ids: <number[]>[],
+      rewards: <any>[]
+    }
+
+    let existingGoals = (await this.connection.query(`SELECT * FROM user_live_goal_rewards WHERE user_id=:user AND live_difficulty_id=:diff`, {
+      user: userId,
+      diff: liveDifficultyId
+    })).map(e => e.live_goal_reward_id)
+    let liveGoals = await liveDB.all(`SELECT * FROM live_goal_reward_m WHERE live_difficulty_id = :ldid AND live_goal_reward_id NOT IN (${existingGoals.join(",")})`, {
+      ldid: liveDifficultyId
+    })
+    await Promise.all(liveGoals.map(async goal => {
+      if (
+        (goal.live_goal_type === 1 && goal.rank >= scoreRank) ||
+        (goal.live_goal_type === 2 && goal.rank >= comboRank) ||
+        (goal.live_goal_type === 3 && goal.rank >= completeRank)
+      ) {
+        await this.connection.query(`INSERT INTO user_live_goal_rewards VALUES (:user, :goal_id, :difficulty)`, {
+          user: userId,
+          goal_id: goal.live_goal_reward_id,
+          difficulty: liveDifficultyId
+        })
+        await item.addPresent(userId, {
+          type: goal.add_type,
+          id: goal.item_id
+        }, "Live Show! Reward", goal.amount, true)
+        result.achieved_ids.push(goal.live_goal_reward_id)
+        result.rewards.push({
+          add_type: goal.add_type,
+          item_id: goal.item_id,
+          item_category_id: goal.item_category_id,
+          amount: goal.amount,
+          reward_box_flag: false
+        })
+      }
+    }))
+
+    return result
+  }
+
   public static getAvailableLiveList() {
     return availableLiveList
   }
@@ -294,6 +425,44 @@ export class Live {
   }
   public static getSpecialLiveList() {
     return specialLiveList
+  }
+  public static getMarathonLiveList(eventId: number) {
+    return marathonLiveList[eventId]
+  }
+  public static getRank(rankInfo: rankInfo[], value: number): number {
+    for (const info of rankInfo) {
+      if (info.rank_min <= value && info.rank_max >= value) return info.rank
+    }
+    return 5
+  }
+  public static getExpAmount(difficulty: number) {
+    return expTable[difficulty]
+  }
+  public static getEventPointMultipliers(comboRank: number, scoreRank: number) {
+    let comboBonus = 1
+    let scoreBonus = 1
+    // on the official server score bonus for S rank is 1.20 and 1.08 for S combo rank
+    // but on this server this values inverted
+    switch(comboRank) {
+      case 1: comboBonus += 0.20; break
+      case 2: comboBonus += 0.15; break
+      case 3: comboBonus += 0.10; break
+      case 4: comboBonus += 0.05; break
+    }
+    switch(scoreRank) {
+      case 1: scoreBonus += 0.08; break
+      case 2: scoreBonus += 0.06; break
+      case 3: scoreBonus += 0.04; break
+      case 4: scoreBonus += 0.02; break
+    }
+  }
+  public static calculateMaxKizuna(maxCombo: number) {
+    // Source: https://decaf.kouhi.me/lovelive/index.php?title=Gameplay#Kizuna
+    return Math.floor(maxCombo / 10) + 
+    Math.floor(Math.max(0, maxCombo - 200) / 10) + 
+    4 * Math.floor(maxCombo / 50) - 
+    Math.floor(Math.max(0, maxCombo - 200) / 50) + 
+    5 * Math.floor(maxCombo / 100)
   }
 }
 (global as any).Live = Live

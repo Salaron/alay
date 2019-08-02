@@ -1,7 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
 
-const liveDB = sqlite3.getLive()
+const marathonDB = sqlite3.getMarathon()
 
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -21,24 +21,29 @@ export default class {
 
   public paramTypes() {
     return {
-      live_difficulty_id: TYPE.STRING
+      live_difficulty_id: TYPE.STRING,
+      lp_factor: TYPE.INT
     }
   }
   public paramCheck() {
     // check if this string contains integer value
     if (parseInt(this.params.live_difficulty_id) != parseInt(this.params.live_difficulty_id)) throw new Error(`live_difficulty_id is NaN`)
+    if (this.params.lp_factor < 1 || this.params.lp_factor > 4) throw new Error(`invalid lp_factor`)
   }
 
   public async execute() {
-    let liveData = await liveDB.get(`
-    SELECT setting.live_setting_id, difficulty.live_difficulty_id, swing_flag, ac_flag, attribute_icon_id as attribute 
-    FROM live_setting_m as setting 
-      INNER JOIN (
-        SELECT live_setting_id, live_difficulty_id FROM special_live_m 
-        UNION SELECT live_setting_id, live_difficulty_id FROM normal_live_m
-      ) as difficulty ON setting.live_setting_id = difficulty.live_setting_id 
-    WHERE live_difficulty_id = :lsid`, { lsid: this.params.live_difficulty_id })
-    if (!liveData) throw new Error(`Live data for live_difficulty_id #${this.params.live_difficulty_id} is missing`)
+    let liveData = await new Live(this.connection).getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    if (liveData.capital_type === 2) {
+      let eventStatus = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+      if (!eventStatus.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
+      let eventLives = Live.getMarathonLiveList(eventStatus.id)
+      if (!eventLives.includes(liveData.live_difficulty_id)) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
+      let tokenCnt = await this.connection.first(`SELECT token_point FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
+        user: this.user_id,
+        event: eventStatus.id
+      })
+      if (!tokenCnt || !tokenCnt.token_point || tokenCnt.token_point - this.params.lp_factor * liveData.capital_value < 0) throw new ErrorCode(3412, "ERROR_CODE_LIVE_NOT_ENOUGH_EVENT_POINT")
+    }
 
     let response: any = {
       has_slide_notes: liveData.swing_flag,

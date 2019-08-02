@@ -1,6 +1,8 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
 
+const marathonDB = sqlite3.getMarathon()
+
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
   public permission: PERMISSION = PERMISSION.XMC
@@ -17,39 +19,33 @@ export default class {
     this.requestData = requestData
   }
 
-  public paramTypes() {
-    return {}
-  }
-  public paramCheck() {
-    return true
-  }
-
   public async execute() {
     let response: any = {
       event_list: [],
       live_list: [],
       limited_bonus_list: [],
-      random_live_list: [],
+      random_live_list: [], // TODO
       free_live_list: [],
       training_live_list: []
     }
 
-    let specialLiveList = Live.getSpecialLiveList()
-    for (let i = 0; i < specialLiveList.length; i++) {
-      response.live_list.push({
-        live_difficulty_id: specialLiveList[i],
-        start_date: "2018-01-01 00:00:00",
-        end_date: "2019-09-01 00:00:00",
-        is_random: false
-      })
+    if (Config.modules.live.unlockAll) {
+      let specialLiveList = Live.getSpecialLiveList()
+      for (const live of specialLiveList) {
+        response.live_list.push({
+          live_difficulty_id: live,
+          start_date: "2018-01-01 00:00:00",
+          end_date: "2019-09-01 00:00:00",
+          is_random: false
+        })
+      }
     }
-
-    let events = await this.connection.query("SELECT * FROM events_list WHERE open_date < :now AND close_date > :now", {
+    
+    let events = await this.connection.query("SELECT * FROM events_list WHERE open_date <= :now AND close_date > :now", {
       now: Utils.toSpecificTimezone(9)
     })
 
-    for (let i = 0; i < events.length; i++) {
-      let event = events[i]
+    for (const event of events) {
       response.event_list.push({
         event_id: event.event_id,
         event_category_id: event.event_category_id,
@@ -66,6 +62,20 @@ export default class {
       })
     }
 
+    let marathonEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+    if (marathonEvent.active) {
+      let marathonLives = (await marathonDB.all("SELECT live_difficulty_id FROM event_marathon_live_schedule_m WHERE event_id = :id", {
+        id: marathonEvent.id
+      })).map(live => live.live_difficulty_id)
+      for (const live of marathonLives) {
+        response.live_list.push({
+          live_difficulty_id: live,
+          start_date: marathonEvent.open_date,
+          end_date: marathonEvent.close_date,
+          is_random: false
+        })
+      }
+    }
     return {
       status: 200,
       result: response

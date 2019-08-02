@@ -19,7 +19,7 @@ export default class {
 
   public async execute() {
     let session = await this.connection.first("SELECT * FROM user_live_progress WHERE user_id = :user", { user: this.user_id })
-    if (session.length === 0) throw new Error(`No active live session`)
+    if (!session) throw new Error(`No active live session`)
 
     // after this client will call live/gameover so we don't need to remove user session from here
     if (

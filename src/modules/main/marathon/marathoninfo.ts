@@ -16,23 +16,43 @@ export default class {
     this.params = requestData.params
     this.requestData = requestData
   }
-
-  public paramTypes() {
-    return { }
-  }
-  public paramCheck() {
-    return true
-  }
-
   public async execute() {
     let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []
     }
+
+    let ranking = await this.connection.first("SELECT event_point, token_point FROM event_ranking WHERE user_id = :user AND event_id = :event", {
+      user: this.user_id,
+      event: currentEvent.id
+    })
+
+    if (!ranking){
+      await this.connection.query("INSERT INTO event_ranking (user_id, event_id, event_point) VALUES (:user, :event, 0)", {
+        user: this.user_id,
+        event: currentEvent.id
+      })
+      ranking = {
+        event_point: 0,
+        token_point: 0
+      }
+    }
     return {
       status: 200,
-      result: []
+      result: [
+        {
+          event_id: currentEvent.id,
+          point_name: "Hello",
+          point_icon_asset: "assets/flash/ui/live/img/e_icon_01.png",
+          event_point: ranking.token_point,
+          total_event_point: ranking.event_point,
+          event_scenario: {
+            progress: 1,
+            event_scenario_status: []
+          }
+        }
+      ]
     }
   }
 }

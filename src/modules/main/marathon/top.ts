@@ -17,33 +17,25 @@ export default class {
     this.requestData = requestData
   }
 
-  public paramTypes() {
+  public async paramTypes() {
     return {
-      incentive_id: TYPE.INT
+      event_id: TYPE.INT
     }
   }
 
   public async execute() {
-    const user = new User(this.connection)
+    let events = new Events(this.connection)
+    let currentEvent = await events.getEventById(this.params.event_id)
+    if (!currentEvent.opened) throw new ErrorCode(1234, "Event is closed")
 
-    let beforeUserInfo = await user.getUserInfo(this.user_id)
-    let result
-    try {
-      result = await new Item(this.connection).openPresent(this.user_id, this.params.incentive_id)
-    } catch (err) {
-      if (err.message == "Present is already collected") throw new ErrorCode(1201) // ERROR_CODE_INCENTIVE_NONE 
-      else throw err
-    }
-
+    let eventUser = await events.getEventUserStatus(this.user_id, currentEvent.id)
     return {
       status: 200,
       result: {
-        opened_num: 1,
-        success: [result],
-        before_user_info: beforeUserInfo,
-        after_user_info: await user.getUserInfo(this.user_id),
-        class_system: User.getClassSystemStatus(this.user_id),
-        unit_support_list: await user.getSupportUnits(this.user_id)
+        event_status: {
+          total_event_point: eventUser.event_point,
+          event_rank: eventUser.event_rank
+        }
       }
     }
   }
