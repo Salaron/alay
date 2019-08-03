@@ -29,29 +29,91 @@ export default <LBonus>{
       name: "green_tickets",
       amount: 1
     },
-    5: {
+    2: {
       name: "blue_tickets",
       amount: 1
     },
-    20: {
+    3: {
       name: "loveca",
-      amount: 20
+      amount: 5
     },
-    50: {
+    4: {
       name: "green_tickets",
-      amount: 15
+      amount: 5
+    },
+    5: {
+      name: "blue_tickets",
+      amount: 2
+    },
+    6: {
+      name: "loveca",
+      amount: 10
+    },
+    7: {
+      name: "blue_tickets",
+      amount: 3
+    },
+    8: {
+      name: "gt",
+      amount: 10
+    },
+    9: {
+      name: "bt",
+      amount: 4
+    },
+    10: {
+      name: "loveca",
+      amount: 25
+    },
+    20: {
+      name: "gt",
+      amount: 25
+    },
+    40: {
+      name: "bt",
+      amount: 5
+    },
+    60: {
+      name: "bt",
+      amount: 10
+    },
+    80: {
+      name: "card",
+      amount: 10,
+      item_id: 1085
+    },
+    100: {
+      name: "lg",
+      amount: 50
     },
     200: {
-      name: "blue_tickets",
+      name: "bt",
+      amount: 15
+    },
+    300: {
+      name: "lg",
+      amount: 100
+    },
+    365: {
+      name: "card",
+      amount: 5,
+      item_id: 1409
+    },
+    400: {
+      name: "bt",
       amount: 25
     },
     500: {
-      name: "blue_tickets",
-      amount: 50
+      name: "lg",
+      amount: 200
     },
-    1000: {
-      name: "blue_tickets",
-      amount: 100
+    600: {
+      name: "bt",
+      amount: 35
+    },
+    700: {
+      name: "lg",
+      amount: 500
     }
   }
 }

@@ -52,13 +52,17 @@ export default class {
     if (!session) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
     if (session.live_difficulty_id != this.params.live_difficulty_id) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
 
-    let currentEvent = await event.getEventStatus(Events.getEventTypes().TOKEN)
-    if (currentEvent.active && Live.getMarathonLiveList(currentEvent.id).includes(this.params.live_difficulty_id)) eventLive = true
-
     let beforeUserInfo = await user.getUserInfo(this.user_id)
+    let currentEvent = await event.getEventStatus(Events.getEventTypes().TOKEN)
     let liveData = await live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    
+    if (liveData.capital_type === 2) { // token live
+      if (!currentEvent.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
+      if (currentEvent.active && Live.getMarathonLiveList(currentEvent.id).includes(this.params.live_difficulty_id)) eventLive = true
+    }
+    
     let maxKizuna = Live.calculateMaxKizuna(liveData.s_rank_combo)
-    if (this.params.love_cnt > maxKizuna) throw new ErrorUser(`Overflow kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`, this.user_id)
+    if (this.params.love_cnt > maxKizuna) throw new ErrorUser(`Too more kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`, this.user_id)
     let deck = (await live.getUserDeck(this.user_id, session.deck_id, false, undefined, true)).deck
     deck = await live.applyKizunaBonusToDeck(this.user_id, deck!, this.params.love_cnt)
 

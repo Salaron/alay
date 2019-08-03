@@ -240,7 +240,6 @@ export class Item {
 
   public async addPresent(userId: number, item: ItemObject, message: string, amount = 1, history = false) {
     if (!item.name && !item.type && !item.id) throw new Error(`Item object is empty`)
-
     if (typeof item.name === "string" && item.type == null) {
       let ntt = Item.nameToType(item.name, item.id)
       item.type = ntt.itemType
@@ -254,7 +253,7 @@ export class Item {
 
     let unitData: any = {}
     if (item.type === 1001) {
-      unitData = await unitDB.get("SELECT rarity, attribute_id FROM unit_m WHERE unit_id=?", [item.id])
+      unitData = await unitDB.get("SELECT rarity, attribute_id FROM unit_m WHERE unit_id=:id", { id: item.id })
     }
 
     let res = await this.connection.query(`

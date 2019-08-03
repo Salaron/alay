@@ -105,6 +105,24 @@ export class Unit {
         amount: options.amount
       })
       await this.updateAlbum(userId, unitId)
+      return {
+        unit_id: unitId,
+        unit_owning_user_id: null,
+        is_support_member: true,
+        exp: 0,
+        next_exp: 0,
+        max_hp: 0,
+        level: 1,
+        skill_level: 1,
+        rank: 1,
+        love: 0,
+        is_rank_max: true,
+        is_level_max: true,
+        is_love_max: true,
+        unit_skill_exp: 0,
+        display_rank: 1,
+        unit_removable_skill_capacity: 0
+      }
     } else {
       let unitData = await unitDB.get(`
       SELECT 
@@ -171,7 +189,7 @@ export class Unit {
           insertData.exp = level[i].next_exp
         }
       }
-      let result = await this.connection.query("\
+      let result = await this.connection.execute("\
       INSERT INTO units (\
         user_id, unit_id, `exp`, next_exp, `level`, max_level, `rank`, \
         max_rank, love, max_love, unit_skill_level, max_skill_level, max_hp, \
@@ -191,10 +209,7 @@ export class Unit {
         maxLevel: insertData.level == insertData.max_level && isMaxRank,
         addLove: insertData.love
       })
-      insertData.unit_owning_user_id = (<any>result).insertId
-      return Unit.parseUnitData(await this.connection.first(`SELECT * FROM units WHERE unit_owning_user_id = :uouid`, {
-        uouid: insertData.unit_owning_user_id
-      }))
+      return await this.getUnitDetail(result.insertId)
     }
   }
 

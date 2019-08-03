@@ -257,6 +257,7 @@ export class Sqlite3 {
   private secretbox: sqlite3
   private other: sqlite3
   private event: sqlite3
+  private achievement: sqlite3
   constructor() {
     // check if all databases exists
     if (!existsSync(rootDir + "data/db/unit.db_")) {
@@ -291,6 +292,9 @@ export class Sqlite3 {
     }
     if (!existsSync(rootDir + "data/db/event_common.db_")) {
       throw new Error("Required file 'data/db/event_common.db_' is missing")
+    }
+    if (!existsSync(rootDir + "data/db/achievement.db_")) {
+      throw new Error("Required file 'data/db/achievement.db_' is missing")
     }
   }
   public getUnit() {
@@ -336,6 +340,10 @@ export class Sqlite3 {
   public getEvent() {
     if (!this.event || this.event.closed) return this.event = new sqlite3(rootDir + "data/db/event_common.db_", "ro")
     else return this.event
+  }
+  public getAchievement() {
+    if (!this.achievement || this.achievement.closed) return this.achievement = new sqlite3(rootDir + "data/db/achievement.db_", "ro")
+    else return this.achievement
   }
 }
 
