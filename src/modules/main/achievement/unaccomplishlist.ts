@@ -20,6 +20,7 @@ export default class {
   }
 
   public async execute() {
+    // TODO
     let list: any[] = []
     let loginAc = await achievementDB.all("SELECT * FROM achievement_m WHERE achievement_type = 52 ORDER BY achievement_id ASC")
 
@@ -27,9 +28,10 @@ export default class {
     for (const ac of loginAc) {
       if (loginCnt >= ac.params1) continue
       if (loginCnt - ac.params1 < 0 && list.length === 0) {
-        let reward: any = Config.lbonus.total_login_bonus[ac.params1]
+        let reward: any = Utils.createObjCopy(Config.lbonus.total_login_bonus[ac.params1])
+        if (!reward) return
         reward.add_type = Item.nameToType(reward.name).itemType
-        reward.item_id = Item.nameToType(reward.name).itemId
+        reward.item_id = Item.nameToType(reward.name, reward.item_id).itemId
         list.push({
           achievement_id: ac.achievement_id,
           count: loginCnt,

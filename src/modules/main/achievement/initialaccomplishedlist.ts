@@ -26,9 +26,9 @@ export default class {
     let loginCnt = (await this.connection.first(`SELECT COUNT(*) as cnt FROM login_received_list WHERE user_id = :user`, { user: this.user_id })).cnt
     for (const ac of loginAc) {
       if (loginCnt < ac.params1) break
-      let reward: any = Config.lbonus.total_login_bonus[ac.params1]
+      let reward: any = Utils.createObjCopy(Config.lbonus.total_login_bonus[ac.params1])
       reward.add_type = Item.nameToType(reward.name).itemType
-      reward.item_id = Item.nameToType(reward.name).itemId
+      reward.item_id = Item.nameToType(reward.name, reward.item_id).itemId
       list.push({
         achievement_id: ac.achievement_id,
         count: loginCnt,

@@ -268,6 +268,7 @@ export class Unit {
       favorite_flag: !!data.favorite_flag,
       display_rank: data.favorite_flag,
       unit_skill_exp: data.unit_skill_exp,
+      skill_level: data.unit_skill_level,
       unit_removable_skill_capacity: data.removable_skill_capacity,
       attribute: data.attribute,
       smile: data.stat_smile,
@@ -280,6 +281,7 @@ export class Unit {
       is_removable_skill_capacity_max: data.removable_skill_capacity >= data.max_removable_skill_capacity,
       is_support_member: supportUnitList.includes(data.unit_id),
       removable_skill_ids: data.removable_skill_ids,
+      insert_date: Utils.parseDate(data.insert_date),
       total_smile: data.stat_smile, // TODO?
       total_cute: data.stat_pure,
       total_cool: data.stat_cool,
