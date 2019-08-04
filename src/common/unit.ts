@@ -2,6 +2,7 @@ import { Connection } from "../core/database"
 import extend from "extend"
 
 const unitDB = sqlite3.getUnit()
+const exchangeDB = sqlite3.getExchange()
 const addUnitDefault: addUnitOptions = {
   level: 1,
   rank: 1,
@@ -17,12 +18,37 @@ const updateAlbumDefault: updateAlbumOptions = {
   addFavPt: 0
 }
 
+let supportUnitData: { [unitId: number]: supportUnitData } = {}
 let supportUnitList: number[] = []
+let noExchangePointList: number[] = []
 export async function init() {
-  let supports = await unitDB.all(`SELECT unit_id FROM unit_m WHERE disable_rank_up = 1 OR disable_rank_up = 3`)
+  let supports = await unitDB.all(`
+  SELECT 
+    name, unit_id, attribute_id, rarity, disable_rank_up, merge_exp, sale_price, merge_cost, grant_exp
+  FROM 
+    unit_m 
+  JOIN unit_level_up_pattern_m
+   ON unit_m.unit_level_up_pattern_id = unit_level_up_pattern_m.unit_level_up_pattern_id 
+  JOIN unit_skill_level_m
+   ON unit_m.default_unit_skill_id = unit_skill_level_m.unit_skill_id
+  WHERE disable_rank_up != 0`)
   supportUnitList = supports.map((unit: any) => {
+    supportUnitData[unit.unit_id] = {
+      name: unit.name,
+      attribute: unit.attribute_id,
+      rarity: unit.rarity,
+      merge_cost: unit.merge_cost,
+      sale_price: unit.sale_price,
+      exp: unit.merge_exp,
+      skill_exp: unit.grant_exp
+    }
     return unit.unit_id
   })
+
+  let noEpList = await exchangeDB.all("SELECT * FROM exchange_nopoint_unit_m")
+  for (const unit of noEpList) {
+    noExchangePointList.push(unit.unit_id)
+  }
 }
 
 interface addUnitOptions {
@@ -303,6 +329,12 @@ export class Unit {
 
   public static getSupportUnitList() {
     return supportUnitList
+  }
+  public static getSupportUnitData() {
+    return supportUnitData
+  }
+  public static getNoExchangePointList() {
+    return noExchangePointList
   }
   public static getRemovableSkillList() {
     // TODO
