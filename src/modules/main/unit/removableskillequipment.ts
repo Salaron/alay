@@ -49,6 +49,7 @@ export default class {
 
     for (const skill of _owningSkill.owning_info) {
       owningSkill[skill.unit_removable_skill_id] = skill.total_amount - skill.equipped_amount
+      assert(owningSkill[skill.unit_removable_skill_id] >= 0, "Not enough sis [owningCheck]")
     }
 
     let _skillInfo = await unitDB.all("SELECT unit_removable_skill_id, size FROM unit_removable_skill_m")
@@ -63,7 +64,7 @@ export default class {
     }
 
     // target reference type:
-    // 0 -- other
+    // 0 -- disabled
     // 1 -- attribute
     // 2 -- unit type
     // 3 -- client-side
@@ -88,7 +89,8 @@ export default class {
       for (const equipedSIS of spaceUsed) {
         spaceAvailable -= skillInfo[equipedSIS.unit_removable_skill_id].size
       }
-      if (spaceAvailable < sisData.size) throw new Error(`Not enought space`)
+      assert(spaceAvailable >= sisData.size, "Not enought space")
+      assert(owningSkill[sis.unit_removable_skill_id] - 1 >= 0, "Not enough sis [equip]")
 
       // now let's check if this sis is valid for this card
       switch (sisData.target_ref) {
