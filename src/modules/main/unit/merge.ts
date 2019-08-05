@@ -33,7 +33,7 @@ export default class {
     if (
       this.params.unit_owning_user_ids.length > 12 ||
       this.params.unit_support_list.length > 12
-    ) throw new Error(``)
+    ) throw new Error(`Too more...`)
   }
 
   public async execute() {
@@ -120,6 +120,7 @@ export default class {
       if (unitData.length != this.params.unit_owning_user_ids.length) throw new ErrorCode(1311)
 
       await unitData.forEachAsync(async unit => {
+        if (unit.unit_owning_user_id === this.params.base_owning_unit_user_id) throw new Error("Nice try :)")
         let data = await unitDB.get(`
         SELECT 
           merge_cost, merge_exp, default_unit_skill_id, sl.grant_exp as grant_skill_exp, attribute_id, rarity 
