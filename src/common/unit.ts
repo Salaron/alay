@@ -106,7 +106,7 @@ export class Unit {
     }
   }
 
-  public async addUnit(userId: number, unitId: number, options: addUnitOptions = {}) {
+  public async addUnit(userId: number, unitId: number, options: addUnitOptions = addUnitDefault) {
     options = extend(true, addUnitDefault, options)
     if (options.useNumber) {
       let res = await unitDB.get(`SELECT unit_id FROM unit_m WHERE unit_number = :number`, { number: unitId })
@@ -215,18 +215,26 @@ export class Unit {
           insertData.exp = level[i].next_exp
         }
       }
-      let result = await this.connection.execute("\
-      INSERT INTO units (\
-        user_id, unit_id, `exp`, next_exp, `level`, max_level, `rank`, \
-        max_rank, love, max_love, unit_skill_level, max_skill_level, max_hp, \
-        removable_skill_capacity, max_removable_skill_capacity, display_rank, \
-        stat_smile, stat_pure, stat_cool, attribute \
-      ) VALUES (\
-        :user_id, :unit_id, :exp, :next_exp, :level, :max_level, :rank, :max_rank, \
-        :love, :max_love, :unit_skill_level, :max_skill_level, :max_hp, \
-        :removable_skill_capacity, :max_removable_skill_capacity, :display_rank, \
-        :stat_smile, :stat_pure, :stat_cool, :attribute \
-      )", insertData)
+
+      if (!options.amount) options.amount = 1 // fix complier error
+      let addedIds = []
+      let lastId = 0
+      for (let i = 0; i < options.amount; i++) {
+        let result = await this.connection.execute("\
+        INSERT INTO units (\
+          user_id, unit_id, `exp`, next_exp, `level`, max_level, `rank`, \
+          max_rank, love, max_love, unit_skill_level, max_skill_level, max_hp, \
+          removable_skill_capacity, max_removable_skill_capacity, display_rank, \
+          stat_smile, stat_pure, stat_cool, attribute \
+        ) VALUES (\
+          :user_id, :unit_id, :exp, :next_exp, :level, :max_level, :rank, :max_rank, \
+          :love, :max_love, :unit_skill_level, :max_skill_level, :max_hp, \
+          :removable_skill_capacity, :max_removable_skill_capacity, :display_rank, \
+          :stat_smile, :stat_pure, :stat_cool, :attribute \
+        )", insertData)
+        addedIds.push(result.insertId)
+        lastId = result.insertId
+      }
 
       let isMaxRank = (insertData.rank == insertData.max_rank)
       await this.updateAlbum(insertData.user_id, insertData.unit_id, {
@@ -235,7 +243,9 @@ export class Unit {
         maxLevel: insertData.level == insertData.max_level && isMaxRank,
         addLove: insertData.love
       })
-      return await this.getUnitDetail(result.insertId)
+      let res: detailUnitData & { unit_owning_ids?: number[] } = await this.getUnitDetail(lastId)
+      res.unit_owning_ids = addedIds
+      return res
     }
   }
 
@@ -271,11 +281,14 @@ export class Unit {
     }
   }
 
-  public async getUnitDetail(unitOwningUserId: number) {
-    let data = await this.connection.first(`SELECT * FROM units WHERE unit_owning_user_id = :uouid`, {
-      uouid: unitOwningUserId
+  public async getUnitDetail(unitOwningUserId: number, userId?: number): Promise<detailUnitData> {
+    let query = "SELECT * FROM units WHERE unit_owning_user_id = :uouid AND deleted = 0"
+    if (userId) query = "SELECT * FROM units WHERE unit_owning_user_id = :uouid AND deleted = 0 AND user_id = :user"
+    let data = await this.connection.first(query, {
+      uouid: unitOwningUserId,
+      user: userId
     })
-    if (!data) throw new Error(`Data for uouid is missing`)
+    if (!data) throw new ErrorCode(1311, "You don't have this card")
 
     data.removable_skill_ids = await this.getUnitSiS(unitOwningUserId)
     return {
@@ -296,6 +309,7 @@ export class Unit {
       unit_skill_exp: data.unit_skill_exp,
       skill_level: data.unit_skill_level,
       unit_removable_skill_capacity: data.removable_skill_capacity,
+      max_removable_skill_capacity: data.max_removable_skill_capacity, // server-side
       attribute: data.attribute,
       smile: data.stat_smile,
       cute: data.stat_pure,
