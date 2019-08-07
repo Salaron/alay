@@ -24,12 +24,12 @@ export default class {
   }
 
   public async execute() {
-    // TODO: profile info in wv 
-    return {
+    // check if this is SunLight client
+    // it has a feature for get profile info
+    if (this.params.sl_client) return { 
       status: 200,
-      result: {
-        error_code: 11102 
-      }
+      result: []
     }
+    throw new ErrorCode(11102)
   }
 }
