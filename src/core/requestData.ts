@@ -18,6 +18,7 @@ export default class RequestData {
   public handlerType: HANDLER_TYPE
   public connection: Connection
   public raw_request_data: any // JSON parse remove some symbols from fromData
+  public requestFromBrowser = false
 
   private auth_level_check_passed = false
   private response: ServerResponse
@@ -41,9 +42,14 @@ export default class RequestData {
         if (this.params.user_id && this.params.token) { // queryString
           this.user_id = parseInt(this.params.user_id) || null
           this.auth_token = this.params.token
-        } else { // cookie
-          this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id")) || null
+          this.requestFromBrowser = true
+        } else if (
+          !isNaN(parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id"))) &&
+          getCookie(<string>this.headers["cookie"] || "", "token") != null
+        ) { // cookie
+          this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id"))
           this.auth_token = getCookie(<string>this.headers["cookie"] || "", "token")
+          this.requestFromBrowser = true
         }
       }
       if (this.user_id != null && this.auth_token != null) {
@@ -52,6 +58,8 @@ export default class RequestData {
           `token=${this.auth_token}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/;`
         ])
       }
+
+      if (!this.headers["x-requested-with"]) this.requestFromBrowser = true
     }
 
     if (formData && formData.request_data && hType === HANDLER_TYPE.MAIN) {
@@ -82,7 +90,7 @@ export default class RequestData {
     if (this.auth_level_check_passed) return this.auth_level
     this.auth_level_check_passed = true
     // TODO additional checks
-
+    
     if (this.user_id === null && this.auth_token === null) {
       // Auth key step
       log.debug(this.headers, "Request Headers")
@@ -91,8 +99,8 @@ export default class RequestData {
 
     if (this.user_id === null && this.auth_token != null) {
       // Has token but not user id: PreLogin
-      let checkToken = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, { 
-        token: this.auth_token 
+      let checkToken = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
+        token: this.auth_token
       })
       if (!checkToken) return this.auth_level = AUTH_LEVEL.REJECTED // Token doesn't exist
       if (checkToken.expire < Utils.parseDate(Date.now())) return this.auth_level = AUTH_LEVEL.REJECTED // Token expired

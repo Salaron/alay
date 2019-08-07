@@ -1,5 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
 
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -17,19 +17,7 @@ export default class {
     this.requestData = requestData
   }
 
-  public paramTypes() {
-    return {
-      user_id: TYPE.INT
-    }
-  }
-
   public async execute() {
-    // TODO: profile info in wv 
-    return {
-      status: 200,
-      result: {
-        error_code: 11102 
-      }
-    }
+    throw new ErrorCode(1205, "Hello")
   }
 }

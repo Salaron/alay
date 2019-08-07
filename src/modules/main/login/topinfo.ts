@@ -3,7 +3,7 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
 import moment from "moment"
 
 export default class {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
+  public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
