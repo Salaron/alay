@@ -125,7 +125,7 @@ export class Unit {
     ) throw new Error("An invalid value was provided")
 
     if (supportUnitList.includes(unitId)) { // add support unit
-      await this.connection.query(`INSERT INTO user_support_unit (user_id, unit_id, amount) VALUES (:user, :id, 1) ON DUPLICATE KEY UPDATE amount=amount+:amount`, {
+      await this.connection.query(`INSERT INTO user_support_unit (user_id, unit_id, amount) VALUES (:user, :id, :amount) ON DUPLICATE KEY UPDATE amount=amount+:amount`, {
         user: userId,
         id: unitId,
         amount: options.amount
@@ -159,9 +159,7 @@ export class Unit {
       FROM 
         unit_m 
       LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id 
-      WHERE unit_id = :unit`, {
-        unit: unitId
-      })
+      WHERE unit_id = :unit`, { unit: unitId })
       if (!unitData) throw new Error(`Unit Id "${unitId} does not exist`)
       let insertData: any = {
         user_id: userId,
@@ -264,21 +262,29 @@ export class Unit {
         lovetotal: options.addLove,
         fav: options.addFavPt
       }
-      await this.connection.query("INSERT INTO user_unit_album VALUES (:user, :unit, :rank, :love, :level, :all, :lovemax, :lovetotal, :fav)", values)
-    } else { // existing
-      let values = {
-        user: userId,
-        unit: unitId,
-        rank: (options.maxRank || data.rank_max_flag) ? 1 : 0,
-        love: (options.maxLove || data.love_max_flag) ? 1 : 0,
-        level: (options.maxLevel || data.rank_level_max_flag) ? 1 : 0,
-        all: ((options.maxRank && options.maxLove && options.maxLevel) || data.all_max_flag) ? 1 : 0,
-        lovemax: Math.min(data.highest_love_per_unit + options.addLove, data.highest_love_per_unit),
-        lovetotal: data.total_love + options.addLove,
-        fav: data.favorite_point + options.addFavPt
+      try {
+        await this.connection.query("INSERT INTO user_unit_album VALUES (:user, :unit, :rank, :love, :level, :all, :lovemax, :lovetotal, :fav)", values, true)
+        return
+      } catch (err) {
+        if (err.code != "ER_DUP_ENTRY") {
+          throw err
+        }
+        data = await this.connection.first("SELECT * FROM user_unit_album WHERE user_id=:user AND unit_id=:unit", { user: userId, unit: unitId })
       }
-      await this.connection.query("UPDATE user_unit_album SET rank_max_flag=:rank, love_max_flag=:love, rank_level_max_flag=:level,all_max_flag=:all,highest_love_per_unit=:lovemax,total_love=:lovetotal,favorite_point=:fav WHERE user_id=:user AND unit_id=:unit;", values)
     }
+    // existing
+    let values = {
+      user: userId,
+      unit: unitId,
+      rank: (options.maxRank || data.rank_max_flag) ? 1 : 0,
+      love: (options.maxLove || data.love_max_flag) ? 1 : 0,
+      level: (options.maxLevel || data.rank_level_max_flag) ? 1 : 0,
+      all: ((options.maxRank && options.maxLove && options.maxLevel) || data.all_max_flag) ? 1 : 0,
+      lovemax: Math.min(data.highest_love_per_unit + options.addLove, data.highest_love_per_unit),
+      lovetotal: data.total_love + options.addLove,
+      fav: data.favorite_point + options.addFavPt
+    }
+    await this.connection.query("UPDATE user_unit_album SET rank_max_flag=:rank, love_max_flag=:love, rank_level_max_flag=:level,all_max_flag=:all,highest_love_per_unit=:lovemax,total_love=:lovetotal,favorite_point=:fav WHERE user_id=:user AND unit_id=:unit;", values)
   }
 
   public async getUnitDetail(unitOwningUserId: number, userId?: number): Promise<detailUnitData> {
@@ -333,9 +339,7 @@ export class Unit {
     let data = await this.connection.query(`
     SELECT unit_removable_skill_id 
     FROM user_unit_removable_skill_equip 
-    WHERE unit_owning_user_id = :id`, {
-      id: unitOwningUserId
-    })
+    WHERE unit_owning_user_id = :id`, { id: unitOwningUserId })
     if (!data) throw new Error(`Data for uouid is missing`)
 
     return data.map((val: any) => { return val.unit_removable_skill_id })

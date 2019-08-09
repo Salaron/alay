@@ -105,7 +105,7 @@ export class ConnectionPool {
     })
   }
 
-  public async query(query: string, values: any = {}, connection?: mysql.PoolConnection): Promise<any[]> {
+  public async query(query: string, values: any = {}, connection?: mysql.PoolConnection, ignoreErrors?: boolean): Promise<any[]> {
     return new Promise(async (res, rej) => {
       let transaction = false
       try {
@@ -118,14 +118,14 @@ export class ConnectionPool {
       (<mysql.PoolConnection>connection).query(query, values, async (err, result) => {
         if (!transaction) (<mysql.PoolConnection>connection).release()
         if (err) {
-          log.error(`The error has occurred while performing a query:\n"${query}" with this values: ${JSON.stringify(values)}`)
+          if (!ignoreErrors) log.error(`The error has occurred while performing a query:\n"${query}" with this values: ${JSON.stringify(values)}`)
           return rej(err)
         }
         res(result)
       })
     })
   }
-  public async first(query: string, values: any = {}, connection?: mysql.PoolConnection): Promise<any> {
+  public async first(query: string, values: any = {}, connection?: mysql.PoolConnection, ignoreErrors?: boolean): Promise<any> {
     return new Promise(async (res, rej) => {
       let transaction = false
       try {
@@ -141,7 +141,7 @@ export class ConnectionPool {
       connection.query(query + " LIMIT 1;", values, async (err, result) => {
         if (!transaction) (<mysql.PoolConnection>connection).release()
         if (err) {
-          log.error(`The error has occurred while performing a query:\n"${query}" with this values: ${JSON.stringify(values)}`)
+          if (!ignoreErrors) log.error(`The error has occurred while performing a query:\n"${query}" with this values: ${JSON.stringify(values)}`)
           return rej(err)
         }
         if (typeof result === "object" && Array.isArray(result)) {
@@ -224,20 +224,20 @@ export class Connection {
     this.released = true
   }
 
-  async execute(query: string, values: any = {}): Promise<any> {
+  async execute(query: string, values: any = {}, ignoreErrors?: boolean): Promise<any> {
     this.checkIfReleased()
     this.lastQuery = query
-    return await MySQLconnectionPool.query(query, values, this.connection)
+    return await MySQLconnectionPool.query(query, values, this.connection, ignoreErrors)
   }
-  async query(query: string, values: any = {}) {
+  async query(query: string, values: any = {}, ignoreErrors?: boolean) {
     this.checkIfReleased()
     this.lastQuery = query
-    return await MySQLconnectionPool.query(query, values, this.connection)
+    return await MySQLconnectionPool.query(query, values, this.connection, ignoreErrors)
   }
-  async first(query: string, values: any = {}) {
+  async first(query: string, values: any = {}, ignoreErrors?: boolean) {
     this.checkIfReleased()
     this.lastQuery = query
-    return await MySQLconnectionPool.first(query, values, this.connection)
+    return await MySQLconnectionPool.first(query, values, this.connection, ignoreErrors)
   }
 
   private checkIfReleased() {

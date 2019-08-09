@@ -198,11 +198,7 @@ export class Item {
 
       case 1001: {
         let unit = new Unit(this.connection)
-        let result
-        for (let i = 0; i < amount; i++) {
-          result = await unit.addUnit(userId, <number>item.id)
-        }
-        return result
+        return await unit.addUnit(userId, <number>item.id, { amount: amount })
       }
 
       case 3006: {
@@ -280,8 +276,7 @@ export class Item {
     })
     if (!present) throw new Error(`Present is already collected`)
 
-    await this.connection.query(`UPDATE reward_table SET collected = 1, opened_date = :now WHERE user_id = :user AND incentive_id = :id`, {
-      now: new Date(),
+    await this.connection.query(`UPDATE reward_table SET collected = 1, opened_date = CURRENT_TIMESTAMP WHERE user_id = :user AND incentive_id = :id`, {
       user: userId,
       id: incentiveId
     })
@@ -295,6 +290,7 @@ export class Item {
       result.amount = present.amount
       result.incentive_id = incentiveId
       result.reward_box_flag = false
+      result.new_unit_flag = true
       return result
     }
     return {

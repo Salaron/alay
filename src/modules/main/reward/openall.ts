@@ -102,7 +102,8 @@ export default class {
         reward_item_list: itemList,
         before_user_info: beforeUserInfo,
         after_user_info: await user.getUserInfo(this.user_id),
-        class_system: User.getClassSystemStatus(this.user_id)
+        class_system: User.getClassSystemStatus(this.user_id),
+        unit_support_list: await user.getSupportUnits(this.user_id)
       }
     }
   }
