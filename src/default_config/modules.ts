@@ -10,7 +10,7 @@ export default <Modules>{
   },
   live: {
     unlockAll: false,
-    continueAttemptsCount: 10
+    continueAttemptsCount: 3
   },
   liveSe: {
     list: []
@@ -23,10 +23,10 @@ export default <Modules>{
     webview_login: true
   },
   personalNotice: {
-    welcomeMessageEnabled: true,
+    welcomeMessageEnabled: false,
     welcomeMessageType: 1,
-    welcomeMessageTitle: "TOS",
-    welcomeMessageContents: "2019.07.01 было добавлено TOS. В следующем окне Вам предложат ознакомиться с ним\nи пройти первую настройку."
+    welcomeMessageTitle: "",
+    welcomeMessageContents: ""
   },
   festival: {
     max_reset_setlist: 15,

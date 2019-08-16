@@ -8,14 +8,14 @@ CREATE TABLE `exchange_item` (
   `start_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   `end_date` TIMESTAMP NULL DEFAULT NULL,
 	PRIMARY KEY (`exchange_item_id`)
-) COLLATE='utf8mb4_0900_ai_ci';
+) COLLATE='utf8mb4_unicode_ci';
 
 CREATE TABLE `exchange_cost` (
 	`exchange_item_id` INT UNSIGNED NOT NULL,
 	`rarity` INT UNSIGNED NOT NULL,
 	`cost_value` INT UNSIGNED NOT NULL,
 	CONSTRAINT `FK_exchange_cost` FOREIGN KEY (`exchange_item_id`) REFERENCES `exchange_item` (`exchange_item_id`) ON UPDATE CASCADE ON DELETE CASCADE
-) COLLATE='utf8mb4_0900_ai_ci';
+) COLLATE='utf8mb4_unicode_ci';
 
 CREATE TABLE `exchange_log` (
 	`exchange_item_id` INT UNSIGNED NOT NULL,
@@ -23,6 +23,4 @@ CREATE TABLE `exchange_log` (
 	`got_item_count` INT NULL,
 	CONSTRAINT `FK_exchange_log_item` FOREIGN KEY (`exchange_item_id`) REFERENCES `exchange_item` (`exchange_item_id`) ON UPDATE CASCADE ON DELETE CASCADE,
 	CONSTRAINT `FK_exchange_log_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE
-)COLLATE='utf8mb4_0900_ai_ci';
-
-
+) COLLATE='utf8mb4_unicode_ci';

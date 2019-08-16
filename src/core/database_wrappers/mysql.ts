@@ -1,11 +1,9 @@
 import * as mysql from "mysql"
-import { Log, LEVEL } from "./log"
+import { Log, LEVEL } from "../log"
 import extend from "extend"
 import { promisify } from "util"
-import sqlite3 from "./sqlite3"
-import { existsSync } from "fs"
 
-const log = new Log("Database")
+const log = new Log("MySQL")
 interface PoolConfig extends mysql.PoolConfig {
   autoReconnect: boolean
   autoReconnectMaxAttempt: number
@@ -46,7 +44,7 @@ export class ConnectionPool {
 
         let connection = await Connection.get()
         await Promise.all([
-          connection.query(`SET names utf8`),
+          connection.query(`SET names utf8mb4`),
           connection.query(`SET SESSION group_concat_max_len = 4294967295`) // max of int32
         ])
         await connection.commit()
@@ -173,7 +171,6 @@ export class ConnectionPool {
     return new Promise((res, rej) => {
       this.pool.getConnection(async(err, connection) => {
         if (err) {
-          await this.handleError(err)
           rej(err)
         }
         res(connection)
@@ -244,109 +241,6 @@ export class Connection {
     if (this.released === true) throw new Error(`The connection already has been released.\nLast query: "${this.lastQuery}"`)
   }
 }
-
-export class Sqlite3 {
-  private unit: sqlite3
-  private live: sqlite3
-  private duty: sqlite3
-  private exchange: sqlite3
-  private festival: sqlite3
-  private item: sqlite3
-  private notes: sqlite3
-  private marathon: sqlite3
-  private secretbox: sqlite3
-  private other: sqlite3
-  private event: sqlite3
-  private achievement: sqlite3
-  constructor() {
-    // check if all databases exists
-    if (!existsSync(rootDir + "data/db/unit.db_")) {
-      throw new Error("Required file 'data/db/unit.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/live.db_")) {
-      throw new Error("Required file 'data/db/live.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/team_duty.db_")) {
-      throw new Error("Required file 'data/db/team_duty.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/exchange.db_")) {
-      throw new Error("Required file 'data/db/exchange.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/festival.db_")) {
-      throw new Error("Required file 'data/db/festival.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/item.db_")) {
-      throw new Error("Required file 'data/db/item.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/live_notes.db_")) {
-      throw new Error("Required file 'data/db/live_notes.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/marathon.db_")) {
-      throw new Error("Required file 'data/db/marathon.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/secretbox.db_")) {
-      throw new Error("Required file 'data/db/secretbox.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/other.db_")) {
-      throw new Error("Required file 'data/db/other.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/event_common.db_")) {
-      throw new Error("Required file 'data/db/event_common.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/achievement.db_")) {
-      throw new Error("Required file 'data/db/achievement.db_' is missing")
-    }
-  }
-  public getUnit() {
-    if (!this.unit || this.unit.closed) return this.unit = new sqlite3(rootDir + "data/db/unit.db_", "ro")
-    else return this.unit
-  }
-  public getLive() {
-    if (!this.live || this.live.closed) return this.live = new sqlite3(rootDir + "data/db/live.db_", "ro")
-    else return this.live
-  }
-  public getDuty() {
-    if (!this.duty || this.duty.closed) return this.duty = new sqlite3(rootDir + "data/db/team_duty.db_", "ro")
-    else return this.duty
-  }
-  public getFestival() {
-    if (!this.festival || this.festival.closed) return this.festival = new sqlite3(rootDir + "data/db/festival.db_", "ro")
-    else return this.festival
-  }
-  public getMarathon() {
-    if (!this.marathon || this.marathon.closed) return this.marathon = new sqlite3(rootDir + "data/db/marathon.db_", "ro")
-    else return this.marathon
-  }
-  public getNotes() {
-    if (!this.notes || this.notes.closed) return this.notes = new sqlite3(rootDir + "data/db/live_notes.db_", "ro")
-    else return this.notes
-  }
-  public getExchange() {
-    if (!this.exchange || this.exchange.closed) return this.exchange = new sqlite3(rootDir + "data/db/exchange.db_", "ro")
-    else return this.exchange
-  }
-  public getItem() {
-    if (!this.item || this.item.closed) return this.item = new sqlite3(rootDir + "data/db/item.db_", "ro")
-    else return this.item
-  }
-  public getSecretbox() {
-    if (!this.secretbox || this.secretbox.closed) return this.secretbox = new sqlite3(rootDir + "data/db/secretbox.db_", "ro")
-    else return this.secretbox
-  }
-  public getOther() {
-    if (!this.other || this.other.closed) return this.other = new sqlite3(rootDir + "data/db/other.db_", "ro")
-    else return this.other
-  }
-  public getEvent() {
-    if (!this.event || this.event.closed) return this.event = new sqlite3(rootDir + "data/db/event_common.db_", "ro")
-    else return this.event
-  }
-  public getAchievement() {
-    if (!this.achievement || this.achievement.closed) return this.achievement = new sqlite3(rootDir + "data/db/achievement.db_", "ro")
-    else return this.achievement
-  }
-}
-
 (<any>global).MySQLconnection = Connection
 
 export function formatQuery(query: string, values: any) {
@@ -382,7 +276,6 @@ export async function MySQLConnect() {
   } catch (e) {
     reconnectAttempts += 1
     if (e.code === "ECONNREFUSED") log.error(`Unable to connect to MySQL Database [ECONNREFUSED] ${reconnectAttempts}/${Config.database.autoReconnectMaxAttempt}`)
-    else log.error(e.message)
     if (reconnectAttempts >= Config.database.autoReconnectMaxAttempt) {
       log.fatal(`Max reconnect attempts reached`)
       process.exit(0)
@@ -391,4 +284,3 @@ export async function MySQLConnect() {
     await MySQLConnect()
   }
 }
-

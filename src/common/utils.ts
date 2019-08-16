@@ -1,6 +1,5 @@
 import { Log } from "../core/log"
 import crypto from "crypto"
-import { Connection } from "../core/database"
 import moment from "moment"
 import { promisify } from "util"
 import { readFile } from "fs"

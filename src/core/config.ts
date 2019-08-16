@@ -47,8 +47,8 @@ export class config {
       log.warn("Base key is missing. XMC verifying will be disabled")
       Config.server.XMC_check = false
     }
-    if (Config.server.PRIVATE_KEY.length < 31) throw new Error(`RSA Private key is not provided`)
-    if (Config.server.PUBLIC_KEY.length < 26) throw new Error(`RSA Public key is not provided`)
+    if (Config.server.PRIVATE_KEY.length < 31) throw new Error(`RSA Private key is not configured`)
+    if (Config.server.PUBLIC_KEY.length < 26) throw new Error(`RSA Public key is not configured`)
 
     log.info("Server version: " + Config.server.server_version)
     log.info("Bundle version: " + Config.client.application_version)

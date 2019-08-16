@@ -1,5 +1,3 @@
-import { Connection } from "../core/database"
-
 const unitDB = sqlite3.getUnit()
 interface ItemObject {
   name?: string

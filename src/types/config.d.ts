@@ -127,7 +127,6 @@ interface Server {
   log_level: import("../core/log").LEVEL // https://stackoverflow.com/questions/39040108/import-class-in-definition-file-d-ts
   debug_mode: boolean
   admin_ids: number[]
-  admin_pass: string
   PRIVATE_KEY: string
   PUBLIC_KEY: string
   release_info: ReleaseInfo[]

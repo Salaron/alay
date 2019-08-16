@@ -1,5 +1,3 @@
-import { Connection } from "../core/database"
-
 const eventDB = sqlite3.getEvent()
 
 export enum eventType {

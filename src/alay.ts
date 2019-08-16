@@ -1,7 +1,8 @@
 import "./core/config"
 import "./handlers/errorHandler"
 import { resolve } from "path"
-import * as Database from "./core/database"
+import { MySQLConnect } from "./core/database_wrappers/mysql"
+import { Sqlite3 } from "./core/database_wrappers/sqlite3"
 import { Log } from "./core/log"
 import ReadLine from "./core/readLine"
 import http from "http"
@@ -9,9 +10,15 @@ import requestHandler from "./handlers/requestHandler"
 
 const log = new Log("Setup");
 (<any>global).rootDir = `${resolve(__dirname)}/../`;
-// Prepare sqlite3 databases
-(<any>global).sqlite3 = new Database.Sqlite3()
-// Import common modules (!)after sqlite3
+try {
+  // Prepare sqlite3 databases
+  (<any>global).sqlite3 = new Sqlite3()
+} catch (err) {
+  log.fatal(err)
+  process.exit(0)
+}
+
+// Import common modules (!) after sqlite3
 import * as modules from "./common";
 
 // Entry point
@@ -22,7 +29,7 @@ import * as modules from "./common";
     // Init readline interface
     ReadLine()
     // Connect to MySQL database
-    await Database.MySQLConnect()
+    await MySQLConnect()
     // Prepare common modules
     // execute init function if exists
     for (let module in modules) {

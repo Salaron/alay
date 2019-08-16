@@ -1,6 +1,5 @@
-import { Connection } from "../core/database"
 import { Log } from "../core/log"
-import extend = require("extend");
+import extend from "extend"
 
 const log = new Log("Common: Live")
 

@@ -2,7 +2,7 @@ CREATE TABLE `secretbox_button` (
   `button_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `secretbox_id` int(10) unsigned NOT NULL DEFAULT '0',
   `step_id` int(10) unsigned DEFAULT NULL,
-  `type` smallint(5) unsigned NOT NULL COMMENT 'All button types described in common/secretbox.ts',
+  `type` smallint(5) unsigned NOT NULL COMMENT 'All button types described in types/secretbox.ts',
   `balloon_asset` text,
   PRIMARY KEY (`button_id`),
   KEY `FK_secretbox_button` (`secretbox_id`),
@@ -21,7 +21,7 @@ CREATE TABLE `secretbox_cost` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE `secretbox_list` (
   `secretbox_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `secretbox_type` tinyint(2) unsigned NOT NULL COMMENT 'All secretbox types described in file common/secretbox.ts',
+  `secretbox_type` tinyint(2) unsigned NOT NULL COMMENT 'All secretbox types described in file types/secretbox.ts',
   `member_category` tinyint(1) unsigned NOT NULL COMMENT '1 or 2',
   `name` text NOT NULL,
   `description` text NOT NULL,

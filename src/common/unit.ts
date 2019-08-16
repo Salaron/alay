@@ -1,4 +1,3 @@
-import { Connection } from "../core/database"
 import extend from "extend"
 
 const unitDB = sqlite3.getUnit()

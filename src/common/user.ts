@@ -1,5 +1,3 @@
-import { Connection } from "../core/database"
-
 interface userParams {
   vanish?: number,
   mirror?: number,

@@ -48,7 +48,7 @@ CREATE TABLE `secretbox_button` (
   `button_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `secretbox_id` int(10) unsigned NOT NULL DEFAULT '0',
   `step_id` int(10) unsigned DEFAULT NULL,
-  `type` smallint(5) unsigned NOT NULL COMMENT 'All button types described in common/secretbox.ts',
+  `type` smallint(5) unsigned NOT NULL COMMENT 'All button types described in types/secretbox.ts',
   `balloon_asset` text,
   PRIMARY KEY (`button_id`),
   KEY `FK_secretbox_button` (`secretbox_id`),
@@ -69,7 +69,7 @@ CREATE TABLE `secretbox_cost` (
 
 CREATE TABLE `secretbox_list` (
   `secretbox_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `secretbox_type` tinyint(2) unsigned NOT NULL COMMENT 'All secretbox types described in file common/secretbox.ts',
+  `secretbox_type` tinyint(2) unsigned NOT NULL COMMENT 'All secretbox types described in file types/secretbox.ts',
   `member_category` tinyint(1) unsigned NOT NULL COMMENT '1 or 2',
   `name` text NOT NULL,
   `description` text NOT NULL,
@@ -258,6 +258,33 @@ CREATE TABLE IF NOT EXISTS `event_ranking` (
   CONSTRAINT `FK_event_ranking_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_event_ranking_event` FOREIGN KEY (`event_id`) REFERENCES `events_list` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `exchange_item` (
+	`exchange_item_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`title` VARCHAR(50) NOT NULL DEFAULT '0',
+	`amount` INT UNSIGNED NOT NULL DEFAULT 0,
+	`item_name` VARCHAR(50) NOT NULL DEFAULT '0',
+  `item_id` INT(11) UNSIGNED NULL DEFAULT NULL,
+  `max_count` INT(10) UNSIGNED NOT NULL DEFAULT NULL,
+  `start_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `end_date` TIMESTAMP NULL DEFAULT NULL,
+	PRIMARY KEY (`exchange_item_id`)
+) COLLATE='utf8mb4_unicode_ci';
+
+CREATE TABLE `exchange_cost` (
+	`exchange_item_id` INT UNSIGNED NOT NULL,
+	`rarity` INT UNSIGNED NOT NULL,
+	`cost_value` INT UNSIGNED NOT NULL,
+	CONSTRAINT `FK_exchange_cost` FOREIGN KEY (`exchange_item_id`) REFERENCES `exchange_item` (`exchange_item_id`) ON UPDATE CASCADE ON DELETE CASCADE
+) COLLATE='utf8mb4_unicode_ci';
+
+CREATE TABLE `exchange_log` (
+	`exchange_item_id` INT UNSIGNED NOT NULL,
+	`user_id` INT UNSIGNED NOT NULL,
+	`got_item_count` INT NULL,
+	CONSTRAINT `FK_exchange_log_item` FOREIGN KEY (`exchange_item_id`) REFERENCES `exchange_item` (`exchange_item_id`) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT `FK_exchange_log_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE
+) COLLATE='utf8mb4_unicode_ci';
 
 -- Экспортируемые данные не выделены.
 -- Дамп структуры для таблица sunlight.login_bonus_sheets
