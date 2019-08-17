@@ -47,7 +47,10 @@ export default class {
       PublicKey: Config.server.PUBLIC_KEY.toString(),
       redirect: "webview.php/admin/index",
       module: "admin",
-      currentOnline: await new Utils(this.connection).getCurrentOnline()
+      currentOnline: await new Utils(this.connection).getCurrentOnline(),
+      external: this.requestData.requestFromBrowser,
+      user_id: this.user_id,
+      token: this.requestData.auth_token,
     }
 
     return {

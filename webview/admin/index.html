@@ -29,6 +29,13 @@
               </ul>
             </div>
 
+            {{#unless external}}
+            <div class="uk-navbar-left">
+              <ul class="uk-navbar-nav">
+                <li><a id="external" uk-icon="expand" href=""></a></li>
+              </ul>
+            </div>
+            {{/unless}}
             <div class="uk-navbar-right">
               <ul class="uk-navbar-nav">
                 <li><a uk-icon="users">{{currentOnline}}</a></li>
@@ -49,6 +56,11 @@
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
+  <script>
+    var external = JSON.parse(`{{{external}}}`)
+    console.log("native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))
+    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))
+  </script>
 </body>
 
 </html>

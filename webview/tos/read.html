@@ -34,6 +34,11 @@
   <script>
     new PerfectScrollbar('#body', { suppressScrollX: true })
     if (window.history.length != 1) $("#header").prepend('<a onclick="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    if (!external) {
+      $('a[href^="http"]').each(function () {
+        $(this).attr("href", "native://browser?url=" + encodeURIComponent($(this).attr("href")))
+      });
+    }
   </script>
 </body>
 

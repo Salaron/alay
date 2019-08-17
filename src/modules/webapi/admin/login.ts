@@ -42,28 +42,31 @@ export default class {
     })
     if (!currentToken || !currentToken.login_token) {
       // This account doesn't have credentials...
-      await this.connection.execute("INSERT INTO user_login (user_id, login_token, last_admin_access) VALUES (:user, :token, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE login_token = :token", {
+      await this.connection.execute("INSERT INTO user_login (user_id, login_token) VALUES (:user, :token) ON DUPLICATE KEY UPDATE login_token = :token", {
         user: this.user_id,
         token: this.requestData.auth_token
       })
     } else {
       this.requestData.auth_token = currentToken.login_token
-      await this.connection.execute("UPDATE user_login SET last_admin_access = CURRENT_TIMESTAMP WHERE user_id = :user AND login_token = :token", {
-        user: this.user_id,
-        token: this.requestData.auth_token
+      await this.connection.execute("UPDATE user_login SET last_activity = CURRENT_TIMESTAMP WHERE user_id = :user", {
+        user: this.user_id
       })
     }
     this.requestData.user_id = this.user_id
     // update our auth level
     await this.requestData.getAuthLevel({ force: true })
-    if (this.requestData.auth_level != AUTH_LEVEL.ADMIN) throw new ErrorCode(1234, "You're not an admin!")
+    if (this.requestData.auth_level != AUTH_LEVEL.ADMIN) {
+      this.requestData.user_id = null
+      this.requestData.auth_token = null
+      throw new ErrorCode(1234, "You're not an admin!")
+    }
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })
     return {
       status: 200,
       result: true,
       headers: {
         "Set-Cookie": [
-          `user_id=${this.user_id}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/;`,
+          `user_id=${this.requestData.user_id}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/;`,
           `token=${this.requestData.auth_token}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/;`
         ]
       }

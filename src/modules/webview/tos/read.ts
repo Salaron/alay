@@ -26,14 +26,6 @@ export default class {
     this.params = requestData.params
     this.requestData = requestData
   }
-
-  public paramTypes() {
-    return { }
-  }
-  public paramCheck() {
-    return true
-  }
-
   public async execute() {
     const utils = new Utils(this.connection)
 
@@ -50,7 +42,8 @@ export default class {
     }
 
     let values = {
-      tos: converter.makeHtml(tos.replace(/--/gi, "—"))
+      tos: converter.makeHtml(tos.replace(/--/gi, "—")),
+      external: this.requestData.requestFromBrowser
     }
     return {
       status: 200,
