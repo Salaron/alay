@@ -480,6 +480,13 @@ CREATE TABLE IF NOT EXISTS `user_award_unlock` (
   CONSTRAINT `FK_award_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `user_tos` (
+	`user_id` INT(10) UNSIGNED NOT NULL,
+	`insert_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`user_id`),
+	CONSTRAINT `FK_user_tos_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Экспортируемые данные не выделены.
 -- Дамп структуры для таблица sunlight.user_background_unlock
 CREATE TABLE IF NOT EXISTS `user_background_unlock` (

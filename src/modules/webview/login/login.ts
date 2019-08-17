@@ -21,7 +21,8 @@ export default class {
   public async execute() {
     let values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      PublicKey: Config.server.PUBLIC_KEY.toString()
+      PublicKey: Config.server.PUBLIC_KEY.toString(),
+      module: "login"
     }
     return {
       status: 200,

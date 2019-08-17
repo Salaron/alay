@@ -7,6 +7,10 @@ import chalk from "chalk"
 
 const log = new Log("Request Data")
 
+interface authLevelOptions {
+  force?: boolean
+}
+
 export default class RequestData {
   public user_id: number | null = null
   public auth_token: string | null = null
@@ -86,8 +90,8 @@ export default class RequestData {
     return rd
   }
 
-  public async getAuthLevel() {
-    if (this.auth_level_check_passed) return this.auth_level
+  public async getAuthLevel(options: authLevelOptions = {}) {
+    if (this.auth_level_check_passed && !options.force) return this.auth_level
     this.auth_level_check_passed = true
     // TODO additional checks
     

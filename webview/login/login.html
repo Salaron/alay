@@ -98,7 +98,7 @@
       if (!checkUser(userId)) return sendNotification("User ID should be integer", "warning")
 
       $.when(sendRequest({
-        module: "login",
+        module: "{{{module}}}",
         action: "login",
         user_id: RSAEncrypt.encrypt(userId),
         password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
@@ -106,7 +106,11 @@
       })).done(function (response) {
         if (response.error || response.maintenance || !response) return
         $("#login_form").hide()
-        sendNotification("Success. Close this window to enter the game", "success")
+        if ("{{{redirect}}}".length != 0) {
+          window.location.replace(window.location.protocol + "//" + window.location.host + "/{{{redirect}}}")
+        } else {
+          sendNotification("Success. Close this window to enter the game", "success")
+        }
       })
     }
   </script>
