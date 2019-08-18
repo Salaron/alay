@@ -69,11 +69,11 @@ function sendRequest(params) {
       }
     },
     error: function (xhr) {
-      if (xhr.status === 600) {
-        if (xhr.responseJSON) sendNotification(xhr.responseJSON.response_data.message, "danger")
+      if (xhr.status === 600 || xhr.status === 500) {
+        if (xhr.responseJSON && xhr.responseJSON.response_data && xhr.responseJSON.response_data.message) sendNotification(xhr.responseJSON.response_data.message, "danger")
+        else if (xhr.responseJSON && xhr.responseJSON.message) sendNotification(xhr.responseJSON.message, "danger")
         else if (xhr.responseText) sendNotification(xhr.responseText, "danger")
-      } else if (xhr.status === 500) {
-        sendNotification(xhr.statusText, "danger")
+        else sendNotification(xhr.statusText, "danger")
       } else {
         sendNotification("Проблема с интернет-соединением", "danger")
       }
