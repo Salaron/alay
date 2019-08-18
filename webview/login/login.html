@@ -38,12 +38,18 @@
         <div class="uk-margin-small">
           <div class="uk-inline uk-width-1-1">
             <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
-            <input id="password" class="uk-input uk-border-pill" required placeholder="Password/Handover" type="password">
+            <input id="password" class="uk-input uk-border-pill" required placeholder="Password/Handover"
+              type="password">
           </div>
         </div>
         <div class="uk-margin-bottom">
           <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="login()">LOG
             IN</button>
+          {{#unless external}}
+          <a id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small-top"
+            href="">OPEN IN
+            BROWSER</a>
+          {{/unless}}
         </div>
       </fieldset>
     </form>
@@ -87,6 +93,8 @@
     var publicKey = `{{{PublicKey}}}`
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(publicKey)
+
+    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id={{{user_id}}}&token={{{token}}}"))
 
     function login() {
       var userId = $("#user_id").val()

@@ -5,7 +5,7 @@ import { promisify } from "util"
 import Handlebars from "handlebars"
 
 export default class {
-  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
+  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.ADMIN
 
   private user_id: number | null
   private connection: Connection
@@ -20,16 +20,11 @@ export default class {
 
   public async execute() {
     let values = {
-      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      PublicKey: Config.server.PUBLIC_KEY.toString(),
-      module: "login",
-      external: this.requestData.requestFromBrowser,
-      user_id: this.user_id,
-      token: this.requestData.auth_token
+      headers: JSON.stringify(this.requestData.getWebapiHeaders())
     }
     return {
       status: 200,
-      result: Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/login/login.html`, "UTF-8"))(values)
+      result: Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/admin/userInfo.html`, "UTF-8"))(values)
     }
   }
 }

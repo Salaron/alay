@@ -2,10 +2,9 @@ import { AUTH_LEVEL } from "../../../types/const"
 import RequestData from "../../../core/requestData"
 import { readFile } from "fs"
 import { promisify } from "util"
-import Handlebars from "handlebars"
 
 export default class {
-  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
+  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE // yep, free access to markdown!
 
   private user_id: number | null
   private connection: Connection
@@ -19,17 +18,9 @@ export default class {
   }
 
   public async execute() {
-    let values = {
-      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      PublicKey: Config.server.PUBLIC_KEY.toString(),
-      module: "login",
-      external: this.requestData.requestFromBrowser,
-      user_id: this.user_id,
-      token: this.requestData.auth_token
-    }
     return {
       status: 200,
-      result: Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/login/login.html`, "UTF-8"))(values)
+      result: await promisify(readFile)(`${rootDir}/webview/admin/markdown.html`, "UTF-8")
     }
   }
 }
