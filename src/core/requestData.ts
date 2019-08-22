@@ -43,7 +43,7 @@ export default class RequestData {
       this.params = querystring.parse(this.request.url!.split(/[?]+/)[1])
       if (this.user_id === null && this.auth_token === null) {
         // for webview available additional variants: queryString and cookie
-        if (this.params.user_id && this.params.token) { // queryString
+        if (Type.isString(this.params.user_id) && Type.isString(this.params.token)) { // queryString
           this.user_id = parseInt(this.params.user_id) || null
           this.auth_token = this.params.token
           this.requestFromBrowser = true

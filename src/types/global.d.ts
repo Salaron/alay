@@ -11,6 +11,7 @@ import { Unit as unit } from "../common/unit"
 import { Item as item } from "../common/item"
 import { Secretbox as secretbox } from "../common/secretbox"
 import { Notice as notice } from "../common/notice"
+import { Download as download } from "../common/download"
 
 declare global {
   // make project root dir global (for easy access to files outside of 'compile' folder)
@@ -34,6 +35,7 @@ declare global {
   const Item: typeof item
   const Secretbox: typeof secretbox
   const Notice: typeof notice
+  const Download: typeof download
 
   interface Array<T> {
     forEachAsync(callback: (element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void>

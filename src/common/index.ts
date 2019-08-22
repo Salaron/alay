@@ -7,6 +7,7 @@ import * as event from "./event"
 import * as item from "./item"
 import * as secretbox from "./secretbox"
 import * as notice from "./notice"
+import * as download from "./download"
 
 export {
   item,
@@ -17,5 +18,6 @@ export {
   live,
   event,
   secretbox,
-  notice
+  notice,
+  download
 }

@@ -1,5 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
 
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -15,13 +15,6 @@ export default class {
     this.connection = requestData.connection
     this.params = requestData.params
     this.requestData = requestData
-  }
-
-  public paramTypes() {
-    return { }
-  }
-  public paramCheck() {
-    return true
   }
 
   public async execute() {
