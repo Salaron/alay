@@ -53,11 +53,14 @@
               type="password">
           </div>
         </div>
-        <div id="buttons" class="uk-margin-bottom">
+        {{#if enableRecaptcha}}
+        <div class="g-recaptcha uk-margin-small" data-theme="dark" data-sitekey="{{siteKey}}"></div>
+        {{/if}}
+        <div id="buttons" class="uk-margin-small">
           <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="login()">LOG
             IN</button>
           {{#unless external}}
-          <a id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small-top"
+          <a id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small"
             href="">OPEN IN
             BROWSER</a>
           {{/unless}}
@@ -98,8 +101,10 @@
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
+  <script type="text/javascript" src='https://www.recaptcha.net/recaptcha/api.js'></script>
   <script>
     var headers = JSON.parse(escapeJSON('{{{headers}}}'))
+    var recaptcha = JSON.parse("{{{enableRecaptcha}}}")
     // RSA preparation
     var publicKey = `{{{PublicKey}}}`
     var RSAEncrypt = new JSEncrypt()
@@ -110,17 +115,20 @@
     function login() {
       var userId = $("#user_id").val()
       var pass = $("#password").val()
+      var rcp = grecaptcha.getResponse()
 
+      if (recaptcha && rcp.length === 0) return sendNotification("reCAPTCHA not passed", "warning")
       if (pass.length === 0) return sendNotification("Password can't be blank", "warning")
       if (pass.length > 16) return sendNotification("Password can't be more than 16 symbols", "warning")
       if (!checkPass(pass)) return sendNotification("Used forbidden characters", "warning")
       if (!checkUser(userId)) return sendNotification("User ID should be integer", "warning")
-
+      
       $.when(sendRequest({
         module: "{{{module}}}",
         action: "login",
         user_id: RSAEncrypt.encrypt(userId),
         password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+        recaptcha: grecaptcha.getResponse(),
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
         if (response.error || response.maintenance || !response) return

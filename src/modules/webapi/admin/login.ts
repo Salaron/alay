@@ -25,6 +25,10 @@ export default class {
     }
   }
   public async execute() {
+    if (Config.modules.login.enable_recaptcha) {
+      if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`recaptcha is not passed`)
+      await new Utils(this.connection).reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
+    }
     let decrypted = Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString()
     this.user_id = parseInt(Buffer.from(Utils.RSADecrypt(this.params.user_id), "base64").toString())
     let pass = Utils.xor(decrypted, this.requestData.auth_token).toString()

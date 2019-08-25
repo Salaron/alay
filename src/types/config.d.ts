@@ -93,6 +93,9 @@ interface Modules {
     auth_logging: boolean
     webview_login: boolean
     enable_registration: boolean
+    enable_recaptcha: boolean
+    recaptcha_site_key: string
+    recaptcha_private_key: string
   }
   personalNotice: {
     welcomeMessageEnabled: boolean

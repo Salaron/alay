@@ -2,7 +2,8 @@
   "common": {
     "announce": "News",
     "settings": "Settings",
-    "profile": "Profile"
+    "profile": "Profile",
+    "notTranslated": "This page does not yet have a translation for your language :<"
   },
   "annouce-index": {
     "more": "More..."

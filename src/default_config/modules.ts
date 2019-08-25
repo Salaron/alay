@@ -21,7 +21,10 @@ export default <Modules>{
   login: {
     auth_logging: true,
     webview_login: true,
-    enable_registration: true
+    enable_registration: true,
+    enable_recaptcha: false,
+    recaptcha_site_key: "",
+    recaptcha_private_key: ""
   },
   personalNotice: {
     welcomeMessageEnabled: false,

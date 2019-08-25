@@ -51,6 +51,8 @@ export default class {
       external: this.requestData.requestFromBrowser,
       user_id: this.user_id,
       token: this.requestData.auth_token,
+      enableRecaptcha: Config.modules.login.enable_recaptcha,
+      siteKey: Config.modules.login.recaptcha_site_key
     }
 
     return {

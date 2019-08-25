@@ -19,14 +19,16 @@ export default class {
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel) throw new Error("hehe")
+    //if (this.requestData.auth_level != this.requiredAuthLevel) throw new Error("hehe")
     let values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       PublicKey: Config.server.PUBLIC_KEY.toString(),
       module: "login",
       external: this.requestData.requestFromBrowser,
       user_id: this.user_id,
-      token: this.requestData.auth_token
+      token: this.requestData.auth_token,
+      enableRecaptcha: Config.modules.login.enable_recaptcha,
+      siteKey: Config.modules.login.recaptcha_site_key
     }
     return {
       status: 200,

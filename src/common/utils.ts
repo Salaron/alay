@@ -4,6 +4,7 @@ import moment from "moment"
 import { promisify } from "util"
 import { readFile } from "fs"
 import extend from "extend"
+import request from "request"
 
 const log = new Log("Common: Utils")
 
@@ -171,8 +172,8 @@ export class Utils {
   }
   static isUnderMaintenance() {
     return (
-      (Utils.toSpecificTimezone(Config.maintenance.time_zone) < Config.maintenance.end_date && 
-      Utils.toSpecificTimezone(Config.maintenance.time_zone) >= Config.maintenance.start_date) || 
+      (Utils.toSpecificTimezone(Config.maintenance.time_zone) < Config.maintenance.end_date &&
+        Utils.toSpecificTimezone(Config.maintenance.time_zone) >= Config.maintenance.start_date) ||
       Config.maintenance.force_enabled
     )
   }
@@ -214,6 +215,18 @@ export class Utils {
       return (await this.connection.first("SELECT language FROM auth_tokens WHERE token = :token", { token: token })).language
     }
     return (await this.connection.first("SELECT language FROM users WHERE user_id=:user", { user: userId })).language
+  }
+
+  public async reCAPTCHAverify(userToken: string, userIp?: string) {
+    let { body } = (await promisify(request.post)(<any>"https://www.google.com/recaptcha/api/siteverify", <any>{
+      form: {
+        secret: Config.modules.login.recaptcha_private_key,
+        response: userToken,
+        remoteip: userIp
+      }
+    })) as any
+    let response = JSON.parse(body)
+    if (response.success != true) throw new Error(`reCAPTCHA check Failed;\n Error-codes: ${response["error-codes"].join(", ")}`)
   }
 }
 (global as any).Utils = Utils

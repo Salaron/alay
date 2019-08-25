@@ -2,7 +2,8 @@
   "common": {
     "announce": "Новости",
     "settings": "Настройки",
-    "profile": "Профиль"
+    "profile": "Профиль",
+    "notTranslated": "Эта страница ещё не переведена на ваш язык :<"
   },
   "annouce-index": {
     "more": "Читать далее..."
