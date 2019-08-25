@@ -7,6 +7,13 @@
   "annouce-index": {
     "more": "More..."
   },
+  "login-hello": {
+    "login": "Login",
+    "registration": "Registration",
+    "tos": "TOS",
+    "langChangeSuccess": "Success. This page will reload automatically.",
+    "hello": "Hello!"
+  },
   "notice": {
     "1": ":affectorName removed you from their friend list",
     "2": ":affectorName sent you a friend request",

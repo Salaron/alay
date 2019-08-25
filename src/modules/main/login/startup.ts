@@ -23,9 +23,6 @@ export default class {
       login_passwd: TYPE.STRING
     }
   }
-  public paramCheck() {
-    return true
-  }
 
   public async execute() {
     if (Config.modules.login.webview_login) return { 
@@ -35,7 +32,8 @@ export default class {
         maintenance: 1 // redirect to webview fake maintenance page
       }
     }
-    
+    if (Config.modules.login.enable_registration === false) throw new ErrorCode(1234, "Registration is disabled!")
+
     let token = await this.connection.first("SELECT * FROM auth_tokens WHERE token = :token", { 
       token: this.requestData.auth_token 
     })

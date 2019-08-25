@@ -11,6 +11,17 @@
 </head>
 
 <style>
+.sl-icon-back {
+  background: white;
+  border-radius: 12px;
+  left: 8px;
+  height: 40px;
+  position: absolute;
+  top: 11px;
+  width: 40px;
+}
+</style>
+<style>
   body {
     background-image: url("/resources/img/login_bg.png");
     background-position: center center;
@@ -42,7 +53,7 @@
               type="password">
           </div>
         </div>
-        <div class="uk-margin-bottom">
+        <div id="buttons" class="uk-margin-bottom">
           <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="login()">LOG
             IN</button>
           {{#unless external}}
@@ -93,7 +104,7 @@
     var publicKey = `{{{PublicKey}}}`
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(publicKey)
-
+    if (window.history.length != 1) $("#buttons").append('<a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id={{{user_id}}}&token={{{token}}}"))
 
     function login() {

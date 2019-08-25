@@ -90,8 +90,9 @@ interface Modules {
     list: number[]
   }
   login: {
-    auth_logging: boolean,
+    auth_logging: boolean
     webview_login: boolean
+    enable_registration: boolean
   }
   personalNotice: {
     welcomeMessageEnabled: boolean

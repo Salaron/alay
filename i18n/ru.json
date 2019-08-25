@@ -7,6 +7,13 @@
   "annouce-index": {
     "more": "Читать далее..."
   },
+  "login-hello": {
+    "login": "Вход",
+    "registration": "Регистрация",
+    "tos": "TOS",
+    "langChangeSuccess": "Язык изменён. Страница перезагрузится автоматически.",
+    "hello": "Привет!"
+  },
   "notice": {
     "1": ":affectorName удалил(-а) Вас из своего списка друзей",
     "2": ":affectorName отправил(-а) Вам заявку в друзья",

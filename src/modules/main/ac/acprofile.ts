@@ -26,7 +26,7 @@ export default class {
   public async execute() {
     // check if this is SunLight client
     // it has a feature for get profile info
-    if (this.params.sl_client) return { 
+    return { 
       status: 200,
       result: []
     }

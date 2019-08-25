@@ -20,7 +20,8 @@ export default <Modules>{
   },
   login: {
     auth_logging: true,
-    webview_login: true
+    webview_login: true,
+    enable_registration: true
   },
   personalNotice: {
     welcomeMessageEnabled: false,

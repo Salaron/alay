@@ -209,7 +209,10 @@ export class Utils {
     }
     return result
   }
-  public async getUserLangCode(userId: number): Promise<string> {
+  public async getUserLangCode(userId: number | null, preLogin = false, token?: string): Promise<string> {
+    if (preLogin === true) {
+      return (await this.connection.first("SELECT language FROM auth_tokens WHERE token = :token", { token: token })).language
+    }
     return (await this.connection.first("SELECT language FROM users WHERE user_id=:user", { user: userId })).language
   }
 }

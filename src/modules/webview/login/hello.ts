@@ -4,6 +4,13 @@ import { readFile } from "fs"
 import { promisify } from "util"
 import Handlebars from "handlebars"
 
+Handlebars.registerHelper("equal", function (a, b, options) {
+  // @ts-ignore: Unreachable code error
+  if (a == b) { return options.fn(this) }
+  // @ts-ignore: Unreachable code error
+  return options.inverse(this)
+})
+
 export default class {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
 
@@ -19,8 +26,16 @@ export default class {
   }
 
   public async execute() {
+    const utils = new Utils(this.connection)
+    let code = await utils.getUserLangCode(this.user_id, true, <string>this.requestData.auth_token)
+    let strings = (await utils.loadLocalization("login-hello"))[code]
+
     let values = {
-      headers: JSON.stringify(this.requestData.getWebapiHeaders())
+      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
+      i18n: strings,
+      languageList: Config.i18n.supportedLanguages,
+      currentLanguage: Config.i18n.langCodes.getKey(code),
+      regEnabled: true
     }
     return {
       status: 200,
