@@ -1,6 +1,5 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
-import moment from "moment"
 
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE

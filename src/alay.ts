@@ -9,7 +9,7 @@ import http from "http"
 import requestHandler from "./handlers/requestHandler"
 
 const log = new Log("Setup");
-(<any>global).rootDir = `${resolve(__dirname)}/../`;
+(<any>global).rootDir = `${resolve(__dirname)}/../`
 try {
   // Prepare sqlite3 databases
   (<any>global).sqlite3 = new Sqlite3()

@@ -1,8 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
-import moment from "moment"
-import { promisify } from "util";
-import { readFile, fstat, exists } from "fs";
+import { promisify } from "util"
+import { readFile, exists } from "fs"
 
 export default class {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
