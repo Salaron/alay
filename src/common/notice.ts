@@ -30,7 +30,7 @@ export class Notice {
 
   public async getPreparedMessage(userId: number, noticeTypeId: noticeType | number, values: any) {
     let strings = await this.getNoticeStrings(userId)
-    let message = strings[noticeTypeId.toString()]
+    let message = strings[noticeType[noticeTypeId]]
     if (!message) throw new Error(`Unknown noticeTypeId: ${noticeTypeId}`)
     return message.replace(/\:(\w+)/g, function (txt: any, key: any) {
       if (values.hasOwnProperty(key)) {

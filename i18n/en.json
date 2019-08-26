@@ -16,9 +16,9 @@
     "hello": "Hello!"
   },
   "notice": {
-    "1": ":affectorName removed you from their friend list",
-    "2": ":affectorName sent you a friend request",
-    "3": ":affectorName rejected your friend request",
-    "4": ":affectorName accepted your friend request"
+    "REMOVED_FROM_FRIENDS": ":affectorName removed you from their friend list",
+    "SEND_FRIEND_REQUEST": ":affectorName sent you a friend request",
+    "REJECTED_FRIEND_REQUEST": ":affectorName rejected your friend request",
+    "ACCEPTED_FRIEND_REQUEST": ":affectorName accepted your friend request"
   }
 }

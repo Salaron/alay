@@ -16,9 +16,9 @@
     "hello": "Привет!"
   },
   "notice": {
-    "1": ":affectorName удалил(-а) Вас из своего списка друзей",
-    "2": ":affectorName отправил(-а) Вам заявку в друзья",
-    "3": ":affectorName отклонил(-а) Вашу заявку в друзья",
-    "4": ":affectorName принял(-а) Вашу заявку в друзья"
+    "REMOVED_FROM_FRIENDS": ":affectorName удалил(-а) Вас из своего списка друзей",
+    "SEND_FRIEND_REQUEST": ":affectorName отправил(-а) Вам заявку в друзья",
+    "REJECTED_FRIEND_REQUEST": ":affectorName отклонил(-а) Вашу заявку в друзья",
+    "ACCEPTED_FRIEND_REQUEST": ":affectorName принял(-а) Вашу заявку в друзья"
   }
 }
