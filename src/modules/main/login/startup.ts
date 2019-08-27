@@ -25,6 +25,7 @@ export default class {
   }
 
   public async execute() {
+    if (this.requestData.auth_level > AUTH_LEVEL.UPDATE) throw new Error(`You're already logged in`)
     if (Config.modules.login.webview_login) return { 
       status: 200, 
       result: {}, 

@@ -32,7 +32,7 @@ export default class {
   }
 
   public async execute() {
-    if (this.requestData.auth_level > AUTH_LEVEL.UPDATE) throw new Error(`You're already logged in`)
+    if (this.requestData.auth_level != this.requiredAuthLevel) throw new Error(`You're already logged in`)
     const trick = {
       status: 200, 
       result: {

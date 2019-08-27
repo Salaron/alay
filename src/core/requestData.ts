@@ -24,9 +24,9 @@ export default class RequestData {
   public connection: Connection
   public raw_request_data: any // JSON parse remove some symbols from fromData
   public requestFromBrowser = false
+  public response: ServerResponse
 
   private auth_level_check_passed = false
-  private response: ServerResponse
   constructor(request: IncomingMessage, response: ServerResponse, formData: any, hType: HANDLER_TYPE) {
     this.headers = request.headers
     this.request = request
@@ -121,7 +121,7 @@ export default class RequestData {
       if (!check) return this.auth_level = AUTH_LEVEL.REJECTED // token is no longer valid
 
       if (moment().diff(check.last_activity, "second") >= Config.modules.user.userSessionExpire) return this.auth_level = AUTH_LEVEL.SESSION_EXPIRED
-      if (Utils.versionCompare(<string>this.request.headers["client-version"] || "0.0", Config.server.server_version) === -1) return this.auth_level = AUTH_LEVEL.UPDATE
+      if (!this.requestFromBrowser && Utils.versionCompare(<string>this.request.headers["client-version"] || "0.0", Config.server.server_version) === -1) return this.auth_level = AUTH_LEVEL.UPDATE
 
       if (Config.server.admin_ids.includes(this.user_id)) return this.auth_level = AUTH_LEVEL.ADMIN
       else return this.auth_level = AUTH_LEVEL.CONFIRMED_USER
@@ -165,6 +165,13 @@ export default class RequestData {
       "authorize": querystring.stringify(authorizeHeader)
     }
     return headers
+  }
+
+  public resetCookieAuth() {
+    this.response.setHeader("Set-Cookie", [
+      `user_id=; expires=${new Date(new Date().getTime() - 600000).toUTCString()}; path=/;`,
+      `token=; expires=${new Date(new Date().getTime() - 600000).toUTCString()}; path=/;`
+    ])
   }
 }
 

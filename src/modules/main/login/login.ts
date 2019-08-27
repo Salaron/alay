@@ -28,6 +28,7 @@ export default class {
   }
 
   public async execute() {
+    if (this.requestData.auth_level > AUTH_LEVEL.UPDATE) throw new Error(`You're already logged in`)
     let token = await this.connection.first("SELECT * FROM auth_tokens WHERE token=:token", {
       token: this.requestData.auth_token
     })

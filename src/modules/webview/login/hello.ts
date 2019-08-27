@@ -12,7 +12,7 @@ Handlebars.registerHelper("equal", function (a, b, options) {
 })
 
 export default class {
-  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
+  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
 
   private user_id: number | null
   private connection: Connection
@@ -26,6 +26,7 @@ export default class {
   }
 
   public async execute() {
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
     const utils = new Utils(this.connection)
     let code = await utils.getUserLangCode(this.user_id, true, <string>this.requestData.auth_token)
     let strings = (await utils.loadLocalization("login-hello"))[code]

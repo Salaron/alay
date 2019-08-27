@@ -109,7 +109,7 @@ function xor(str1, str2) {
   return fromUTF8array(result)
 }
 function checkPass(input) {
-  return input.match(/^[A-Za-z0-9]\w{1,16}$/)
+  return input.match(/^[A-Za-z0-9]\w{1,32}$/)
 }
 function checkUser(input) {
   return (
@@ -117,4 +117,8 @@ function checkUser(input) {
     parseInt(input) === parseInt(input) &&
     parseInt(input) > 0
   )
+}
+function checkMail(input) {
+  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,6})+$/
+  return regex.test(input)
 }

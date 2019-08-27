@@ -40,7 +40,10 @@ export default class {
         this.requestData.auth_token = token
         break
       }
-      default: throw new ErrorUser("Attempt to get access to admin panel", this.user_id)
+      default: {
+        this.requestData.resetCookieAuth()
+        throw new ErrorUser("Attempt to get access to admin panel", this.user_id)
+      }
     }
     let values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),

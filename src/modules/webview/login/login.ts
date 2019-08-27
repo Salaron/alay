@@ -19,7 +19,7 @@ export default class {
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel) throw new Error("hehe")
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
     let values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       PublicKey: Config.server.PUBLIC_KEY.toString(),

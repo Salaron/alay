@@ -22,6 +22,7 @@ export default class {
     }
   }
   public async execute() {
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
       await new Utils(this.connection).reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
@@ -70,7 +71,7 @@ export default class {
   }
 }
 function checkPass(input: any) {
-  return input.match(/^[A-Za-z0-9]\w{1,16}$/)
+  return input.match(/^[A-Za-z0-9]\w{1,32}$/)
 }
 function checkUser(input: any) {
   return (

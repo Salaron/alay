@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>SunLight Login</title>
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
+</head>
+
+<style>
+  .sl-icon-back {
+    background: white;
+    border-radius: 12px;
+    left: 8px;
+    height: 40px;
+    position: absolute;
+    top: 11px;
+    width: 40px;
+  }
+</style>
+<style>
+  body {
+    background-image: url("/resources/img/login_bg.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+</style>
+
+<body
+  class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light"
+  data-uk-height-viewport>
+  <!-- overlay -->
+  <div class="uk-position-cover uk-overlay-primary"></div>
+  <!-- /overlay -->
+  <div class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade" style>
+    <!-- login -->
+    <form class="toggle-class" id="login_form">
+      <fieldset class="uk-fieldset">
+        <div class="uk-margin-small">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
+            <input id="name" class="uk-input uk-border-pill" required placeholder="Nickname" type="text">
+          </div>
+        </div>
+        <div class="uk-margin-small">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
+            <input id="mail" class="uk-input uk-border-pill" placeholder="E-mail" required type="text">
+          </div>
+        </div>
+        <div class="uk-margin-small">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+            <input id="password" class="uk-input uk-border-pill" required placeholder="Password" type="password">
+          </div>
+        </div>
+        <div class="uk-margin-small">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+            <input id="password2" class="uk-input uk-border-pill" required placeholder="Repeat Password" type="password">
+          </div>
+        </div>
+        {{#if enableRecaptcha}}
+        <div class="g-recaptcha uk-margin-small" data-theme="dark" data-sitekey="{{siteKey}}"></div>
+        {{/if}}
+        <div id="buttons" class="uk-margin-small">
+          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+            onclick="startUp()">REGISTER</button>
+          {{#unless external}}
+          <a id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small" href="">OPEN
+            IN
+            BROWSER</a>
+          {{/unless}}
+        </div>
+      </fieldset>
+    </form>
+    <!-- /login -->
+
+    <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+    <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+    <script type="text/javascript" src="/resources/js/common.js"></script>
+    <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
+    <script type="text/javascript" src='https://www.recaptcha.net/recaptcha/api.js'></script>
+    <script>
+      var headers = JSON.parse(escapeJSON('{{{headers}}}'))
+      var recaptcha = JSON.parse("{{{enableRecaptcha}}}")
+      // RSA preparation
+      var publicKey = `{{{PublicKey}}}`
+      var RSAEncrypt = new JSEncrypt()
+      RSAEncrypt.setKey(publicKey)
+      if (window.history.length != 1) $("body").append('<div><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token={{{token}}}"))
+
+      function startUp() {
+        var name = $("#name").val()
+        var mail = $("#mail").val()
+        var pass = $("#password").val()
+        var pass2 = $("#password2").val()
+        var recaptchaResponse = grecaptcha.getResponse()
+
+        if (name.length === 0) return sendNotification("Name can't be blank", "warning")
+        if (name.length > 20) return sendNotification("Name can't be more than 20 symbols", "warning")
+
+        if (mail.length === 0) return sendNotification("Mail can't be blank", "warning")
+        if (!checkMail(mail)) return sendNotification("Invalid mail format", "warning")
+      
+        if (pass.length === 0) return sendNotification("Password can't be blank", "warning")
+        if (pass.length > 32) return sendNotification("Password can't be more than 32 symbols", "warning")
+        if (!checkPass(pass)) return sendNotification("Used forbidden characters", "warning")
+        if (pass != pass2) return sendNotification("Passwords didn't match!", "warning")
+
+        if (recaptcha && recaptchaResponse.length === 0) return sendNotification("reCAPTCHA not passed", "warning")
+        grecaptcha.reset()
+        $.when(sendRequest({
+          module: "login",
+          action: "startUp",
+          name: name,
+          mail: mail,
+          password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+          recaptcha: recaptchaResponse,
+          timestamp: Math.floor(Date.now() / 1000)
+        })).done(function (response) {
+          if (response.error || response.maintenance || !response) return
+
+        })
+      }
+    </script>
+</body>
+
+</html>

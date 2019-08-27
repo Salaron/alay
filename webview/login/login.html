@@ -11,15 +11,15 @@
 </head>
 
 <style>
-.sl-icon-back {
-  background: white;
-  border-radius: 12px;
-  left: 8px;
-  height: 40px;
-  position: absolute;
-  top: 11px;
-  width: 40px;
-}
+  .sl-icon-back {
+    background: white;
+    border-radius: 12px;
+    left: 8px;
+    height: 40px;
+    position: absolute;
+    top: 11px;
+    width: 40px;
+  }
 </style>
 <style>
   body {
@@ -53,17 +53,24 @@
               type="password">
           </div>
         </div>
+
         {{#if enableRecaptcha}}
         <div class="g-recaptcha uk-margin-small" data-theme="dark" data-sitekey="{{siteKey}}"></div>
         {{/if}}
-        <div id="buttons" class="uk-margin-small">
+
+        <div class="uk-margin-small">
           <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="login()">LOG
             IN</button>
           {{#unless external}}
-          <a id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small"
-            href="">OPEN IN
+          <a id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small" href="">OPEN
+            IN
             BROWSER</a>
           {{/unless}}
+        </div>
+
+        <div class="uk-text-center">
+          <a class="uk-link-reset uk-text-small toggle-class uk-margin-top"
+            data-uk-toggle="target: .toggle-class; animation: uk-animation-fade">Forgot your password?</a>
         </div>
       </fieldset>
     </form>
@@ -71,29 +78,31 @@
 
     <!-- recover password -->
     <form class="toggle-class" hidden>
-      <div class="uk-margin-small">
-        <div class="uk-inline uk-width-1-1">
-          <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
-          <input class="uk-input uk-border-pill" placeholder="E-mail" required type="text">
+      <fieldset class="uk-fieldset">
+        <div class="uk-margin-small">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
+            <input class="uk-input uk-border-pill" placeholder="E-mail" required type="text">
+          </div>
         </div>
-      </div>
-      <div class="uk-margin-bottom">
-        <button type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1">SEND PASSWORD</button>
-      </div>
+
+        {{#if enableRecaptcha}}
+        <div class="g-recaptcha uk-margin-small" data-theme="dark" data-sitekey="{{siteKey}}"></div>
+        {{/if}}
+
+        <div class="uk-margin-small">
+          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+            onclick="recoverPassword()">SEND</button>
+        </div>
+
+        <div class="uk-text-center">
+          <a class="uk-link-reset uk-text-small toggle-class uk-margin-small"
+            data-uk-toggle="target: .toggle-class; animation: uk-animation-fade" hidden><span
+              data-uk-icon="arrow-left"></span> Back to Login</a>
+        </div>
+      </fieldset>
     </form>
     <!-- /recover password -->
-
-    <!-- action buttons -->
-    <div>
-      <div class="uk-text-center">
-        <a class="uk-link-reset uk-text-small toggle-class"
-          data-uk-toggle="target: .toggle-class; animation: uk-animation-fade" hidden>Forgot your password?</a>
-        <a class="uk-link-reset uk-text-small toggle-class"
-          data-uk-toggle="target: .toggle-class; animation: uk-animation-fade" hidden><span
-            data-uk-icon="arrow-left"></span> Back to Login</a>
-      </div>
-    </div>
-    <!-- action buttons -->
   </div>
 
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -109,36 +118,41 @@
     var publicKey = `{{{PublicKey}}}`
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(publicKey)
-    if (window.history.length != 1) $("#buttons").append('<a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    if (window.history.length != 1) $("body").append('<div><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id={{{user_id}}}&token={{{token}}}"))
 
     function login() {
       var userId = $("#user_id").val()
       var pass = $("#password").val()
-      var rcp = grecaptcha.getResponse()
+      var recaptchaResponse = grecaptcha.getResponse()
 
-      if (recaptcha && rcp.length === 0) return sendNotification("reCAPTCHA not passed", "warning")
+      if (!checkUser(userId)) return sendNotification("User ID should be integer", "warning")
       if (pass.length === 0) return sendNotification("Password can't be blank", "warning")
       if (pass.length > 16) return sendNotification("Password can't be more than 16 symbols", "warning")
       if (!checkPass(pass)) return sendNotification("Used forbidden characters", "warning")
-      if (!checkUser(userId)) return sendNotification("User ID should be integer", "warning")
-      
+
+      if (recaptcha && recaptchaResponse.length === 0) return sendNotification("reCAPTCHA not passed", "warning")
+      grecaptcha.reset()
       $.when(sendRequest({
         module: "{{{module}}}",
         action: "login",
         user_id: RSAEncrypt.encrypt(userId),
         password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
-        recaptcha: grecaptcha.getResponse(),
+        recaptcha: recaptchaResponse,
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
         if (response.error || response.maintenance || !response) return
-        $("#login_form").hide()
+        $("#login_form, #buttons").hide()
         if ("{{{redirect}}}".length != 0) {
           window.location.replace(window.location.protocol + "//" + window.location.host + "/{{{redirect}}}")
         } else {
           sendNotification("Success. Close this window to enter the game", "success")
         }
       })
+    }
+
+    function recoverPassword() {
+      sendNotification("TODO", "primary")
     }
   </script>
 </body>

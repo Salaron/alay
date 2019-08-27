@@ -78,7 +78,7 @@ export default class {
 }
 
 function checkPass(input: any) {
-  return input.match(/^[A-Za-z0-9]\w{1,16}$/)
+  return input.match(/^[A-Za-z0-9]\w{1,32}$/)
 }
 function checkUser(input: any) {
   return (
