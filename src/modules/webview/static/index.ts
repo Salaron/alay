@@ -54,9 +54,7 @@ export default class {
       case "10": html = await promisify(readFile)(`${rootDir}/webview/static/maintenance.html`, "UTF-8"); break
       case "11":
       case "12": html = await promisify(readFile)(`${rootDir}/webview/static/update.html`, "UTF-8"); break
-      case "13": {
-        // TODO
-      }
+      case "13": html = await promisify(readFile)(`${rootDir}/webview/static/banned.html`, "UTF-8"); break
     }
     return {
       status: 200,

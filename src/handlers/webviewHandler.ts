@@ -18,13 +18,11 @@ export default async function webviewHandler(request: IncomingMessage, response:
         direct: true
       })
     }
-    if (requestData.auth_level === AUTH_LEVEL.BANNED) {
-      return await writeJsonResponse(response, {
-        httpStatusCode: 423,
-        connection: requestData.connection,
-        responseData: "You have been banned on this server.",
-        direct: true
-      })
+    if (requestData.auth_level === AUTH_LEVEL.BANNED && !request.url!.includes("webview.php/static/index?id=13")) {
+      await requestData.connection.rollback()
+      response.statusCode = 302
+      response.setHeader("Location", "../../webview.php/static/index?id=13") // user banned page
+      return response.end()
     }
 
     // "extract" module & action

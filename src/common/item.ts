@@ -184,7 +184,6 @@ export class Item {
       ) && item.id === null
     ) throw new Error("You should need to provide itemId")
 
-    // TODO: backgrounds, awards, lives?
     switch(item.type){
       case 1000:
       case 3000:

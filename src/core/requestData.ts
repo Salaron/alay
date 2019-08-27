@@ -119,6 +119,14 @@ export default class RequestData {
         token: this.auth_token
       })
       if (!check) return this.auth_level = AUTH_LEVEL.REJECTED // token is no longer valid
+      let banCheck = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
+        user: this.user_id
+      })
+      if (banCheck) {
+        if (banCheck.expiration_date && moment().diff(banCheck.expiration_date, "second") < 0 || !banCheck.expiration_date) {
+          return this.auth_level = AUTH_LEVEL.BANNED
+        }
+      }
 
       if (moment().diff(check.last_activity, "second") >= Config.modules.user.userSessionExpire) return this.auth_level = AUTH_LEVEL.SESSION_EXPIRED
       if (!this.requestFromBrowser && Utils.versionCompare(<string>this.request.headers["client-version"] || "0.0", Config.server.server_version) === -1) return this.auth_level = AUTH_LEVEL.UPDATE

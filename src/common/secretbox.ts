@@ -452,7 +452,7 @@ export class Secretbox {
               if (q.toLowerCase().includes("order")) {
                 throw new Error(`Never use "ORDER BY" in custom query`)
               }
-              if (excludeRateup) { // TODO
+              if (excludeRateup) {
                 if (q.slice(-1) === ";") q = q.slice(0, -1) // remove ";" -- the end of query
                 if (q.toLowerCase().includes("where")) {
                   q = q.splice(q.toLowerCase().lastIndexOf("where") + 6, 0, `unit_id NOT IN (${rateupIds.join(",")}) AND `)
