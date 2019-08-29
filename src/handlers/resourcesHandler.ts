@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from "http"
 import { createReadStream, readFile } from "fs"
 import { Log } from "../core/log"
 import { promisify } from "util"
+import { gzip } from "zlib"
 import mime from "mime"
 
 const log = new Log("Resources Handler")
@@ -27,7 +28,14 @@ export default async function resourcesHandler(request: IncomingMessage, respons
     })
   } else {
     let file = await promisify(readFile)(`${rootDir}/resources/${url.join("/")}`, "UTF-8")
-    response.end(file)
+
+    if (request.headers["accept-encoding"] && request.headers["accept-encoding"]!.indexOf("gzip") != -1) {
+      response.setHeader("Content-Encoding", "gzip")
+      response.write(await promisify(gzip)(file))
+    } else {
+      response.write(file)
+    }
+    response.end()
   }
 
 }

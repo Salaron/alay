@@ -229,7 +229,10 @@ export class Utils {
       }
     })) as any
     let response = JSON.parse(body)
-    if (response.success != true) throw new Error(`reCAPTCHA check Failed;\n Error-codes: ${response["error-codes"].join(", ")}`)
+    if (response.success != true) {
+      log.error(`reCAPTCHA test Failed;\n Error-codes: ${response["error-codes"].join(", ")}`)
+      throw new ErrorWebApi(`reCAPTCHA test failed`)
+    }
   }
 }
 (global as any).Utils = Utils

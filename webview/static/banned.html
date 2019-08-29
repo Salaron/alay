@@ -6,7 +6,7 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=880, user-scalable=no">
+  <meta name="viewport" content="user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
@@ -20,11 +20,14 @@
       </div>
 
       <div id="body">
-        <p class="uk-text-lead">По решению администратора сервера Ваш аккаунт был заблокирован за нарушение правил сервиса.</p>
-
+        <h2 class="uk-text-lead">По решению администратора сервера Ваш аккаунт был заблокирован за нарушение <a
+            href="../../webview.php/tos/read">правил сервера</a>.</h2>
+        <br>
+        <h3 class="uk-text-secondary">Сообщение, оставленное администратором: {{message}}</h3>
         {{#if expiration_date}}
         <br>
-        Данная блокировка является временной и доступ будет возобновлён через {{expiration_date_human}} ({{expiration_date}})
+        <h3 class="uk-text-primary">Данная блокировка является временной и доступ будет возобновлён через
+          {{expiration_date_human}} ({{expiration_date}})</h3>
         {{/if}}
       </div>
     </div>

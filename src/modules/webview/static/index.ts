@@ -73,7 +73,8 @@ export default class {
         html = await promisify(readFile)(`${rootDir}/webview/static/banned.html`, "UTF-8")
         values = {
           expiration_date: data.expiration_date,
-          expiration_date_human: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").humanize() : null
+          expiration_date_human: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").humanize() : null,
+          message: data.message
         }
         break
       }

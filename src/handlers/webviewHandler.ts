@@ -3,6 +3,8 @@ import { IncomingMessage, ServerResponse } from "http"
 import { writeJsonResponse } from "../handlers/apiHandler"
 import executeAction from "../handlers/actionHandler"
 import RequestData from "../core/requestData"
+import { promisify } from "util"
+import { gzip } from "zlib"
 
 export default async function webviewHandler(request: IncomingMessage, response: ServerResponse) {
   let requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBVIEW)
@@ -18,7 +20,9 @@ export default async function webviewHandler(request: IncomingMessage, response:
         direct: true
       })
     }
-    if (requestData.auth_level === AUTH_LEVEL.BANNED && !request.url!.includes("webview.php/static/index?id=13")) {
+    if (requestData.auth_level === AUTH_LEVEL.BANNED && 
+      !request.url!.includes("webview.php/static/index?id=") &&
+      !request.url!.includes("webview.php/tos/read")) {
       await requestData.connection.rollback()
       response.statusCode = 302
       response.setHeader("Location", "../../webview.php/static/index?id=13") // user banned page
@@ -37,6 +41,11 @@ export default async function webviewHandler(request: IncomingMessage, response:
       for (let key of Object.keys(result.headers)) {
         response.setHeader(key, result.headers[key])
       }
+    }
+    
+    if (request.headers["accept-encoding"] && request.headers["accept-encoding"]!.indexOf("gzip") != -1) {
+      response.setHeader("Content-Encoding", "gzip")
+      result.result = await promisify(gzip)(result.result)
     }
     response.end(result.result)
     await requestData.connection.commit()
