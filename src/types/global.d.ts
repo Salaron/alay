@@ -1,7 +1,7 @@
 import { Connection as connection, ConnectionPool } from "../core/database_wrappers/mysql"
 import { Sqlite3 } from "../core/database_wrappers/sqlite3"
 import { config } from "../core/config"
-import { ErrorCode as errorCode, ErrorUser as errorUser } from "../handlers/errorHandler"
+import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../handlers/errorHandler"
 import { Utils as utils } from "../common/utils"
 import { Type as type } from "../common/type"
 import { User as user } from "../common/user"
@@ -25,6 +25,7 @@ declare global {
   // custom errors for better handling
   const ErrorCode: typeof errorCode
   const ErrorUser: typeof errorUser
+  const ErrorWebApi: typeof errorWebApi
   // common modules
   const Utils: typeof utils
   const Type: typeof type

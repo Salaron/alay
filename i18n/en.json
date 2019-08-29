@@ -15,6 +15,34 @@
     "langChangeSuccess": "Success. This page will reload automatically.",
     "hello": "Hello!"
   },
+  "login-login": {
+    "login": "LOG IN",
+    "forgotPassword": "Forgot your password?",
+    "backToLogin": "Back to Login",
+    "userIdShouldBeInt": "Field \"User ID\" should be int",
+    "successDescriptionLogin": "You have successfully logged in!<br>Close this window to enter the game.",
+    "invalidLoginOrPass": "Invalid User ID or password"
+  },
+  "login-startup": {
+    "nickname": "Nickname",
+    "password": "Password",
+    "email": "E-mail",
+    "repeatPassword": "Repeat Password",
+    "send": "SEND",
+    "openInBrowser": "OPEN IN BROWSER",
+    "nicknameBlank": "Field \"Nickname\" can't be empty",
+    "nicknameLimit": "Field \"Nickname\" can't be more than 20 symbols",
+    "mailBlank": "Field \"E-mail\" can't be empty",
+    "mailInvalidFormat": "Field \"E-mail\" is invalid",
+    "passwordBlank": "Field \"Пароль\" can't be empty",
+    "passwordLimit": "Field \"Nickname\" can't be more than 32 symbols",
+    "passwordInvalidFormat": "Field \"Пароль\" is invalid",
+    "passwordsNotMatch": "Passwords do not match",
+    "success": "Success!",
+    "successDescription": "Account #:userId successfully created! Remember/save this number, it will be useful to you when you'll try to login again.<br>To continue registration close this window.",
+    "recaptchaFailed": "You must pass the reCAPTCHA",
+    "emailExists": "An account with the specified E-mail is already registered"
+  },
   "notice": {
     "REMOVED_FROM_FRIENDS": ":affectorName removed you from their friend list",
     "SEND_FRIEND_REQUEST": ":affectorName sent you a friend request",

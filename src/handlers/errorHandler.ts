@@ -21,8 +21,16 @@ export class ErrorUser extends Error {
     this.user_id = user_id
   }
 }
+export class ErrorWebApi extends Error {
+  public sendToClient: boolean
+  constructor(message: string, sendToClient = false) {
+    super(message)
+    this.sendToClient = sendToClient
+  }
+}
 (global as any).ErrorCode = ErrorCode;
-(global as any).ErrorUser = ErrorUser
+(global as any).ErrorUser = ErrorUser;
+(global as any).ErrorWebApi = ErrorWebApi
 
 export async function sendError() {
 

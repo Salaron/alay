@@ -51,6 +51,14 @@ export default async function webapiHandler(request: IncomingMessage, response: 
     })
   } catch (err) {
     await requestData.connection.rollback()
+    if (err instanceof ErrorWebApi && err.sendToClient === true) {
+      await writeJsonResponse(response, {
+        responseData: { message: err.message },
+        direct: true,
+        httpStatusCode: 600
+      })
+      return
+    }
     throw err
   }
 }

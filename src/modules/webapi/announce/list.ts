@@ -23,9 +23,6 @@ export default class {
       offset: TYPE.INT
     }
   }
-  public paramCheck() {
-    return true
-  }
 
   public async execute() {
     let response: any = {

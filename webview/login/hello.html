@@ -61,9 +61,10 @@
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="">
+    var headers = {{{headers}}}
+  </script>
   <script>
-    var headers = JSON.parse(escapeJSON('{{{headers}}}'))
-
     $('#changeLanguage').on('click', function () {
       UIkit.modal('#languageSelect').toggle()
     })

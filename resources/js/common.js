@@ -122,3 +122,12 @@ function checkMail(input) {
   var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,6})+$/
   return regex.test(input)
 }
+
+function replacePlaceholders(input, values) {
+  return input.replace(/\:(\w+)/g, function (txt, key) {
+    if (values.hasOwnProperty(key)) {
+      return values[key]
+    }
+    return txt
+  })
+}

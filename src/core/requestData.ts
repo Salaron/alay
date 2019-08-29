@@ -22,7 +22,7 @@ export default class RequestData {
   public request: IncomingMessage
   public handlerType: HANDLER_TYPE
   public connection: Connection
-  public raw_request_data: any // JSON parse remove some symbols from fromData
+  public raw_request_data: any // JSON.parse can make XMC calculation wrong
   public requestFromBrowser = false
   public response: ServerResponse
 

@@ -55,7 +55,10 @@ export default class {
     let newToken = Utils.randomString(80 + Math.floor(Math.random() * 10))
     let password = Utils.randomString(10, "upper")
 
-    this.user_id = (<any>(await this.connection.query("INSERT INTO users (user_id) VALUES (null)"))).insertId
+    this.user_id = (await this.connection.execute("INSERT INTO users (introduction, password, language) VALUES ('Hello!', :pass, :lang)", {
+      pass: password,
+      lang: Config.i18n.defaultLanguage
+    })).insertId
     await this.connection.query("INSERT INTO user_login (user_id, login_key, login_passwd, login_token) VALUES (:id, :key, :pass, null);", {
       id: this.user_id,
       key: login_key,
@@ -63,11 +66,6 @@ export default class {
     })
     await this.connection.query("INSERT INTO user_exchange_point VALUES (:user,2, 10),(:user,3, 0),(:user,4,0),(:user,5, 0);", { 
       user: this.user_id 
-    })
-    await this.connection.query("UPDATE users SET introduction='Hello!', password=:pass, language=:lang WHERE user_id=:user", { 
-      user: this.user_id, 
-      pass: password, 
-      lang: Config.i18n.defaultLanguage 
     })
 
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })

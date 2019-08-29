@@ -49,7 +49,7 @@
         <div class="uk-margin-small">
           <div class="uk-inline uk-width-1-1">
             <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
-            <input id="password" class="uk-input uk-border-pill" required placeholder="Password/Handover"
+            <input id="password" class="uk-input uk-border-pill" required placeholder="{{i18n/password}}/Handover"
               type="password">
           </div>
         </div>
@@ -59,18 +59,17 @@
         {{/if}}
 
         <div class="uk-margin-small">
-          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="login()">LOG
-            IN</button>
+          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+            onclick="login()">{{i18n/login}}</button>
           {{#unless external}}
-          <a id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small" href="">OPEN
-            IN
-            BROWSER</a>
+          <a id="external"
+            class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small">{{i18n/openInBrowser}}</a>
           {{/unless}}
         </div>
 
         <div class="uk-text-center">
           <a class="uk-link-reset uk-text-small toggle-class uk-margin-top"
-            data-uk-toggle="target: .toggle-class; animation: uk-animation-fade">Forgot your password?</a>
+            data-uk-toggle="target: .toggle-class; animation: uk-animation-fade">{{i18n/forgotPassword}}</a>
         </div>
       </fieldset>
     </form>
@@ -82,7 +81,7 @@
         <div class="uk-margin-small">
           <div class="uk-inline uk-width-1-1">
             <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
-            <input class="uk-input uk-border-pill" placeholder="E-mail" required type="text">
+            <input class="uk-input uk-border-pill" placeholder="{{i18n/email}}" required type="text">
           </div>
         </div>
 
@@ -92,17 +91,25 @@
 
         <div class="uk-margin-small">
           <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
-            onclick="recoverPassword()">SEND</button>
+            onclick="recoverPassword()">{{i18n/send}}</button>
         </div>
 
         <div class="uk-text-center">
           <a class="uk-link-reset uk-text-small toggle-class uk-margin-small"
             data-uk-toggle="target: .toggle-class; animation: uk-animation-fade" hidden><span
-              data-uk-icon="arrow-left"></span> Back to Login</a>
+              data-uk-icon="arrow-left"></span> {{i18n/backToLogin}}</a>
         </div>
       </fieldset>
     </form>
     <!-- /recover password -->
+  </div>
+
+  <div id="notice" class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium"
+    hidden>
+    <h1>{{i18n/success}}</h1>
+    <p>
+      {{{i18n/successDescriptionLogin}}}
+    </p>
   </div>
 
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -111,42 +118,47 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
   <script type="text/javascript" src='https://www.recaptcha.net/recaptcha/api.js'></script>
-  <script>
-    var headers = JSON.parse(escapeJSON('{{{headers}}}'))
-    var recaptcha = JSON.parse("{{{enableRecaptcha}}}")
+  <script type="">
+    // fix error? o.O
+    var headers = {{{headers}}}
+    var recaptchaEnabled = {{{enableRecaptcha}}}
+  </script>
+  <script type="text/javascript">
     // RSA preparation
-    var publicKey = `{{{PublicKey}}}`
     var RSAEncrypt = new JSEncrypt()
-    RSAEncrypt.setKey(publicKey)
-    if (window.history.length != 1) $("body").append('<div><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
-    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id={{{user_id}}}&token={{{token}}}"))
+    RSAEncrypt.setKey(`{{PublicKey}}`)
+    if (window.history.length != 1) $("body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
 
     function login() {
       var userId = $("#user_id").val()
       var pass = $("#password").val()
-      var recaptchaResponse = grecaptcha.getResponse()
 
-      if (!checkUser(userId)) return sendNotification("User ID should be integer", "warning")
-      if (pass.length === 0) return sendNotification("Password can't be blank", "warning")
-      if (pass.length > 16) return sendNotification("Password can't be more than 16 symbols", "warning")
-      if (!checkPass(pass)) return sendNotification("Used forbidden characters", "warning")
+      if (!checkUser(userId)) return sendNotification("{{i18n/userIdShouldBeInt}}", "warning")
+      if (pass.length === 0) return sendNotification("{{i18n/passwordBlank}}", "warning")
+      if (pass.length > 32) return sendNotification("{{i18n/passwordLimit}}", "warning")
+      if (!checkPass(pass)) return sendNotification("{{i18n/passwordInvalidFormat}}", "warning")
 
-      if (recaptcha && recaptchaResponse.length === 0) return sendNotification("reCAPTCHA not passed", "warning")
-      grecaptcha.reset()
+      if (recaptchaEnabled === true) {
+        var recaptchaResponse = grecaptcha.getResponse()
+        if (recaptcha && recaptchaResponse.length === 0) return sendNotification("{{i18n/recaptchaFailed}}", "warning")
+        grecaptcha.reset()
+      }
+
       $.when(sendRequest({
         module: "{{{module}}}",
         action: "login",
         user_id: RSAEncrypt.encrypt(userId),
         password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
-        recaptcha: recaptchaResponse,
+        recaptcha: recaptchaResponse || "",
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
         if (response.error || response.maintenance || !response) return
-        $("#login_form, #buttons").hide()
         if ("{{{redirect}}}".length != 0) {
           window.location.replace(window.location.protocol + "//" + window.location.host + "/{{{redirect}}}")
         } else {
-          sendNotification("Success. Close this window to enter the game", "success")
+          $("#login_form, #buttons, #back").hide()
+          $("#notice").removeAttr("hidden").show()
         }
       })
     }

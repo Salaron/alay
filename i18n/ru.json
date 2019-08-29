@@ -15,6 +15,34 @@
     "langChangeSuccess": "Язык изменён. Страница перезагрузится автоматически.",
     "hello": "Привет!"
   },
+  "login-login": {
+    "login": "ВОЙТИ",
+    "forgotPassword": "Забыли пароль?",
+    "backToLogin": "Вернуться к форме входа",
+    "userIdShouldBeInt": "Поле \"User ID\" должно быть целочисленным",
+    "successDescriptionLogin": "Вы успешно вошли в аккаунт!<br>Закройте данное окно для входа в игру.",
+    "invalidLoginOrPass": "User ID или пароль указаны неверно"
+  },
+  "login-startup": {
+    "nickname": "Никнейм",
+    "password": "Пароль",
+    "email": "Почта",
+    "repeatPassword": "Повторите пароль",
+    "send": "ОТПРАВИТЬ",
+    "openInBrowser": "ОТКРЫТЬ В БРАУЗЕРЕ",
+    "nicknameBlank": "Поле \"Никнейм\" не может быть пустым",
+    "nicknameLimit": "Поле \"Никнейм\" не может быть больше 20 символов",
+    "mailBlank": "Поле \"E-mail\" не может быть пустым",
+    "mailInvalidFormat": "Поле \"E-mail\" некорректно",
+    "passwordBlank": "Поле \"Пароль\" не может быть пустым",
+    "passwordLimit": "Поле \"Nickname\" не может быть больше 32 символов",
+    "passwordInvalidFormat": "Поле \"Пароль\" некорректно",
+    "passwordsNotMatch": "Пароли не совпадают",
+    "success": "Успех!",
+    "successDescription": "Аккаунт #:userId успешно создан! Запомните/сохраните этот номер, он пригодится Вам при входе. <br>Для продолжения регистрации закройте данное окно.",
+    "recaptchaFailed": "Вы должны пройти проверку reCAPTCHA",
+    "emailExists": "Аккаунт с указанной почтой уже зарегистрирован"
+  },
   "notice": {
     "REMOVED_FROM_FRIENDS": ":affectorName удалил(-а) Вас из своего списка друзей",
     "SEND_FRIEND_REQUEST": ":affectorName отправил(-а) Вам заявку в друзья",

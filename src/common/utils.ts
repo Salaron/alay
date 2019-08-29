@@ -192,7 +192,7 @@ export class Utils {
       now: moment(new Date()).subtract(10, "minutes").format("YYYY-MM-DD HH:mm:ss")
     })).cnt
   }
-  public async loadLocalization(section: string) {
+  public async loadLocalization(...sections: string[]) {
     let result: any = {}
     let defaultStr = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${Config.i18n.defaultLanguage}.json`, `utf-8`))
 
@@ -206,7 +206,10 @@ export class Utils {
         throw err
       }
       result[langCode] = {}
-      extend(true, result[langCode], defaultStr[section], defaultStr["common"] || {}, file[section], file["common"])
+      for (let section of sections) {
+        extend(true, result[langCode], defaultStr[section], file[section])
+      }
+      extend(true, result[langCode], defaultStr["common"] || {}, file["common"])
     }
     return result
   }

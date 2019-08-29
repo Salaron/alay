@@ -9,17 +9,23 @@
   <meta name="viewport" content="width=880, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
 </head>
 
 <body>
   <div id="outer">
     <div id="inner">
       <div id="header">
-        <h1 class="title">Your account has been suspended</h1>
+        <h1 class="title">Login Restricted</h1>
       </div>
 
       <div id="body">
-        TODO
+        <p class="uk-text-lead">По решению администратора сервера Ваш аккаунт был заблокирован за нарушение правил сервиса.</p>
+
+        {{#if expiration_date}}
+        <br>
+        Данная блокировка является временной и доступ будет возобновлён через {{expiration_date_human}} ({{expiration_date}})
+        {{/if}}
       </div>
     </div>
   </div>
