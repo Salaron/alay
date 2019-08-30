@@ -1,6 +1,7 @@
 import { Connection as connection, ConnectionPool } from "../core/database_wrappers/mysql"
 import { Sqlite3 } from "../core/database_wrappers/sqlite3"
 import { config } from "../core/config"
+import { Mailer as mailer } from "../core/mailer"
 import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../handlers/errorHandler"
 import { Utils as utils } from "../common/utils"
 import { Type as type } from "../common/type"
@@ -22,6 +23,7 @@ declare global {
   const sqlite3: Sqlite3
   type Connection = connection
   const Config: config
+  const Mailer: mailer
   // custom errors for better handling
   const ErrorCode: typeof errorCode
   const ErrorUser: typeof errorUser

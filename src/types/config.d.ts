@@ -148,3 +148,9 @@ interface Maintenance {
   time_zone: number
   bypass: number[]
 }
+
+interface Mailer {
+  enabled: boolean
+  transportSettings: import("nodemailer").TransportOptions
+  name: string
+}

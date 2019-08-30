@@ -9,6 +9,7 @@ import LLclient from "../config/LLclient"
 import Modules from "../config/modules"
 import I18n from "../config/i18n"
 import Maintenance from "../config/maintenance"
+import Mailer from "../config/mailer"
 
 export class config {
   public lbonus: typeof LBonus
@@ -19,6 +20,7 @@ export class config {
   public llsifclient: typeof LLclient
   public i18n: typeof I18n
   public maintenance: typeof Maintenance
+  public mailer: typeof Mailer
 
   public specialKey: string | Buffer = ""
   constructor() {
@@ -30,6 +32,7 @@ export class config {
     this.lbonus = LBonus
     this.i18n = I18n
     this.maintenance = Maintenance
+    this.mailer = Mailer
   }
 
   async prepareConfig(): Promise<void> {
@@ -64,6 +67,7 @@ export class config {
     delete require.cache[require.resolve("../config/modules")]
     delete require.cache[require.resolve("../config/i18n")]
     delete require.cache[require.resolve("../config/maintenance")]
+    delete require.cache[require.resolve("../config/mailer")]
 
     // and import again
     this.server = <typeof Server><unknown>(await import("../config/server")).default
@@ -73,7 +77,8 @@ export class config {
     this.llsifclient = <typeof LLclient><unknown>(await import("../config/LLclient")).default
     this.modules = <typeof Modules><unknown>(await import("../config/modules")).default
     this.i18n = <typeof I18n><unknown>(await import("../config/i18n")).default
-    this.maintenance = <typeof Maintenance><unknown>(await import("../config/maintenance")).default;
+    this.maintenance = <typeof Maintenance><unknown>(await import("../config/maintenance")).default
+    this.mailer = <typeof Mailer><unknown>(await import("../config/mailer")).default;
     (<any>global).logLevel = this.server.log_level
 
     await this.prepareConfig()
