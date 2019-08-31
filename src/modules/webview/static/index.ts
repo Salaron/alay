@@ -50,7 +50,7 @@ export default class {
           endTimeEn: moment(Config.maintenance.end_date).locale("en").format("HH:mm"),
           startDayEn: moment(Config.maintenance.start_date).locale("en").format("D MMMM"),
           endDayEn: moment(Config.maintenance.end_date).locale("en").format("D MMMM"),
-          timeZone: Config.maintenance.time_zone
+          timeZone: Utils.getTimeZoneWithPrefix(Config.maintenance.time_zone)
         }
         break
       }

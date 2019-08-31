@@ -1,5 +1,6 @@
 import "./core/config"
 import "./handlers/errorHandler"
+import "./core/mailer"
 import { resolve } from "path"
 import { MySQLConnect } from "./core/database_wrappers/mysql"
 import { Sqlite3 } from "./core/database_wrappers/sqlite3"

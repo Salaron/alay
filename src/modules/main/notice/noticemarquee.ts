@@ -19,18 +19,30 @@ export default class {
   }
 
   public async execute() {
+    const utils = new Utils(this.connection)
+    let langCode = await utils.getUserLangCode(this.user_id, false)
+    let i18n = await utils.loadLocalization("noticemarquee")
+    let strings = i18n[langCode]
+    if (Type.isNullDef(strings)) throw new Error(`Can't find language settings for code ${langCode}`)
+
     let response = {
       item_count: 0,
       marquee_list: <any>[]
     }
     if (Config.maintenance.notice && moment(Config.maintenance.start_date).diff(moment(new Date()).utcOffset(Config.maintenance.time_zone), "h") < 3) {
-      let startDay = moment(Config.maintenance.start_date).format("D MMMM")
-      let startTime = moment(Config.maintenance.start_date).format("HH:mm")
-      let endDay = moment(Config.maintenance.end_date).format("D MMMM")
-      let endTime = moment(Config.maintenance.end_date).format("HH:mm")
+      let startDay = moment(Config.maintenance.start_date).locale(langCode).format("D MMMM")
+      let startTime = moment(Config.maintenance.start_date).locale(langCode).format("HH:mm")
+      let endDay = moment(Config.maintenance.end_date).locale(langCode).format("D MMMM")
+      let endTime = moment(Config.maintenance.end_date).locale(langCode).format("HH:mm")
       response.marquee_list.push({
         marquee_id: 1,
-        text: `В период с ${startDay} ${startTime} по ${endDay} ${endTime} UTC+${Config.maintenance.time_zone} сервер будет отключён для проведения обновления`,
+        text: Utils.prepareTemplate(strings.maintenanceNotice, {
+          startDay,
+          startTime,
+          endDay,
+          endTime,
+          timeZone: Utils.getTimeZoneWithPrefix(Config.maintenance.time_zone)
+        }),
         start_date: Utils.toSpecificTimezone(9, new Date(new Date().setMinutes(new Date().getMinutes() - 1))),
         end_date: Utils.toSpecificTimezone(9, Config.maintenance.start_date)
       })

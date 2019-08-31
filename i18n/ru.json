@@ -39,14 +39,17 @@
     "passwordInvalidFormat": "Поле \"Пароль\" некорректно",
     "passwordsNotMatch": "Пароли не совпадают",
     "success": "Успех!",
-    "successDescription": "Аккаунт #:userId успешно создан! Запомните/сохраните этот номер, он пригодится Вам при входе. <br>Для продолжения регистрации закройте данное окно.",
+    "successDescription": "Аккаунт #{{userId}} успешно создан! Запомните/сохраните этот номер, он пригодится Вам при входе. <br>Для продолжения регистрации закройте данное окно.",
     "recaptchaFailed": "Вы должны пройти проверку reCAPTCHA",
     "emailExists": "Аккаунт с указанной почтой уже зарегистрирован"
   },
   "notice": {
-    "REMOVED_FROM_FRIENDS": ":affectorName удалил(-а) Вас из своего списка друзей",
-    "SEND_FRIEND_REQUEST": ":affectorName отправил(-а) Вам заявку в друзья",
-    "REJECTED_FRIEND_REQUEST": ":affectorName отклонил(-а) Вашу заявку в друзья",
-    "ACCEPTED_FRIEND_REQUEST": ":affectorName принял(-а) Вашу заявку в друзья"
+    "REMOVED_FROM_FRIENDS": "{{affectorName}} удалил(-а) Вас из своего списка друзей",
+    "SEND_FRIEND_REQUEST": "{{affectorName}} отправил(-а) Вам заявку в друзья",
+    "REJECTED_FRIEND_REQUEST": "{{affectorName}} отклонил(-а) Вашу заявку в друзья",
+    "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} принял(-а) Вашу заявку в друзья"
+  },
+  "noticemarquee": {
+    "maintenanceNotice": "В период с {{startDay}} {{startTime}} по {{endDay}} {{endTime}} UTC{{timeZone}} сервер будет отключён для проведения технических работ"
   }
 }

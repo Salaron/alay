@@ -234,5 +234,20 @@ export class Utils {
       throw new ErrorWebApi(`reCAPTCHA test failed`)
     }
   }
+
+  public static prepareTemplate(template: string, values: any = {}) {
+    return template.replace(/{{\s?([^{}\s]*)\s?}}/g, function (txt: any, key: any) {
+      if (values.hasOwnProperty(key)) {
+        return values[key]
+      }
+      return txt
+    })
+  }
+
+  public static getTimeZoneWithPrefix(tz: number) {
+    if (tz < 0) return `-${tz}`
+    else if (tz > 0) return `+${tz}`
+    else return `${tz}`
+  }
 }
 (global as any).Utils = Utils

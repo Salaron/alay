@@ -13,14 +13,15 @@ export class Mailer {
   }
 
   public async sendMail(receivers: string, subject: string, text: string) {
+    if (this.available === false) return false
     try {
-      await this.transporter.sendMail({
+      let result = await this.transporter.sendMail({
         from: `${Config.mailer.name} ${(<any>Config.mailer.transportSettings).auth.user}`,
         to: receivers,
         subject: subject,
         text: text
       })
-      return true
+      return result
     } catch (err) {
       log.error(err)
       return false
@@ -42,4 +43,4 @@ export class Mailer {
     }
   }
 }
-(global as any).Mailer = Mailer
+(global as any).Mailer = new Mailer()

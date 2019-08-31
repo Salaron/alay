@@ -32,12 +32,7 @@ export class Notice {
     let strings = await this.getNoticeStrings(userId)
     let message = strings[noticeType[noticeTypeId]]
     if (!message) throw new Error(`Unknown noticeTypeId: ${noticeTypeId}`)
-    return message.replace(/\:(\w+)/g, function (txt: any, key: any) {
-      if (values.hasOwnProperty(key)) {
-        return values[key]
-      }
-      return txt
-    })
+    return Utils.prepareTemplate(message, values)
   }
   public async addNotice(affector: number, filterId: filter, message: string | noticeType, receiver?: number) {
     await this.connection.execute(`INSERT INTO user_notice (affector_id, receiver_id, filter_id, message, type_id) VALUES (:aff, :rec, :fil, :msg, :type)`, {

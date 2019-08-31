@@ -39,14 +39,17 @@
     "passwordInvalidFormat": "Field \"Пароль\" is invalid",
     "passwordsNotMatch": "Passwords do not match",
     "success": "Success!",
-    "successDescription": "Account #:userId successfully created! Remember/save this number, it will be useful to you when you'll try to login again.<br>To continue registration close this window.",
+    "successDescription": "Account #{{userId}} successfully created! Remember/save this number, it will be useful to you when you'll try to login again.<br>To continue registration close this window.",
     "recaptchaFailed": "You must pass the reCAPTCHA",
     "emailExists": "An account with the specified E-mail is already registered"
   },
   "notice": {
-    "REMOVED_FROM_FRIENDS": ":affectorName removed you from their friend list",
-    "SEND_FRIEND_REQUEST": ":affectorName sent you a friend request",
-    "REJECTED_FRIEND_REQUEST": ":affectorName rejected your friend request",
-    "ACCEPTED_FRIEND_REQUEST": ":affectorName accepted your friend request"
+    "REMOVED_FROM_FRIENDS": "{{affectorName}} removed you from their friend list",
+    "SEND_FRIEND_REQUEST": "{{affectorName}} sent you a friend request",
+    "REJECTED_FRIEND_REQUEST": "{{affectorName}} rejected your friend request",
+    "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} accepted your friend request"
+  },
+  "noticemarquee": {
+    "maintenanceNotice": "In the period from {{startDay}} {{startTime}} to {{endDay}} {{endTime}} UTC{{timeZone}}, server will be unavailable due to maintenance"
   }
 }
