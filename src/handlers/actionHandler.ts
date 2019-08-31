@@ -1,8 +1,9 @@
-import RequestData, { REQUEST_TYPE, PERMISSION, RESPONSE_TYPE, HANDLER_TYPE, TYPE } from "../core/requestData"
+import RequestData, { REQUEST_TYPE, PERMISSION, RESPONSE_TYPE, HANDLER_TYPE } from "../core/requestData"
 import { Log } from "../core/log"
 import "./actions/webApi"
 import "./actions/webView"
 import "./actions/main"
+import { TYPE } from "../common/type"
 
 const log = new Log("Action Handler")
 let cache = <any>{}

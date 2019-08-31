@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL } from "../../../core/requestData"
 import moment from "moment"
+import { TYPE } from "../../../common/type"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER

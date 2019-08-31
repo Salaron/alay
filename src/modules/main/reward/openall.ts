@@ -1,8 +1,9 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import { Log } from "../../../core/log"
 import { User } from "../../../common/user"
 import { Item } from "../../../common/item"
+import { TYPE } from "../../../common/type"
 
 const log = new Log("reward/openAll")
 

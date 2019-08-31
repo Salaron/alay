@@ -1,5 +1,6 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
+import { TYPE } from "../../../common/type"
 
 /*
 STATE = {

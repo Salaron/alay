@@ -41,14 +41,6 @@ export enum PERMISSION {
   XMC,
   STATIC
 }
-export enum TYPE {
-  INT,
-  FLOAT,
-  NUMBER, // INT or FLOAT
-  BOOLEAN,
-  STRING,
-  NULL
-}
 export enum WV_REQUEST_TYPE {
   BOTH,
   APPLICATION,

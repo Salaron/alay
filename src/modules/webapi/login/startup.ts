@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL } from "../../../core/requestData"
 import { Utils } from "../../../common/utils"
+import { TYPE } from "../../../common/type"
 
 let i18n: any = {}
 

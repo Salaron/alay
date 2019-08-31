@@ -1,8 +1,9 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import assert from "assert"
 import { Unit } from "../../../common/unit"
 import { User } from "../../../common/user"
+import { TYPE } from "../../../common/type"
 
 const unitDB = sqlite3.getUnit()
 

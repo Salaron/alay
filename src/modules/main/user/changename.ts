@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import { Log } from "../../../core/log"
+import { TYPE } from "../../../common/type"
 
 const log = new Log("user/changeName")
 

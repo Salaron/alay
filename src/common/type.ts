@@ -1,3 +1,12 @@
+export enum TYPE {
+  INT,
+  FLOAT,
+  NUMBER, // INT or FLOAT
+  BOOLEAN,
+  STRING,
+  NULL
+}
+
 export class Type {
   // Number 
   public static isInt(variable: any): boolean {
@@ -77,5 +86,7 @@ export class Type {
       variable instanceof Date 
     )
   }
+
+  public TYPES: typeof TYPE = TYPE
 }
 (global as any).Type = Type

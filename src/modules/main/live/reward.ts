@@ -1,10 +1,11 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import assert from "assert"
 import { User } from "../../../common/user"
 import { Live } from "../../../common/live"
 import { Item } from "../../../common/item"
 import { Events } from "../../../common/event"
+import { TYPE } from "../../../common/type"
 
 export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE

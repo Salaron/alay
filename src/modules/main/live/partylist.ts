@@ -1,8 +1,9 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import { Live } from "../../../common/live"
 import { Events } from "../../../common/event"
 import { Utils } from "../../../common/utils"
+import { TYPE } from "../../../common/type"
 
 const marathonDB = sqlite3.getMarathon()
 

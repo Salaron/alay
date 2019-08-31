@@ -1,5 +1,6 @@
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL } from "../../../core/requestData"
+import { TYPE } from "../../../common/type"
 
 const supportedParams = Config.i18n.supportedLanguages
 const convert = Config.i18n.langCodes

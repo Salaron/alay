@@ -1,10 +1,11 @@
-import { AUTH_LEVEL, TYPE, WV_REQUEST_TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
 import { readFile } from "fs"
 import { promisify } from "util"
 import moment from "moment"
 import Handlebars from "handlebars"
 import { Utils } from "../../../common/utils"
+import { TYPE } from "../../../common/type"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH

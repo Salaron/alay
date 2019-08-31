@@ -1,7 +1,8 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import moment from "moment"
 import { User } from "../../../common/user"
+import { TYPE } from "../../../common/type"
 
 export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI

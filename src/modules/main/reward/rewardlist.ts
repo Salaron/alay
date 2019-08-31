@@ -1,7 +1,8 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import { Item } from "../../../common/item"
 import { Unit } from "../../../common/unit"
+import { TYPE } from "../../../common/type"
 
 const unitDB = sqlite3.getUnit()
 
