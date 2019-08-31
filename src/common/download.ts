@@ -1,5 +1,6 @@
 import { readdir, readFile } from "fs"
 import { promisify } from "util"
+import { Utils } from "./utils"
 
 interface updateUrls {
   [version: string]: {
@@ -34,4 +35,3 @@ export class Download {
     return updateUrls
   }
 }
-(global as any).Download = Download

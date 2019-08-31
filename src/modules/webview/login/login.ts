@@ -1,23 +1,18 @@
-import { AUTH_LEVEL } from "../../../types/const"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
 import { readFile } from "fs"
 import { promisify } from "util"
 import Handlebars from "handlebars"
+import { Utils } from "../../../common/utils"
 
 let i18n: any = {}
 
-export default class {
+export default class extends WebViewAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
+  public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
 
-  private user_id: number | null
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public async execute() {

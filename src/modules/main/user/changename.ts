@@ -1,23 +1,16 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
 import { Log } from "../../../core/log"
 
 const log = new Log("user/changeName")
 
-export default class {
+export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
-  private user_id: number
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = <number>requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramTypes() {
@@ -25,6 +18,7 @@ export default class {
       name: TYPE.STRING
     }
   }
+
   public paramCheck() {
     if (!this.params.name.match(/^.{1,20}$/)) throw new ErrorCode(1100)
     return true

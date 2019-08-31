@@ -12,10 +12,14 @@ import {
   buttonType,
   secretboxType,
   animationType
-} from "../types/secretbox"
+} from "../typings/secretbox"
 import { promisify } from "util"
 import { readFile } from "fs"
 import { Log } from "../core/log"
+import { Connection } from "../core/database_wrappers/mysql"
+import { Utils } from "./utils"
+import { Item } from "./item"
+import { User } from "./user"
 
 const unitDB = sqlite3.getUnit()
 const secretboxDB = sqlite3.getSecretbox()
@@ -520,5 +524,3 @@ export class Secretbox {
     }
   }
 }
-
-(<any>global).Secretbox = Secretbox

@@ -1,3 +1,6 @@
+import { Connection } from "../core/database_wrappers/mysql"
+import { Unit } from "./unit"
+
 const unitDB = sqlite3.getUnit()
 interface ItemObject {
   name?: string
@@ -299,4 +302,3 @@ export class Item {
     }
   }
 }
-(global as any).Item = Item

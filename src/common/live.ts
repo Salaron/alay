@@ -1,5 +1,9 @@
 import { Log } from "../core/log"
 import extend from "extend"
+import { Connection } from "../core/database_wrappers/mysql"
+import { User } from "./user"
+import { Item } from "./item"
+import { Unit } from "./unit"
 
 const log = new Log("Common: Live")
 
@@ -59,7 +63,7 @@ export async function init() {
 }
 
 export class Live {
-  connection: Connection
+  private connection: Connection
   constructor(connection: Connection) {
     this.connection = connection
   }
@@ -514,7 +518,6 @@ export class Live {
       5 * Math.floor(maxCombo / 100)
   }
 }
-(global as any).Live = Live
 
 function bonus(type: number | string) {
   if (typeof type === "string") type = parseInt(type)

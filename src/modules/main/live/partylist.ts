@@ -1,22 +1,18 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { Live } from "../../../common/live"
+import { Events } from "../../../common/event"
+import { Utils } from "../../../common/utils"
 
 const marathonDB = sqlite3.getMarathon()
 
-export default class {
+export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
-  private user_id: number
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = <number>requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramTypes() {
@@ -25,6 +21,7 @@ export default class {
       lp_factor: TYPE.INT
     }
   }
+
   public paramCheck() {
     // check if this string contains integer value
     if (parseInt(this.params.live_difficulty_id) != parseInt(this.params.live_difficulty_id)) throw new Error(`live_difficulty_id is NaN`)

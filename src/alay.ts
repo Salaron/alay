@@ -1,15 +1,13 @@
 import "./core/config"
 import "./handlers/errorHandler"
 import "./core/mailer"
-import { resolve } from "path"
-import { MySQLConnect } from "./core/database_wrappers/mysql"
-import { Sqlite3 } from "./core/database_wrappers/sqlite3"
 import { Log } from "./core/log"
-import ReadLine from "./core/readLine"
-import http from "http"
-import requestHandler from "./handlers/requestHandler"
+import { resolve } from "path"
+import { Sqlite3 } from "./core/database_wrappers/sqlite3"
+import { MySQLConnect } from "./core/database_wrappers/mysql"
 
 const log = new Log("Setup");
+
 (<any>global).rootDir = `${resolve(__dirname)}/../`
 try {
   // Prepare sqlite3 databases
@@ -19,7 +17,9 @@ try {
   process.exit(0)
 }
 
-// Import common modules (!) after sqlite3
+import ReadLine from "./core/readLine"
+import http from "http"
+import requestHandler from "./handlers/requestHandler"
 import * as modules from "./common";
 
 // Entry point

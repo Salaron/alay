@@ -1,10 +1,11 @@
-import { HANDLER_TYPE, AUTH_LEVEL } from "../types/const"
+import { HANDLER_TYPE, AUTH_LEVEL } from "../core/requestData"
 import { IncomingMessage, ServerResponse } from "http"
 import { writeJsonResponse } from "../handlers/apiHandler"
 import executeAction from "../handlers/actionHandler"
 import RequestData from "../core/requestData"
 import { promisify } from "util"
 import { gzip } from "zlib"
+import { ActionResult } from "../typings/handlers"
 
 export default async function webviewHandler(request: IncomingMessage, response: ServerResponse) {
   let requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBVIEW)

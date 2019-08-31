@@ -11,6 +11,8 @@ import I18n from "../config/i18n"
 import Maintenance from "../config/maintenance"
 import Mailer from "../config/mailer"
 
+import { Utils } from "../common/utils"
+
 export class config {
   public lbonus: typeof LBonus
   public server: typeof Server
@@ -78,9 +80,8 @@ export class config {
     this.modules = <typeof Modules><unknown>(await import("../config/modules")).default
     this.i18n = <typeof I18n><unknown>(await import("../config/i18n")).default
     this.maintenance = <typeof Maintenance><unknown>(await import("../config/maintenance")).default
-    this.mailer = <typeof Mailer><unknown>(await import("../config/mailer")).default;
-    (<any>global).logLevel = this.server.log_level
-
+    this.mailer = <typeof Mailer><unknown>(await import("../config/mailer")).default
+    
     await this.prepareConfig()
   }
 }

@@ -1,22 +1,17 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { User } from "../../../common/user"
+import { Unit } from "../../../common/unit"
 
 const unitDB = sqlite3.getUnit()
 
-export default class {
+export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
-  private user_id: number
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = <number>requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramCheck() {
@@ -43,7 +38,7 @@ export default class {
       })
       if (units.length != this.params.unit_owning_user_id.length) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
 
-      await Promise.all(units.map(async unit => {
+      await Promise.all(units.map(async (unit: any) => {
         let data = await unitDB.get(`
         SELECT U.rarity, L.sale_price FROM unit_m as U JOIN unit_level_up_pattern_m as L ON L.unit_level_up_pattern_id = U.unit_level_up_pattern_id 
         WHERE U.unit_id=? AND L.unit_level=?`, [unit.unit_id, unit.level])

@@ -1,23 +1,19 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
 import assert from "assert"
+import { User } from "../../../common/user"
+import { Unit } from "../../../common/unit"
+import { Utils } from "../../../common/utils"
 
 const unitDB = sqlite3.getUnit()
 
-export default class {
+export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
-  private user_id: number
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = <number>requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramTypes() {
@@ -25,6 +21,7 @@ export default class {
       base_owning_unit_user_id: TYPE.INT
     }
   }
+
   public paramCheck() {
     assert(
       typeof this.params.unit_owning_user_ids === "object" && Array.isArray(this.params.unit_owning_user_ids) &&
@@ -119,7 +116,7 @@ export default class {
       })
       if (unitData.length != this.params.unit_owning_user_ids.length) throw new ErrorCode(1311)
 
-      await unitData.forEachAsync(async unit => {
+      await unitData.forEachAsync(async (unit: any) => {
         if (unit.unit_owning_user_id === this.params.base_owning_unit_user_id) throw new Error("Nice try :)")
         let data = await unitDB.get(`
         SELECT 
@@ -145,9 +142,9 @@ export default class {
         ) gainSkillExp += data.grant_skill_exp
         if ((!noExchangePointList.includes(unit.unit_id)) && seals[data.rarity] != null) {
           seals[data.rarity] += 1
-        }  
+        }
       })
-      
+
       if (Config.modules.unit.removeFromDatabase === true) {
         await this.connection.query(`DELETE FROM units WHERE unit_owning_user_id IN (:units) AND user_id = :user`, {
           units: this.params.unit_owning_user_ids,

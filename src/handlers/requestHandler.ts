@@ -7,6 +7,7 @@ import webviewHandler from "./webviewHandler"
 import webapiHandler from "./webapihandler"
 import resourcesHandler from "./resourcesHandler"
 import { writeJsonResponse } from "./apiHandler"
+import { Utils } from "../common/utils"
 
 const log = new Log("Request Handler")
 

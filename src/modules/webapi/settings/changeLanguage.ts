@@ -1,21 +1,14 @@
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, TYPE } from "../../../types/const"
+import { AUTH_LEVEL, TYPE } from "../../../core/requestData"
 
 const supportedParams = Config.i18n.supportedLanguages
 const convert = Config.i18n.langCodes
 
-export default class {
+export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
 
-  private user_id: number | null
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramTypes() {

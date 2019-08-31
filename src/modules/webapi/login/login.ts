@@ -1,20 +1,14 @@
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, TYPE } from "../../../types/const"
+import { AUTH_LEVEL, TYPE } from "../../../core/requestData"
+import { Utils } from "../../../common/utils"
 
 let i18n: any = {}
 
-export default class {
+export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
 
-  private user_id: number
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = <number>requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramTypes() {
@@ -31,7 +25,7 @@ export default class {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
       await utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
     }
-    
+
     let code = await utils.getUserLangCode(this.user_id, true, <string>this.requestData.auth_token)
     if (Object.keys(i18n).length === 0) i18n = await utils.loadLocalization("login-startup", "login-login")
     let strings = i18n[code]
@@ -42,7 +36,7 @@ export default class {
 
     if (!checkUser(this.user_id)) throw new ErrorWebApi(strings.userIdShouldBeInt, true)
     if (!checkPass(password)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
-    
+
     let data = await this.connection.first(`SELECT * FROM users WHERE user_id = :user AND password = :pass`, {
       user: this.user_id,
       pass: password
@@ -63,7 +57,7 @@ export default class {
     let check = await this.connection.first(`SELECT * FROM user_login WHERE login_key = :key AND login_passwd = :pass`, {
       key: cred.login_key,
       pass: cred.login_passwd
-    }) 
+    })
     if (check) throw new ErrorWebApi(`This credentials already used`)
 
     await this.connection.query(`INSERT INTO user_login (user_id, login_key, login_passwd) VALUES (:user, :key, :pass) ON DUPLICATE KEY UPDATE login_key = :key, login_passwd = :pass`, {
@@ -71,7 +65,7 @@ export default class {
       pass: cred.login_passwd,
       user: this.user_id
     })
-    
+
     // Destroy current token
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })
     return {

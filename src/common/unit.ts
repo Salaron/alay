@@ -1,4 +1,6 @@
 import extend from "extend"
+import { Connection } from "../core/database_wrappers/mysql"
+import { Utils } from "./utils"
 
 const unitDB = sqlite3.getUnit()
 const exchangeDB = sqlite3.getExchange()
@@ -357,4 +359,3 @@ export class Unit {
     // TODO
   }
 }
-(global as any).Unit = Unit

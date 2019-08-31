@@ -1,5 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
 
 let otherDB = sqlite3.getOther()
 let ids: number[] = []
@@ -9,20 +9,13 @@ export async function init(): Promise<void> {
   ids = all.map((s: any) => { return s.stamp_id })
 }
 
-export default class {
+export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
-  private user_id: number
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = <number>requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramTypes() {
@@ -32,6 +25,7 @@ export default class {
       stamp_setting_id: TYPE.INT
     }
   }
+
   public paramCheck() {
     if (
       this.params.main_flag < 0 || this.params.main_flag > 1 ||

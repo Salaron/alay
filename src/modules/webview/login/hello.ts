@@ -1,8 +1,9 @@
-import { AUTH_LEVEL } from "../../../types/const"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
 import { readFile } from "fs"
 import { promisify } from "util"
 import Handlebars from "handlebars"
+import { Utils } from "../../../common/utils"
 
 Handlebars.registerHelper("equal", function (a, b, options) {
   // @ts-ignore: Unreachable code error
@@ -11,18 +12,12 @@ Handlebars.registerHelper("equal", function (a, b, options) {
   return options.inverse(this)
 })
 
-export default class {
+export default class extends WebViewAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
-
-  private user_id: number | null
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
+  public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
+  
   constructor(requestData: RequestData) {
-    this.user_id = requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public async execute() {

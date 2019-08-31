@@ -1,15 +1,66 @@
 import { IncomingMessage, ServerResponse } from "http"
 import { IncomingForm } from "formidable"
 import querystring from "querystring"
-import { AUTH_LEVEL, HANDLER_TYPE } from "../types/const"
 import { Log } from "../core/log"
 import chalk from "chalk"
 import moment from "moment"
+import { Utils } from "../common/utils"
+import { Connection } from "./database_wrappers/mysql"
 
 const log = new Log("Request Data")
 
 interface authLevelOptions {
   force?: boolean
+}
+export enum AUTH_LEVEL {
+  NONE,
+  BANNED,
+  SESSION_EXPIRED,
+  REJECTED,
+  PRE_LOGIN,
+  UPDATE,
+  CONFIRMED_USER,
+  ADMIN
+}
+export enum REQUEST_TYPE {
+  BOTH,
+  SINGLE,
+  MULTI
+}
+export enum RESPONSE_TYPE {
+  SINGLE = 1,
+  MULTI
+}
+export enum HANDLER_TYPE {
+  MAIN,
+  WEBAPI,
+  WEBVIEW
+}
+export enum PERMISSION {
+  NOXMC,
+  XMC,
+  STATIC
+}
+export enum TYPE {
+  INT,
+  FLOAT,
+  NUMBER, // INT or FLOAT
+  BOOLEAN,
+  STRING,
+  NULL
+}
+export enum WV_REQUEST_TYPE {
+  BOTH,
+  APPLICATION,
+  BROWSER
+}
+export interface Authorize {
+  consumerKey: string
+  timeStamp: number
+  version: string
+  nonce: string | number
+  token?: string 
+  requestTimeStamp?: number
 }
 
 export default class RequestData {

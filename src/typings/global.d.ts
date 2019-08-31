@@ -1,44 +1,34 @@
-import { Connection as connection, ConnectionPool } from "../core/database_wrappers/mysql"
+import { Connection, ConnectionPool } from "../core/database_wrappers/mysql"
 import { Sqlite3 } from "../core/database_wrappers/sqlite3"
 import { config } from "../core/config"
 import { Mailer as mailer } from "../core/mailer"
 import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../handlers/errorHandler"
-import { Utils as utils } from "../common/utils"
-import { Type as type } from "../common/type"
-import { User as user } from "../common/user"
-import { Live as live } from "../common/live"
-import { Events as events } from "../common/event"
-import { Unit as unit } from "../common/unit"
-import { Item as item } from "../common/item"
-import { Secretbox as secretbox } from "../common/secretbox"
-import { Notice as notice } from "../common/notice"
-import { Download as download } from "../common/download"
+import RequestData from "../core/requestData"
+import { Type as type} from "../common/type"
+
+import { WebApiAction as WebApiAction_ } from "../handlers/actions/webApi"
+import { WebViewAction as WebViewAction_ } from "../handlers/actions/webView"
+import { MainAction as MainAction_ } from "../handlers/actions/main"
 
 declare global {
   // make project root dir global (for easy access to files outside of 'compile' folder)
   const rootDir: string
   // database stuff
-  const MySQLconnection: typeof connection
+  const MySQLconnection: typeof Connection
   const MySQLconnectionPool: ConnectionPool
   const sqlite3: Sqlite3
-  type Connection = connection
+  // core modules should be global
   const Config: config
   const Mailer: mailer
-  // custom errors for better handling
+  // custom errors for handling
   const ErrorCode: typeof errorCode
   const ErrorUser: typeof errorUser
   const ErrorWebApi: typeof errorWebApi
-  // common modules
-  const Utils: typeof utils
+  // just
   const Type: typeof type
-  const User: typeof user
-  const Live: typeof live
-  const Events: typeof events
-  const Unit: typeof unit
-  const Item: typeof item
-  const Secretbox: typeof secretbox
-  const Notice: typeof notice
-  const Download: typeof download
+  const WebApiAction: typeof WebApiAction_
+  const WebViewAction: typeof WebViewAction_
+  const MainAction: typeof MainAction_
 
   interface Array<T> {
     forEachAsync(callback: (element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void>

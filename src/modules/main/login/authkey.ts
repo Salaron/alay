@@ -1,24 +1,18 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
 import { Log } from "../../../core/log"
 import crypto from "crypto"
+import { Utils } from "../../../common/utils"
 
 const log = new Log("Authkey")
 
-export default class {
+export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.NOXMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
 
-  private user_id: number | null
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramTypes() {
@@ -27,6 +21,7 @@ export default class {
       auth_data: TYPE.STRING
     }
   }
+
   public paramCheck() {
     return true
   }
@@ -34,7 +29,7 @@ export default class {
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel) throw new Error(`You're already logged in`)
     const trick = {
-      status: 200, 
+      status: 200,
       result: {
         authorize_token: Utils.randomString(80 + Math.floor(Math.random() * 10)),
         dummy_token: crypto.randomBytes(32).toString("base64")

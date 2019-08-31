@@ -1,6 +1,8 @@
-import RequestData from "../core/requestData"
-import { HANDLER_TYPE, REQUEST_TYPE, PERMISSION, TYPE, RESPONSE_TYPE } from "../types/const"
+import RequestData, { REQUEST_TYPE, PERMISSION, RESPONSE_TYPE, HANDLER_TYPE, TYPE } from "../core/requestData"
 import { Log } from "../core/log"
+import "./actions/webApi"
+import "./actions/webView"
+import "./actions/main"
 
 const log = new Log("Action Handler")
 let cache = <any>{}
@@ -12,9 +14,9 @@ interface Options {
 
 export default async function executeAction(module: string, action: string, requestData: RequestData, options: Options = {}) {
   if (
-    !module || 
-    !action || 
-    module.length === 0 || 
+    !module ||
+    !action ||
+    module.length === 0 ||
     action.length === 0
   ) throw new ErrorUser(`Module or Action is not provided (${module}/${action})`, requestData.user_id)
   module = module.replace(/\s/g, "X").toLowerCase()
@@ -35,7 +37,7 @@ export default async function executeAction(module: string, action: string, requ
       if (loaded.init) await loaded.init()
       cache[`${moduleFolder}/${module}/${action}`] = loaded
     }
-  
+
     let body = new cache[`${moduleFolder}/${module}/${action}`].default(requestData)
     // Main related things
     if (requestData.handlerType === HANDLER_TYPE.MAIN) {

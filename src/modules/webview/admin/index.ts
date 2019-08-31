@@ -1,23 +1,16 @@
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
+import { WV_REQUEST_TYPE, AUTH_LEVEL } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
 import { readFile } from "fs"
 import { promisify } from "util"
 import Handlebars from "handlebars"
+import { Utils } from "../../../common/utils"
 
-export default class {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
-  public permission: PERMISSION = PERMISSION.NOXMC
+export default class extends WebViewAction {
+  public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
 
-  private user_id: number
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = <number>requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public async execute() {

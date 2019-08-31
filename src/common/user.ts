@@ -1,3 +1,6 @@
+import { Connection } from "../core/database_wrappers/mysql"
+import { Unit } from "./unit"
+
 interface userParams {
   vanish?: number,
   mirror?: number,
@@ -6,7 +9,7 @@ interface userParams {
 }
 
 export class User {
-  connection: Connection
+  private connection: Connection
   constructor(connection: Connection) {
     this.connection = connection
   }
@@ -151,4 +154,3 @@ export class User {
     return result
   }
 }
-(global as any).User = User

@@ -1,9 +1,10 @@
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../types/const"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
 import { readFile } from "fs"
 import { promisify } from "util"
 import showdown from "showdown"
 import Handlebars from "handlebars"
+import { Utils } from "../../../common/utils"
 
 const converter = new showdown.Converter({
   tables: true, 
@@ -11,20 +12,12 @@ const converter = new showdown.Converter({
   requireSpaceBeforeHeadingText: true
 })
 
-export default class {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
-  public permission: PERMISSION = PERMISSION.NOXMC
+export default class extends WebViewAction {
+  public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
 
-  private user_id: number | null
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
   public async execute() {
     const utils = new Utils(this.connection)

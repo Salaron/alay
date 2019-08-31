@@ -3,6 +3,9 @@ import querystring from "querystring"
 import { promisify } from "util"
 import { gzip } from "zlib"
 import { LEVEL } from "../core/log"
+import { Connection } from "../core/database_wrappers/mysql"
+import { Utils } from "../common/utils"
+import { Authorize } from "../core/requestData"
 
 export async function writeJsonResponse(response: ServerResponse, options: Options = {}) {
   response.setHeader("Content-Type", "application/json")

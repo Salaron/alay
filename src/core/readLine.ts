@@ -1,5 +1,6 @@
 import readline from "readline"
 import { Log } from "./log"
+import { Unit } from "../common/unit"
 
 const log = new Log("ReadLine")
 const readLineInterface = readline.createInterface({

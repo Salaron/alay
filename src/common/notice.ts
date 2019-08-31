@@ -1,3 +1,6 @@
+import { Utils } from "./utils"
+import { Connection } from "../core/database_wrappers/mysql"
+
 enum noticeType {
   REMOVED_FROM_FRIENDS = 1,
   SEND_FRIEND_REQUEST,
@@ -51,4 +54,3 @@ export class Notice {
     return filter
   }
 }
-(global as any).Notice = Notice

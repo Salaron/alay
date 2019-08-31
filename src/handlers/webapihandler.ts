@@ -1,4 +1,4 @@
-import { HANDLER_TYPE, AUTH_LEVEL } from "../types/const"
+import { HANDLER_TYPE, AUTH_LEVEL } from "../core/requestData"
 import { IncomingMessage, ServerResponse } from "http"
 import { writeJsonResponse } from "../handlers/apiHandler"
 import executeAction from "../handlers/actionHandler"

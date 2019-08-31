@@ -5,6 +5,7 @@ import { promisify } from "util"
 import { readFile } from "fs"
 import extend from "extend"
 import request from "request"
+import { Connection } from "../core/database_wrappers/mysql"
 
 const log = new Log("Common: Utils")
 
@@ -31,7 +32,7 @@ export async function init() {
 }
 
 export class Utils {
-  connection: Connection
+  private connection: Connection
   constructor(connection: Connection) {
     this.connection = connection
   }
@@ -250,4 +251,3 @@ export class Utils {
     else return `${tz}`
   }
 }
-(global as any).Utils = Utils

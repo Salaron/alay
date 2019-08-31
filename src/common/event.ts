@@ -1,3 +1,8 @@
+import { Utils } from "./utils"
+import { Connection } from "../core/database_wrappers/mysql"
+import { Item } from "./item"
+import { Unit } from "./unit"
+
 const eventDB = sqlite3.getEvent()
 
 export enum eventType {
@@ -276,4 +281,3 @@ export class Events {
     return tokenEventPoint[liveDifficulty][comboRank][scoreRank]
   }
 }
-(global as any).Events = Events

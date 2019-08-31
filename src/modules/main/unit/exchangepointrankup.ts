@@ -1,6 +1,8 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../types/const"
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, TYPE } from "../../../core/requestData"
 import assert from "assert"
+import { Unit } from "../../../common/unit"
+import { User } from "../../../common/user"
 
 const unitDB = sqlite3.getUnit()
 
@@ -11,20 +13,13 @@ const rankUpCost = <any>{ // cost[RARITY][POINT_ID]
   5: [null, null, 100,    5, null,    1]  // SSR sticer. R, SR, SSR
 }
 
-export default class {
+export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
-  private user_id: number
-  private connection: Connection
-  private requestData: RequestData
-  private params: any
   constructor(requestData: RequestData) {
-    this.user_id = <number>requestData.user_id
-    this.connection = requestData.connection
-    this.params = requestData.params
-    this.requestData = requestData
+    super(requestData)
   }
 
   public paramTypes() {
@@ -33,6 +28,7 @@ export default class {
       exchange_point_id: TYPE.INT
     }
   }
+
   public paramCheck() {
     assert(this.params.exchange_point_id >= 2 && this.params.exchange_point_id <= 5, "Invalid params")
   }
