@@ -163,7 +163,7 @@ export class Utils {
   static mergeArrayDedupe(array: any): any[] {
     return [...new Set([].concat(...array))]
   }
-  static toSpecificTimezone(utcOffset: number = 9, date?: string | Date) {
+  static toSpecificTimezone(utcOffset = 9, date?: string | Date) {
     if (!date) date = new Date()
     return moment(date).utcOffset(utcOffset).format("YYYY-MM-DD HH:mm:ss")
   }

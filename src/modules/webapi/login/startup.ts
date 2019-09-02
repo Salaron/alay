@@ -73,7 +73,7 @@ export default class extends WebApiAction {
     })
 
     // send mail
-    await Mailer.sendMail(this.params.mail, "Welcome to SunLight Server!", `Привет, ${this.params.name}!\n\nВы получили данное письмо, потому что Ваша почта была указана при регистрации на пользовательском сервере по игре Love Live! School Idol Festival.\n\nВ дальнейшем этот адрес эл. почты будет использоваться для оповещения и подтверждения действий, связанных с Вашим аккаунтом.`)
+    await Mailer.sendMail(this.params.mail, "Добро пожаловать!", `Привет, ${this.params.name}!\n\nВы получили данное письмо, потому что Ваша почта была указана при регистрации на пользовательском сервере по игре Love Live! School Idol Festival.\n\nВ дальнейшем этот адрес эл. почты будет использоваться для оповещения и подтверждения действий, связанных с Вашим аккаунтом.`)
 
     // Destroy current token
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })

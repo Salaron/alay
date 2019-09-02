@@ -6,7 +6,7 @@ import { existsSync } from "fs"
 // make sqlite3 promise-like
 class Sqlite3Wrapper {
   public database: sqliteDB.Database
-  public closed: boolean = false
+  public closed = false
   private databaseName: string
   private lastQuery: string | undefined
   constructor(fileName: string, mode: "ro" | "rw" | number) {

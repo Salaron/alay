@@ -21,6 +21,7 @@ export abstract class WebApiAction {
     return {}
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   public paramCheck(): void {
   }
 

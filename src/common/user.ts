@@ -121,7 +121,7 @@ export class User {
     return result
   }
 
-  public async addExp(userId: number, amount: number, multiplier: number = 1) {
+  public async addExp(userId: number, amount: number, multiplier = 1) {
     let result: { level: number, from_exp: number }[] = []
 
     let userInfo = await this.connection.first(`SELECT level, previous_exp, next_exp, exp FROM users WHERE user_id = :user`, {

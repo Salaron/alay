@@ -4,9 +4,11 @@
     "@typescript-eslint"
   ],
   "extends": [
+    "plugin:@typescript-eslint/recommended"
   ],
   "env": {
-    "es6": true
+    "es6": true,
+    "node": true
   },
   "globals": {
     "Atomics": "readonly",
@@ -34,6 +36,8 @@
       }
     ],
     "no-var": "error",
+    "prefer-const": "off",
+    "prefer-rest-params": "warn",
     "@typescript-eslint/array-type": "error",
     "@typescript-eslint/class-name-casing": "off",
     "@typescript-eslint/no-explicit-any": "off",
@@ -50,6 +54,8 @@
     "@typescript-eslint/member-delimiter-style": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-object-literal-type-assertion": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/consistent-type-assertions": "off",
+    "@typescript-eslint/ban-ts-ignore": "off"
   }
 }

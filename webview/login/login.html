@@ -38,7 +38,7 @@
   <!-- /overlay -->
   <div class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade" style>
     <!-- login -->
-    <form class="toggle-class" id="login_form">
+    <form id="loginForm" class="toggle-base">
       <fieldset class="uk-fieldset">
         <div class="uk-margin-small">
           <div class="uk-inline uk-width-1-1">
@@ -68,20 +68,20 @@
         </div>
 
         <div class="uk-text-center">
-          <a class="uk-link-reset uk-text-small toggle-class uk-margin-top"
-            data-uk-toggle="target: .toggle-class; animation: uk-animation-fade">{{i18n/forgotPassword}}</a>
+          <a class="uk-link-reset uk-text-small uk-margin-top"
+            data-uk-toggle="target: .toggle-base; animation: uk-animation-fade">{{i18n/forgotPassword}}</a>
         </div>
       </fieldset>
     </form>
     <!-- /login -->
 
     <!-- recover password -->
-    <form class="toggle-class" hidden>
+    <form id="recoverForm" class="toggle-base" onkeydown="return event.key != 'Enter';" hidden>
       <fieldset class="uk-fieldset">
         <div class="uk-margin-small">
           <div class="uk-inline uk-width-1-1">
             <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
-            <input class="uk-input uk-border-pill" placeholder="{{i18n/email}}" required type="text">
+            <input id="mail" class="uk-input uk-border-pill" required placeholder="{{i18n/email}}" type="text">
           </div>
         </div>
 
@@ -95,17 +95,40 @@
         </div>
 
         <div class="uk-text-center">
-          <a class="uk-link-reset uk-text-small toggle-class uk-margin-small"
-            data-uk-toggle="target: .toggle-class; animation: uk-animation-fade" hidden><span
-              data-uk-icon="arrow-left"></span> {{i18n/backToLogin}}</a>
+          <a class="uk-link-reset uk-text-small uk-margin-small"
+            data-uk-toggle="target: .toggle-base; animation: uk-animation-fade"><span data-uk-icon="arrow-left"></span>
+            {{i18n/backToLogin}}</a>
         </div>
       </fieldset>
     </form>
     <!-- /recover password -->
+
+    <!-- confirm code -->
+    <form id="confirmForm" onkeydown="return event.key != 'Enter';" hidden>
+      <fieldset class="uk-fieldset" style="width: 304px">
+        <div class="uk-margin-small">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+            <input id="code" class="uk-input uk-border-pill" required placeholder="{{i18n/confirmationCode}}" type="text">
+          </div>
+        </div>
+
+        <div class="uk-margin-small">
+          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+            onclick="confirmCode()">{{i18n/send}}</button>
+        </div>
+
+        <div class="uk-text-center">
+          <a class="uk-link-reset uk-text-small uk-margin-small"
+            data-uk-toggle="target: #confirmForm, #loginForm; animation: uk-animation-fade"><span
+              data-uk-icon="arrow-left"></span> {{i18n/backToLogin}}</a>
+        </div>
+      </fieldset>
+    </form>
+    <!-- /confirm code-->
   </div>
 
-  <div id="notice" class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium"
-    hidden>
+  <div id="notice" class="uk-overlay uk-position-bottom uk-light" hidden>
     <h1>{{i18n/success}}</h1>
     <p>
       {{{i18n/successDescriptionLogin}}}
@@ -157,14 +180,64 @@
         if ("{{{redirect}}}".length != 0) {
           window.location.replace(window.location.protocol + "//" + window.location.host + "/{{{redirect}}}")
         } else {
-          $("#login_form, #buttons, #back").hide()
-          $("#notice").removeAttr("hidden").show()
+          $("#back").hide()
+          UIkit.toggle("#loginForm", {
+            target: "#loginForm, #notice",
+            animation: "uk-animation-fade"
+          }).toggle()
         }
       })
     }
 
     function recoverPassword() {
-      sendNotification("TODO", "primary")
+      var mail = $("#mail").val()
+      if (!checkMail(mail)) return sendNotification("{{i18n/mailInvalidFormat}}", "warning")
+
+      if (recaptchaEnabled === true) {
+        var recaptchaResponse = grecaptcha.getResponse(1)
+        if (recaptcha && recaptchaResponse.length === 0) return sendNotification("{{i18n/recaptchaFailed}}", "warning")
+        grecaptcha.reset(1)
+      }
+
+      $.when(sendRequest({
+        module: "login",
+        action: "passwordRecovery",
+        mail: mail,
+        recaptcha: recaptchaResponse || "",
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+
+        var toggle = UIkit.toggle("#loginForm", {
+          target: "#recoverForm, #confirmForm",
+          animation: "uk-animation-fade"
+        })
+        toggle.toggle()
+        toggle.$destroy()
+        sendNotification("{{i18n/mailSuccess}}", "success")
+      })
+    }
+
+    function confirmCode() {
+      var code = $("#code").val()
+
+      if (!checkPass(code) || code.length != 6) return sendNotification("{{i18n/confirmationCodeInvalidFormat}}", "warning")
+
+      $.when(sendRequest({
+        module: "login",
+        action: "codeVerify",
+        code: code,
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+        var toggle = UIkit.toggle("#loginForm", {
+          target: "#loginForm, #confirmForm",
+          animation: "uk-animation-fade"
+        })
+        toggle.toggle()
+        toggle.$destroy()
+        sendNotification("{{i18n/passwordResetSuccess}}", "success")
+      })
     }
   </script>
 </body>

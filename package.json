@@ -4,27 +4,31 @@
   "description": "...",
   "main": "alay.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ./src/ --ext .ts, .tsx"
   },
   "author": "Salaron",
   "license": "ISC",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.0.0",
-    "@typescript-eslint/parser": "^2.0.0",
-    "eslint": "^6.2.2",
-    "typescript": "^3.5.3"
-  },
-  "dependencies": {
     "@types/circular-json": "^0.4.0",
     "@types/extend": "^3.0.1",
     "@types/formidable": "^1.0.31",
     "@types/mime": "^2.0.1",
     "@types/mysql": "^2.15.7",
-    "@types/node": "^12.7.2",
+    "@types/node": "^12.7.3",
     "@types/nodemailer": "^6.2.1",
     "@types/request": "^2.48.2",
     "@types/showdown": "^1.9.3",
     "@types/sqlite3": "^3.1.5",
+    "@typescript-eslint/eslint-plugin": "^2.1.0",
+    "@typescript-eslint/parser": "^2.1.0",
+    "eslint": "^6.3.0",
+    "eslint-import-resolver-typescript": "^1.1.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-json": "^1.4.0",
+    "typescript": "^3.6.2"
+  },
+  "dependencies": {
     "chalk": "^2.4.2",
     "circular-json": "^0.5.9",
     "extend": "^3.0.2",

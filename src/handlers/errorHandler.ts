@@ -31,7 +31,3 @@ export class ErrorWebApi extends Error {
 (global as any).ErrorCode = ErrorCode;
 (global as any).ErrorUser = ErrorUser;
 (global as any).ErrorWebApi = ErrorWebApi
-
-export async function sendError() {
-
-}

@@ -21,7 +21,13 @@
     "backToLogin": "Вернуться к форме входа",
     "userIdShouldBeInt": "Поле \"User ID\" должно быть целочисленным",
     "successDescriptionLogin": "Вы успешно вошли в аккаунт!<br>Закройте данное окно для входа в игру.",
-    "invalidLoginOrPass": "User ID или пароль указаны неверно"
+    "invalidLoginOrPass": "User ID или пароль указаны неверно",
+    "mailNotExists": "Данная почта отсутствует в базе данных",
+    "sendError": "Произошла ошибка при отправке письма на указанную почту. Попроуйте позже",
+    "passwordResetSuccess": "Новый пароль был отправлен на Вашу почту",
+    "confirmationCodeInvalidFormat": "Поле \"Код подтверждения\" некорректно",
+    "mailSuccess": "Письмо с кодом подтверждения было отправлено на указанную почту",
+    "confirmationCode": "Код подтверждения"
   },
   "login-startup": {
     "nickname": "Никнейм",
@@ -51,5 +57,8 @@
   },
   "noticemarquee": {
     "maintenanceNotice": "В период с {{startDay}} {{startTime}} по {{endDay}} {{endTime}} UTC{{timeZone}} сервер будет отключён для проведения технических работ"
+  },
+  "mailer": {
+
   }
 }

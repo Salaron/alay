@@ -54,9 +54,8 @@ import * as modules from "./common";
 
 // like 'forEach' but async
 Array.prototype.forEachAsync = async function (callback: <T>(element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void> {
-  let array = this
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
+  for (let index = 0; index < this.length; index++) {
+    await callback(this[index], index, this)
   }
 }
 // return random value from array
