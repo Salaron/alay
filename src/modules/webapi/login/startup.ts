@@ -34,7 +34,7 @@ export default class extends WebApiAction {
       await utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
     }
     
-    let code = await i18n.getUserLocalizationCode(this.requestData.auth_level)
+    let code = await i18n.getUserLocalizationCode(<string>this.requestData.auth_token)
     let strings = await i18n.getStrings(code, "login-login", "login-startup")
 
     let pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
