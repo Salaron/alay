@@ -6,7 +6,7 @@ import { Utils } from "../../../common/utils"
 export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH
   public permission: PERMISSION = PERMISSION.XMC
-  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
+  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.UPDATE
 
   constructor(requestData: RequestData) {
     super(requestData)
