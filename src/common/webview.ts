@@ -34,13 +34,14 @@ export class WebView {
     })).cnt
   }
 
+  public async getLanguageModalTemplate(userId: number): Promise<string>
   public async getLanguageModalTemplate(token: string): Promise<string>
-  public async getLanguageModalTemplate(userId: number | string): Promise<string> {
+  public async getLanguageModalTemplate(input: number | string): Promise<string> {
     let template = await WebView.getTemplate("common", "changelanguage")
 
     return template({
       languageList: Config.i18n.languages,
-      currentLanguage: await new I18n(this.connection).getUserLocalizationCode(<any>userId)
+      currentLanguage: await new I18n(this.connection).getUserLocalizationCode(<any>input)
     })
   }
 }

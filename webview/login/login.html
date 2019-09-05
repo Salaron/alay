@@ -149,7 +149,7 @@
   <script type="text/javascript">
     // RSA preparation
     var RSAEncrypt = new JSEncrypt()
-    RSAEncrypt.setKey(`{{PublicKey}}`)
+    RSAEncrypt.setKey(`{{publicKey}}`)
     if (window.history.length != 1) $("body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
 

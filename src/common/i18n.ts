@@ -138,7 +138,6 @@ export class I18n {
 
   public static async clearCache() {
     cache = {}
-    mdCache = {}
     await init()
   }
 }
