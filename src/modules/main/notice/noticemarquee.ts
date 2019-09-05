@@ -2,6 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import moment from "moment"
 import { Utils } from "../../../common/utils"
+import { I18n } from "../../../common/i18n"
 
 export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
@@ -13,11 +14,10 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    const utils = new Utils(this.connection)
-    let langCode = await utils.getUserLangCode(this.user_id, false)
-    let i18n = await utils.loadLocalization("noticemarquee")
-    let strings = i18n[langCode]
-    if (Type.isNullDef(strings)) throw new Error(`Can't find language settings for code ${langCode}`)
+    const i18n = new I18n(this.connection)
+
+    let langCode = await i18n.getUserLocalizationCode(this.user_id)
+    let strings = await new I18n(this.connection).getStrings(langCode, "noticemarquee")
 
     let response = {
       item_count: 0,

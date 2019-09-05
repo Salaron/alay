@@ -1,9 +1,9 @@
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../core/requestData"
 import { TYPE } from "../../../common/type"
+import { I18n } from "../../../common/i18n"
 
-const supportedParams = Config.i18n.supportedLanguages
-const convert = Config.i18n.langCodes
+const langCodes = Object.values(Config.i18n.languages)
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -14,24 +14,14 @@ export default class extends WebApiAction {
 
   public paramTypes() {
     return {
-      lang: TYPE.STRING
+      code: TYPE.STRING
     }
   }
 
   public async execute() {
-    if (!supportedParams.includes(this.params.lang)) throw new Error(`Unsupported language`)
-    let langCode = convert[this.params.lang]
-    if (!langCode) throw new Error(`Can't find suitable language code`)
-    let query = "UPDATE users SET language = :lang WHERE user_id = :user"
-
-    if (this.requestData.auth_level === AUTH_LEVEL.PRE_LOGIN) {
-      query = "UPDATE auth_tokens SET language = :lang WHERE token = :token"
-    }
-    await this.connection.execute(query, {
-      lang: langCode,
-      user: this.user_id,
-      token: this.requestData.auth_token
-    })
+    if (!langCodes.includes(this.params.code)) throw new Error(`Unsupported language code`)
+    let input: any = this.user_id === null ? this.requestData.auth_token : this.user_id
+    await new I18n(this.connection).setUserLocalizationCode(input, this.params.code)
 
     return {
       status: 200,

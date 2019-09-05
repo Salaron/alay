@@ -1,5 +1,6 @@
 import { Utils } from "./utils"
 import { Connection } from "../core/database_wrappers/mysql"
+import { I18n } from "./i18n"
 
 enum noticeType {
   REMOVED_FROM_FRIENDS = 1,
@@ -26,9 +27,8 @@ export class Notice {
 
   public async getNoticeStrings(userId: number) {
     // based on current user language
-    const utils = new Utils(this.connection)
-    let code = await utils.getUserLangCode(userId)
-    return (await utils.loadLocalization("notice"))[code]
+    let i18n = new I18n(this.connection)
+    return i18n.getStrings(userId, "notice")
   }
 
   public async getPreparedMessage(userId: number, noticeTypeId: noticeType | number, values: any) {

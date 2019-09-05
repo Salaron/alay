@@ -2,8 +2,7 @@ import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../core/requestData"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
-
-let i18n: any = {}
+import { I18n } from "../../../common/i18n"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -23,15 +22,14 @@ export default class extends WebApiAction {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorWebApi("Access only with a certain auth level")
 
     const utils = new Utils(this.connection)
+    const i18n = new I18n(this.connection)
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
       await utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
     }
 
-    let code = await utils.getUserLangCode(this.user_id, true, <string>this.requestData.auth_token)
-    if (Object.keys(i18n).length === 0) i18n = await utils.loadLocalization("login-startup", "login-login")
-    let strings = i18n[code]
-    if (Type.isNullDef(strings)) throw new Error(`Can't find language settings for code ${code}`)
+    let code = await i18n.getUserLocalizationCode(this.requestData.auth_level)
+    let strings = await i18n.getStrings(code, "login-login", "login-startup")
 
     let userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })
     if (!userData) throw new ErrorWebApi(strings.mailNotExists, true)

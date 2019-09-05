@@ -1,0 +1,18 @@
+<div id="languageSelect" uk-modal>
+  <div class="uk-modal-dialog">
+    <button class="uk-modal-close-default" type="button" uk-close></button>
+    <div class="uk-modal-header">
+      <h2 class="uk-modal-title uk-dark">Select Language</h2>
+    </div>
+    <div class="uk-modal-body">
+      {{#each languageList}}
+      {{#equal this ../currentLanguage}}
+      <label><input class="uk-radio" type="radio" name="language_radio" value="{{this}}" checked> {{@key}}</label>
+      {{else}}
+      <label><input class="uk-radio" type="radio" name="language_radio" value="{{this}}"> {{@key}}</label>
+      {{/equal}}
+      <br>
+      {{/each}}
+    </div>
+  </div>
+</div>

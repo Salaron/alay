@@ -188,39 +188,6 @@ export class Utils {
     )
   }
 
-  public async getCurrentOnline() {
-    return (await this.connection.first("SELECT COUNT(*) as cnt FROM user_login WHERE last_activity>:now", {
-      now: moment(new Date()).subtract(10, "minutes").format("YYYY-MM-DD HH:mm:ss")
-    })).cnt
-  }
-  public async loadLocalization(...sections: string[]) {
-    let result: any = {}
-    let defaultStr = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${Config.i18n.defaultLanguage}.json`, `utf-8`))
-
-    for (let langName in Config.i18n.langCodes) {
-      let langCode = Config.i18n.langCodes[langName]
-      let file
-      try {
-        file = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${langCode}.json`, `utf-8`))
-      } catch (err) {
-        err.message = `Can't parse file with strings for '${langName}' language`
-        throw err
-      }
-      result[langCode] = {}
-      for (let section of sections) {
-        extend(true, result[langCode], defaultStr[section], file[section])
-      }
-      extend(true, result[langCode], defaultStr["common"] || {}, file["common"])
-    }
-    return result
-  }
-  public async getUserLangCode(userId: number | null, preLogin = false, token?: string): Promise<string> {
-    if (preLogin === true) {
-      return (await this.connection.first("SELECT language FROM auth_tokens WHERE token = :token", { token: token })).language
-    }
-    return (await this.connection.first("SELECT language FROM users WHERE user_id=:user", { user: userId })).language
-  }
-
   public async reCAPTCHAverify(userToken: string, userIp?: string) {
     let { body } = (await promisify(request.post)(<any>"https://www.google.com/recaptcha/api/siteverify", <any>{
       form: {

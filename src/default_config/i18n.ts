@@ -1,6 +1,5 @@
 export default <I18n>{
-  supportedLanguages: ["Русский", "English (US)"],
-  langCodes: {
+  languages: {
     "English (US)": "en",
     "Русский": "ru"
   },

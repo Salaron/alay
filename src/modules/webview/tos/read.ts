@@ -1,16 +1,7 @@
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
-import { readFile } from "fs"
-import { promisify } from "util"
-import showdown from "showdown"
-import Handlebars from "handlebars"
-import { Utils } from "../../../common/utils"
-
-const converter = new showdown.Converter({
-  tables: true, 
-  simpleLineBreaks: true, 
-  requireSpaceBeforeHeadingText: true
-})
+import { I18n } from "../../../common/i18n"
+import { WebView } from "../../../common/webview"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -20,27 +11,22 @@ export default class extends WebViewAction {
     super(requestData)
   }
   public async execute() {
-    const utils = new Utils(this.connection)
+    const i18n = new I18n(this.connection)
 
-    let userLanguage = Config.i18n.defaultLanguage
-    if (this.user_id != null) userLanguage = await utils.getUserLangCode(this.user_id)
-    let html = await promisify(readFile)(`${rootDir}/webview/tos/read.html`, "UTF-8")
-    let tos = ``
+    let code = Config.i18n.defaultLanguage
     try {
-      tos = await promisify(readFile)(`${rootDir}/i18n/TOS/${userLanguage}.md`, "UTF-8")
-    } catch (err) {
-      tos = await promisify(readFile)(`${rootDir}/i18n/TOS/${Config.i18n.defaultLanguage}.md`, "UTF-8")
-      let warningString = await utils.loadLocalization("common")
-      tos = `*${warningString[userLanguage].notTranslated}*\n\n${tos}`
-    }
+      // @ts-ignore
+      code = await i18n.getUserLocalizationCode(this.user_id || this.requestData.auth_token)
+    } catch (_) { }
+    let template = await WebView.getTemplate("tos", "read")
 
     let values = {
-      tos: converter.makeHtml(tos.replace(/--/gi, "—")),
+      tos: await i18n.getMarkdown(code, i18n.markdownType.TOS),
       external: this.requestData.requestFromBrowser
     }
     return {
       status: 200,
-      result: Handlebars.compile(html)(values)
+      result: template(values)
     }
   }
 }

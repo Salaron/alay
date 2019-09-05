@@ -8,6 +8,8 @@ import * as item from "./item"
 import * as secretbox from "./secretbox"
 import * as notice from "./notice"
 import * as download from "./download"
+import * as i18n from "./i18n"
+import * as webview from "./webview"
 
 export {
   item,
@@ -19,5 +21,7 @@ export {
   event,
   secretbox,
   notice,
-  download
+  download,
+  i18n,
+  webview
 }

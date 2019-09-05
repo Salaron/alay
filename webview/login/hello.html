@@ -23,24 +23,6 @@
   class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden"
   data-uk-height-viewport>
 
-  <div id="languageSelect" uk-modal>
-    <div class="uk-modal-dialog">
-      <button class="uk-modal-close-default" type="button" uk-close></button>
-      <div class="uk-modal-header">
-        <h2 class="uk-modal-title uk-dark">Select Language</h2>
-      </div>
-      <div class="uk-modal-body">
-        {{#each languageList}}
-        {{#equal this ../currentLanguage}}
-        <label><input class="uk-radio" type="radio" name="language_radio" value="{{this}}" checked> {{this}}</label>
-        {{else}}
-        <label><input class="uk-radio" type="radio" name="language_radio" value="{{this}}"> {{this}}</label>
-        {{/equal}}
-        <br>
-        {{/each}}
-      </div>
-    </div>
-  </div>
   <div class="uk-overlay-primary uk-position-cover">
     <a id="changeLanguage" style="margin: 10px;" class="uk-icon-button uk-position-right lang-button"
       uk-icon="icon: world; ratio: 1.25"></a>
@@ -57,30 +39,15 @@
     <a class="uk-button uk-button-default uk-border-pill" href="/webview.php/tos/read">{{i18n/tos}}</a>
   </div>
 
+  {{{changeLanguageModal}}}
+
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script type="">
     var headers = {{{headers}}}
-  </script>
-  <script>
-    $('#changeLanguage').on('click', function () {
-      UIkit.modal('#languageSelect').toggle()
-    })
-    $("input[type=radio][name='language_radio']").change(function () {
-      var params = {
-        module: "settings",
-        action: "changeLanguage",
-        lang: $(this).val(),
-        timestamp: Math.floor(Date.now() / 1000)
-      }
-      $.when(sendRequest(params)).done(function (response) {
-        if (response.error || response.maintenance) return
-        sendNotification("{{i18n/langChangeSuccess}}", "success")
-        setTimeout(window.location.reload.bind(window.location), 1000)
-      })
-    })
   </script>
 </body>
 

@@ -1,11 +1,7 @@
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
-import { readFile } from "fs"
-import { promisify } from "util"
-import Handlebars from "handlebars"
-import { Utils } from "../../../common/utils"
-
-let i18n: any = {}
+import { I18n } from "../../../common/i18n"
+import { WebView } from "../../../common/webview"
 
 export default class extends WebViewAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -17,16 +13,14 @@ export default class extends WebViewAction {
 
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
-    const utils = new Utils(this.connection)
+    const i18n = new I18n(this.connection)
 
-    let code = await utils.getUserLangCode(this.user_id, true, <string>this.requestData.auth_token)
-    if (Object.keys(i18n).length === 0) i18n = await utils.loadLocalization("login-startup", "login-login")
-    let strings = i18n[code]
-    if (Type.isNullDef(strings)) throw new Error(`Can't find language settings for code ${code}`)
+    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-startup", "login-login")
+    let template = await WebView.getTemplate("login", "login")
 
     let values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      PublicKey: Config.server.PUBLIC_KEY.toString(),
+      publicKey: Config.server.PUBLIC_KEY.toString(),
       module: "login",
       external: this.requestData.requestFromBrowser,
       enableRecaptcha: Config.modules.login.enable_recaptcha,
@@ -35,7 +29,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/login/login.html`, "UTF-8"))(values)
+      result: template(values)
     }
   }
 }

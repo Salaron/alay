@@ -6,7 +6,7 @@
   <title>SunLight Admin Page</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=880, user-scalable=no">
+  <meta name="viewport" content="user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
@@ -17,33 +17,56 @@
   <div id="outer">
     <div id="inner">
       <div id="header">
-        <div class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
-          uk-sticky="bottom: #offset">
-          <nav class="uk-navbar">
-            <div class="uk-navbar-center" id="navbar">
-              <ul class="uk-navbar-nav">
-                <li><a href="/webview.php/announce/index">Новости</a></li>
-                <li><a href="/webview.php/profile/index">Профиль</a></li>
-                <li><a href="/webview.php/settings/index">Настройки</a></li>
-                <li class="uk-active" onclick="return false;"><a href="/webview.php/admin/index">APanel</a></li>
-              </ul>
-            </div>
+        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
+          uk-sticky="bottom: #offset" uk-navbar="mode: click">
 
-            {{#unless external}}
-            <div class="uk-navbar-left">
-              <ul class="uk-navbar-nav">
-                <li><a id="external" uk-icon="expand" href=""></a></li>
-              </ul>
-            </div>
-            {{/unless}}
-            <div class="uk-navbar-right">
-              <ul class="uk-navbar-nav">
-                <li><a uk-icon="users">{{currentOnline}}</a></li>
-              </ul>
-            </div>
-          </nav>
-        </div>
+          <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav">
+              <li>
+                <a uk-icon="menu"></a>
+                <div class="uk-navbar-dropdown">
+                  <ul class="uk-nav uk-dropdown-nav">
+                    <li><a href="/webview.php/announce/index">
+                        <span uk-icon="home" class="uk-icon"></span> {{i18n/announce}}
+                      </a></li>
+                    <li><a href="/webview.php/profile/index">
+                        <span uk-icon="user" class="uk-icon"></span> {{i18n/profile}}
+                      </a></li>
+                    <li><a href="/webview.php/settings/index">
+                        <span uk-icon="settings" class="uk-icon"></span> {{i18n/settings}}
+                      </a></li>
+                      
+                    <li><a href="/webview.php/server/info">
+                        <span uk-icon="nut" class="uk-icon"></span> About
+                      </a></li>
+
+                    <li class="uk-nav-divider"></li>
+                    <li><a id="changeLanguage"><span uk-icon="world" class="uk-icon"></span> Change Language</a>
+                    </li>
+
+                    <li class="uk-active"><a>
+                        <span uk-icon="star" class="uk-icon"></span> APanel
+                      </a></li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="uk-navbar-center">
+            <ul class="uk-navbar-nav">
+              <li class="uk-active"><a class="uk-text-bold">APanel</a></li>
+            </ul>
+          </div>
+
+          <div class="uk-navbar-right">
+            <ul class="uk-navbar-nav">
+              <li><a uk-icon="users">{{currentOnline}}</a></li>
+            </ul>
+          </div>
+        </nav>
       </div>
+      <!-- /header -->
 
       <div id="body">
         <div class="uk-flex uk-margin-top">
@@ -80,6 +103,8 @@
           href="/webview.php/admin/markdown">Markdown Editor</a>
       </div>
     </div>
+
+    {{{changeLanguageModal}}}
   </div>
 
   <!-- JS FILES -->
@@ -88,6 +113,10 @@
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
+  <script type="text/javascript" src="/resources/js/change-language.js"></script>
+  <script type="">
+    var headers = {{{headers}}}
+  </script>
   <script>
     new PerfectScrollbar('#body', { suppressScrollX: true })
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))

@@ -18,8 +18,7 @@ interface Database {
   database: string
 }
 interface I18n {
-  supportedLanguages: string[]
-  langCodes: langCodes
+  languages: langCodes
   defaultLanguage: string
 }
 interface langCodes {
