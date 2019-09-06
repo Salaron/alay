@@ -94,7 +94,7 @@
   <script>
     var announceTotal = 1 // Start from 1 so that we can load the list
     var loadAttempt = 0 // Just in case, in order not to overload the server
-    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
+    var ps = new PerfectScrollbar('#body', { suppressScrollX: true }) 
     var announceTemplate = Handlebars.templates["announce-index"]
 
     $(document).ready(function () {
@@ -140,10 +140,12 @@
         announceTotal = response.response_data.total
         response.response_data.more = "{{{i18n/more}}}"
         $("#body").append(announceTemplate(response.response_data))
+        // fix incorrect height on load
+        $("#body").height($(window).height() - $("#body").offset().top - 20) 
         ps.update()
         if (before === $(".uk-card-header").length) loadAttempt += 1
         else loadAttempt = 0
-        callback()
+        if (callback) callback()
       })
     }
 

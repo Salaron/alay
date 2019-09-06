@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>SunLight Admin Page</title>
+  <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, user-scalable=no">
@@ -16,6 +16,7 @@
 <body>
   <div id="outer">
     <div id="inner">
+      <!-- header -->
       <div id="header">
         <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
           uk-sticky="bottom: #offset" uk-navbar="mode: click">
@@ -36,15 +37,18 @@
                         <span uk-icon="settings" class="uk-icon"></span> {{i18n/settings}}
                       </a></li>
 
-                    <li><a href="/webview.php/server/info">
+                    <li class="uk-active"><a>
                         <span uk-icon="nut" class="uk-icon"></span> {{i18n/aboutServer}}
                       </a></li>
 
                     <li class="uk-nav-divider"></li>
-
-                    <li class="uk-active"><a>
+                    <li><a id="changeLanguage"><span uk-icon="world" class="uk-icon"></span> Change Language</a>
+                    </li>
+                    {{#if isAdmin}}
+                    <li><a href="/webview.php/admin/index">
                         <span uk-icon="star" class="uk-icon"></span> APanel
                       </a></li>
+                    {{/if}}
                   </ul>
                 </div>
               </li>
@@ -53,7 +57,7 @@
 
           <div class="uk-navbar-center">
             <ul class="uk-navbar-nav">
-              <li class="uk-active"><a class="uk-text-bold">APanel</a></li>
+              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">{{i18n/aboutServer}}</a></li>
             </ul>
           </div>
 
@@ -67,42 +71,10 @@
       <!-- /header -->
 
       <div id="body">
-        <div class="uk-flex uk-margin-top">
-          <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-3"
-            href="/webview.php/admin/addPresent">Add
-            present</a>
-          <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-3 uk-margin-left"
-            href="/webview.php/admin/addAnnounce">Add
-            Announce</a>
-          <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-3 uk-margin-left"
-            href="/webview.php/admin/AddPersonalNotice">Add
-            Personal Notice</a>
-        </div>
-
-        <div class="uk-flex uk-margin-top">
-          <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-3"
-            href="/webview.php/admin/addSecretbox">Add
-            Secretbox</a>
-          <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-3 uk-margin-left"
-            href="/webview.php/admin/addlBonus">Add Login Bonus Sheet</a>
-          <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-3 uk-margin-left"
-            href="/webview.php/admin/addExchangeItem">Add Exchange Item</a>
-        </div>
-
-        <div class="uk-flex uk-margin-top">
-          <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-2"
-            href="/webview.php/admin/userInfo">Get User
-            Info</a>
-          <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-2 uk-margin-left"
-            href="/webview.php/admin/log">Get Log</a>
-        </div>
-
-        <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-1 uk-margin-top"
-          href="/webview.php/admin/markdown">Markdown Editor</a>
       </div>
-    </div>
 
-    {{{changeLanguageModal}}}
+      {{{changeLanguageModal}}}
+    </div>
   </div>
 
   <script type="">
@@ -116,9 +88,9 @@
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
+
   <script>
     new PerfectScrollbar('#body', { suppressScrollX: true })
-    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))
   </script>
 </body>
 

@@ -11,18 +11,12 @@ export default class extends WebViewAction {
     super(requestData)
   }
 
-  public paramTypes() {
-    return {
-      //id: TYPE.STRING
-    }
-  }
-
   public async execute() {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
     let strings = await i18n.getStrings(this.user_id, "common")
-    let template = await WebView.getTemplate("profile", "index")
+    let template = await WebView.getTemplate("server", "info")
 
     let values = {
       i18n: strings,

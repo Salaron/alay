@@ -3,7 +3,7 @@
     "announce": "News",
     "settings": "Settings",
     "profile": "Profile",
-    "aboutServer": "About",
+    "aboutServer": "About server",
     "notTranslated": "This page does not yet have a translation for your language :<"
   },
   "annouce-index": {
@@ -67,6 +67,6 @@
     "bodyPasswordRecovered": "The password for your account has been successfully changed!\n\nUse data below to login in your account:\nUser ID: {{userId}}\nPassword: {{password}}\n\nWe recommend changing the password in the settings after login.",
 
     "subjectWelcome": "Welcome!",
-    "bodyWelcome": "Hey {{userName}}!\n\nYou received this email because your mail was indicated at registration on the private server for the game Love Live! School Idol Festival.\n\nIn the future, this email address mail will be used to notify and confirm actions associated with your account.\n\nThank You for playing :з"
+    "bodyWelcome": "Hey {{userName}}!\n\nYou received this email because your mail was indicated at registration on the private server for the game Love Live! School Idol Festival.\n\nIn the future, this email address mail will be used to notify and confirm actions associated with your account.\n\nThank You for playing! :з"
   }
 }
