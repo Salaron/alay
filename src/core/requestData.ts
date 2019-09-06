@@ -175,6 +175,10 @@ export default class RequestData {
       if (moment().diff(check.last_activity, "second") >= Config.modules.user.userSessionExpire) return this.auth_level = AUTH_LEVEL.SESSION_EXPIRED
       if (!this.requestFromBrowser && Utils.versionCompare(<string>this.request.headers["client-version"] || "0.0", Config.server.server_version) === -1) return this.auth_level = AUTH_LEVEL.UPDATE
 
+      await this.connection.execute("UPDATE user_login SET last_activity = CURRENT_TIMESTAMP WHERE user_id = :user AND login_token = :token", {
+        user: this.user_id,
+        token: this.auth_token
+      })
       if (Config.server.admin_ids.includes(this.user_id)) return this.auth_level = AUTH_LEVEL.ADMIN
       else return this.auth_level = AUTH_LEVEL.CONFIRMED_USER
     }
