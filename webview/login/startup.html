@@ -138,7 +138,8 @@
 
         $("#dialog, #back").hide()
         $("#notice").html(replacePlaceholders($("#notice").html(), {
-          userId: response.response_data.user_id
+          userId: response.response_data.user_id,
+          mail: response.response_data.mail_sended === true ? "{{{i18n/checkMail}}}" : ""
         })).removeAttr("hidden").show()
       })
     }

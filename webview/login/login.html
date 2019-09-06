@@ -223,7 +223,7 @@
     function confirmCode() {
       var code = $("#code").val()
 
-      if (!checkPass(code) || code.length != 6) return sendNotification("{{i18n/confirmationCodeInvalidFormat}}", "warning")
+      if (!checkPass(code) || code.length != 10) return sendNotification("{{i18n/confirmationCodeInvalidFormat}}", "warning")
 
       $.when(sendRequest({
         module: "login",

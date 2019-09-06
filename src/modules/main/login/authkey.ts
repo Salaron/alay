@@ -84,9 +84,8 @@ export default class extends MainAction {
       } else return trick
 
       let token = Utils.randomString(80 + Math.floor(Math.random() * 10))
-      await this.connection.query("INSERT INTO auth_tokens (token, expire, session_key, login_key, login_passwd, language) VALUES (:token, :expire, :sk, :lk, :lp, 'ru')", {
+      await this.connection.query("INSERT INTO auth_tokens (token, expire, session_key, login_key, login_passwd, language) VALUES (:token, DATE_ADD(NOW(), INTERVAL 30 MINUTE), :sk, :lk, :lp, 'ru')", {
         token: token,
-        expire: Utils.parseDate(Date.now() + 1200000),
         sk: sessionKey,
         lk: loginKey,
         lp: loginPaswd

@@ -2,8 +2,6 @@ import { Log } from "../core/log"
 import crypto from "crypto"
 import moment from "moment"
 import { promisify } from "util"
-import { readFile } from "fs"
-import extend from "extend"
 import request from "request"
 import { Connection } from "../core/database_wrappers/mysql"
 
@@ -15,9 +13,15 @@ export async function init() {
     try {
       let connection = await MySQLconnection.get()
       try {
-        let tokens = await connection.query("SELECT * FROM auth_tokens WHERE expire <= CURRENT_TIMESTAMP")
+        let [tokens, codes] = await Promise.all([
+          connection.query("SELECT * FROM auth_tokens WHERE expire <= CURRENT_TIMESTAMP"),
+          connection.query("SELECT * FROM auth_recovery_codes WHERE expire <= CURRENT_TIMESTAMP")
+        ])
         await tokens.forEachAsync(async (token) => {
           await connection.query("DELETE FROM auth_tokens WHERE token=:token", { token: token.token })
+        })
+        await codes.forEachAsync(async (code) => {
+          await connection.query("DELETE FROM auth_recovery_codes WHERE token = :token", { token: code.token })
         })
         await connection.commit()
       } catch (err) {
@@ -188,7 +192,7 @@ export class Utils {
     )
   }
 
-  public async reCAPTCHAverify(userToken: string, userIp?: string) {
+  public static async reCAPTCHAverify(userToken: string, userIp?: string) {
     let { body } = (await promisify(request.post)(<any>"https://www.google.com/recaptcha/api/siteverify", <any>{
       form: {
         secret: Config.modules.login.recaptcha_private_key,

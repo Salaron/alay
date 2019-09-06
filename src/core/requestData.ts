@@ -92,10 +92,11 @@ export default class RequestData {
           this.auth_token = this.params.token
           this.requestFromBrowser = true
         } else if (
-          !isNaN(parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id"))) &&
           getCookie(<string>this.headers["cookie"] || "", "token") != null
         ) { // cookie
-          this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id"))
+          if (!isNaN(parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id")))) {
+            this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id"))
+          }
           this.auth_token = getCookie(<string>this.headers["cookie"] || "", "token")
           this.requestFromBrowser = true
         }

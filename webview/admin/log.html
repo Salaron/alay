@@ -42,15 +42,19 @@
     </div>
   </div>
 
-  <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="">
+    var headers = {{{headers}}}
+    var enableResize = true
+  </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
 
   <script>
-    new PerfectScrollbar('#body', { suppressScrollX: true })
-    var headers = JSON.parse(escapeJSON('{{{headers}}}'))
+    let ps = new PerfectScrollbar('#body', { suppressScrollX: true })
 
     function update() {
       $.when(sendRequest({
@@ -62,6 +66,7 @@
         $("#warn").scrollTop($("#warn")[0].scrollHeight)
         $("#error").html(response.response_data.error)
         $("#error").scrollTop($("#error")[0].scrollHeight)
+        ps.update()   
       })
     }
     $(document).ready(function () {

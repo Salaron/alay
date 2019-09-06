@@ -40,8 +40,8 @@ export default class extends WebViewAction {
         throw new ErrorUser("Attempt to get access to admin panel", this.user_id)
       }
     }
-
-    let strings = await new I18n(this.connection).getStrings(this.user_id)
+    let strings = await new I18n(this.connection).getStrings(Config.i18n.defaultLanguage, "login-login", "login-startup")
+    
     let values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       publicKey: Config.server.PUBLIC_KEY.toString(),
@@ -51,7 +51,6 @@ export default class extends WebViewAction {
       external: this.requestData.requestFromBrowser,
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,
-      changeLanguageModal: await webview.getLanguageModalTemplate(this.user_id),
       i18n: strings
     }
 

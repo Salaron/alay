@@ -27,15 +27,13 @@ export default class extends WebApiAction {
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
     
-    const utils = new Utils(this.connection)
     const i18n = new I18n(this.connection)
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
-      await utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
+      await Utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
     }
     
-    let code = await i18n.getUserLocalizationCode(<string>this.requestData.auth_token)
-    let strings = await i18n.getStrings(code, "login-login", "login-startup")
+    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup", "mailer")
 
     let pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     if (!checkPass(pass)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
@@ -72,14 +70,17 @@ export default class extends WebApiAction {
     })
 
     // send mail
-    await Mailer.sendMail(this.params.mail, "Добро пожаловать!", `Привет, ${this.params.name}!\n\nВы получили данное письмо, потому что Ваша почта была указана при регистрации на пользовательском сервере по игре Love Live! School Idol Festival.\n\nВ дальнейшем этот адрес эл. почты будет использоваться для оповещения и подтверждения действий, связанных с Вашим аккаунтом.`)
+    let status = await Mailer.sendMail(this.params.mail, strings.subjectWelcome, Utils.prepareTemplate(strings.bodyWelcome, {
+      userName: this.params.name
+    }))
 
     // Destroy current token
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })
     return {
       status: 200,
       result: {
-        user_id: this.user_id
+        user_id: this.user_id,
+        mail_sended: status != false
       }
     }
   }

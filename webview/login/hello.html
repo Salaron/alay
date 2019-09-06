@@ -49,6 +49,14 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
+  <script>
+    setCookie("user_id", "", 1)
+    var values = window.location.href.split("?")[1]
+    if (values) {
+      values = parseQueryString(values)
+      if (values.token) setCookie("token", values.token, 1)
+    }
+  </script>
 </body>
 
 </html>

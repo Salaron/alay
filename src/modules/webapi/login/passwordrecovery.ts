@@ -20,26 +20,31 @@ export default class extends WebApiAction {
 
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorWebApi("Access only with a certain auth level")
-
-    const utils = new Utils(this.connection)
-    const i18n = new I18n(this.connection)
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
-      await utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
+      await Utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
     }
+    const i18n = new I18n(this.connection)
 
-    let code = await i18n.getUserLocalizationCode(<string>this.requestData.auth_token)
-    let strings = await i18n.getStrings(code, "login-login", "login-startup")
-
+    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
     let userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })
     if (!userData) throw new ErrorWebApi(strings.mailNotExists, true)
-    // TODO: verify attempts caching
-    // Token expiration
 
-    let confirmationToken = Utils.randomString(6)
+    let confirmationCode = Utils.randomString(10, "upper")
+    await this.connection.execute(`
+    INSERT INTO auth_recovery_codes (token, code, mail, expire) VALUES (:token, :code, :mail, DATE_ADD(NOW(), INTERVAL 30 MINUTE)) 
+    ON DUPLICATE KEY UPDATE code = :code, expire = DATE_ADD(NOW(), INTERVAL 30 MINUTE)`, {
+      token: this.requestData.auth_token,
+      code: confirmationCode,
+      mail: userData.mail
+    })
 
-    //let result = await Mailer.sendMail(userData.mail, "Восстановление пароля", `Привет, ${userData.name}!\n\nВы получили это письмо, поскольку был сделан запрос на восстановление пароля от Вашего аккаунта.\nЕсли Вы этого не делали, то проигнорируйте это сообщение.\n\nДля восстановления пароля введите данный код подтверждения: ${confirmationToken}\nIP адрес отправителя: ${this.requestData.request.connection.remoteAddress}`)
-    if (undefined) throw new ErrorWebApi(strings.sendError, true)
+    let result = await Mailer.sendMail(userData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovery, {
+      userName: userData.name,
+      code: confirmationCode,
+      ip: this.requestData.request.connection.remoteAddress
+    }))
+    if (!result) throw new ErrorWebApi(strings.sendError, true)
     return {
       status: 200,
       result: true
