@@ -35,7 +35,7 @@
                     <li><a href="/webview.php/settings/index">
                         <span uk-icon="settings" class="uk-icon"></span> {{i18n/settings}}
                       </a></li>
-                      
+
                     <li><a href="/webview.php/server/info">
                         <span uk-icon="nut" class="uk-icon"></span> About
                       </a></li>
@@ -107,16 +107,17 @@
     {{{changeLanguageModal}}}
   </div>
 
-  <!-- JS FILES -->
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
-  <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script type="">
     var headers = {{{headers}}}
+    var enableResize = true
   </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
+  <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script>
     new PerfectScrollbar('#body', { suppressScrollX: true })
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))

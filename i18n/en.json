@@ -3,6 +3,7 @@
     "announce": "News",
     "settings": "Settings",
     "profile": "Profile",
+    "aboutServer": "About",
     "notTranslated": "This page does not yet have a translation for your language :<"
   },
   "annouce-index": {
@@ -20,7 +21,13 @@
     "backToLogin": "Back to Login",
     "userIdShouldBeInt": "Field \"User ID\" should be int",
     "successDescriptionLogin": "You have successfully logged in!<br>Close this window to enter the game.",
-    "invalidLoginOrPass": "Invalid User ID or password"
+    "invalidLoginOrPass": "Invalid User ID or password",
+    "mailNotExists": "Account with this E-mail does not exist",
+    "sendError": "An error occurred while sending the letter. Try again later",
+    "passwordResetSuccess": "A new password has been sent to your mail",
+    "confirmationCodeInvalidFormat": "Field \"Verification code\" is invalid",
+    "mailSuccess": "A letter with a verification code was sent to the specified E-mail",
+    "confirmationCode": "Verification code"
   },
   "login-startup": {
     "nickname": "Nickname",

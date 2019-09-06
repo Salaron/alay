@@ -6,7 +6,7 @@
   <title>SunLight Login</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
 </head>
 
@@ -109,7 +109,8 @@
         <div class="uk-margin-small">
           <div class="uk-inline uk-width-1-1">
             <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
-            <input id="code" class="uk-input uk-border-pill" required placeholder="{{i18n/confirmationCode}}" type="text">
+            <input id="code" class="uk-input uk-border-pill" required placeholder="{{i18n/confirmationCode}}"
+              type="text">
           </div>
         </div>
 
@@ -135,17 +136,18 @@
     </p>
   </div>
 
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
-  <script type="text/javascript" src='https://www.recaptcha.net/recaptcha/api.js'></script>
   <script type="">
     // fix error? o.O
     var headers = {{{headers}}}
     var recaptchaEnabled = {{{enableRecaptcha}}}
   </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
+  <script type="text/javascript" src='https://www.recaptcha.net/recaptcha/api.js'></script>
+
   <script type="text/javascript">
     // RSA preparation
     var RSAEncrypt = new JSEncrypt()

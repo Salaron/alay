@@ -6,16 +6,17 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="user-scalable=no">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
 </head>
 
-<body>
+<body class="uk-height-viewport">
   <div id="outer">
     <div id="inner">
+      <!-- header -->
       <div id="header">
         <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
           uk-sticky="bottom: #offset" uk-navbar="mode: click">
@@ -35,9 +36,9 @@
                     <li><a href="/webview.php/settings/index">
                         <span uk-icon="settings" class="uk-icon"></span> {{i18n/settings}}
                       </a></li>
-                      
+
                     <li><a href="/webview.php/server/info">
-                        <span uk-icon="nut" class="uk-icon"></span> About
+                        <span uk-icon="nut" class="uk-icon"></span> {{i18n/aboutServer}}
                       </a></li>
 
                     <li class="uk-nav-divider"></li>
@@ -76,17 +77,20 @@
     </div>
   </div>
 
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/handlebars.runtime.min.js"></script>
-  <script type="text/javascript" src="/resources/templates/announce-index.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
-  <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script type="">
     var headers = {{{headers}}}
+    var enableResize = true
   </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+
+  <script type="text/javascript" src="/resources/js/handlebars.runtime.min.js"></script>
+  <script type="text/javascript" src="/resources/templates/announce-index.js"></script>
+  
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
+  <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script>
     var announceTotal = 1 // Start from 1 so that we can load the list
     var loadAttempt = 0 // Just in case, in order not to overload the server

@@ -6,7 +6,7 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="user-scalable=no">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
@@ -27,7 +27,7 @@
                 <a uk-icon="menu"></a>
                 <div class="uk-navbar-dropdown">
                   <ul class="uk-nav uk-dropdown-nav">
-                    <li><a href="/webview.php/announce/index" class="transition">
+                    <li><a href="/webview.php/announce/index">
                         <span uk-icon="home" class="uk-icon"></span> {{i18n/announce}}
                       </a></li>
                     <li class="uk-active"><a>
@@ -36,9 +36,9 @@
                     <li><a href="/webview.php/settings/index">
                         <span uk-icon="settings" class="uk-icon"></span> {{i18n/settings}}
                       </a></li>
-                      
+
                     <li><a href="/webview.php/server/info">
-                        <span uk-icon="nut" class="uk-icon"></span> About
+                        <span uk-icon="nut" class="uk-icon"></span> {{i18n/aboutServer}}
                       </a></li>
 
                     <li class="uk-nav-divider"></li>
@@ -77,15 +77,18 @@
     </div>
   </div>
 
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
-  <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script type="">
     var headers = {{{headers}}}
+    var enableResize = true
   </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
+  <script type="text/javascript" src="/resources/js/change-language.js"></script>
+
   <script>
     new PerfectScrollbar('#body', { suppressScrollX: true })
   </script>

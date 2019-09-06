@@ -4,9 +4,6 @@
   margin: 0;
   padding: 0;
   border: 0;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
 }
 body {
   font-size: 22px;
@@ -16,6 +13,7 @@ body {
 }
 html, body {
   margin: 0;
+  height: 100%;
 }
 
 /* SL NavBar */
@@ -26,14 +24,14 @@ html, body {
 
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
   color: rgba(255,255,255,0.8);
-  font-size: 25px;
-  min-height: 57px;
+  font-size: 22px;
+  min-height: 50px;
   text-transform: none;
 }
 
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li.uk-active>a {
   color: #fff;
-  font-size: 25px;
+  font-size: 22px;
   text-transform: none;
 }
 
@@ -59,7 +57,7 @@ html, body {
 }
 /* TODO: use screen media for height */
 #body {
-  height: 84vh;
+  max-height: 100%;
   margin: 5px 3px 5px;
   padding: 0 19px 0 13px;
   position: relative;

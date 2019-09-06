@@ -8,15 +8,19 @@ import mime from "mime"
 const log = new Log("Resources Handler")
 
 export default async function resourcesHandler(request: IncomingMessage, response: ServerResponse) {
-  let mimeType = mime.getType(<string>request.url)
+  let rUrl = request.url!.split("?")[0]
+  let mimeType = mime.getType(rUrl)
   if (mimeType == null) throw new Error("Unknown type")
-  if (request.url!.includes(".js.map")) {
+  if (rUrl.includes(".js.map")) {
     response.end()
     return
   }
   response.setHeader("Content-Type", mimeType)
-  let [, , ...url] = request.url!.split("/")
+  let [, , ...url] = rUrl.split("/")
 
+  log.debug(request.headers)
+  response.setHeader("Cache-Control", "max-age=21600")
+  response.setHeader("Expires", new Date(Date.now() + 21600000).toUTCString())
   if (mimeType.startsWith("image") === true) {
     let stream = createReadStream(`${rootDir}/resources/${url.join("/")}`)
     stream.pipe(response)

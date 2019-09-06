@@ -131,3 +131,12 @@ function replacePlaceholders(input, values) {
     return txt
   })
 }
+
+if (!enableResize) var enableResize = false
+if ($ && enableResize) {
+  $("#body").height($(window).height() - $("#body").offset().top - 20)
+  $(window).resize(function () {
+    $("#body").height($(window).height() - $("#body").offset().top - 20)
+    if (typeof ps != "undefined") ps.update()
+  });
+}
