@@ -141,7 +141,7 @@
         response.response_data.more = "{{{i18n/more}}}"
         $("#body").append(announceTemplate(response.response_data))
         // fix incorrect height on load
-        $("#body").height($(window).height() - $("#body").offset().top - 20) 
+        //$("#body").height($(window).height() - $("#body").offset().top - 20) 
         ps.update()
         if (before === $(".uk-card-header").length) loadAttempt += 1
         else loadAttempt = 0
@@ -156,7 +156,7 @@
         id: parseInt(announceId),
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
-        callback(response)
+        callback(response.response_data)
       })
     }
   </script>
