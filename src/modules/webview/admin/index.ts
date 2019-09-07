@@ -51,7 +51,8 @@ export default class extends WebViewAction {
       external: this.requestData.requestFromBrowser,
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,
-      i18n: strings
+      i18n: strings,
+      isAdmin: true
     }
 
     return {

@@ -4,7 +4,8 @@
     "settings": "Settings",
     "profile": "Profile",
     "aboutServer": "About server",
-    "notTranslated": "This page does not yet have a translation for your language :<"
+    "notTranslated": "This page does not yet have a translation for your language :<",
+    "bugReport": "Bug Report"
   },
   "annouce-index": {
     "more": "More..."

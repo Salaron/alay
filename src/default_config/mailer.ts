@@ -7,5 +7,6 @@ export default <Mailer>{
       pass: ""
     }
   },
-  name: "SunLight Server"
+  name: "SunLight Server",
+  supportMail: ""
 }

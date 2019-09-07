@@ -152,4 +152,5 @@ interface Mailer {
   enabled: boolean
   transportSettings: import("nodemailer").TransportOptions
   name: string
+  supportMail: string
 }

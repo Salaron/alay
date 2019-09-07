@@ -1,7 +1,7 @@
 import Handlebars from "handlebars"
 import moment from "moment"
 import { promisify } from "util"
-import { readFile } from "fs"
+import { readFile, readFileSync } from "fs"
 import { Connection } from "../core/database_wrappers/mysql"
 import { I18n } from "./i18n"
 
@@ -18,13 +18,24 @@ export class WebView {
     this.connection = connection
   }
 
+  public static getTemplateSync(module: string, action: string): Handlebars.TemplateDelegate {
+    let template = templates[`${module}-${action}`]
+    if (!template || Config.server.debug_mode) {
+      template = Handlebars.compile(readFileSync(`${rootDir}/webview/${module}/${action}.html`, "utf-8"))
+      if (!Config.server.debug_mode) {
+        templates[`${module}-${action}`] = template
+      }
+    }
+    return template
+  }
   public static async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
-    if (typeof templates[`${module}-${action}`] != "undefined") return <Handlebars.TemplateDelegate>templates[`${module}-${action}`]
-
-    let template = Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/${module}/${action}.html`, "utf-8"))
-    if (Config.server.debug_mode) {
-      templates[`${module}-${action}`] = undefined // remove previously saved template
-    } else templates[`${module}-${action}`] = template
+    let template = templates[`${module}-${action}`]
+    if (!template || Config.server.debug_mode) {
+      template = Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/${module}/${action}.html`, "utf-8"))
+      if (!Config.server.debug_mode) {
+        templates[`${module}-${action}`] = template
+      }
+    }
     return template
   }
 
@@ -55,15 +66,25 @@ Handlebars.registerHelper("equal", function (a, b, options) {
   return options.inverse(this)
 })
 
-Handlebars.registerHelper("nl2br", function(text) {
+Handlebars.registerHelper("nl2br", function (text) {
   let nl2br = (text + "").replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, "$1" + "<br>" + "$2")
   return new Handlebars.SafeString(nl2br)
 })
 
-Handlebars.registerHelper("momentFormat", function(date, format) {
+Handlebars.registerHelper("momentFormat", function (date, format) {
   return new Handlebars.SafeString(moment(date).format(format))
 })
 
-Handlebars.registerHelper("nullCheck", function(value) {
+Handlebars.registerHelper("nullCheck", function (value) {
   return new Handlebars.SafeString(value == null ? "N/A" : value)
+})
+
+Handlebars.registerHelper("header", function (pageName, context) {
+  let template = WebView.getTemplateSync("common", "header")
+  context.i18n.pageName = pageName
+  context.support = {
+    mail: Config.mailer.supportMail,
+    enabled: Config.mailer.supportMail.length > 0
+  }
+  return new Handlebars.SafeString(template(context))
 })

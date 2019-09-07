@@ -16,59 +16,9 @@
 <body>
   <div id="outer">
     <div id="inner">
-      <!-- header -->
       <div id="header">
-        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
-          uk-sticky="bottom: #offset" uk-navbar="mode: click">
-
-          <div class="uk-navbar-left">
-            <ul class="uk-navbar-nav">
-              <li>
-                <a uk-icon="menu"></a>
-                <div class="uk-navbar-dropdown">
-                  <ul class="uk-nav uk-dropdown-nav">
-                    <li><a href="/webview.php/announce/index">
-                        <span uk-icon="home" class="uk-icon"></span> {{i18n/announce}}
-                      </a></li>
-                    <li class="uk-active"><a>
-                        <span uk-icon="user" class="uk-icon"></span> {{i18n/profile}}
-                      </a></li>
-                    <li><a href="/webview.php/settings/index">
-                        <span uk-icon="settings" class="uk-icon"></span> {{i18n/settings}}
-                      </a></li>
-
-                    <li><a href="/webview.php/server/info">
-                        <span uk-icon="nut" class="uk-icon"></span> {{i18n/aboutServer}}
-                      </a></li>
-
-                    <li class="uk-nav-divider"></li>
-                    <li><a id="changeLanguage"><span uk-icon="world" class="uk-icon"></span> Change Language</a>
-                    </li>
-                    {{#if isAdmin}}
-                    <li><a href="/webview.php/admin/index">
-                        <span uk-icon="star" class="uk-icon"></span> APanel
-                      </a></li>
-                    {{/if}}
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div class="uk-navbar-center">
-            <ul class="uk-navbar-nav">
-              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">{{i18n/profile}}</a></li>
-            </ul>
-          </div>
-
-          <div class="uk-navbar-right">
-            <ul class="uk-navbar-nav">
-              <li><a uk-icon="users">{{currentOnline}}</a></li>
-            </ul>
-          </div>
-        </nav>
+        {{{header i18n/profile this}}}
       </div>
-      <!-- /header -->
 
       <div id="body">
 
@@ -76,8 +26,7 @@
           <div class="uk-container uk-container-small">
             <div class="uk-grid uk-grid-medium uk-flex uk-flex-middle" data-uk-grid="">
               <div class="uk-width-auto uk-first-column">
-                <div class="avatar-border"
-                  style="background-image: url('//r.llsif.win/{{icon}}');margin-bottom: 15px;">
+                <div class="avatar-border" style="background-image: url('//r.llsif.win/{{icon}}');margin-bottom: 15px;">
                 </div>
               </div>
               <div class="uk-width-expand" style="line-height: 25px;">
@@ -106,7 +55,8 @@
                   <td class="uk-width-1-6">{{user/user_id}}</td>
                   <td class="uk-width-1-4">{{momentFormat user/registrationDate "YYYY-MM-DD"}}</td>
                   <td class="uk-width-1-6">{{user/daysInTheGame}}</td>
-                  <td class="uk-width-1-6" uk-tooltip="title: {{i18n/excludingEvents}}; pos: top-right">{{user/livesPlayed}}</td>
+                  <td class="uk-width-1-6" uk-tooltip="title: {{i18n/excludingEvents}}; pos: top-right">
+                    {{user/livesPlayed}}</td>
                 </tr>
               </tbody>
             </table>
@@ -136,8 +86,10 @@
                 {{#each eventData}}
                 <tr>
                   <td class="uk-width-1-6" style="font-size: 1.1rem;">{{this/type}}</td>
-                  <td class="uk-width-1-4" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">{{momentFormat this/start_date "YY-MM-DD HH:mm"}}</td>
-                  <td class="uk-width-1-4" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">{{momentFormat this/end_date "YY-MM-DD HH:mm"}}</td>
+                  <td class="uk-width-1-4" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
+                    {{momentFormat this/start_date "YY-MM-DD HH:mm"}}</td>
+                  <td class="uk-width-1-4" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
+                    {{momentFormat this/end_date "YY-MM-DD HH:mm"}}</td>
                   <td class="uk-width-1-6">{{nullCheck this/ptRank}}</td>
                   <td class="uk-width-1-6">{{nullCheck this/scoreRank}}</td>
                   <td class="uk-width-1-6">{{this/lives_played}}</td>
