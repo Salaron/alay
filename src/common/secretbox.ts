@@ -151,6 +151,7 @@ export class Secretbox {
       }, `Gained from Scouting Box "${secretBoxInfo.name}"`, 1, true)
       res.unit_rarity_id = (await unitDB.get("SELECT rarity FROM unit_m WHERE unit_id=?", [res.unit_id])).rarity
       res.new_unit_flag = existingCards.indexOf(res.unit_id) === -1
+      res.is_hit = null
       cardsResult.push(res)
     })
 
@@ -189,7 +190,7 @@ export class Secretbox {
         show_end_date: secretBoxInfo.enabled === 1,
         add_gauge: secretBoxInfo.add_gauge,
         pon_count: ponCount,
-        pon_upper_limit: secretBoxInfo.upper_limit,
+        pon_upper_limit: secretBoxInfo.upper_limit === null ? 0 : secretBoxInfo.upper_limit,
         additional_info: await this.generateAdditionalInfo(secretBoxInfo.secretbox_id, secretBoxInfo.secretbox_type, userId)
       },
       secret_box_items: {

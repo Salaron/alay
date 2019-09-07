@@ -52,6 +52,19 @@
     "recaptchaFailed": "Вы должны пройти проверку reCAPTCHA",
     "emailExists": "Аккаунт с указанной почтой уже зарегистрирован"
   },
+  "profile-index": {
+    "registrationDate": "Дата регистрации",
+    "daysInTheGame": "Дней в игре",
+    "livesPlayed": "Сыграно лайвов",
+    "excludingEvents": "Без учёта ивентов",
+    "events": "Участие в ивентах",
+    "eventType": "Тип",
+    "eventStart": "Начало",
+    "eventEnd": "Конец",
+    "eventPtRank": "Event pts ранк",
+    "eventScoreRank": "Score ранк",
+    "jpTimeZone": "Японский часовой пояс"
+  },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} удалил(-а) Вас из своего списка друзей",
     "SEND_FRIEND_REQUEST": "{{affectorName}} отправил(-а) Вам заявку в друзья",

@@ -20,7 +20,9 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    if (parseInt(this.params.invite_code) != parseInt(this.params.invite_code)) throw new ErrorCode(2400, "Invite code is NaN")
+    let numbers = this.params.invite_code.match(/\d+/g)
+    if (numbers === null) throw new ErrorCode(2400, "Invite_code doesn't contain numbers")
+    this.params.invite_code = numbers[0]
     const user = new User(this.connection)
 
     let profile = await this.connection.first(`

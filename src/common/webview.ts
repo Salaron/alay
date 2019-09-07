@@ -54,3 +54,16 @@ Handlebars.registerHelper("equal", function (a, b, options) {
   // @ts-ignore: Unreachable code error
   return options.inverse(this)
 })
+
+Handlebars.registerHelper("nl2br", function(text) {
+  let nl2br = (text + "").replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, "$1" + "<br>" + "$2")
+  return new Handlebars.SafeString(nl2br)
+})
+
+Handlebars.registerHelper("momentFormat", function(date, format) {
+  return new Handlebars.SafeString(moment(date).format(format))
+})
+
+Handlebars.registerHelper("nullCheck", function(value) {
+  return new Handlebars.SafeString(value == null ? "N/A" : value)
+})

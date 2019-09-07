@@ -52,6 +52,19 @@
     "recaptchaFailed": "You must pass the reCAPTCHA",
     "emailExists": "An account with the specified E-mail is already registered"
   },
+  "profile-index": {
+    "registrationDate": "Registration date",
+    "daysInTheGame": "Days in the game",
+    "livesPlayed": "Lives played",
+    "excludingEvents": "Excluding events",
+    "events": "Participation in events",
+    "eventType": "Type",
+    "eventStart": "Start date",
+    "eventEnd": "End date",
+    "eventPtRank": "Event pts rank",
+    "eventScoreRank": "Score rank",
+    "jpTimeZone": "Japanese time zone"
+  },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} removed you from their friend list",
     "SEND_FRIEND_REQUEST": "{{affectorName}} sent you a friend request",

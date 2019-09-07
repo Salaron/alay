@@ -156,7 +156,7 @@ export class Item {
 
   public static correctName(name: string, itemId?: number | null) {
     let type = this.nameToType(name, itemId)
-    return this.typeToName(type.itemType, itemId)
+    return this.typeToName(type.itemType, itemId || type.itemId)
   }
   public static getIncentiveId(itemType: number, itemId?: number | null) {
     switch(itemType){
