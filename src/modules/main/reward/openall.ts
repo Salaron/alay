@@ -4,8 +4,11 @@ import { Log } from "../../../core/log"
 import { User } from "../../../common/user"
 import { Item } from "../../../common/item"
 import { TYPE } from "../../../common/type"
+import { Unit } from "../../../common/unit"
 
 const log = new Log("reward/openAll")
+const rarityUnits = Unit.rarityUnits
+const attributeUnits = Unit.attributeUnits
 
 export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -39,8 +42,8 @@ export default class extends MainAction {
         // All
         const orderList = ["DESC", "ASC", "DESC"]
         if (!orderList[this.params.order]) throw new Error(`Invalid order`)
-        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND collected IS NULL ORDER BY insert_date ${orderList[this.params.order]} LIMIT 1000`
-        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND collected IS NULL`
+        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND opened_date IS NULL ORDER BY insert_date ${orderList[this.params.order]} LIMIT 1000`
+        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND opened_date IS NULL`
         break
       }
       case 1: {
@@ -48,15 +51,15 @@ export default class extends MainAction {
         const orderList = ["DESC", "ASC", "DESC", "ASC"]
         let filter = ``
         if (this.params.filter.length != 2) throw new Error(`Invalid filter`)
-        if (this.params.filter[0] != 0) {
-          filter = ` AND rarity = ${this.params.filter[0]}`
+        if (this.params.filter[0] != 0 && rarityUnits[this.params.filter[0]]) {
+          filter = ` AND item_id IN (${rarityUnits[this.params.filter[0]]})`
         }
-        if (this.params.filter[1] != 0) {
-          filter = filter + ` AND attribute = ${this.params.filter[1]}`
+        if (this.params.filter[1] != 0 && attributeUnits[this.params.filter[1]]) {
+          filter = filter + ` AND item_id IN (${attributeUnits[this.params.filter[1]]})`
         }
         if (!orderList[this.params.order]) throw new Error(`Invalid order`)
-        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND item_type = 1001 AND collected IS NULL ${filter} ORDER BY insert_date LIMIT 1000`
-        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND item_type = 1001 AND collected IS NULL ${filter} `
+        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND item_type = 1001 AND opened_date IS NULL ${filter} ORDER BY insert_date LIMIT 1000`
+        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND item_type = 1001 AND opened_date IS NULL ${filter} `
         break
       }
       case 2: {
@@ -65,8 +68,8 @@ export default class extends MainAction {
         let filter = ``
         if (this.params.filter[0] != 0) filter = ` AND item_type IN (${this.params.filter.join(",")})`
         if (!orderList[this.params.order]) throw new Error(`Invalid order`)
-        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND item_type <> 1001 AND collected IS NULL ${filter} ORDER BY insert_date ${orderList[this.params.order]} LIMIT 1000`
-        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND item_type <> 1001 AND collected IS NULL ${filter}`
+        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND item_type <> 1001 AND opened_date IS NULL ${filter} ORDER BY insert_date ${orderList[this.params.order]} LIMIT 1000`
+        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND item_type <> 1001 AND opened_date IS NULL ${filter}`
         break
       }
       default: throw new Error(`Invalid category`)

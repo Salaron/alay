@@ -54,7 +54,7 @@
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
 
   <script>
-    let ps = new PerfectScrollbar('#body', { suppressScrollX: true })
+    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
 
     function update() {
       $.when(sendRequest({

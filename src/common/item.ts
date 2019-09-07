@@ -247,22 +247,13 @@ export class Item {
       item.name = Item.typeToName(item.type, item.id)
     }
 
-    let unitData: any = {}
-    if (item.type === 1001) {
-      unitData = await unitDB.get("SELECT rarity, attribute_id FROM unit_m WHERE unit_id=:id", { id: item.id })
-    }
-
     let res = await this.connection.query(`
-    INSERT INTO reward_table (
-      user_id, amount, item_type, incentive_message, item_id, attribute, rarity
-    ) VALUES (
+    INSERT INTO reward_table (user_id, amount, item_type, incentive_message, item_id) VALUES (
       ${userId}, 
       ${amount}, 
       ${item.type}, 
       '${message.replace(/[\'']/g, "\\'")}', 
-      ${item.id || null},
-      ${unitData.attribute_id || null}, 
-      ${unitData.rarity || null}
+      ${item.id || null}
     )`)
     if (!history) return (<any>res).insertId
 
@@ -270,13 +261,13 @@ export class Item {
   }
 
   public async openPresent(userId: number, incentiveId: number) {
-    let present = await this.connection.first(`SELECT * FROM reward_table WHERe user_id=:user AND incentive_id=:id AND collected IS NULL`, { 
+    let present = await this.connection.first(`SELECT amount, item_id, item_type FROM reward_table WHERE user_id= :user AND incentive_id = :id AND opened_date IS NULL`, { 
       user: userId, 
       id: incentiveId 
     })
     if (!present) throw new Error(`Present is already collected`)
 
-    await this.connection.query(`UPDATE reward_table SET collected = 1, opened_date = CURRENT_TIMESTAMP WHERE user_id = :user AND incentive_id = :id`, {
+    await this.connection.query(`UPDATE reward_table SET opened_date = CURRENT_TIMESTAMP WHERE user_id = :user AND incentive_id = :id`, {
       user: userId,
       id: incentiveId
     })

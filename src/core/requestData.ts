@@ -122,9 +122,11 @@ export default class RequestData {
     }
     if (formData && hType === HANDLER_TYPE.WEBAPI) this.params = formData
 
+    let url = <string>this.request.url!.split(/[?]+/)[0]
     if (this.params != null && Object.keys(this.params).length > 0) {
-      let url = <string>this.request.url!.split(/[?]+/)[0]
       log.info(chalk["bgWhite"](chalk["black"]((url))) + " " + JSON.stringify(this.params), "User #" + this.user_id)
+    } else {
+      log.info(chalk["bgWhite"](chalk["black"]((url))), "User #" + this.user_id)
     }
   }
   static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {

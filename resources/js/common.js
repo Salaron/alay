@@ -138,10 +138,8 @@ function updateBodySize() {
 }
 if (!enableResize) var enableResize = false
 if ($ && enableResize) {
-  $(function() {
+  updateBodySize();
+  $(window).resize(function () {
     updateBodySize();
-    $(window).resize(function() {
-      updateBodySize();
-    });
   });
 }

@@ -2,6 +2,10 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import { Item } from "../../../common/item"
 import { TYPE } from "../../../common/type"
+import { Unit } from "../../../common/unit"
+
+const rarityUnits = Unit.rarityUnits
+const attributeUnits = Unit.attributeUnits
 
 export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH
@@ -39,30 +43,30 @@ export default class extends MainAction {
     switch (this.params.category) {
       case 0: {
         // All
-        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND collected = 1 ${id} ORDER BY opened_date DESC LIMIT 20`
-        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND collected = 1`
+        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND opened_date IS NOT NULL ${id} ORDER BY opened_date DESC LIMIT 20`
+        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND opened_date IS NOT NULL`
         break
       }
       case 1: {
         // Members
         let filter = ``
         if (this.params.filter.length != 2) throw new Error(`Invalid filter`)
-        if (this.params.filter[0] != 0) {
-          filter = ` AND rarity = ${this.params.filter[0]}`
+        if (this.params.filter[0] != 0 && rarityUnits[this.params.filter[0]]) {
+          filter = ` AND item_id IN (${rarityUnits[this.params.filter[0]]})`
         }
-        if (this.params.filter[1] != 0) {
-          filter = filter + ` AND attribute = ${this.params.filter[1]}`
+        if (this.params.filter[1] != 0 && attributeUnits[this.params.filter[1]]) {
+          filter = filter + ` AND item_id IN (${attributeUnits[this.params.filter[1]]})`
         }
-        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND item_type = 1001 AND collected = 1 ${filter} ${id} ORDER BY opened_date DESC LIMIT 20`
-        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND item_type = 1001 AND collected IS NULL ${filter} `
+        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND item_type = 1001 AND opened_date IS NOT NULL ${filter} ${id} ORDER BY opened_date DESC LIMIT 20`
+        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND item_type = 1001 AND opened_date IS NOT NULL ${filter} `
         break
       }
       case 2: {
         // Items
         let filter = ``
         if (this.params.filter[0] != 0) filter = ` AND item_type IN (${this.params.filter.join(",")})`
-        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND item_type <> 1001 AND collected = 1 ${filter} ${id} ORDER BY opened_date DESC LIMIT 20`
-        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND item_type <> 1001 AND collected = 1 ${filter}`
+        rewardListQuery = `SELECT * FROM reward_table WHERE user_id=${this.user_id} AND item_type <> 1001 AND opened_date IS NOT NULL ${filter} ${id} ORDER BY opened_date DESC LIMIT 20`
+        rewardCountQuery = `SELECT count(*) as count FROM reward_table WHERE user_id=${this.user_id} AND item_type <> 1001 AND opened_date IS NOT NULL ${filter}`
         break
       }
       default: throw new Error(`Invalid category`)

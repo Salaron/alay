@@ -22,6 +22,9 @@ const updateAlbumDefault: updateAlbumOptions = {
 let supportUnitData: { [unitId: number]: supportUnitData } = {}
 let supportUnitList: number[] = []
 let noExchangePointList: number[] = []
+let attributeUnits: { [attribute: number]: number[] } = {}
+let rarityUnits: { [rarity: number]: number[] } = {}
+
 export async function init() {
   let supports = await unitDB.all(`
   SELECT 
@@ -50,6 +53,15 @@ export async function init() {
   for (const unit of noEpList) {
     noExchangePointList.push(unit.unit_id)
   }
+
+  let allUnits = await unitDB.all("SELECT rarity, attribute_id, unit_id FROM unit_m")
+  for (let unit of allUnits) {
+    if (!attributeUnits[unit.attribute_id]) attributeUnits[unit.attribute_id] = []
+    attributeUnits[unit.attribute_id].push(unit.unit_id)
+
+    if (!rarityUnits[unit.rarity]) rarityUnits[unit.rarity] = []
+    rarityUnits[unit.rarity].push(unit.unit_id)
+  }
 }
 
 interface addUnitOptions {
@@ -68,6 +80,12 @@ interface updateAlbumOptions {
 }
 
 export class Unit {
+  public static supportUnits = supportUnitList
+  public supportUnits = supportUnitList
+  public static attributeUnits = attributeUnits
+  public attributeUnits = attributeUnits
+  public static rarityUnits = rarityUnits
+  public rarityUnits = rarityUnits
   private connection: Connection
   constructor(connection: Connection) {
     this.connection = connection

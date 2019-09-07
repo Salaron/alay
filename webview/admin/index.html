@@ -117,7 +117,7 @@
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script>
-    new PerfectScrollbar('#body', { suppressScrollX: true })
+    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))
   </script>
 </body>
