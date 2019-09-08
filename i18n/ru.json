@@ -62,7 +62,7 @@
     "eventType": "Тип",
     "eventStart": "Начало",
     "eventEnd": "Конец",
-    "eventPtRank": "Event pts ранк",
+    "eventPtRank": "pts ранк",
     "eventScoreRank": "Score ранк",
     "jpTimeZone": "Японский часовой пояс"
   },

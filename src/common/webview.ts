@@ -66,9 +66,9 @@ Handlebars.registerHelper("equal", function (a, b, options) {
   return options.inverse(this)
 })
 
-Handlebars.registerHelper("nl2br", function (text) {
-  let nl2br = (text + "").replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, "$1" + "<br>" + "$2")
-  return new Handlebars.SafeString(nl2br)
+Handlebars.registerHelper("nl2br", function (text) {  
+  console.log(text)
+  return new Handlebars.SafeString(text.replace(/(\r\n|\n|\r|\\n|\\r|\\r\\n)/gm, "<br>"))
 })
 
 Handlebars.registerHelper("momentFormat", function (date, format) {

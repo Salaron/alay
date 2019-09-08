@@ -55,9 +55,8 @@ html, body {
   padding: 3px;
   position: relative;
 }
-/* TODO: use screen media for height */
 #body {
-  max-height: 100%;
+  height: 70vh;
   margin: 5px 3px 5px;
   padding: 0 19px 0 13px;
   position: relative;
@@ -135,9 +134,9 @@ ol, ul {
   height: 107px;
   width: 107px;
   border-radius: 100%;
-  box-shadow: 0 0 13px rgba(0, 0, 0, .7);
-  -webkit-box-shadow: 0 0 13px rgba(0, 0, 0, .7);
-  -moz-box-shadow: 0 0 13px rgba(0, 0, 0, .7);
+  box-shadow: 0 0 10px rgba(0, 0, 0, .7);
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
+  -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   margin-top: 10px;
   background-position: center;
   background-repeat: no-repeat;

@@ -20,85 +20,84 @@
         {{{header i18n/profile this}}}
       </div>
 
-      <div id="body">
+      <div id="body" class="uk-scrollspy-inview uk-animation-fade">
 
-        <section class="uk-section uk-section-small" style="padding-bottom: 0; padding-top: 0;">
-          <div class="uk-container uk-container-small">
-            <div class="uk-grid uk-grid-medium uk-flex uk-flex-middle" data-uk-grid="">
-              <div class="uk-width-auto uk-first-column">
-                <div class="avatar-border" style="background-image: url('//r.llsif.win/{{icon}}');margin-bottom: 15px;">
-                </div>
-              </div>
-              <div class="uk-width-expand" style="line-height: 25px;">
-                <h3 class="uk-margin-remove uk-text-bold">{{user/name}}</h3>
-                <span class="uk-text-small uk-text-muted"
-                  style="word-wrap: break-word;">{{nl2br user/introduction}}</span>
+        <div class="uk-container uk-width-1-1">
+          <div class="uk-grid uk-grid-medium uk-flex uk-flex-middle" data-uk-grid="">
+            <div class="uk-width-auto uk-first-column">
+              <div class="avatar-border" style="background-image: url('//r.llsif.win/{{icon}}');margin-bottom: 15px;">
               </div>
             </div>
+            <div class="uk-width-expand" style="line-height: 15px;">
+              <h3 class="uk-margin-remove uk-text-bold">{{user/name}}</h3>
+              <span class="uk-text-small uk-text-muted"
+                style="word-wrap: break-word;">{{nl2br user/introduction}}</span>
+            </div>
           </div>
-        </section>
+        </div>
 
-        <div class="uk-container uk-margin-top">
+        <div class="uk-container uk-margin uk-width-1-1">
           <div class="uk-overflow-auto">
-            <table
-              class="uk-table uk-table-middle uk-table-divider  uk-table-justify uk-scrollspy-inview uk-animation-fade">
+            <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
               <thead>
                 <tr>
-                  <th>User ID</th>
-                  <th>{{i18n/registrationDate}}</th>
-                  <th>{{i18n/daysInTheGame}}</th>
-                  <th uk-tooltip="title: {{i18n/excludingEvents}}; pos: bottom-right">{{i18n/livesPlayed}}</th>
+                  <th class="uk-width-1-5">User ID</th>
+                  <th class="uk-width-1-4">{{i18n/registrationDate}}</th>
+                  <th class="uk-width-1-5">{{i18n/daysInTheGame}}</th>
+                  <th class="uk-width-1-5" uk-tooltip="title: {{i18n/excludingEvents}}; pos: bottom-right">
+                    {{i18n/livesPlayed}}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td class="uk-width-1-6">{{user/user_id}}</td>
-                  <td class="uk-width-1-4">{{momentFormat user/registrationDate "YYYY-MM-DD"}}</td>
-                  <td class="uk-width-1-6">{{user/daysInTheGame}}</td>
-                  <td class="uk-width-1-6" uk-tooltip="title: {{i18n/excludingEvents}}; pos: top-right">
+                  <td>{{user/user_id}}</td>
+                  <td>{{momentFormat user/registrationDate "DD.MM.YYYY"}}</td>
+                  <td>{{user/daysInTheGame}}</td>
+                  <td uk-tooltip="title: {{i18n/excludingEvents}}; pos: top-right">
                     {{user/livesPlayed}}</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <hr class="uk-margin-remove-top">
         </div>
 
         {{#if haveEventData}}
-        <div class="uk-container">
-          <hr>
+        <div class="uk-container uk-margin uk-width-1-1">
           <h3 class="uk-text-bold uk-align-center">
-            <center>{{i18n/events}}</center>
+            <center class="uk-margin-bottom">{{i18n/events}}</center>
           </h3>
           <div class="uk-overflow-auto">
-            <table
-              class="uk-table uk-table-middle uk-table-divider  uk-table-justify uk-scrollspy-inview uk-animation-fade">
+            <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
               <thead>
                 <tr>
-                  <th>{{i18n/eventType}}</th>
-                  <th uk-tooltip="title: {{i18n/jpTimeZone}}; pos: top-right;">{{i18n/eventStart}}</th>
-                  <th uk-tooltip="title: {{i18n/jpTimeZone}}; pos: top-right;">{{i18n/eventEnd}}</th>
-                  <th>{{i18n/eventPtRank}}</th>
-                  <th>{{i18n/eventScoreRank}}</th>
-                  <th>{{i18n/livesPlayed}}</th>
+                  <th class="uk-table-shrink">{{i18n/eventType}}</th>
+                  <th class="uk-table-shrink uk-text-nowrap" uk-tooltip="title: {{i18n/jpTimeZone}}; pos: top-left;">
+                    {{i18n/eventStart}}</th>
+                  <th class="uk-table-shrink uk-text-nowrap" uk-tooltip="title: {{i18n/jpTimeZone}}; pos: top-left;">
+                    {{i18n/eventEnd}}</th>
+                  <th class="uk-width-1-6">{{i18n/eventPtRank}}</th>
+                  <th class="uk-table-shrink">{{i18n/eventScoreRank}}</th>
+                  <th class="uk-table-shrink">{{i18n/livesPlayed}}</th>
                 </tr>
               </thead>
               <tbody>
                 {{#each eventData}}
                 <tr>
-                  <td class="uk-width-1-6" style="font-size: 1.1rem;">{{this/type}}</td>
-                  <td class="uk-width-1-4" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
-                    {{momentFormat this/start_date "YY-MM-DD HH:mm"}}</td>
-                  <td class="uk-width-1-4" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
-                    {{momentFormat this/end_date "YY-MM-DD HH:mm"}}</td>
-                  <td class="uk-width-1-6">{{nullCheck this/ptRank}}</td>
-                  <td class="uk-width-1-6">{{nullCheck this/scoreRank}}</td>
-                  <td class="uk-width-1-6">{{this/lives_played}}</td>
+                  <td style="font-size: 1.2rem;">{{this/type}}</td>
+                  <td style="font-size: 1.3rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
+                    {{momentFormat this/start_date "DD.MM.YY HH:mm"}}</td>
+                  <td style="font-size: 1.3rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
+                    {{momentFormat this/end_date "DD.MM.YY HH:mm"}}</td>
+                  <td class="uk-text-break">{{nullCheck this/ptRank}}</td>
+                  <td>{{nullCheck this/scoreRank}}</td>
+                  <td>{{this/lives_played}}</td>
                 </tr>
                 {{/each}}
               </tbody>
             </table>
           </div>
-          <hr class="uk-margin-remove">
+          <hr class="uk-margin-remove-top">
         </div>
         {{/if}}
       </div>
@@ -120,7 +119,8 @@
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
 
   <script>
-    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
+    var ps = new PerfectScrollbar('#body', { suppressScrollX: false })
+    new PerfectScrollbar(".uk-table")
   </script>
 </body>
 

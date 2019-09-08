@@ -62,7 +62,7 @@
     "eventType": "Type",
     "eventStart": "Start date",
     "eventEnd": "End date",
-    "eventPtRank": "Event pts rank",
+    "eventPtRank": "pts rank",
     "eventScoreRank": "Score rank",
     "jpTimeZone": "Japanese time zone"
   },
