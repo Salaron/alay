@@ -67,7 +67,6 @@ Handlebars.registerHelper("equal", function (a, b, options) {
 })
 
 Handlebars.registerHelper("nl2br", function (text) {  
-  console.log(text)
   return new Handlebars.SafeString(text.replace(/(\r\n|\n|\r|\\n|\\r|\\r\\n)/gm, "<br>"))
 })
 

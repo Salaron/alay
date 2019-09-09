@@ -221,4 +221,12 @@ export class Utils {
     else if (tz > 0) return `+${tz}`
     else return `${tz}`
   }
+
+  public static checkPass(input: string) {
+    return input.match(/^[A-Za-z0-9]\w{1,32}$/)
+  }
+  public static checkMail(input: string) {
+    let regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,6})+$/
+    return regex.test(input)
+  }
 }

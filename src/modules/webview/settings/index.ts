@@ -15,7 +15,7 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
-    let strings = await i18n.getStrings(this.user_id, "common")
+    let strings = await i18n.getStrings(this.user_id, "common", "login-login", "login-startup", "settings-index")
     let template = await WebView.getTemplate("settings", "index")
 
     let values = {
@@ -23,7 +23,8 @@ export default class extends WebViewAction {
       currentOnline: await webview.getCurrentOnline(),
       isAdmin: Config.server.admin_ids.includes(this.user_id),
       changeLanguageModal: await webview.getLanguageModalTemplate(this.user_id),
-      headers: JSON.stringify(this.requestData.getWebapiHeaders())
+      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
+      publicKey: Config.server.PUBLIC_KEY
     }
 
     return {

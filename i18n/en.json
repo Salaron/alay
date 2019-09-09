@@ -5,7 +5,9 @@
     "profile": "Profile",
     "aboutServer": "About server",
     "notTranslated": "This page does not yet have a translation for your language :<",
-    "bugReport": "Bug Report"
+    "bugReport": "Bug Report",
+    "yes": "Yes",
+    "no": "No"
   },
   "annouce-index": {
     "more": "More..."
@@ -43,9 +45,9 @@
     "nicknameLimit": "Field \"Nickname\" can't be more than 20 symbols",
     "mailBlank": "Field \"E-mail\" can't be empty",
     "mailInvalidFormat": "Field \"E-mail\" is invalid",
-    "passwordBlank": "Field \"Пароль\" can't be empty",
+    "passwordBlank": "Field \"Password\" can't be empty",
     "passwordLimit": "Field \"Nickname\" can't be more than 32 symbols",
-    "passwordInvalidFormat": "Field \"Пароль\" is invalid",
+    "passwordInvalidFormat": "Field \"Password\" is invalid",
     "passwordsNotMatch": "Passwords do not match",
     "success": "Success!",
     "checkMail": "A welcome letter was also sent to your mail ^-^<br>Check the Spam folder if you cannot find it.<br>",

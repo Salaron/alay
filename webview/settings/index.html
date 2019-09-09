@@ -20,7 +20,73 @@
         {{{header i18n/settings this}}}
       </div>
 
-      <div id="body">
+      <div id="body" class="uk-scrollspy-inview uk-animation-fade">
+        <div class="uk-container uk-container-small">
+          <div class="uk-text-bold" href="#">{{i18n/mods}}</div>
+          <h6>{{nl2br i18n/modsNotice}}</h6>
+          <h4 uk-tooltip="title: {{nl2br i18n/vanishTooltip}}; pos: bottom-left">Vanish:</h4>
+          <label><input class="uk-radio" type="radio" name="vanish" value="0"> Disable</label>
+          <label><input class="uk-radio" type="radio" name="vanish" value="1"> Hidden</label>
+          <label><input class="uk-radio" type="radio" name="vanish" value="2"> Sudden</label>
+
+          <h4 uk-tooltip="title: {{nl2br i18n/mirrorTooltip}}; pos: bottom-left">Mirror:</h4>
+          <label><input class="uk-radio" type="radio" name="mirror" value="0"> Disable</label>
+          <label><input class="uk-radio" type="radio" name="mirror" value="1"> Enable</label>
+
+          <h4 uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left">HP:</h4>
+          <label><input class="uk-radio" type="radio" name="hp" value="0"> Default</label>
+          <label><input class="uk-radio" type="radio" name="hp" value="1"> 200 HP</label>
+          <label><input class="uk-radio" type="radio" name="hp" value="2"> 1 HP (Sudden Death)</label>
+
+          <h4 uk-tooltip="title: {{nl2br i18n/applyForEventTooltip}}; pos: bottom-left">{{i18n/applyForEvent}}</h4>
+          <label><input class="uk-radio" type="radio" name="event" value="0"> {{i18n/no}}</label>
+          <label><input class="uk-radio" type="radio" name="event" value="1"> {{i18n/yes}}</label>
+
+          <hr>
+
+          <div class="uk-text-bold" href="#">{{i18n/passwordAndEmail}}</div>
+          <h6 style="color: red">{{nl2br i18n/passwordNotice}}</h6>
+          <div class="uk-flex uk-margin-small">
+            <div class="uk-width-1-2">
+              <div class="uk-margin-small">
+                <div class="uk-inline">
+                  <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+                  <input id="newPassword" class="uk-input uk-border-pill" required placeholder="{{i18n/newPassword}}"
+                    type="password">
+                </div>
+              </div>
+              <div class="uk-margin-small">
+                <div class="uk-inline">
+                  <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+                  <input id="newPassword2" class="uk-input uk-border-pill" required
+                    placeholder="{{i18n/repeatPassword}}" type="password">
+                </div>
+              </div>
+              <button type="button" class="uk-button uk-button-primary uk-border-pill"
+                onclick="changePassword()">{{i18n/changePassword}}</button>
+            </div>
+            <div class="uk-width-1-2 uk-margin-left">
+              <div class="uk-margin-small">
+                <div class="uk-inline">
+                  <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
+                  <input id="mail" class="uk-input uk-border-pill" required placeholder="{{i18n/email}}" type="text">
+                </div>
+              </div>
+              <div class="uk-margin-small">
+                <div class="uk-inline">
+                  <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+                  <input id="currentPassword" class="uk-input uk-border-pill" required
+                    placeholder="{{i18n/currentPassword}}" type="password">
+                </div>
+              </div>
+              <button type="button" class="uk-button uk-button-primary uk-border-pill"
+                onclick="changeMail()">{{i18n/changeEmail}}</button>
+            </div>
+          </div>
+
+          <hr>
+
+        </div>
       </div>
 
       {{{changeLanguageModal}}}
@@ -38,9 +104,64 @@
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
+  <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
 
   <script>
+    var RSAEncrypt = new JSEncrypt()
+    RSAEncrypt.setKey(`{{publicKey}}`)
     var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
+
+    function changePassword() {
+      var currentPass = $("#currentPassword").val()
+      var pass = $("#newPassword").val()
+      var pass2 = $("#newPassword2").val()
+
+      if (currentPass.length === 0) return sendNotification("{{i18n/currentPasswordBlank}}", "warning")
+      if (currentPass.length > 32) return sendNotification("{{i18n/currentPasswordLimit}}", "warning")
+      if (!checkPass(currentPass)) return sendNotification("{{i18n/currentPasswordInvalidFormat}}", "warning")
+
+      if (pass.length === 0) return sendNotification("{{i18n/newPasswordBlank}}", "warning")
+      if (pass.length > 32) return sendNotification("{{i18n/newPasswordLimit}}", "warning")
+      if (!checkPass(pass)) return sendNotification("{{i18n/newPasswordInvalidFormat}}", "warning")
+      if (pass != pass2) return sendNotification("{{i18n/passwordsNotMatch}}", "warning")
+
+      $.when(sendRequest({
+        module: "settings",
+        action: "changePassword",
+        password: RSAEncrypt.encrypt(xor(currentPass, parseQueryString(headers.authorize).token)),
+        newPassword: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+
+        $("#currentPassword, #newPassword, #newPassword2").val("")
+        sendNotification("{{i18n/passwordChangeSuccess}}", "success")
+      })
+    }
+    function changeMail() {
+      var mail = $("#mail").val()
+      var pass = $("#currentPassword").val()
+
+      if (pass.length === 0) return sendNotification("{{i18n/currentPasswordBlank}}", "warning")
+      if (pass.length > 32) return sendNotification("{{i18n/currentPasswordLimit}}", "warning")
+      if (!checkPass(pass)) return sendNotification("{{i18n/currentPasswordInvalidFormat}}", "warning")
+
+      if (mail.length === 0) return sendNotification("{{i18n/mailBlank}}", "warning")
+      if (!checkMail(mail)) return sendNotification("{{i18n/mailInvalidFormat}}", "warning")
+
+      $.when(sendRequest({
+        module: "settings",
+        action: "changeMail",
+        mail: mail,
+        password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+
+        $("#mail, #currentPassword").val("")
+        sendNotification("{{i18n/mailChangeSuccess}}", "success")
+      })
+    }
   </script>
 </body>
 
