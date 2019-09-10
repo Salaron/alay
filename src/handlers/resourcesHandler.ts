@@ -19,8 +19,8 @@ export default async function resourcesHandler(request: IncomingMessage, respons
   let [, , ...url] = rUrl.split("/")
 
   log.debug(request.headers)
-  response.setHeader("Cache-Control", "max-age=21600")
-  response.setHeader("Expires", new Date(Date.now() + 21600000).toUTCString())
+  //response.setHeader("Cache-Control", "max-age=21600")
+  //response.setHeader("Expires", new Date(Date.now() + 21600000).toUTCString())
   if (mimeType.startsWith("image") === true) {
     let stream = createReadStream(`${rootDir}/resources/${url.join("/")}`)
     stream.pipe(response)

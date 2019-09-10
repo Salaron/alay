@@ -86,14 +86,14 @@
               <tbody>
                 {{#each eventData}}
                 <tr>
-                  <td style="font-size: 1.2rem;">{{this/type}}</td>
-                  <td style="font-size: 1.3rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
+                  <td style="font-size: .9rem;">{{this/type}}</td>
+                  <td class="uk-text-nowrap" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
                     {{momentFormat this/start_date "DD.MM.YY HH:mm"}}</td>
-                  <td style="font-size: 1.3rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
+                  <td class="uk-text-nowrap" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
                     {{momentFormat this/end_date "DD.MM.YY HH:mm"}}</td>
-                  <td class="uk-text-break">{{nullCheck this/ptRank}}</td>
-                  <td>{{nullCheck this/scoreRank}}</td>
-                  <td>{{this/lives_played}}</td>
+                  <td class="uk-text-break">{{notAvailable this/ptRank}}</td>
+                  <td>{{notAvailable this/scoreRank}}</td>
+                  <td>{{notAvailable this/lives_played}}</td>
                 </tr>
                 {{/each}}
               </tbody>

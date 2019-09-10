@@ -6,13 +6,12 @@
   border: 0;
 }
 body {
-  font-size: 22px;
+  font-size: 17px;
   padding: 0 2px;
   -webkit-text-size-adjust : 100%;
   background: transparent;
 }
 html, body {
-  margin: 0;
   height: 100%;
 }
 
@@ -131,8 +130,8 @@ ol, ul {
 
 /* SL Profile */
 .avatar-border {
-  height: 107px;
-  width: 107px;
+  height: 106px;
+  width: 106px;
   border-radius: 100%;
   box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .7);

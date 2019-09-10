@@ -74,8 +74,8 @@ Handlebars.registerHelper("momentFormat", function (date, format) {
   return new Handlebars.SafeString(moment(date).format(format))
 })
 
-Handlebars.registerHelper("nullCheck", function (value) {
-  return new Handlebars.SafeString(value == null ? "N/A" : value)
+Handlebars.registerHelper("notAvailable", function (value) {
+  return new Handlebars.SafeString(!value ? "N/A" : value)
 })
 
 Handlebars.registerHelper("header", function (pageName, context) {
