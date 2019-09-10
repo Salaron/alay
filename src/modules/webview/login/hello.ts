@@ -19,7 +19,7 @@ export default class extends WebViewAction {
     let [strings, template, changeLanguageModal] = await Promise.all([
       i18n.getStrings(this.user_id, "login-hello"),
       WebView.getTemplate("login", "hello"),
-      await new WebView(this.connection).getLanguageModalTemplate(this.user_id)
+      new WebView(this.connection).getLanguageModalTemplate(this.user_id)
     ])
 
     let values = {
