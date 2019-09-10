@@ -42,6 +42,7 @@
               <thead>
                 <tr>
                   <th class="uk-width-1-5">User ID</th>
+                  <th class="uk-width-1-5">{{i18n/userRank}}</th>
                   <th class="uk-width-1-4">{{i18n/registrationDate}}</th>
                   <th class="uk-width-1-5">{{i18n/daysInTheGame}}</th>
                   <th class="uk-width-1-5" uk-tooltip="title: {{i18n/excludingEvents}}; pos: bottom-right">
@@ -51,6 +52,7 @@
               <tbody>
                 <tr>
                   <td>{{user/user_id}}</td>
+                  <td>{{user/rank}}</td>
                   <td>{{momentFormat user/registrationDate "DD.MM.YYYY"}}</td>
                   <td>{{user/daysInTheGame}}</td>
                   <td uk-tooltip="title: {{i18n/excludingEvents}}; pos: top-right">
@@ -120,7 +122,6 @@
 
   <script>
     var ps = new PerfectScrollbar('#body', { suppressScrollX: false })
-    new PerfectScrollbar(".uk-table")
   </script>
 </body>
 

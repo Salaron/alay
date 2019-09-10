@@ -16,13 +16,16 @@ export default class extends WebViewAction {
       throw new ErrorCode(1234, "Access only with a certain auth level")
     const i18n = new I18n(this.connection)
 
-    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-hello")
-    let template = await WebView.getTemplate("login", "hello")
-    
+    let [strings, template, changeLanguageModal] = await Promise.all([
+      i18n.getStrings(this.user_id, "login-hello"),
+      WebView.getTemplate("login", "hello"),
+      await new WebView(this.connection).getLanguageModalTemplate(this.user_id)
+    ])
+
     let values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       i18n: strings,
-      changeLanguageModal: await new WebView(this.connection).getLanguageModalTemplate(<string>this.requestData.auth_token),
+      changeLanguageModal,
       regEnabled: Config.modules.login.enable_registration
     }
     return {

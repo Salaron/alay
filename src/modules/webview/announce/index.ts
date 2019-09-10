@@ -15,15 +15,19 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
-    let strings = await i18n.getStrings(this.user_id, "common")
-    let template = await WebView.getTemplate("announce", "index")
-    
+    let [strings, template, currentOnline, changeLanguageModal] = await Promise.all([
+      i18n.getStrings(this.user_id, "common"),
+      WebView.getTemplate("announce", "index"),
+      webview.getCurrentOnline(),
+      webview.getLanguageModalTemplate(this.user_id)
+    ])
+
     let values = {
-      currentOnline: await webview.getCurrentOnline(),
+      currentOnline,
+      changeLanguageModal,
       isAdmin: Config.server.admin_ids.includes(this.user_id),
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      i18n: strings,
-      changeLanguageModal: await webview.getLanguageModalTemplate(this.user_id)
+      i18n: strings
     }
     return {
       status: 200,

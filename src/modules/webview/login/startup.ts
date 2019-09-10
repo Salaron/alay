@@ -12,11 +12,14 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")    
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) 
+      throw new ErrorCode(1234, "Access only with a certain auth level")
     const i18n = new I18n(this.connection)
 
-    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-startup", "login-login")
-    let template = await WebView.getTemplate("login", "startup")
+    let [strings, template] = await Promise.all([
+      i18n.getStrings(<string>this.requestData.auth_token, "login-startup", "login-login"),
+      WebView.getTemplate("login", "startup")
+    ])
 
     let values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),

@@ -57,6 +57,7 @@
   },
   "profile-index": {
     "registrationDate": "Дата регистрации",
+    "userRank": "Позиция в топе",
     "daysInTheGame": "Дней в игре",
     "livesPlayed": "Сыграно лайвов",
     "excludingEvents": "Без учёта ивентов",
