@@ -25,7 +25,7 @@ let mdCache: I18nMdCache = {}
 let defaultStrings: I18nSection = {}
 
 const log = new Log("i18n")
-const converter = new showdown.Converter({
+export const showdownConverter = new showdown.Converter({
   tables: true, 
   simpleLineBreaks: true, 
   requireSpaceBeforeHeadingText: true
@@ -133,7 +133,7 @@ export class I18n {
       md += await promisify(readFile)(`${rootDir}/i18n/TOS/${Config.i18n.defaultLanguage}.md`, "UTF-8")
     }
 
-    return mdCache[languageCode][I18nMarkdownType[type]] = converter.makeHtml(md.replace(/--/gi, "—"))
+    return mdCache[languageCode][I18nMarkdownType[type]] = showdownConverter.makeHtml(md.replace(/--/gi, "—"))
   }
 
   public static async clearCache() {

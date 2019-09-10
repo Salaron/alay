@@ -16,7 +16,7 @@ export default class extends WebViewAction {
     const webview = new WebView(this.connection)
 
     let [strings, template, currentOnline, changeLanguageModal] = await Promise.all([
-      i18n.getStrings(this.user_id, "common"),
+      i18n.getStrings(this.user_id, "common", "announce-index"),
       WebView.getTemplate("announce", "index"),
       webview.getCurrentOnline(),
       webview.getLanguageModalTemplate(this.user_id)

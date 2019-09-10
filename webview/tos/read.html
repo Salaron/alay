@@ -6,7 +6,7 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=880, user-scalable=no">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
@@ -17,7 +17,19 @@
   <div id="outer">
     <div id="inner">
       <div id="header">
-        <h1 class="title">Terms of Use</h1>
+        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
+          uk-sticky="bottom: #offset">
+          <div class="uk-navbar-left">
+            <ul id="2back" class="uk-navbar-nav">
+              <li class="uk-active"><a class="uk-text-bold"></a></li>
+            </ul>
+          </div>
+          <div class="uk-navbar-center">
+            <ul class="uk-navbar-nav">
+              <li class="uk-active"><a class="uk-text-bold">Terms of Use</a></li>
+            </ul>
+          </div>
+        </nav>
       </div>
       <div id="body">
         {{{tos}}}
@@ -38,7 +50,7 @@
 
   <script>
     var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
-    if (window.history.length != 1) $("#header").prepend('<a onclick="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    if (window.history.length != 1) $("#2back").prepend('<a onclick="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
     if (!external) {
       $('a[href^="http"]').each(function () {
         $(this).attr("href", "native://browser?url=" + encodeURIComponent($(this).attr("href")))

@@ -28,7 +28,7 @@ export default class extends WebApiAction {
         title: list[i].title,
         date: moment(list[i].insert_date).format("HH:mm DD-MM-YYYY"),
         description: list[i].description.replace(/--/g, "—"),
-        extendable: list[i].announce != null
+        extendable: list[i].body != null
       })
     }
 

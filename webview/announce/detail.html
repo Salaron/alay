@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>SunLight Admin Page</title>
+  <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, user-scalable=no">
@@ -17,22 +17,26 @@
   <div id="outer">
     <div id="inner">
       <div id="header">
-        {{{header "APanel" this}}}
+        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
+          uk-sticky="bottom: #offset">
+          <div class="uk-navbar-left">
+            <ul id="2back" class="uk-navbar-nav">
+              <li class="uk-active"><a class="uk-text-bold">{{announce/title}}</a></li>
+            </ul>
+          </div>
+        </nav>
       </div>
 
       <div id="body">
-        WIP
-        <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-1 uk-margin-top"
-          href="/webview.php/admin/markdown">Markdown Editor</a>
+        {{{announce/body}}}
       </div>
-    </div>
 
-    {{{changeLanguageModal}}}
+    </div>
   </div>
 
   <script type="">
-    var headers = {{{headers}}}
     var enableResize = true
+    var external = {{{external}}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -40,10 +44,17 @@
 
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
-  <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script>
     var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
-    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))
+    if (window.history.length != 1) {
+      var url = window.location.protocol + "//" + window.location.host + "/webview.php/announce/index?id={{announce/id}}" 
+      $("#2back").prepend('<a href="' + url + '" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    }
+    if (!external) {
+      $('a[href^="http"]').each(function () {
+        $(this).attr("href", "native://browser?url=" + encodeURIComponent($(this).attr("href")))
+      })
+    }
   </script>
 </body>
 
