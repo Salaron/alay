@@ -37,17 +37,18 @@
 
   <script type="text/javascript" src="/resources/js/handlebars.runtime.min.js"></script>
   <script type="text/javascript" src="/resources/templates/announce-index.js"></script>
-  
+
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script>
     var announceTotal = 1 // Start from 1 so that we can load the list
     var loadAttempt = 0 // Just in case, in order not to overload the server
-    var ps = new PerfectScrollbar('#body', { suppressScrollX: true }) 
+    var ps = undefined
     var announceTemplate = Handlebars.templates["announce-index"]
 
     $(document).ready(function () {
+      ps = new PerfectScrollbar('#body', { suppressScrollX: true })
       loadNews(function () {
         // check if current url contains query string
         var queryString = window.location.href.split("?")[1]

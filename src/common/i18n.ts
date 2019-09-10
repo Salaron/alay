@@ -102,13 +102,13 @@ export class I18n {
       languageCode = await this.getUserLocalizationCode(input)
     } else if (typeof input === "string") languageCode = input
 
+    if (Config.server.debug_mode) await I18n.clearCache()
     let result: any = {}
     for (let section of sections) {
       extend(true, result, defaultStrings[section], cache[languageCode][section])
     }
     extend(true, result, defaultStrings["common"] || {}, cache[languageCode]["common"] || {})
 
-    if (Config.server.debug_mode) await I18n.clearCache()
     return result
   }
 
