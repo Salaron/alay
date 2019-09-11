@@ -18,7 +18,6 @@ export default async function resourcesHandler(request: IncomingMessage, respons
   response.setHeader("Content-Type", mimeType)
   let [, , ...url] = rUrl.split("/")
 
-  log.debug(request.headers)
   if (!Config.server.debug_mode) {
     response.setHeader("Cache-Control", "max-age=21600")
     response.setHeader("Expires", new Date(Date.now() + 21600000).toUTCString())

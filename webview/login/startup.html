@@ -64,9 +64,6 @@
             type="password">
         </div>
       </div>
-      {{#if enableRecaptcha}}
-      <div class="g-recaptcha uk-margin-small" data-theme="dark" data-sitekey="{{siteKey}}"></div>
-      {{/if}}
       <div id="buttons" class="uk-margin-small">
         <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
           onclick="startUp()">{{i18n/send}}</button>
@@ -78,7 +75,8 @@
     </fieldset>
   </div>
 
-  <div id="notice" class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium" hidden>
+  <div id="notice" class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium"
+    hidden>
     <h1>{{i18n/success}}</h1>
     <p>
       {{{i18n/successDescription}}}
@@ -94,7 +92,9 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
-  <script type="text/javascript" src='https://www.recaptcha.net/recaptcha/api.js'></script>
+  {{#if enableRecaptcha}}
+  <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?render={{siteKey}}"></script>
+  {{/if}}
   <script>
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(`{{publicKey}}`)
@@ -119,29 +119,37 @@
       if (!checkPass(pass)) return sendNotification("{{i18n/passwordInvalidFormat}}", "warning")
       if (pass != pass2) return sendNotification("{{i18n/passwordsNotMatch}}", "warning")
 
-      if (recaptchaEnabled) {
-        var recaptchaResponse = grecaptcha.getResponse()
-        if (recaptcha && recaptchaResponse.length === 0) return sendNotification("{{i18n/recaptchaFailed}}", "warning")
-        grecaptcha.reset()
+      function send(token) {
+        $.when(sendRequest({
+          module: "login",
+          action: "startUp",
+          name: name,
+          mail: mail,
+          password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+          recaptcha: token || "",
+          timestamp: Math.floor(Date.now() / 1000)
+        })).done(function (response) {
+          if (!response || !response.response_data) return
+
+          $("#dialog, #back").hide()
+          $("#notice").html(replacePlaceholders($("#notice").html(), {
+            userId: response.response_data.user_id,
+            mail: response.response_data.mail_sended === true ? "{{{i18n/checkMail}}}" : ""
+          })).removeAttr("hidden").show()
+        })
       }
 
-      $.when(sendRequest({
-        module: "login",
-        action: "startUp",
-        name: name,
-        mail: mail,
-        password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
-        recaptcha: recaptchaResponse || "",
-        timestamp: Math.floor(Date.now() / 1000)
-      })).done(function (response) {
-        if (!response || !response.response_data) return
+      if (recaptchaEnabled === true) {
+        grecaptcha.ready(function () {
+          grecaptcha.execute("{{siteKey}}", { action: "login" }).then(function (token) {
+            send(token)
+          })
+        })
+      } else {
+        send()
+      }
 
-        $("#dialog, #back").hide()
-        $("#notice").html(replacePlaceholders($("#notice").html(), {
-          userId: response.response_data.user_id,
-          mail: response.response_data.mail_sended === true ? "{{{i18n/checkMail}}}" : ""
-        })).removeAttr("hidden").show()
-      })
+
     }
   </script>
 </body>

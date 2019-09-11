@@ -30,7 +30,7 @@ export default class extends WebViewAction {
     ])
     if (!announce) throw new Error("Announce doesn't have a body")
     
-    announce.body = showdownConverter.makeHtml(announce.body)
+    announce.body = showdownConverter.makeHtml(announce.body.replace(/--/gi, "—"))
     let values = {
       announce,
       external: this.requestData.requestFromBrowser

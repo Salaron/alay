@@ -52,6 +52,7 @@
     }
     if (!external) {
       $('a[href^="http"]').each(function () {
+        if (this.includes("webview.php/announce/index")) return
         $(this).attr("href", "native://browser?url=" + encodeURIComponent($(this).attr("href")))
       })
     }

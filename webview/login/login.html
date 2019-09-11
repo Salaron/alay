@@ -54,10 +54,6 @@
           </div>
         </div>
 
-        {{#if enableRecaptcha}}
-        <div class="g-recaptcha uk-margin-small" data-theme="dark" data-sitekey="{{siteKey}}"></div>
-        {{/if}}
-
         <div class="uk-margin-small">
           <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
             onclick="login()">{{i18n/login}}</button>
@@ -84,10 +80,6 @@
             <input id="mail" class="uk-input uk-border-pill" required placeholder="{{i18n/email}}" type="text">
           </div>
         </div>
-
-        {{#if enableRecaptcha}}
-        <div class="g-recaptcha uk-margin-small" data-theme="dark" data-sitekey="{{siteKey}}"></div>
-        {{/if}}
 
         <div class="uk-margin-small">
           <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
@@ -147,7 +139,9 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
-  <script type="text/javascript" src='https://www.recaptcha.net/recaptcha/api.js'></script>
+  {{#if enableRecaptcha}}
+  <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?render={{siteKey}}"></script>
+  {{/if}}
 
   <script type="text/javascript">
     // RSA preparation
@@ -175,64 +169,76 @@
       if (pass.length > 32) return sendNotification("{{i18n/passwordLimit}}", "warning")
       if (!checkPass(pass)) return sendNotification("{{i18n/passwordInvalidFormat}}", "warning")
 
-      if (recaptchaEnabled === true) {
-        var recaptchaResponse = grecaptcha.getResponse()
-        if (recaptcha && recaptchaResponse.length === 0) return sendNotification("{{i18n/recaptchaFailed}}", "warning")
-        grecaptcha.reset()
+      function send(token) {
+        $.when(sendRequest({
+          module: "{{{module}}}",
+          action: "login",
+          user_id: RSAEncrypt.encrypt(userId),
+          password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+          recaptcha: token || "",
+          timestamp: Math.floor(Date.now() / 1000)
+        })).done(function (response) {
+          if (response.error || response.maintenance || !response) return
+          if ("{{{redirect}}}".length != 0) {
+            window.location.replace(window.location.protocol + "//" + window.location.host + "/{{{redirect}}}")
+          } else {
+            $("#back").hide()
+            UIkit.toggle("#loginForm", {
+              target: "#loginForm, #notice",
+              animation: "uk-animation-fade"
+            }).toggle()
+          }
+        })
       }
-
-      $.when(sendRequest({
-        module: "{{{module}}}",
-        action: "login",
-        user_id: RSAEncrypt.encrypt(userId),
-        password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
-        recaptcha: recaptchaResponse || "",
-        timestamp: Math.floor(Date.now() / 1000)
-      })).done(function (response) {
-        if (response.error || response.maintenance || !response) return
-        if ("{{{redirect}}}".length != 0) {
-          window.location.replace(window.location.protocol + "//" + window.location.host + "/{{{redirect}}}")
-        } else {
-          $("#back").hide()
-          UIkit.toggle("#loginForm", {
-            target: "#loginForm, #notice",
-            animation: "uk-animation-fade"
-          }).toggle()
-        }
-      })
+      if (recaptchaEnabled === true) {
+        grecaptcha.ready(function () {
+          grecaptcha.execute("{{siteKey}}", { action: "login" }).then(function (token) {
+            send(token)
+          })
+        })
+      } else {
+        send()
+      }
     }
 
     function recoverPassword() {
       var mail = $("#mail").val()
       if (!checkMail(mail)) return sendNotification("{{i18n/mailInvalidFormat}}", "warning")
 
-      if (recaptchaEnabled === true) {
-        var recaptchaResponse = grecaptcha.getResponse(1)
-        if (recaptcha && recaptchaResponse.length === 0) return sendNotification("{{i18n/recaptchaFailed}}", "warning")
-        grecaptcha.reset(1)
+      function send(token) {
+        $.when(sendRequest({
+          module: "login",
+          action: "passwordRecovery",
+          mail: mail,
+          recaptcha: token || "",
+          timestamp: Math.floor(Date.now() / 1000)
+        })).done(function (response) {
+          if (response.error || response.maintenance || !response) return
+
+          if (!external) {
+            window.location.replace("native://browser?url=" + encodeURIComponent(window.location.href + "?recovery=true&user_id=&token=" + parseQueryString(headers.authorize).token))
+          } else {
+            var toggle = UIkit.toggle("#loginForm", {
+              target: "#recoverForm, #confirmForm",
+              animation: "uk-animation-fade"
+            })
+            toggle.toggle()
+            toggle.$destroy()
+            sendNotification("{{i18n/mailSuccess}}", "success")
+          }
+        })
       }
 
-      $.when(sendRequest({
-        module: "login",
-        action: "passwordRecovery",
-        mail: mail,
-        recaptcha: recaptchaResponse || "",
-        timestamp: Math.floor(Date.now() / 1000)
-      })).done(function (response) {
-        if (response.error || response.maintenance || !response) return
-
-        if (!external) {
-          window.location.replace("native://browser?url=" + encodeURIComponent(window.location.href + "?recovery=true&user_id=&token=" + parseQueryString(headers.authorize).token))
-        } else {
-          var toggle = UIkit.toggle("#loginForm", {
-            target: "#recoverForm, #confirmForm",
-            animation: "uk-animation-fade"
+      if (recaptchaEnabled === true) {
+        grecaptcha.ready(function () {
+          grecaptcha.execute("{{siteKey}}", { action: "login" }).then(function (token) {
+            send(token)
           })
-          toggle.toggle()
-          toggle.$destroy()
-          sendNotification("{{i18n/mailSuccess}}", "success")
-        }
-      })
+        })
+      } else {
+        send()
+      }
+
     }
 
     function confirmCode() {

@@ -89,5 +89,6 @@ Handlebars.registerHelper("header", function (pageName, context) {
 })
 
 Handlebars.registerHelper("setChecked", function (currentValue, value) {
+  if (!value && currentValue === 0) return new Handlebars.SafeString("checked")
   return new Handlebars.SafeString(currentValue == value ? "checked" : "")
 })

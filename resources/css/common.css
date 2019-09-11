@@ -6,7 +6,7 @@
   border: 0;
 }
 body {
-  font-size: 17px;
+  font-size: 1rem;
   padding: 0 2px;
   -webkit-text-size-adjust : 100%;
   background: transparent;
@@ -14,6 +14,10 @@ body {
 html, body {
   height: 100%;
 }
+p {
+  margin: 0px;
+}
+
 
 /* SL NavBar */
 .sl-navbar-container:not(.uk-navbar-transparent) {
@@ -76,7 +80,8 @@ html, body {
 
 /* SL Headers */
 h1, h2, h3, h4, h5, h6 {
-  margin: 0 !important;
+  margin-bottom: 10px !important;
+  margin-top: 10px !important;
 }
 
 /* SL announce detail */

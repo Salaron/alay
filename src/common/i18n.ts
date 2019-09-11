@@ -28,7 +28,10 @@ const log = new Log("i18n")
 export const showdownConverter = new showdown.Converter({
   tables: true, 
   simpleLineBreaks: true, 
-  requireSpaceBeforeHeadingText: true
+  smartIndentationFix: true,
+  openLinksInNewWindow: true,
+  emoji: true,
+  omitExtraWLInCodeBlocks: true
 })
 
 export async function init() {
