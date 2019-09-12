@@ -139,6 +139,7 @@ function updateBodySize() {
 if (!enableResize) var enableResize = false
 if ($ && enableResize) {
   updateBodySize();
+  
   $(function () {
     updateBodySize();
   })

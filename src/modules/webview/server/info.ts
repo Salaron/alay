@@ -2,6 +2,9 @@ import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
 import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
+import { readFile } from "fs"
+import { promisify } from "util"
+import moment from "moment"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -15,15 +18,39 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
-    let strings = await i18n.getStrings(this.user_id, "common")
-    let template = await WebView.getTemplate("server", "info")
+    let code = await i18n.getUserLocalizationCode(this.user_id)
+    let [strings, template, currentOnline, changeLanguageModal] = await Promise.all([
+      i18n.getStrings(code, "common"),
+      WebView.getTemplate("server", "info"),
+      webview.getCurrentOnline(),
+      webview.getLanguageModalTemplate(this.user_id)
+    ])
+
+    let serverInfo = {
+      branch: "Unknown",
+      commit: "Unknown",
+      commitDate: "Unknown",
+      clientVersion: Config.server.server_version,
+      bundleVersion: this.requestData.request.headers["bundle-version"] ? this.requestData.request.headers["bundle-version"] : "Unknown",
+      uptime: moment.duration(0 - Math.ceil(process.uptime()), "seconds").locale(code).humanize(true)
+    }
+    try {
+      let branchInfo = (await promisify(readFile)(`${rootDir}/.git/HEAD`, "utf-8")).substring(5).replace(/\n/g, "")
+      let log = (await promisify(readFile)(`${rootDir}/.git/logs/${branchInfo}`, "utf-8")).split(/\n/)
+      let lastCommit = log[log.length - 2].split(/\t|\s/g)
+      serverInfo.branch = branchInfo.split("/")[2]
+      serverInfo.commit = lastCommit[1].substring(0, 7)
+      serverInfo.commitDate = moment(parseInt(lastCommit[4]) * 1000).format("YYYY-MM-DD HH:mm") + " " + lastCommit[5]
+    } catch (_) {
+    }
 
     let values = {
       i18n: strings,
-      currentOnline: await webview.getCurrentOnline(),
-      isAdmin: Config.server.admin_ids.includes(this.user_id),
-      changeLanguageModal: await webview.getLanguageModalTemplate(this.user_id),
-      headers: JSON.stringify(this.requestData.getWebapiHeaders())
+      currentOnline,
+      changeLanguageModal,
+      isAdmin: Config.server.admin_ids.includes(this.user_id),  
+      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
+      serverInfo
     }
 
     return {

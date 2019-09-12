@@ -136,13 +136,13 @@ ol, ul {
 
 /* SL Profile */
 .avatar-border {
-  height: 106px;
   width: 106px;
-  border-radius: 100%;
+  height: 106px;
+  background-position: center;
+  background-size: auto;
+  background-repeat: no-repeat;
   box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
-  margin-top: 10px;
-  background-position: center;
-  background-repeat: no-repeat;
+  border-radius: 100%;
 }

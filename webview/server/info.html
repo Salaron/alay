@@ -20,7 +20,19 @@
         {{{header i18n/aboutServer this}}}
       </div>
 
-      <div id="body">
+      <div id="body" class="uk-scrollspy-inview uk-animation-fade">
+
+        <div class="uk-container uk-container-small">
+          <h4 class="uk-text-bold">SunLight Project</h4>
+          <p>
+            Branch: {{serverInfo/branch}} <br>
+            Commit: {{serverInfo/commit}} <br>
+            Date: {{serverInfo/commitDate}} <br>
+            Client Version: {{serverInfo/clientVersion}} <br>
+            Bundle Version: {{serverInfo/bundleVersion}} <br>
+            Uptime: {{serverInfo/uptime}}
+          </p>
+        </div>
       </div>
 
       {{{changeLanguageModal}}}
@@ -40,7 +52,7 @@
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
 
   <script>
-    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
+    var ps = new PerfectScrollbar('#body', { suppressScrollX: false })
   </script>
 </body>
 

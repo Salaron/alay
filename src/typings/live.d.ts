@@ -45,3 +45,12 @@ interface scoreInfo {
   bad_cnt: number
   miss_cnt: number
 }
+
+interface writeToLogResult {
+  live_setting_id: number
+  live_difficulty_id?: number
+  score: number
+  combo: number
+  combo_rank: number
+  score_rank: number
+}

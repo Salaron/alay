@@ -58,7 +58,7 @@ export default class extends MainAction {
       if (!currentEvent.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
       if (currentEvent.active && Live.getMarathonLiveList(currentEvent.id).includes(this.params.live_difficulty_id)) eventLive = true
     }
-    
+
     let maxKizuna = Live.calculateMaxKizuna(liveData.s_rank_combo)
     if (this.params.love_cnt > maxKizuna) throw new ErrorUser(`Too more kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`, this.user_id)
     let deck = (await live.getUserDeck(this.user_id, session.deck_id, false, undefined, true)).deck
@@ -153,6 +153,13 @@ export default class extends MainAction {
       class_system: User.getClassSystemStatus(this.user_id)
     }
 
+    await live.writeToLog(this.user_id, {
+      live_setting_id: liveData.live_setting_id,
+      score: totalScore,
+      combo: this.params.max_combo,
+      combo_rank: comboRank,
+      score_rank: scoreRank
+    })
     await this.connection.query(`DELETE FROM user_live_progress WHERE user_id = :user`, { user: this.user_id })
     if (currentEvent.active) {
       let userStatus = await this.connection.first(`SELECT token_point, score FROM event_ranking WHERE user_id = :user AND event_id = :event`, {

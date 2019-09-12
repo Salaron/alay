@@ -13,6 +13,23 @@
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
 </head>
 
+<style>
+  .stats_entry {
+    display: flex;
+    margin: 0px;
+    justify-content: space-between;
+  }
+
+  .stats_test {
+    font-weight: 450;
+  }
+
+  .stats_value {
+    margin-left: 5px;
+    font-weight: 700;
+  }
+</style>
+
 <body>
   <div id="outer">
     <div id="inner">
@@ -22,52 +39,62 @@
 
       <div id="body" class="uk-scrollspy-inview uk-animation-fade">
 
-        <div class="uk-container uk-width-1-1">
-          <div class="uk-grid uk-grid-medium uk-flex uk-flex-middle" data-uk-grid="">
-            <div class="uk-width-auto uk-first-column">
-              <div class="avatar-border" style="background-image: url('//r.llsif.win/{{icon}}');margin-bottom: 15px;">
+        <div class="uk-container uk-width-1-1 uk-margin">
+          <div class="uk-flex uk-margin-small-top">
+            <div>
+              <div class="avatar-border" style="background-image: url('//r.llsif.win/{{icon}}');">
               </div>
             </div>
-            <div class="uk-width-expand" style="line-height: 15px;">
-              <h3 class="uk-margin-remove uk-text-bold">{{user/name}}</h3>
-              <span class="uk-text-small uk-text-muted"
+            <div class="uk-margin-left">
+              <h3 class="uk-text-bold">{{user/name}}</h3>
+              <span class="uk-text-muted"
                 style="word-wrap: break-word;">{{nl2br user/introduction}}</span>
             </div>
           </div>
         </div>
 
-        <div class="uk-container uk-margin uk-width-1-1">
-          <div class="uk-overflow-auto">
-            <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
-              <thead>
-                <tr>
-                  <th class="uk-width-1-5">User ID</th>
-                  <th class="uk-width-1-5">{{i18n/userRank}}</th>
-                  <th class="uk-width-1-4">{{i18n/registrationDate}}</th>
-                  <th class="uk-width-1-5">{{i18n/daysInTheGame}}</th>
-                  <th class="uk-width-1-5" uk-tooltip="title: {{i18n/excludingEvents}}; pos: bottom-right">
-                    {{i18n/livesPlayed}}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{{user/user_id}}</td>
-                  <td>{{user/rank}}</td>
-                  <td>{{momentFormat user/registrationDate "DD.MM.YYYY"}}</td>
-                  <td>{{user/daysInTheGame}}</td>
-                  <td uk-tooltip="title: {{i18n/excludingEvents}}; pos: top-right">
-                    {{user/livesPlayed}}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <hr class="uk-margin-remove-top">
+        <div class="uk-container uk-width-1-1">
+          <dl class="stats_entry">
+            <dt class="stats_test">User ID</dt>
+            <dd class="stats_value">{{numberWithSpaces user/user_id}}</dd>
+          </dl>
+          <dl class="stats_entry">
+            <dt class="stats_test">{{i18n/userRank}}</dt>
+            <dd class="stats_value">{{numberWithSpaces user/rank}}</dd>
+          </dl>
+          <dl class="stats_entry">
+            <dt class="stats_test">{{i18n/registrationDate}}</dt>
+            <dd class="stats_value" uk-tooltip="title: {{user/registrationDate}}">{{user/registrationDateFormated}}
+            </dd>
+          </dl>
+          <dl class="stats_entry">
+            <dt class="stats_test">{{i18n/daysInTheGame}}</dt>
+            <dd class="stats_value">{{numberWithSpaces user/daysInTheGame}}</dd>
+          </dl>
+          <dl class="stats_entry">
+            <dt class="stats_test">Времени в лайвах</dt>
+            <dd class="stats_value" uk-tooltip="title: {{numberWithSpaces user/playTimeWithLowCombo}} with combo < 50 (lg farming?)">{{user/playTime}}</dd>
+          </dl>
+          <dl class="stats_entry">
+            <dt class="stats_test">{{i18n/livesPlayed}}</dt>
+            <dd class="stats_value">{{numberWithSpaces user/livesPlayed}}</dd>
+          </dl>
+          <dl class="stats_entry">
+            <dt class="stats_test">Всего очков</dt>
+            <dd class="stats_value">{{numberWithSpaces user/totalScore}}</dd>
+          </dl>
+          <dl class="stats_entry">
+            <dt class="stats_test">Максимальное комбо</dt>
+            <dd class="stats_value">{{numberWithSpaces user/maxCombo}}</dd>
+          </dl>
         </div>
 
+
         {{#if haveEventData}}
-        <div class="uk-container uk-margin uk-width-1-1">
+        <div class=" uk-container uk-margin uk-width-1-1">
+          <hr>
           <h3 class="uk-text-bold uk-align-center">
-            <center class="uk-margin-bottom">{{i18n/events}}</center>
+            <center>{{i18n/events}}</center>
           </h3>
           <div class="uk-overflow-auto">
             <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
@@ -83,9 +110,9 @@
                   <th class="uk-table-shrink">{{i18n/livesPlayed}}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="eventDataTableBody">
                 {{#each eventData}}
-                <tr>
+                <tr class="eventData">
                   <td style="font-size: .9rem;">{{this/type}}</td>
                   <td class="uk-text-nowrap" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
                     {{momentFormat this/start_date "DD.MM.YY HH:mm"}}</td>
@@ -99,6 +126,14 @@
               </tbody>
             </table>
           </div>
+          {{#if haveMoreEventData}}
+          <button id="loadMoreEventDataButton" type="button"
+            class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
+            onclick="loadEventData()">
+            <span class="uk-icon" uk-icon="triangle-down"></span> показать больше <span class="uk-icon"
+              uk-icon="triangle-down"></span>
+          </button>
+          {{/if}}
           <hr class="uk-margin-remove-top">
         </div>
         {{/if}}
@@ -111,6 +146,7 @@
   <script type="">
     var headers = {{{headers}}}
     var enableResize = true
+    var userId = {{{userId}}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -122,6 +158,27 @@
 
   <script>
     var ps = new PerfectScrollbar('#body', { suppressScrollX: false })
+
+    function loadEventData() {
+      $("#loadMoreEventDataButton").attr("disabled", "disabled")
+      var offset = $(".eventData").length
+
+      $.when(sendRequest({
+        module: "profile",
+        action: "getEventData",
+        offset: offset,
+        limit: 10,
+        userId: userId,
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+        if (response.response_data.total === offset + response.response_data.added) $("#loadMoreEventDataButton").attr("hidden", "hidden")
+        $("#eventDataTableBody").append(response.response_data.data)
+        $("#loadMoreEventDataButton").removeAttr("disabled")
+      }).fail(function () {
+        $("#loadMoreEventDataButton").removeAttr("disabled")
+      })
+    }
   </script>
 </body>
 

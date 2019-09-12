@@ -66,7 +66,7 @@ Handlebars.registerHelper("equal", function (a, b, options) {
   return options.inverse(this)
 })
 
-Handlebars.registerHelper("nl2br", function (text) {  
+Handlebars.registerHelper("nl2br", function (text) {
   return new Handlebars.SafeString(text.replace(/(\r\n|\n|\r|\\n|\\r|\\r\\n)/gm, "<br>"))
 })
 
@@ -75,7 +75,7 @@ Handlebars.registerHelper("momentFormat", function (date, format) {
 })
 
 Handlebars.registerHelper("notAvailable", function (value) {
-  return new Handlebars.SafeString(!value ? "N/A" : value)
+  return new Handlebars.SafeString(!value ? "—" : value)
 })
 
 Handlebars.registerHelper("header", function (pageName, context) {
@@ -91,4 +91,11 @@ Handlebars.registerHelper("header", function (pageName, context) {
 Handlebars.registerHelper("setChecked", function (currentValue, value) {
   if (!value && currentValue === 0) return new Handlebars.SafeString("checked")
   return new Handlebars.SafeString(currentValue == value ? "checked" : "")
+})
+
+Handlebars.registerHelper("numberWithSpaces", function (number) {
+  if (!number) return new Handlebars.SafeString("0")
+  let parts = number.toString().split(".")
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+  return new Handlebars.SafeString(parts.join("."))
 })

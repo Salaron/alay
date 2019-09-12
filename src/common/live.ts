@@ -441,6 +441,8 @@ export class Live {
         if (deck[i].love + deck[i].kizuna_add < deck[i].max_love) {
           deck[i].kizuna_add++
           kizuna--
+        } else {
+          kizuna--
         }
       }
     }
@@ -464,6 +466,18 @@ export class Live {
     })
 
     return deck
+  }
+
+  public async writeToLog(userId: number, result: writeToLogResult) {
+    await this.connection.execute("INSERT INTO user_live_log (user_id, live_setting_id, live_difficulty_id, score, combo, combo_rank, score_rank) VALUES (:user, :lsid, :ldid, :score, :combo, :combo_r, :score_r)", {
+      user: userId,
+      lsid: result.live_setting_id,
+      ldid: result.live_difficulty_id,
+      score: result.score,
+      combo: result.combo,
+      combo_r: result.combo_rank,
+      score_r: result.score_rank
+    })
   }
 
   public static getAvailableLiveList() {
