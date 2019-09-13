@@ -64,7 +64,7 @@
     "maxCombo": "Максимальное комбо",
     "livesPlayed": "Сыграно лайвов",
     "excludingEvents": "Без учёта ивентов",
-    "events": "Участие в ивентах",
+    "events": "Активность в ивентах",
     "eventType": "Тип",
     "eventStart": "Начало",
     "eventEnd": "Конец",
@@ -72,9 +72,10 @@
     "eventScoreRank": "Score ранк",
     "jpTimeZone": "Японский часовой пояс",
     "lastActivity": "Последняя активность",
-    "rank": "Ранг",
-    "songName": "Название",
-    "combo": "Комбо"
+    "combo": "комбо",
+    "showMore": "ПОКАЗАТЬ БОЛЬШЕ",
+    "lastActivityDataIsMissing": "Пользователь не делал ничего заметного в последнее время!",
+    "eventDataIsMissing": "Пользователь пока не участвовал в ивентах :c"
   },
   "settings-index": {
     "mods": "Моды",

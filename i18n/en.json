@@ -57,13 +57,14 @@
   },
   "profile-index": {
     "registrationDate": "Registration date",
+    "userRank": "Rank by level",
     "daysInTheGame": "Days in the game",
     "totalPlayTime": "Total play time",
     "totalScore": "Total score",
     "maxCombo": "Maximum combo",
     "livesPlayed": "Lives played",
     "excludingEvents": "Excluding events",
-    "events": "Participation in Events",
+    "events": "Event Activity",
     "eventType": "Type",
     "eventStart": "Start date",
     "eventEnd": "End date",
@@ -71,9 +72,10 @@
     "eventScoreRank": "Score rank",
     "jpTimeZone": "Japanese time zone",
     "lastActivity": "Recent Activity",
-    "rank": "Rank",
-    "songName": "Song name",
-    "combo": "Combo"
+    "combo": "combo",
+    "showMore": "SHOW MORE",
+    "lastActivityDataIsMissing": "This user hasn't done anything notable recently!",
+    "eventDataIsMissing": "The user has not yet participated in the events :c"
   },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} removed you from their friend list",

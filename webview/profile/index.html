@@ -107,20 +107,17 @@
           <div class="uk-overflow-auto">
             <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
               <thead>
-                <tr>
-                  <th>{{i18n/rank}}</th>
-                  <th>{{i18n/songName}}</th>
-                  <th>{{i18n/combo}}</th>
-                </tr>
               </thead>
               <tbody id="lastActivityTableBody">
                 {{#each lastActivity}}
+                {{#if this}}
                 <tr class="lastActivity">
                   <td class="rank-icon" style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
                   </td>
                   <td>{{nl2br this/name}} <br><span class="uk-text-small">{{this/timeAgo}}</span></td>
-                  <td>{{this/combo}}/{{this/s_rank_combo}} ({{this/combo_rank}})</td>
+                  <td uk-tooltip="{{../i18n/combo}}"> {{this/combo}}/{{this/s_rank_combo}}</td>
                 </tr>
+                {{/if}}
                 {{/each}}
               </tbody>
             </table>
@@ -129,13 +126,13 @@
           <button id="loadMoreLastActivityDataButton" type="button"
             class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
             onclick="loadLastActivityData()">
-            <span class="uk-icon" uk-icon="triangle-down"></span> показать больше <span class="uk-icon"
+            <span class="uk-icon" uk-icon="triangle-down"></span> {{i18n/showMore}} <span class="uk-icon"
               uk-icon="triangle-down"></span>
           </button>
           {{/if}}
           <hr class="uk-margin-remove-top">
           {{else}}
-          <p>Пользователь не делал ничего заметного в последнее время!</p>
+          <p>{{i18n/lastActivityDataIsMissing}}</p>
           <hr>
           {{/if}}
         </div>
@@ -179,14 +176,14 @@
           <button id="loadMoreEventDataButton" type="button"
             class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
             onclick="loadEventData()">
-            <span class="uk-icon" uk-icon="triangle-down"></span> показать больше <span class="uk-icon"
+            <span class="uk-icon" uk-icon="triangle-down"></span> {{i18n/showMore}} <span class="uk-icon"
               uk-icon="triangle-down"></span>
           </button>
           {{/if}}
           <hr class="uk-margin-remove-top">
         </div>
         {{else}}
-        <p>Пользователь пока не участвовал в ивентах...</p>
+        <p>{{i18n/eventDataIsMissing}}</p>
         <hr>
         {{/if}}
       </div>

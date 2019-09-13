@@ -41,16 +41,16 @@ export default class extends WebApiAction {
     const i18n = new I18n(this.connection)
 
     let code = await i18n.getUserLocalizationCode(this.user_id)
-    let [template, liveDataLog, total] = await Promise.all([
+    let [strings, template, liveDataLog, total] = await Promise.all([
+      i18n.getStrings(code, "profile-index"),
       WebView.getTemplate("profile", "lastactivitydata"),
-      this.connection.query(`SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC LIMIT ${this.params.offset}, ${this.params.limit}`, { 
-        user: this.params.userId 
+      this.connection.query(`SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC LIMIT ${this.params.offset}, ${this.params.limit}`, {
+        user: this.params.userId
       }),
       this.connection.first("SELECT COUNT(*) as count FROM user_live_log WHERE user_id = :user", { user: this.params.userId })
     ])
 
-    let lastActivity = <any>[]
-    await Promise.all(liveDataLog.map(async live => {
+    let lastActivity = await Promise.all(liveDataLog.map(async live => {
       if (!live.live_setting_id && !live.live_setting_ids) throw new Error("live setting id is missing")
 
       // mf support
@@ -79,7 +79,7 @@ export default class extends WebApiAction {
       live.score_rank = convertRank[live.score_rank]
       live.combo_rank = convertRank[live.combo_rank]
 
-      lastActivity.push(live)
+      return live
     }))
 
     return {
@@ -88,7 +88,8 @@ export default class extends WebApiAction {
         total: total.count,
         added: lastActivity.length,
         data: template({
-          lastActivity
+          lastActivity,
+          i18n: strings
         })
       }
     }

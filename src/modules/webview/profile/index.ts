@@ -86,17 +86,16 @@ export default class extends WebViewAction {
     })
 
     let total = 0
-    let lastActivity = <any>[]
 
     // promise.all of promise.all?
-    await Promise.all([
+    let [, lastActivity] = await Promise.all([
       Promise.all(liveDataStatus.map(async live => {
         let time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
           lsid: live.live_setting_id
         })
-        if (live.hi_combo > 50 && live.clear_cnt < 250) total += time.live_time * (live.clear_cnt || 1)
+        if (live.hi_combo > 100) total += time.live_time * (live.clear_cnt || 1)
       })),
-      Promise.all(liveDataLog.map(async live => {
+      Promise.all(liveDataLog.map(async (live, index) => {
         if (!live.live_setting_id && !live.live_setting_ids) throw new Error("live setting id is missing")
 
         // mf support
@@ -115,19 +114,19 @@ export default class extends WebViewAction {
         live.s_rank_combo = 0
         live.s_rank_score = 0
         for (let liveInfo of liveInfoList) {
-          if (live.combo > 5 && live.is_event) total += liveInfo.live_time
+          if (live.combo > 100 && live.is_event) total += liveInfo.live_time
           songNames.push(`${liveInfo.name} (${convertDifficulty[liveInfo.difficulty]} ${liveInfo.stage_level}☆)`)
           live.s_rank_combo += liveInfo.s_rank_combo
           live.s_rank_score += liveInfo.s_rank_score
         }
-        if (lastActivity.length === 4) return
+        if (index > 3) return
 
         live.name = songNames.join("\n")
         live.timeAgo = moment.duration(moment(live.insert_date).diff(Date.now())).locale(code).humanize(true)
         live.score_rank = convertRank[live.score_rank]
         live.combo_rank = convertRank[live.combo_rank]
 
-        lastActivity.push(live)
+        return live
       }))
     ])
 
@@ -137,10 +136,11 @@ export default class extends WebViewAction {
     user.registrationDate = moment(user.registrationDate).locale(code).format("DD MMMM YYYY HH:mm:ss")
     user.totalScore = userScore.total
 
+    lastActivity = lastActivity.slice(0, 4)
     let haveMoreEventData = eventData.length > 3
     let haveMoreLastActivityData = lastActivity.length > 3
-    eventData.pop()
-    lastActivity.pop()
+    if (haveMoreEventData) eventData.pop()
+    if (haveMoreLastActivityData) lastActivity.pop()
     let values = {
       i18n: strings,
       isAdmin: Config.server.admin_ids.includes(this.user_id),
@@ -153,7 +153,6 @@ export default class extends WebViewAction {
       currentOnline,
       changeLanguageModal,
       userId,
-      haveEventData: eventData.length != 0,
       icon: user.display_rank === 1 ? icons.normal_icon_asset : icons.rank_max_icon_asset
     }
 
