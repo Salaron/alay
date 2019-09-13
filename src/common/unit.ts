@@ -330,7 +330,7 @@ export class Unit {
       unit_skill_level: data.unit_skill_level,
       max_hp: data.max_hp,
       favorite_flag: !!data.favorite_flag,
-      display_rank: data.favorite_flag,
+      display_rank: data.display_rank,
       unit_skill_exp: data.unit_skill_exp,
       skill_level: data.unit_skill_level,
       unit_removable_skill_capacity: data.removable_skill_capacity,
