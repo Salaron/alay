@@ -71,7 +71,10 @@
     "eventPtRank": "pts ранк",
     "eventScoreRank": "Score ранк",
     "jpTimeZone": "Японский часовой пояс",
-    "lastActivity": "Последняя активность"
+    "lastActivity": "Последняя активность",
+    "rank": "Ранг",
+    "songName": "Название",
+    "combo": "Комбо"
   },
   "settings-index": {
     "mods": "Моды",

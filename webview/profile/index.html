@@ -29,7 +29,6 @@
     font-weight: 700;
   }
 
-
   .rank-icon {
     width: 6em;
     height: 2em;
@@ -82,8 +81,7 @@
           </dl>
           <dl class="stats_entry">
             <dt class="stats_test">{{i18n/totalPlayTime}}</dt>
-            <dd class="stats_value"
-              uk-tooltip="title: {{numberWithSpaces user/playTimeWithLowCombo}} with combo < 50 (lg farming?)">
+            <dd class="stats_value">
               {{user/playTime}}</dd>
           </dl>
           <dl class="stats_entry">
@@ -105,26 +103,36 @@
           <h3 class="uk-text-bold uk-align-center uk-margin-bottom">
             <center>{{i18n/lastActivity}}</center>
           </h3>
-          {{#if haveLastActivity}}
+          {{#if lastActivity.length}}
           <div class="uk-overflow-auto">
             <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
               <thead>
-
-              </thead>
-              <tbody id="lastActivityBody">
-                {{#each lastActivity}}
                 <tr>
-                  <td class="rank-icon"
-                    style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
+                  <th>{{i18n/rank}}</th>
+                  <th>{{i18n/songName}}</th>
+                  <th>{{i18n/combo}}</th>
+                </tr>
+              </thead>
+              <tbody id="lastActivityTableBody">
+                {{#each lastActivity}}
+                <tr class="lastActivity">
+                  <td class="rank-icon" style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
                   </td>
-                  <td>{{this/name}} <br><span class="uk-text-small">{{this/timeAgo}}</span></td>
+                  <td>{{nl2br this/name}} <br><span class="uk-text-small">{{this/timeAgo}}</span></td>
                   <td>{{this/combo}}/{{this/s_rank_combo}} ({{this/combo_rank}})</td>
-                  <td>{{this/score}} ({{this/score_rank }})</td>
                 </tr>
                 {{/each}}
               </tbody>
             </table>
           </div>
+          {{#if haveMoreLastActivityData}}
+          <button id="loadMoreLastActivityDataButton" type="button"
+            class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
+            onclick="loadLastActivityData()">
+            <span class="uk-icon" uk-icon="triangle-down"></span> показать больше <span class="uk-icon"
+              uk-icon="triangle-down"></span>
+          </button>
+          {{/if}}
           <hr class="uk-margin-remove-top">
           {{else}}
           <p>Пользователь не делал ничего заметного в последнее время!</p>
@@ -132,11 +140,11 @@
           {{/if}}
         </div>
 
-        {{#if haveEventData}}
         <div class="uk-container uk-margin uk-width-1-1">
-          <h3 class="uk-text-bold uk-align-center">
+          <h3 class="uk-text-bold uk-align-center uk-margin-bottom">
             <center>{{i18n/events}}</center>
           </h3>
+          {{#if eventData.length}}
           <div class="uk-overflow-auto">
             <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
               <thead>
@@ -177,6 +185,9 @@
           {{/if}}
           <hr class="uk-margin-remove-top">
         </div>
+        {{else}}
+        <p>Пользователь пока не участвовал в ивентах...</p>
+        <hr>
         {{/if}}
       </div>
 
@@ -200,6 +211,27 @@
   <script>
     var ps = new PerfectScrollbar('#body', { suppressScrollX: false })
 
+    function loadLastActivityData() {
+      $("#loadMoreLastActivityDataButton").attr("disabled", "disabled")
+      var offset = $(".lastActivity").length
+
+      $.when(sendRequest({
+        module: "profile",
+        action: "getLastActivityData",
+        offset: offset,
+        limit: 5,
+        userId: userId,
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+        if (response.response_data.total === offset + response.response_data.added) $("#loadMoreLastActivityDataButton").attr("hidden", "hidden")
+        $("#lastActivityTableBody").append(response.response_data.data)
+        $("#loadMoreLastActivityDataButton").removeAttr("disabled")
+      }).fail(function () {
+        $("#loadMoreLastActivityDataButton").removeAttr("disabled")
+      })
+    }
+
     function loadEventData() {
       $("#loadMoreEventDataButton").attr("disabled", "disabled")
       var offset = $(".eventData").length
@@ -208,7 +240,7 @@
         module: "profile",
         action: "getEventData",
         offset: offset,
-        limit: 10,
+        limit: 5,
         userId: userId,
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {

@@ -1,6 +1,5 @@
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../core/requestData"
-import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
 import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"

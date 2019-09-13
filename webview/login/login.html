@@ -161,6 +161,7 @@
     }
 
     function login() {
+      $(".uk-button").attr("disabled", "disabled")
       var userId = $("#user_id").val()
       var pass = $("#password").val()
 
@@ -178,6 +179,7 @@
           recaptcha: token || "",
           timestamp: Math.floor(Date.now() / 1000)
         })).done(function (response) {
+          $(".uk-button").removeAttr("disabled")
           if (response.error || response.maintenance || !response) return
           if ("{{{redirect}}}".length != 0) {
             window.location.replace(window.location.protocol + "//" + window.location.host + "/{{{redirect}}}")
@@ -188,6 +190,8 @@
               animation: "uk-animation-fade"
             }).toggle()
           }
+        }).fail(function () {
+          $(".uk-button").removeAttr("disabled")
         })
       }
       if (recaptchaEnabled === true) {
@@ -202,6 +206,7 @@
     }
 
     function recoverPassword() {
+      $(".uk-button").attr("disabled", "disabled")
       var mail = $("#mail").val()
       if (!checkMail(mail)) return sendNotification("{{i18n/mailInvalidFormat}}", "warning")
 
@@ -213,6 +218,7 @@
           recaptcha: token || "",
           timestamp: Math.floor(Date.now() / 1000)
         })).done(function (response) {
+          $(".uk-button").removeAttr("disabled")
           if (response.error || response.maintenance || !response) return
 
           if (!external) {
@@ -226,6 +232,8 @@
             toggle.$destroy()
             sendNotification("{{i18n/mailSuccess}}", "success")
           }
+        }).fail(function () {
+          $(".uk-button").removeAttr("disabled")
         })
       }
 
@@ -242,6 +250,7 @@
     }
 
     function confirmCode() {
+      $(".uk-button").attr("disabled", "disabled")
       var code = $("#code").val()
 
       if (!checkPass(code) || code.length != 10) return sendNotification("{{i18n/confirmationCodeInvalidFormat}}", "warning")
@@ -252,6 +261,7 @@
         code: code,
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
+        $(".uk-button").removeAttr("disabled")
         if (response.error || response.maintenance || !response) return
         var toggle = UIkit.toggle("#loginForm", {
           target: "#loginForm, #confirmForm",
@@ -260,6 +270,8 @@
         toggle.toggle()
         toggle.$destroy()
         sendNotification("{{i18n/passwordResetSuccess}}", "success")
+      }).fail(function () {
+        $(".uk-button").removeAttr("disabled")
       })
     }
   </script>

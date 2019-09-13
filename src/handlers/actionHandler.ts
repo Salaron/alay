@@ -50,13 +50,13 @@ export default async function executeAction(module: string, action: string, requ
       }
     }
 
-    let startTime = process.hrtime()
+    let startTime = Date.now()
     if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUser(`No permissions`, requestData.user_id)
     if (body.paramTypes) checkParamTypes(requestData.params, body.paramTypes())
     if (body.paramCheck) body.paramCheck()
     let result = await body.execute()
-    let endTime = process.hrtime(startTime)
-    log.debug(`${module}/${action} execution took ${endTime[1] / 1000000} ms`)
+    let endTime = Date.now()
+    log.debug(`${module}/${action} -- ${endTime - startTime} ms`, "Execution")
     return result
   } catch (err) {
     // handle module errors

@@ -103,6 +103,7 @@
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
 
     function startUp() {
+      $(".uk-button").attr("disabled", "disabled")
       var name = $("#name").val()
       var mail = $("#mail").val()
       var pass = $("#password").val()
@@ -129,6 +130,7 @@
           recaptcha: token || "",
           timestamp: Math.floor(Date.now() / 1000)
         })).done(function (response) {
+          $(".uk-button").removeAttr("disabled")
           if (!response || !response.response_data) return
 
           $("#dialog, #back").hide()
@@ -136,6 +138,8 @@
             userId: response.response_data.user_id,
             mail: response.response_data.mail_sended === true ? "{{{i18n/checkMail}}}" : ""
           })).removeAttr("hidden").show()
+        }).fail(function () {
+          $(".uk-button").removeAttr("disabled")
         })
       }
 
@@ -148,8 +152,6 @@
       } else {
         send()
       }
-
-
     }
   </script>
 </body>

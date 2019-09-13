@@ -47,8 +47,9 @@ interface scoreInfo {
 }
 
 interface writeToLogResult {
-  live_setting_id: number
-  live_difficulty_id?: number
+  live_setting_id?: number
+  live_setting_ids?: string
+  is_event: boolean
   score: number
   combo: number
   combo_rank: number

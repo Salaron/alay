@@ -63,14 +63,17 @@
     "maxCombo": "Maximum combo",
     "livesPlayed": "Lives played",
     "excludingEvents": "Excluding events",
-    "events": "Participation in events",
+    "events": "Participation in Events",
     "eventType": "Type",
     "eventStart": "Start date",
     "eventEnd": "End date",
     "eventPtRank": "pts rank",
     "eventScoreRank": "Score rank",
     "jpTimeZone": "Japanese time zone",
-    "lastActivity": "Last activity"
+    "lastActivity": "Recent Activity",
+    "rank": "Rank",
+    "songName": "Song name",
+    "combo": "Combo"
   },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} removed you from their friend list",

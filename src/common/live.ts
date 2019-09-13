@@ -469,10 +469,11 @@ export class Live {
   }
 
   public async writeToLog(userId: number, result: writeToLogResult) {
-    await this.connection.execute("INSERT INTO user_live_log (user_id, live_setting_id, live_difficulty_id, score, combo, combo_rank, score_rank) VALUES (:user, :lsid, :ldid, :score, :combo, :combo_r, :score_r)", {
+    await this.connection.execute("INSERT INTO user_live_log (user_id, live_setting_id, live_setting_ids, is_event, score, combo, combo_rank, score_rank) VALUES (:user, :lsid, :lsids, :event, :score, :combo, :combo_r, :score_r)", {
       user: userId,
       lsid: result.live_setting_id,
-      ldid: result.live_difficulty_id,
+      lsids: result.live_setting_ids,
+      event: result.is_event,
       score: result.score,
       combo: result.combo,
       combo_r: result.combo_rank,

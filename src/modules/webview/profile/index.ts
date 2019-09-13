@@ -41,7 +41,7 @@ export default class extends WebViewAction {
     }
 
     let code = await i18n.getUserLocalizationCode(this.user_id)
-    let [strings, template, user, userScore, eventData, _lastActivity, liveData, liveData2, currentOnline, changeLanguageModal] = await Promise.all([
+    let [strings, template, user, userScore, eventData, liveDataStatus, liveDataLog, currentOnline, changeLanguageModal] = await Promise.all([
       i18n.getStrings(code, "common", "profile-index"),
       WebView.getTemplate("profile", "index"),
       this.connection.first(`
@@ -64,7 +64,7 @@ export default class extends WebViewAction {
       WHERE users.user_id = :user`, {
         user: userId
       }),
-      this.connection.first(`SELECT (IFNULL(SUM(hi_score), 0) + (SELECT IFNULL(SUM(score), 0) FROM user_live_log WHERE user_id = :user)) as total FROM user_live_status WHERE user_id = :user`, { user: userId }),
+      this.connection.first(`SELECT IFNULL(SUM(score), 0) as total FROM user_live_log WHERE user_id = :user`, { user: userId }),
       this.connection.query(`
       SELECT 
         name as type, start_date, end_date, lives_played,
@@ -75,9 +75,8 @@ export default class extends WebViewAction {
       WHERE user_id = :user ORDER BY end_date DESC`, {
         user: userId
       }),
-      this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC", { user: userId }),
       this.connection.query("SELECT * FROM user_live_status WHERE user_id = :user AND status = 2", { user: userId }),
-      this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user AND live_difficulty_id IS NULL", { user: userId }),
+      this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC", { user: userId }),
       webview.getCurrentOnline(),
       webview.getLanguageModalTemplate(this.user_id)
     ])
@@ -87,47 +86,61 @@ export default class extends WebViewAction {
     })
 
     let total = 0
-    let totalWithLow = 0
+    let lastActivity = <any>[]
 
-    let [, , lastActivity] = await Promise.all([
-      Promise.all(liveData.map(async live => {
+    // promise.all of promise.all?
+    await Promise.all([
+      Promise.all(liveDataStatus.map(async live => {
         let time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
           lsid: live.live_setting_id
         })
-        totalWithLow += time.live_time * (live.clear_cnt || 1)
         if (live.hi_combo > 50 && live.clear_cnt < 250) total += time.live_time * (live.clear_cnt || 1)
       })),
-      Promise.all(liveData2.map(async live => {
-        let time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
-          lsid: live.live_setting_id
+      Promise.all(liveDataLog.map(async live => {
+        if (!live.live_setting_id && !live.live_setting_ids) throw new Error("live setting id is missing")
+
+        // mf support
+        let liveSettingId = live.live_setting_id === null ? live.live_setting_ids.split(",") : live.live_setting_id
+        let liveInfoList = await liveDB.all(`
+        SELECT 
+          name, stage_level, s_rank_combo, s_rank_score, difficulty, live_time 
+        FROM live_setting_m 
+        JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id 
+        JOIN live_track_m ON live_setting_m.live_track_id = live_track_m.live_track_id
+        WHERE live_setting_id IN (:lsids)`, {
+          lsids: liveSettingId
         })
-        totalWithLow += time.live_time
-        if (live.combo > 50) total += time.live_time
-      })),
-      Promise.all(_lastActivity.map(async live => {
-        let liveInfo = await liveDB.get("SELECT name, stage_level, s_rank_combo, difficulty FROM live_setting_m JOIN live_track_m ON live_setting_m.live_track_id = live_track_m.live_track_id WHERE live_setting_id = :lsid", {
-          lsid: live.live_setting_id
-        })
-        live.name = `${liveInfo.name} (${convertDifficulty[liveInfo.difficulty]} ${liveInfo.stage_level}☆)`
+
+        let songNames = []
+        live.s_rank_combo = 0
+        live.s_rank_score = 0
+        for (let liveInfo of liveInfoList) {
+          if (live.combo > 5 && live.is_event) total += liveInfo.live_time
+          songNames.push(`${liveInfo.name} (${convertDifficulty[liveInfo.difficulty]} ${liveInfo.stage_level}☆)`)
+          live.s_rank_combo += liveInfo.s_rank_combo
+          live.s_rank_score += liveInfo.s_rank_score
+        }
+        if (lastActivity.length === 4) return
+
+        live.name = songNames.join("\n")
         live.timeAgo = moment.duration(moment(live.insert_date).diff(Date.now())).locale(code).humanize(true)
         live.score_rank = convertRank[live.score_rank]
         live.combo_rank = convertRank[live.combo_rank]
-        live.s_rank_combo = liveInfo.s_rank_combo
-        return live
+
+        lastActivity.push(live)
       }))
     ])
-    
+
     user.playTime = `${parseInt(moment.utc(Math.floor(total * 1000)).format("D")) - 1}`
     user.playTime += `d ${moment.utc(Math.floor(total * 1000)).format("H[h] m[m] s[s]")}`
-    user.playTimeWithLowCombo = `${parseInt(moment.utc(Math.floor(totalWithLow * 1000)).format("D")) - 1}`
-    user.playTimeWithLowCombo += `d ${moment.utc(Math.floor(totalWithLow * 1000)).format("H[h] m[m] s[s]")}`
     user.registrationDateFormated = moment(user.registrationDate).locale(code).format("MMMM YYYY")
-    user.registrationDate = moment(user.registrationDate).locale(code).format("DD MMMM YYYY HH:mm:ss zz")
+    user.registrationDate = moment(user.registrationDate).locale(code).format("DD MMMM YYYY HH:mm:ss")
     user.totalScore = userScore.total
 
     let haveMoreEventData = eventData.length > 3
-    let haveLastActivity = lastActivity.length > 0
+    let haveMoreLastActivityData = lastActivity.length > 3
     eventData.pop()
+    lastActivity.pop()
     let values = {
       i18n: strings,
       isAdmin: Config.server.admin_ids.includes(this.user_id),
@@ -135,7 +148,7 @@ export default class extends WebViewAction {
       user,
       eventData,
       haveMoreEventData,
-      haveLastActivity,
+      haveMoreLastActivityData,
       lastActivity,
       currentOnline,
       changeLanguageModal,

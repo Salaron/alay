@@ -31,7 +31,7 @@ export default class extends MainAction {
         response.live_list.push({
           live_difficulty_id: live,
           start_date: "2018-01-01 00:00:00",
-          end_date: "2019-09-01 00:00:00",
+          end_date: "2020-01-01 06:00:00",
           is_random: false
         })
       }

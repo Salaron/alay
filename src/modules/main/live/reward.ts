@@ -50,9 +50,11 @@ export default class extends MainAction {
     if (!session) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
     if (session.live_difficulty_id != this.params.live_difficulty_id) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
 
-    let beforeUserInfo = await user.getUserInfo(this.user_id)
-    let currentEvent = await event.getEventStatus(Events.getEventTypes().TOKEN)
-    let liveData = await live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    let [beforeUserInfo, currentEvent, liveData] = await Promise.all([
+      user.getUserInfo(this.user_id),
+      event.getEventStatus(Events.getEventTypes().TOKEN),
+      live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    ])
     
     if (liveData.capital_type === 2) { // token live
       if (!currentEvent.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
@@ -93,11 +95,14 @@ export default class extends MainAction {
 
     let exp = Live.getExpAmount(liveData.difficulty)
     if (scoreRank === 5) exp = Math.floor(exp / 2)
-    let nextLevelInfo = await user.addExp(this.user_id, exp)
-    await item.addPresent(this.user_id, {
-      name: "coins",
-    }, "Live Show! Reward", 150000, true)
-    let afterUserInfo = await user.getUserInfo(this.user_id)
+    let [nextLevelInfo, , afterUserInfo] = await Promise.all([
+      user.addExp(this.user_id, exp),
+      item.addPresent(this.user_id, {
+        name: "coins",
+      }, "Live Show! Reward", 150000, true),
+      user.getUserInfo(this.user_id)
+    ])
+    
     let response = {
       live_info: [
         {
@@ -155,6 +160,7 @@ export default class extends MainAction {
 
     await live.writeToLog(this.user_id, {
       live_setting_id: liveData.live_setting_id,
+      is_event: false, 
       score: totalScore,
       combo: this.params.max_combo,
       combo_rank: comboRank,
