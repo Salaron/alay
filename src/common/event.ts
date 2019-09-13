@@ -64,6 +64,8 @@ const tokenEventPoint = [ // format: [difficulty][comboRank][scoreRank]
 ]
 
 export class Events {
+  public TYPES = eventType
+  public static TYPES = eventType
   private connection: Connection
   constructor(connection: Connection) {
     this.connection = connection

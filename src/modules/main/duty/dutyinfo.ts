@@ -32,14 +32,17 @@ export default class extends MainAction {
         user: this.user_id,
         event: currentEvent.id
       })
+      ranking = {
+        event_point: 0
+      }
     }
 
     let response: any = {
       base_info: {
         event_id: currentEvent.id,
         asset_bgm_id: 201,
-        event_point: ranking.event_point || 0,
-        total_event_point: ranking.event_point || 0
+        event_point: ranking.event_point,
+        total_event_point: ranking.event_point
       },
       difficulty_list: [],
       all_user_mission_count: 0
