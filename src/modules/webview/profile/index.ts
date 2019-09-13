@@ -4,10 +4,24 @@ import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
 import assert from "assert"
 import moment from "moment"
-import { Utils } from "../../../common/utils"
 
 const unitDB = sqlite3.getUnit()
 const liveDB = sqlite3.getLive()
+const convertRank = <any>{
+  1: "S",
+  2: "A",
+  3: "B",
+  4: "C",
+  5: "D"
+}
+const convertDifficulty = <any>{
+  1: "Easy",
+  2: "Normal",
+  3: "Hard",
+  4: "Expert",
+  5: "",
+  6: "Master"
+}
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -27,7 +41,7 @@ export default class extends WebViewAction {
     }
 
     let code = await i18n.getUserLocalizationCode(this.user_id)
-    let [strings, template, user, userScore, eventData, liveData, liveData2, currentOnline, changeLanguageModal] = await Promise.all([
+    let [strings, template, user, userScore, eventData, _lastActivity, liveData, liveData2, currentOnline, changeLanguageModal] = await Promise.all([
       i18n.getStrings(code, "common", "profile-index"),
       WebView.getTemplate("profile", "index"),
       this.connection.first(`
@@ -61,6 +75,7 @@ export default class extends WebViewAction {
       WHERE user_id = :user ORDER BY end_date DESC`, {
         user: userId
       }),
+      this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC", { user: userId }),
       this.connection.query("SELECT * FROM user_live_status WHERE user_id = :user AND status = 2", { user: userId }),
       this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user AND live_difficulty_id IS NULL", { user: userId }),
       webview.getCurrentOnline(),
@@ -73,20 +88,35 @@ export default class extends WebViewAction {
 
     let total = 0
     let totalWithLow = 0
-    await Promise.all(liveData.map(async live => {
-      let time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
-        lsid: live.live_setting_id
-      })
-      totalWithLow += time.live_time * (live.clear_cnt || 1)
-      if (live.hi_combo > 50 && live.clear_cnt < 250) total += time.live_time * (live.clear_cnt || 1)
-    }))
-    await Promise.all(liveData2.map(async live => {
-      let time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
-        lsid: live.live_setting_id
-      })
-      totalWithLow += time.live_time
-      if (live.combo > 50) total += time.live_time
-    }))
+
+    let [, , lastActivity] = await Promise.all([
+      Promise.all(liveData.map(async live => {
+        let time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
+          lsid: live.live_setting_id
+        })
+        totalWithLow += time.live_time * (live.clear_cnt || 1)
+        if (live.hi_combo > 50 && live.clear_cnt < 250) total += time.live_time * (live.clear_cnt || 1)
+      })),
+      Promise.all(liveData2.map(async live => {
+        let time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
+          lsid: live.live_setting_id
+        })
+        totalWithLow += time.live_time
+        if (live.combo > 50) total += time.live_time
+      })),
+      Promise.all(_lastActivity.map(async live => {
+        let liveInfo = await liveDB.get("SELECT name, stage_level, s_rank_combo, difficulty FROM live_setting_m JOIN live_track_m ON live_setting_m.live_track_id = live_track_m.live_track_id WHERE live_setting_id = :lsid", {
+          lsid: live.live_setting_id
+        })
+        live.name = `${liveInfo.name} (${convertDifficulty[liveInfo.difficulty]} ${liveInfo.stage_level}☆)`
+        live.timeAgo = moment.duration(moment(live.insert_date).diff(Date.now())).locale(code).humanize(true)
+        live.score_rank = convertRank[live.score_rank]
+        live.combo_rank = convertRank[live.combo_rank]
+        live.s_rank_combo = liveInfo.s_rank_combo
+        return live
+      }))
+    ])
+    
     user.playTime = `${parseInt(moment.utc(Math.floor(total * 1000)).format("D")) - 1}`
     user.playTime += `d ${moment.utc(Math.floor(total * 1000)).format("H[h] m[m] s[s]")}`
     user.playTimeWithLowCombo = `${parseInt(moment.utc(Math.floor(totalWithLow * 1000)).format("D")) - 1}`
@@ -96,6 +126,7 @@ export default class extends WebViewAction {
     user.totalScore = userScore.total
 
     let haveMoreEventData = eventData.length > 3
+    let haveLastActivity = lastActivity.length > 0
     eventData.pop()
     let values = {
       i18n: strings,
@@ -104,6 +135,8 @@ export default class extends WebViewAction {
       user,
       eventData,
       haveMoreEventData,
+      haveLastActivity,
+      lastActivity,
       currentOnline,
       changeLanguageModal,
       userId,

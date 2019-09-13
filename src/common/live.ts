@@ -494,7 +494,7 @@ export class Live {
   }
   public static getRank(rankInfo: rankInfo[], value: number): number {
     for (const info of rankInfo) {
-      if (info.rank_min <= value && info.rank_max >= value) return info.rank
+      if (info.rank_min <= value && (info.rank_max >= value || info.rank_max === 0)) return info.rank
     }
     return 5
   }

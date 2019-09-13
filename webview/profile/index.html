@@ -28,6 +28,16 @@
     margin-left: 5px;
     font-weight: 700;
   }
+
+
+  .rank-icon {
+    width: 6em;
+    height: 2em;
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
 </style>
 
 <body>
@@ -47,8 +57,7 @@
             </div>
             <div class="uk-margin-left">
               <h3 class="uk-text-bold">{{user/name}}</h3>
-              <span class="uk-text-muted"
-                style="word-wrap: break-word;">{{nl2br user/introduction}}</span>
+              <span class="uk-text-muted" style="word-wrap: break-word;">{{nl2br user/introduction}}</span>
             </div>
           </div>
         </div>
@@ -72,27 +81,59 @@
             <dd class="stats_value">{{numberWithSpaces user/daysInTheGame}}</dd>
           </dl>
           <dl class="stats_entry">
-            <dt class="stats_test">Времени в лайвах</dt>
-            <dd class="stats_value" uk-tooltip="title: {{numberWithSpaces user/playTimeWithLowCombo}} with combo < 50 (lg farming?)">{{user/playTime}}</dd>
+            <dt class="stats_test">{{i18n/totalPlayTime}}</dt>
+            <dd class="stats_value"
+              uk-tooltip="title: {{numberWithSpaces user/playTimeWithLowCombo}} with combo < 50 (lg farming?)">
+              {{user/playTime}}</dd>
           </dl>
           <dl class="stats_entry">
             <dt class="stats_test">{{i18n/livesPlayed}}</dt>
             <dd class="stats_value">{{numberWithSpaces user/livesPlayed}}</dd>
           </dl>
           <dl class="stats_entry">
-            <dt class="stats_test">Всего очков</dt>
+            <dt class="stats_test">{{i18n/totalScore}}</dt>
             <dd class="stats_value">{{numberWithSpaces user/totalScore}}</dd>
           </dl>
           <dl class="stats_entry">
-            <dt class="stats_test">Максимальное комбо</dt>
+            <dt class="stats_test">{{i18n/maxCombo}}</dt>
             <dd class="stats_value">{{numberWithSpaces user/maxCombo}}</dd>
           </dl>
         </div>
 
+        <div class="uk-container uk-margin uk-width-1-1">
+          <hr>
+          <h3 class="uk-text-bold uk-align-center uk-margin-bottom">
+            <center>{{i18n/lastActivity}}</center>
+          </h3>
+          {{#if haveLastActivity}}
+          <div class="uk-overflow-auto">
+            <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
+              <thead>
+
+              </thead>
+              <tbody id="lastActivityBody">
+                {{#each lastActivity}}
+                <tr>
+                  <td class="rank-icon"
+                    style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
+                  </td>
+                  <td>{{this/name}} <br><span class="uk-text-small">{{this/timeAgo}}</span></td>
+                  <td>{{this/combo}}/{{this/s_rank_combo}} ({{this/combo_rank}})</td>
+                  <td>{{this/score}} ({{this/score_rank }})</td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+          <hr class="uk-margin-remove-top">
+          {{else}}
+          <p>Пользователь не делал ничего заметного в последнее время!</p>
+          <hr>
+          {{/if}}
+        </div>
 
         {{#if haveEventData}}
-        <div class=" uk-container uk-margin uk-width-1-1">
-          <hr>
+        <div class="uk-container uk-margin uk-width-1-1">
           <h3 class="uk-text-bold uk-align-center">
             <center>{{i18n/events}}</center>
           </h3>

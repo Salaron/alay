@@ -58,6 +58,9 @@
   "profile-index": {
     "registrationDate": "Registration date",
     "daysInTheGame": "Days in the game",
+    "totalPlayTime": "Total play time",
+    "totalScore": "Total score",
+    "maxCombo": "Maximum combo",
     "livesPlayed": "Lives played",
     "excludingEvents": "Excluding events",
     "events": "Participation in events",
@@ -66,7 +69,8 @@
     "eventEnd": "End date",
     "eventPtRank": "pts rank",
     "eventScoreRank": "Score rank",
-    "jpTimeZone": "Japanese time zone"
+    "jpTimeZone": "Japanese time zone",
+    "lastActivity": "Last activity"
   },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} removed you from their friend list",

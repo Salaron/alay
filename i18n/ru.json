@@ -59,6 +59,9 @@
     "registrationDate": "Дата регистрации",
     "userRank": "Позиция в топе",
     "daysInTheGame": "Дней в игре",
+    "totalPlayTime": "Времени в лайвах",
+    "totalScore": "Всего очков",
+    "maxCombo": "Максимальное комбо",
     "livesPlayed": "Сыграно лайвов",
     "excludingEvents": "Без учёта ивентов",
     "events": "Участие в ивентах",
@@ -67,7 +70,8 @@
     "eventEnd": "Конец",
     "eventPtRank": "pts ранк",
     "eventScoreRank": "Score ранк",
-    "jpTimeZone": "Японский часовой пояс"
+    "jpTimeZone": "Японский часовой пояс",
+    "lastActivity": "Последняя активность"
   },
   "settings-index": {
     "mods": "Моды",
