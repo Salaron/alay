@@ -51,6 +51,16 @@ export default class extends MainAction {
       server_timestamp: Utils.timeStamp()
     }
 
+    let friendIds = <number[]>[]
+    let _friendsFromDb = await this.connection.query("SELECT initiator_id, recipient_id FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND STATUS = 1", {
+      user: this.user_id
+    })
+    _friendsFromDb.map(friend => {
+      if (friend.initiator_id === this.user_id) friendIds.push(friend.recipient_id)
+      else friendIds.push(friend.initiator_id)
+    })
+    if (friendIds.length === 0) friendIds.push(0) // lol
+
     // First: select 15 random friends
     let friendList = await this.connection.query(`
     SELECT DISTINCT
@@ -58,15 +68,14 @@ export default class extends MainAction {
       units.unit_owning_user_id,  unit_id, units.exp as unit_exp, units.next_exp, units.level as unit_level, units.max_level, 
       units.rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
       units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool,
-      (SELECT status FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id) AND status = 1 LIMIT 1) as friend_status
+      1 as friend_status
     FROM users 
       JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id 
       JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
       JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
-    WHERE users.user_id != :user
-    HAVING friend_status = 1 
+    WHERE users.user_id != :user AND users.user_id IN (${friendIds.join(",")})
     ORDER BY RAND() 
-    LIMIT 15`, { user: this.user_id })
+    LIMIT 15`, { user: this.user_id, })
 
     // select random users by level (currentUserLevel / 3)
     let rndUserCnt = 30 - friendList.length
@@ -76,13 +85,12 @@ export default class extends MainAction {
       units.unit_owning_user_id,  unit_id, units.exp as unit_exp, units.next_exp, units.level as unit_level, units.max_level, 
       units.rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
       units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool,
-      (SELECT status FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id) AND status = 1) as friend_status
+      0 as friend_status
     FROM users 
       JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id 
       JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
       JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
-    WHERE users.user_id != :user AND users.level > (SELECT level/3 FROM users WHERE user_id = :user)
-    HAVING friend_status IS NULL 
+    WHERE users.user_id != :user AND users.user_id NOT IN (${friendIds.join(",")}) AND users.level > (SELECT level/3 FROM users WHERE user_id = :user)
     ORDER BY RAND() 
     LIMIT ${rndUserCnt}`, { user: this.user_id })
 
@@ -93,13 +101,12 @@ export default class extends MainAction {
       units.unit_owning_user_id,  unit_id, units.exp as unit_exp, units.next_exp, units.level as unit_level, units.max_level, 
       units.rank, units.max_rank, units.love, units.max_love, units.unit_skill_level, units.max_hp, units.favorite_flag, units.display_rank, units.unit_skill_exp, 
       units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool,
-      (SELECT status FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id) AND status = 1) as friend_status
+      0 as friend_status
     FROM users 
       JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id 
       JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
       JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
-    WHERE users.user_id != :user
-    HAVING friend_status IS NULL 
+    WHERE users.user_id != :user AND users.user_id NOT IN (${friendIds.join(",")})
     ORDER BY RAND() 
     LIMIT ${rndUserCnt}`, { user: this.user_id })
 
