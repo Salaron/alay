@@ -57,6 +57,7 @@
   },
   "profile-index": {
     "registrationDate": "Registration date",
+    "userLevel": "Level", 
     "userRank": "Rank by level",
     "daysInTheGame": "Days in the game",
     "totalPlayTime": "Total play time",
@@ -74,8 +75,32 @@
     "recentPlays": "Recent Plays",
     "combo": "combo",
     "showMore": "SHOW MORE",
-    "lastActivityDataIsMissing": "This user hasn't done anything notable recently!",
+    "recentPlaysDataIsMissing": "No records yet :(",
     "eventDataIsMissing": "The user has not yet participated in the events :c"
+  },
+  "settings-index": {
+    "mods": "Mods",
+    "currentPassword": "Current password",
+    "currentPasswordBlank": "Поле \"Current password\" не может быть пустым",
+    "currentPasswordLimit": "Поле \"Current password\" не может быть больше 32 символов",
+    "currentPasswordInvalidFormat": "Поле \"Current password\" некорректно",
+    "newPassword": "New password",
+    "newPasswordBlank": "Поле \"New password\" не может быть пустым",
+    "newPasswordLimit": "Поле \"New password\" не может быть больше 32 символов",
+    "newPasswordInvalidFormat": "Поле \"Password\" некорректно",
+    "passwordNotice": "Handover ID is a PASSWORD from your account.\nDon't send it to anyone, and in case of compromentation, change it.",
+    "modsNotice": "Tap on the name of the mod to find out what it affects.",
+    "vanishTooltip": "Исчезание нот (как хидден в osu!)\nHidden — ноты исчезают перед приближением к кольцу.\nSudden — ноты появляются перед приближением к кольцу.",
+    "mirrorTooltip": "Зеркалирование нот.\nЕсли активирован, то ноты всего лайва меняются местами с параллельными им.\nПервый слева становится первым справа и т.д.",
+    "hpTooltip": "Изменение количества начального здоровья в лайве.\nПрименяется только для обычных лайвов!",
+    "applyForEventTooltip": "Позволяет использовать указанные настройки (кроме HP) для ивент-лайвов.",
+    "applyForEvent": "Apply for event-lives?",
+    "passwordAndEmail": "Password & E-mail",
+    "changePassword": "Change password",
+    "changeEmail": "Change E-mail",
+    "invalidPassword": "Поле \"Current password\" указано неверно",
+    "mailChangeSuccess": "E-mail успешно изменён!",
+    "passwordChangeSuccess": "Пароль успешно изменён!"
   },
   "server-info": {
     "currentOnline": "Current Online"

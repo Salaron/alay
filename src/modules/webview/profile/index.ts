@@ -46,7 +46,7 @@ export default class extends WebViewAction {
       WebView.getTemplate("profile", "index"),
       this.connection.first(`
       SELECT 
-        users.user_id, name, introduction, users.insert_date as registrationDate, 
+        users.user_id, users.level, name, introduction, users.insert_date as registrationDate, 
         (SELECT COUNT(*) FROM login_received_list WHERE user_id = :user) as daysInTheGame,
         (
           (SELECT IFNULL(SUM(clear_cnt), 0) FROM user_live_status WHERE user_id=:user AND hi_combo > 150) + 

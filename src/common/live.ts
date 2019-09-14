@@ -70,10 +70,10 @@ export class Live {
 
   public async getLiveNotes(userId: number, liveSettingId: number, isEvent = false) {
     let params = await new User(this.connection).getParams(userId)
-    let vanish = 0
-
-    // make mirror on-the-fly 
+    
+    // make mirror and vanish on-the-fly 
     let mirror = 0
+    let vanish = 0
     if ((isEvent === true && params.event === 1) || isEvent === false) {
       vanish = params.vanish ? params.vanish : 0
       mirror = params.mirror === 1 ? 10 : 0

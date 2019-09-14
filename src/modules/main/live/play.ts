@@ -5,6 +5,7 @@ import { Live } from "../../../common/live"
 import { Events } from "../../../common/event"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
+import { User } from "../../../common/user"
 
 export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -42,6 +43,7 @@ export default class extends MainAction {
     JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
     WHERE user_unit_deck.user_id=:user`, { user: this.params.party_user_id })
 
+    let eventLive = false
     let liveInfo = await live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     if (liveInfo.capital_type === 2) { // token live
       if (!eventStatus.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
@@ -57,17 +59,26 @@ export default class extends MainAction {
         user: this.user_id,
         id: eventStatus.id
       })
+      eventLive = true
     }
-    let liveNotes = await live.getLiveNotes(this.user_id, liveInfo.live_setting_id)
-    let deckInfo = await live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id)
 
-    await this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id, lp_factor) VALUES (:user, :difficulty, :setting_id, :deck, :factor)", {
-      user: this.user_id,
-      difficulty: this.params.live_difficulty_id,
-      setting_id: liveInfo.live_setting_id,
-      deck: this.params.unit_deck_id,
-      factor: this.params.lp_factor
-    })
+    let [liveNotes, deckInfo, mods] = await Promise.all([
+      live.getLiveNotes(this.user_id, liveInfo.live_setting_id, eventLive),
+      live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id),
+      new User(this.connection).getParams(this.user_id, ["hp", "event"]),
+      this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id, lp_factor) VALUES (:user, :difficulty, :setting_id, :deck, :factor)", {
+        user: this.user_id,
+        difficulty: this.params.live_difficulty_id,
+        setting_id: liveInfo.live_setting_id,
+        deck: this.params.unit_deck_id,
+        factor: this.params.lp_factor
+      })
+    ])
+
+    if ((mods.event && eventLive) || !eventLive) {
+      if (mods.hp === 1) deckInfo.total_hp = 200
+      if (mods.hp === 2) deckInfo.total_hp = 1
+    }
     let response = {
       rank_info: liveInfo.score_rank_info,
       energy_full_time: Utils.toSpecificTimezone(9),

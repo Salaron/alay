@@ -175,6 +175,7 @@
       })).done(function (response) {
         if (response.error || response.maintenance || !response) return
 
+        $("#mail").attr("placeholder", mail)
         $("#mail, #currentPassword").val("")
         sendNotification("{{i18n/mailChangeSuccess}}", "success")
       })

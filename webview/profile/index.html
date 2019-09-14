@@ -67,6 +67,10 @@
             <dd class="stats_value">{{numberWithSpaces user/user_id}}</dd>
           </dl>
           <dl class="stats_entry">
+            <dt class="stats_test">{{i18n/userLevel}}</dt>
+            <dd class="stats_value">{{numberWithSpaces user/level}}</dd>
+          </dl>
+          <dl class="stats_entry">
             <dt class="stats_test">{{i18n/userRank}}</dt>
             <dd class="stats_value">{{numberWithSpaces user/rank}}</dd>
           </dl>
@@ -132,7 +136,7 @@
           {{/if}}
           <hr class="uk-margin-remove-top">
           {{else}}
-          <p>{{i18n/lastActivityDataIsMissing}}</p>
+          <p>{{i18n/recentPlaysDataIsMissing}}</p>
           <hr>
           {{/if}}
         </div>
