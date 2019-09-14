@@ -13,10 +13,10 @@ const sort: any = {
   6: "units.stat_cool DESC",
   7: "units.stat_pure ASC",
   8: "units.stat_pure DESC",
-  9: "user_login.last_activity ASC",
-  10: "user_login.last_activity DESC",
-  11: "user_friend.insert_date ASC",
-  12: "user_friend.insert_date DESC"
+  9: "last_activity ASC",
+  10: "last_activity DESC",
+  11: "insert_date ASC",
+  12: "insert_date DESC"
 }
 
 export default class extends MainAction {
@@ -41,18 +41,35 @@ export default class extends MainAction {
 
     let order = sort[this.params.sort]
     if (!order) throw new Error(`Unknown sort type: ${this.params.sort}`)
-    let whereQuery = ``
+
+    let userIds: number[] = []
     switch (this.params.type) {
       case 0: { // friend list
-        whereQuery = `WHERE (initiator_id = :user OR recipient_id = :user) AND status = 1`
+        userIds = (await this.connection.query("SELECT initiator_id, recipient_id FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND STATUS = 1", {
+          user: this.user_id
+        })).map(friend => {
+          if (friend.initiator_id === this.user_id) return friend.recipient_id
+          return friend.initiator_id
+        })
+        if (userIds.length === 0) userIds.push(0)
         break
       }
       case 1: { // pending
-        whereQuery = `WHERE initiator_id = :user AND status = 0`
+        userIds = (await this.connection.query("SELECT recipient_id FROM user_friend WHERE initiator_id = :user AND status = 0", {
+          user: this.user_id
+        })).map(pending => {
+          return pending.recipient_id
+        })
+        if (userIds.length === 0) userIds.push(0)
         break
       }
       case 2: { // approval
-        whereQuery = `WHERE recipient_id = :user AND status = 0`
+        userIds = (await this.connection.query("SELECT initiator_id FROM user_friend WHERE recipient_id = :user AND status = 0", {
+          user: this.user_id
+        })).map(approval => {
+          return approval.initiator_id
+        })
+        if (userIds.length === 0) userIds.push(0)
         await this.connection.query(`UPDATE user_friend SET readed = 1 WHERE recipient_id = :user`, { user: this.user_id })
         break
       }
@@ -60,55 +77,46 @@ export default class extends MainAction {
     }
 
     let friends = await this.connection.query(`
-    SELECT 
-      user_friend.insert_date, user_friend.agree_date, user_friend.initiator_id, user_friend.recipient_id
+    SELECT
+      users.user_id, name, users.level, introduction, last_login,
+      (SELECT last_activity FROM user_login WHERE user_id = users.user_id) as last_activity,
+      (SELECT agree_date FROM user_friend WHERE status = 0 AND (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id)) as agree_date,
+      (SELECT insert_date FROM user_friend WHERE status = 0 AND (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id)) as insert_date,
+      setting_award_id 
     FROM 
-      user_friend
-    JOIN users ON user_friend.initiator_id = users.user_id OR user_friend.recipient_id = users.user_id
-    JOIN user_unit_deck ON users.user_id = user_unit_deck.user_id AND users.main_deck = user_unit_deck.unit_deck_id 
-    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id = 5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
-    JOIN units ON user_unit_deck_slot.unit_owning_user_id = units.unit_owning_user_id
-    JOIN user_login ON users.user_id = user_login.user_id
-    ${whereQuery} ORDER BY ${order}`, { user: this.user_id})
-    let list: any[] = []
-
-    for (const friend of friends) {
-      let friendId = friend.initiator_id
-      if (friendId === this.user_id) friendId = friend.recipient_id
-
-      let profile = await this.connection.first(`
-      SELECT 
-        user_id, name, level, introduction, last_login,
-        (SELECT last_activity FROM user_login WHERE user_id = :user) as last_activity,
-        setting_award_id
-      FROM users 
-      WHERE user_id = :user AND tutorial_state = -1`, { user: friendId })
-      if (!profile) continue
+      users
+    JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id 
+    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
+    JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
+    WHERE partner_unit IS NOT NULL AND users.user_id IN (${userIds.join(",")}) ORDER BY ${order}`, {
+      user: this.user_id
+    })
+    friends = await Promise.all(friends.map(async friend => {
       let dateNow = moment(new Date())
-      let dateLastLogin = moment(new Date(profile.last_activity || profile.last_login))
+      let dateLastLogin = moment(new Date(friend.last_activity || friend.last_login))
       let applied = moment(new Date(friend.agree_date || friend.insert_date))
       let lastLogin = Math.floor(moment.duration(dateNow.diff(dateLastLogin)).asMinutes())
       let appliedTime = Math.floor(moment.duration(dateNow.diff(applied)).asMinutes())
 
-      list.push({
+      return {
         user_data: {
-          user_id: profile.user_id,
-          name: profile.name,
-          level: profile.level,
-          elapsed_time_from_login: lastLogin > 1440 ? ` ${Math.floor(lastLogin/1440)} day(s)` : lastLogin > 60 ? ` ${Math.floor(lastLogin/60)} hour(s)` : ` ${lastLogin} min(s)`,
-          elapsed_time_from_applied: appliedTime > 1440 ? ` ${Math.floor(appliedTime/1440)} day(s)` : appliedTime > 60 ? ` ${Math.floor(appliedTime/60)} hour(s)` : ` ${appliedTime} min(s)`,
-          comment: profile.introduction
+          user_id: friend.user_id,
+          name: friend.name,
+          level: friend.level,
+          elapsed_time_from_login: lastLogin > 1440 ? ` ${Math.floor(lastLogin / 1440)} day(s)` : lastLogin > 60 ? ` ${Math.floor(lastLogin / 60)} hour(s)` : ` ${lastLogin} min(s)`,
+          elapsed_time_from_applied: appliedTime > 1440 ? ` ${Math.floor(appliedTime / 1440)} day(s)` : appliedTime > 60 ? ` ${Math.floor(appliedTime / 60)} hour(s)` : ` ${appliedTime} min(s)`,
+          comment: friend.introduction
         },
-        center_unit_info: await user.getCenterUnitInfo(friendId),
-        setting_award_id: profile.setting_award_id
-      })
-    }
+        center_unit_info: await user.getCenterUnitInfo(friend.user_id),
+        setting_award_id: friend.setting_award_id
+      }
+    }))
 
     return {
       status: 200,
       result: {
-        item_count: list.length,
-        friend_list: list
+        item_count: friends.length,
+        friend_list: friends
       }
     }
   }

@@ -101,17 +101,17 @@
         <div class="uk-container uk-margin uk-width-1-1">
           <hr>
           <h3 class="uk-text-bold uk-align-center uk-margin-bottom">
-            <center>{{i18n/lastActivity}}</center>
+            <center>{{i18n/recentPlays}}</center>
           </h3>
-          {{#if lastActivity.length}}
+          {{#if recentPlays.length}}
           <div class="uk-overflow-auto">
             <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
               <thead>
               </thead>
-              <tbody id="lastActivityTableBody">
-                {{#each lastActivity}}
+              <tbody id="recentPlaysTable">
+                {{#each recentPlays}}
                 {{#if this}}
-                <tr class="lastActivity">
+                <tr class="recentPlays">
                   <td class="rank-icon" style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
                   </td>
                   <td>{{nl2br this/name}} <br><span class="uk-text-small">{{this/timeAgo}}</span></td>
@@ -122,10 +122,10 @@
               </tbody>
             </table>
           </div>
-          {{#if haveMoreLastActivityData}}
-          <button id="loadMoreLastActivityDataButton" type="button"
+          {{#if haveMoreRecentPlays}}
+          <button id="loadMoreRecentPlaysButton" type="button"
             class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
-            onclick="loadLastActivityData()">
+            onclick="loadRecentPlaysData()">
             <span class="uk-icon" uk-icon="triangle-down"></span> {{i18n/showMore}} <span class="uk-icon"
               uk-icon="triangle-down"></span>
           </button>
@@ -208,24 +208,24 @@
   <script>
     var ps = new PerfectScrollbar('#body', { suppressScrollX: false })
 
-    function loadLastActivityData() {
-      $("#loadMoreLastActivityDataButton").attr("disabled", "disabled")
-      var offset = $(".lastActivity").length
+    function loadRecentPlaysData() {
+      $("#loadMoreRecentPlaysButton").attr("disabled", "disabled")
+      var offset = $(".recentPlays").length
 
       $.when(sendRequest({
         module: "profile",
-        action: "getLastActivityData",
+        action: "getRecentPlays",
         offset: offset,
         limit: 5,
         userId: userId,
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
         if (response.error || response.maintenance || !response) return
-        if (response.response_data.total === offset + response.response_data.added) $("#loadMoreLastActivityDataButton").attr("hidden", "hidden")
-        $("#lastActivityTableBody").append(response.response_data.data)
-        $("#loadMoreLastActivityDataButton").removeAttr("disabled")
+        if (response.response_data.total === offset + response.response_data.added) $("#loadMoreRecentPlaysButton").attr("hidden", "hidden")
+        $("#recentPlaysTable").append(response.response_data.data)
+        $("#loadMoreRecentPlaysButton").removeAttr("disabled")
       }).fail(function () {
-        $("#loadMoreLastActivityDataButton").removeAttr("disabled")
+        $("#loadMoreRecentPlaysButton").removeAttr("disabled")
       })
     }
 

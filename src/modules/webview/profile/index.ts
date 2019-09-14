@@ -88,7 +88,7 @@ export default class extends WebViewAction {
     let total = 0
 
     // promise.all of promise.all?
-    let [, lastActivity] = await Promise.all([
+    let [, recentPlays] = await Promise.all([
       Promise.all(liveDataStatus.map(async live => {
         let time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
           lsid: live.live_setting_id
@@ -136,11 +136,11 @@ export default class extends WebViewAction {
     user.registrationDate = moment(user.registrationDate).locale(code).format("DD MMMM YYYY HH:mm:ss")
     user.totalScore = userScore.total
 
-    lastActivity = lastActivity.slice(0, 4)
+    recentPlays = recentPlays.slice(0, 4)
     let haveMoreEventData = eventData.length > 3
-    let haveMoreLastActivityData = lastActivity.length > 3
+    let haveMoreRecentPlays = recentPlays.length > 3
     if (haveMoreEventData) eventData.pop()
-    if (haveMoreLastActivityData) lastActivity.pop()
+    if (haveMoreRecentPlays) recentPlays.pop()
     let values = {
       i18n: strings,
       isAdmin: Config.server.admin_ids.includes(this.user_id),
@@ -148,8 +148,8 @@ export default class extends WebViewAction {
       user,
       eventData,
       haveMoreEventData,
-      haveMoreLastActivityData,
-      lastActivity,
+      haveMoreRecentPlays,
+      recentPlays,
       currentOnline,
       changeLanguageModal,
       userId,
