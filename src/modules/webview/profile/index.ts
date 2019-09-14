@@ -41,7 +41,7 @@ export default class extends WebViewAction {
     }
 
     let code = await i18n.getUserLocalizationCode(this.user_id)
-    let [strings, template, user, userScore, eventData, liveDataStatus, liveDataLog, currentOnline, changeLanguageModal] = await Promise.all([
+    let [strings, template, user, userScore, eventData, liveDataStatus, liveDataLog, changeLanguageModal] = await Promise.all([
       i18n.getStrings(code, "common", "profile-index"),
       WebView.getTemplate("profile", "index"),
       this.connection.first(`
@@ -77,7 +77,6 @@ export default class extends WebViewAction {
       }),
       this.connection.query("SELECT * FROM user_live_status WHERE user_id = :user AND status = 2", { user: userId }),
       this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC", { user: userId }),
-      webview.getCurrentOnline(),
       webview.getLanguageModalTemplate(this.user_id)
     ])
 
@@ -150,7 +149,6 @@ export default class extends WebViewAction {
       haveMoreEventData,
       haveMoreRecentPlays,
       recentPlays,
-      currentOnline,
       changeLanguageModal,
       userId,
       icon: user.display_rank === 1 ? icons.normal_icon_asset : icons.rank_max_icon_asset

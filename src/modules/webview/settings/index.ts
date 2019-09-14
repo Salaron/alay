@@ -24,12 +24,11 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
-    let [strings, template, mods, userData, currentOnline, changeLanguageModal] = await Promise.all([
+    let [strings, template, mods, userData, changeLanguageModal] = await Promise.all([
       i18n.getStrings(this.user_id, "common", "login-login", "login-startup", "settings-index"),
       WebView.getTemplate("settings", "index"),
       new User(this.connection).getParams(this.user_id, supportedMods),
       this.connection.first("SELECT mail FROM users WHERE user_id = :user", { user: this.user_id }),
-      webview.getCurrentOnline(),
       webview.getLanguageModalTemplate(this.user_id)
     ])
 
@@ -40,7 +39,6 @@ export default class extends WebViewAction {
       publicKey: Config.server.PUBLIC_KEY,
       mods,
       userData,
-      currentOnline,
       changeLanguageModal
     }
 

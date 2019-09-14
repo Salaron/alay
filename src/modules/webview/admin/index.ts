@@ -47,7 +47,6 @@ export default class extends WebViewAction {
       publicKey: Config.server.PUBLIC_KEY.toString(),
       redirect: "webview.php/admin/index",
       module: "admin",
-      currentOnline: await webview.getCurrentOnline(),
       external: this.requestData.requestFromBrowser,
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,

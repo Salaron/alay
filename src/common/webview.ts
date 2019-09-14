@@ -39,7 +39,7 @@ export class WebView {
     return template
   }
 
-  public async getCurrentOnline() {
+  public async getCurrentOnline(): Promise<number> {
     return (await this.connection.first("SELECT COUNT(*) as cnt FROM user_login WHERE last_activity > :now", {
       now: moment().subtract(10, "minutes").format("YYYY-MM-DD HH:mm:ss")
     })).cnt

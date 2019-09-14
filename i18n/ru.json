@@ -101,6 +101,9 @@
     "mailChangeSuccess": "E-mail успешно изменён!",
     "passwordChangeSuccess": "Пароль успешно изменён!"
   },
+  "server-info": {
+    "currentOnline": "Текущий онлайн"
+  },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} удалил(-а) Вас из своего списка друзей",
     "SEND_FRIEND_REQUEST": "{{affectorName}} отправил(-а) Вам заявку в друзья",

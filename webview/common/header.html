@@ -8,23 +8,27 @@
         <div class="uk-navbar-dropdown">
           <ul class="uk-nav uk-dropdown-nav">
             <li {{#equal i18n/pageName i18n/announce}} class="uk-active" {{/equal}}>
-              <a href="/webview.php/announce/index" {{#equal i18n/pageName i18n/announce}} onclick="return false;" {{/equal}}>
+              <a href="/webview.php/announce/index" {{#equal i18n/pageName i18n/announce}} onclick="return false;"
+                {{/equal}}>
                 <span uk-icon="home" class="uk-icon"></span> {{i18n/announce}}
               </a>
             </li>
             <li {{#equal i18n/pageName i18n/profile}} class="uk-active" {{/equal}}>
-              <a href="/webview.php/profile/index" {{#equal i18n/pageName i18n/profile}} onclick="return false;" {{/equal}}>
+              <a href="/webview.php/profile/index" {{#equal i18n/pageName i18n/profile}} onclick="return false;"
+                {{/equal}}>
                 <span uk-icon="user" class="uk-icon"></span> {{i18n/profile}}
               </a>
             </li>
             <li {{#equal i18n/pageName i18n/settings}} class="uk-active" {{/equal}}>
-              <a href="/webview.php/settings/index" {{#equal i18n/pageName i18n/settings}} onclick="return false;" {{/equal}}>
+              <a href="/webview.php/settings/index" {{#equal i18n/pageName i18n/settings}} onclick="return false;"
+                {{/equal}}>
                 <span uk-icon="settings" class="uk-icon"></span> {{i18n/settings}}
               </a>
             </li>
 
             <li {{#equal i18n/pageName i18n/aboutServer}} class="uk-active" {{/equal}}>
-              <a href="/webview.php/server/info" {{#equal i18n/pageName i18n/aboutServer}} onclick="return false;" {{/equal}}>
+              <a href="/webview.php/server/info" {{#equal i18n/pageName i18n/aboutServer}} onclick="return false;"
+                {{/equal}}>
                 <span uk-icon="nut" class="uk-icon"></span> {{i18n/aboutServer}}
               </a>
             </li>
@@ -55,12 +59,6 @@
   <div class="uk-navbar-center">
     <ul class="uk-navbar-nav">
       <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">{{i18n/pageName}}</a></li>
-    </ul>
-  </div>
-
-  <div class="uk-navbar-right">
-    <ul class="uk-navbar-nav">
-      <li><a uk-icon="users">{{currentOnline}}</a></li>
     </ul>
   </div>
 </nav>

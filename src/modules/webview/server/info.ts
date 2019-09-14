@@ -19,10 +19,9 @@ export default class extends WebViewAction {
     const webview = new WebView(this.connection)
 
     let code = await i18n.getUserLocalizationCode(this.user_id)
-    let [strings, template, currentOnline, changeLanguageModal] = await Promise.all([
-      i18n.getStrings(code, "common"),
+    let [strings, template, changeLanguageModal] = await Promise.all([
+      i18n.getStrings(code, "server-info"),
       WebView.getTemplate("server", "info"),
-      webview.getCurrentOnline(),
       webview.getLanguageModalTemplate(this.user_id)
     ])
 
@@ -32,7 +31,8 @@ export default class extends WebViewAction {
       commitDate: "Unknown",
       clientVersion: Config.server.server_version,
       bundleVersion: this.requestData.request.headers["bundle-version"] ? this.requestData.request.headers["bundle-version"] : "Unknown",
-      uptime: moment.duration(0 - Math.ceil(process.uptime()), "seconds").locale(code).humanize(true)
+      uptime: moment.duration(0 - Math.ceil(process.uptime()), "seconds").locale(code).humanize(true),
+      currentOnline: await webview.getCurrentOnline()
     }
     try {
       let branchInfo = (await promisify(readFile)(`${rootDir}/.git/HEAD`, "utf-8")).substring(5).replace(/\n/g, "")
@@ -46,7 +46,6 @@ export default class extends WebViewAction {
 
     let values = {
       i18n: strings,
-      currentOnline,
       changeLanguageModal,
       isAdmin: Config.server.admin_ids.includes(this.user_id),  
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),

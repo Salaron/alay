@@ -77,6 +77,9 @@
     "lastActivityDataIsMissing": "This user hasn't done anything notable recently!",
     "eventDataIsMissing": "The user has not yet participated in the events :c"
   },
+  "server-info": {
+    "currentOnline": "Current Online"
+  },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} removed you from their friend list",
     "SEND_FRIEND_REQUEST": "{{affectorName}} sent you a friend request",

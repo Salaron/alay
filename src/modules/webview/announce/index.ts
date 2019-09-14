@@ -1,5 +1,6 @@
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
+import moment from "moment"
 import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
 
@@ -15,16 +16,28 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
-    let [strings, template, currentOnline, changeLanguageModal] = await Promise.all([
-      i18n.getStrings(this.user_id, "common", "announce-index"),
+    let code = await i18n.getUserLocalizationCode(this.user_id)
+    let [strings, template, announceList, changeLanguageModal] = await Promise.all([
+      i18n.getStrings(code, "common", "announce-index"),
       WebView.getTemplate("announce", "index"),
-      webview.getCurrentOnline(),
+      this.connection.query(`SELECT * FROM webview_announce ORDER BY insert_date DESC LIMIT 5`),
       webview.getLanguageModalTemplate(this.user_id)
     ])
 
+    announceList = announceList.map(announce => {
+      return {
+        id: announce.id,
+        title: announce.title,
+        date: moment(announce.insert_date).format("DD.MM.YYYY H:mm"),
+        description: announce.description.replace(/--/g, "—"),
+        extendable: announce.body != null
+      }
+    })
+
     let values = {
-      currentOnline,
       changeLanguageModal,
+      announceList,
+      code,
       isAdmin: Config.server.admin_ids.includes(this.user_id),
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       i18n: strings
