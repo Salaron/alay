@@ -65,7 +65,7 @@ export default class extends MainAction {
     const [liveNotes, deckInfo, mods] = await Promise.all([
       live.getLiveNotes(this.user_id, liveInfo.live_setting_id, eventLive),
       live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id),
-      new User(this.connection).getParams(this.user_id, ["hp", "event"]),
+      new User(this.connection).getParams(this.user_id, ["hp"]),
       this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id, lp_factor) VALUES (:user, :difficulty, :setting_id, :deck, :factor)", {
         user: this.user_id,
         difficulty: this.params.live_difficulty_id,
@@ -75,7 +75,7 @@ export default class extends MainAction {
       })
     ])
 
-    if ((mods.event && eventLive) || !eventLive) {
+    if (!eventLive) {
       if (mods.hp === 1) deckInfo.total_hp = 200
       if (mods.hp === 2) deckInfo.total_hp = 1
     }
