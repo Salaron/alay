@@ -21,11 +21,11 @@ export default class extends WebApiAction {
   public async execute() {
     const strings = await new I18n(this.connection).getStrings(this.user_id, "login-startup", "settings-index", "mailer")
 
-    let password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
-    let newPassword = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.newPassword), "base64").toString(), this.requestData.auth_token).toString()
+    const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
+    const newPassword = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.newPassword), "base64").toString(), this.requestData.auth_token).toString()
     if (!Utils.checkPass(password) || !Utils.checkPass(newPassword)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
 
-    let passwordCheck = await this.connection.first("SELECT name, mail FROM users WHERE user_id = :user AND password = :pass", {
+    const passwordCheck = await this.connection.first("SELECT name, mail FROM users WHERE user_id = :user AND password = :pass", {
       user: this.user_id,
       pass: password
     })
@@ -40,7 +40,7 @@ export default class extends WebApiAction {
       userName: passwordCheck.name,
       supportMail: Config.mailer.supportMail.length > 0 ? Config.mailer.supportMail : ""
     }))
-      
+
     return {
       status: 200,
       result: true

@@ -17,10 +17,10 @@ export default class extends WebViewAction {
     try {
       // @ts-ignore
       code = await i18n.getUserLocalizationCode(this.user_id || this.requestData.auth_token)
-    } catch (_) { }
-    let template = await WebView.getTemplate("tos", "read")
+    } catch (_) { } // tslint:disable-line
+    const template = await WebView.getTemplate("tos", "read")
 
-    let values = {
+    const values = {
       tos: await i18n.getMarkdown(code, i18n.markdownType.TOS),
       external: this.requestData.requestFromBrowser
     }

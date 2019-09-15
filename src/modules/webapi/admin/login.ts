@@ -24,19 +24,19 @@ export default class extends WebApiAction {
       await Utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
     }
 
-    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup")
+    const strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup")
     this.user_id = parseInt(Buffer.from(Utils.RSADecrypt(this.params.user_id), "base64").toString())
-    let password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
+    const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
 
     if (!checkUser(this.user_id)) throw new ErrorWebApi(strings.userIdShouldBeInt, true)
     if (!checkPass(password)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
 
-    let data = await this.connection.first(`SELECT * FROM users WHERE user_id = :user AND password = :pass`, {
+    const data = await this.connection.first(`SELECT * FROM users WHERE user_id = :user AND password = :pass`, {
       user: this.user_id,
       pass: password
     })
     if (!data) throw new ErrorWebApi(strings.invalidLoginOrPass, true)
-    let currentToken = await this.connection.first("SELECT login_token FROM user_login WHERE user_id = :user", {
+    const currentToken = await this.connection.first("SELECT login_token FROM user_login WHERE user_id = :user", {
       user: this.user_id
     })
     if (!currentToken || !currentToken.login_token) {

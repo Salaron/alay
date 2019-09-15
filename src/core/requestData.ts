@@ -1,3 +1,4 @@
+// tslint:disable:variable-name
 import { IncomingMessage, ServerResponse } from "http"
 import { IncomingForm } from "formidable"
 import querystring from "querystring"
@@ -51,7 +52,7 @@ export interface Authorize {
   timeStamp: number
   version: string
   nonce: string | number
-  token?: string 
+  token?: string
   requestTimeStamp?: number
 }
 
@@ -92,12 +93,12 @@ export default class RequestData {
           this.auth_token = this.params.token
           this.requestFromBrowser = true
         } else if (
-          getCookie(<string>this.headers["cookie"] || "", "token") != null
+          getCookie(<string>this.headers.cookie || "", "token") != null
         ) { // cookie
-          if (!isNaN(parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id")))) {
-            this.user_id = parseInt(<string>getCookie(<string>this.headers["cookie"] || "", "user_id"))
+          if (!isNaN(parseInt(<string>getCookie(<string>this.headers.cookie || "", "user_id")))) {
+            this.user_id = parseInt(<string>getCookie(<string>this.headers.cookie || "", "user_id"))
           }
-          this.auth_token = getCookie(<string>this.headers["cookie"] || "", "token")
+          this.auth_token = getCookie(<string>this.headers.cookie || "", "token")
           this.requestFromBrowser = true
         }
       }
@@ -122,16 +123,16 @@ export default class RequestData {
     }
     if (formData && hType === HANDLER_TYPE.WEBAPI) this.params = formData
 
-    let url = <string>this.request.url!.split(/[?]+/)[0]
+    const url = <string>this.request.url!.split(/[?]+/)[0]
     if (this.params != null && Object.keys(this.params).length > 0) {
-      log.info(chalk["bgWhite"](chalk["black"]((url))) + " " + JSON.stringify(this.params), "User #" + this.user_id)
+      log.info(chalk.bgWhite(chalk.black((url))) + " " + JSON.stringify(this.params), "User #" + this.user_id)
     } else {
-      log.info(chalk["bgWhite"](chalk["black"]((url))), "User #" + this.user_id)
+      log.info(chalk.bgWhite(chalk.black((url))), "User #" + this.user_id)
     }
   }
-  static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {
-    let formData = await formidableParseAsync(request)
-    let rd = new RequestData(request, response, formData, type)
+  public static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {
+    const formData = await formidableParseAsync(request)
+    const rd = new RequestData(request, response, formData, type)
     rd.connection = await MySQLconnection.get()
     return rd
   }
@@ -140,7 +141,7 @@ export default class RequestData {
     if (this.auth_level_check_passed && !options.force) return this.auth_level
     this.auth_level_check_passed = true
     // TODO additional checks
-    
+
     if (this.user_id === null && this.auth_token === null) {
       // Auth key step
       log.debug(this.headers, "Request Headers")
@@ -149,7 +150,7 @@ export default class RequestData {
 
     if (this.user_id === null && this.auth_token != null) {
       // Has token but not user id: PreLogin
-      let checkToken = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
+      const checkToken = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
         token: this.auth_token
       })
       if (!checkToken) return this.auth_level = AUTH_LEVEL.REJECTED // Token doesn't exist
@@ -160,12 +161,12 @@ export default class RequestData {
 
     if (this.user_id != null && this.auth_token != null) {
       // Has token and user id: Logged In
-      let check = await this.connection.first(`SELECT last_activity FROM user_login WHERE user_id = :user AND login_token = :token`, {
+      const check = await this.connection.first(`SELECT last_activity FROM user_login WHERE user_id = :user AND login_token = :token`, {
         user: this.user_id,
         token: this.auth_token
       })
       if (!check) return this.auth_level = AUTH_LEVEL.REJECTED // token is no longer valid
-      let banCheck = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
+      const banCheck = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
         user: this.user_id
       })
       if (banCheck) {
@@ -192,11 +193,11 @@ export default class RequestData {
     if (useSpecialKey) {
       xmc = Utils.hmacSHA1(this.raw_request_data, Config.specialKey)
     } else if (this.auth_level === AUTH_LEVEL.PRE_LOGIN) {
-      let key = await this.connection.first(`SELECT session_key FROM auth_tokens WHERE token = :token`, { token: this.auth_level })
+      const key = await this.connection.first(`SELECT session_key FROM auth_tokens WHERE token = :token`, { token: this.auth_level })
       if (!key) return false
       xmc = Utils.hmacSHA1(this.raw_request_data, key.session_key)
     } else if (this.auth_level >= AUTH_LEVEL.CONFIRMED_USER) {
-      let key = await this.connection.first(`SELECT session_key FROM user_login WHERE user_id = :user AND login_token = :token`, {
+      const key = await this.connection.first(`SELECT session_key FROM user_login WHERE user_id = :user AND login_token = :token`, {
         user: this.user_id,
         token: this.auth_level
       })
@@ -208,14 +209,14 @@ export default class RequestData {
   }
 
   public getWebapiHeaders() {
-    let authorizeHeader = {
+    const authorizeHeader = {
       consumerKey: Config.client.consumer_key.length > 0 ? Config.client.consumer_key : "lovelive_test",
       timeStamp: Utils.timeStamp(),
       version: "1.1",
       nonce: "WA0",
       token: this.auth_token || ""
     }
-    let headers = {
+    const headers = {
       "user-id": this.user_id ? this.user_id.toString() : "",
       "bundle-version": this.headers["bundle-version"] || Config.client.application_version,
       "client-version": this.headers["client-version"] || Config.server.server_version,
@@ -235,7 +236,7 @@ export default class RequestData {
 
 async function formidableParseAsync(request: IncomingMessage): Promise<any> {
   return new Promise((res, rej) => {
-    let form = new IncomingForm()
+    const form = new IncomingForm()
     form.parse(request, (err, fields) => {
       if (err) return rej(err)
       res(fields)
@@ -243,10 +244,9 @@ async function formidableParseAsync(request: IncomingMessage): Promise<any> {
   })
 }
 function getCookie(cheader: string, cname: string) {
-  let name = cname + "="
-  let cArray = cheader.split(";")
-  for (let i = 0; i < cArray.length; i++) {
-    let c = cArray[i]
+  const name = cname + "="
+  const cArray = cheader.split(";")
+  for (let c of cArray) {
     while (c.charAt(0) == " ") {
       c = c.substring(1)
     }

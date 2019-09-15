@@ -8,7 +8,7 @@ import { gzip } from "zlib"
 import { ActionResult } from "../typings/handlers"
 
 export default async function webviewHandler(request: IncomingMessage, response: ServerResponse) {
-  let requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBVIEW)
+  const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBVIEW)
   try {
     // get auth level
     await requestData.getAuthLevel()
@@ -21,7 +21,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
         direct: true
       })
     }
-    if (requestData.auth_level === AUTH_LEVEL.BANNED && 
+    if (requestData.auth_level === AUTH_LEVEL.BANNED &&
       !request.url!.includes("webview.php/static/index?id=") &&
       !request.url!.includes("webview.php/tos/read")) {
       await requestData.connection.rollback()
@@ -36,14 +36,14 @@ export default async function webviewHandler(request: IncomingMessage, response:
     const module = urlSplit[2].replace(/[^a-z]/g, "")
     const action = urlSplit[3].replace(/[^a-z]/g, "")
 
-    let result: ActionResult = await executeAction(module, action, requestData)
+    const result: ActionResult = await executeAction(module, action, requestData)
     response.setHeader("Content-Type", "text/html; charset=utf-8")
     if (result.headers && Object.keys(result.headers).length > 0) {
-      for (let key of Object.keys(result.headers)) {
+      for (const key of Object.keys(result.headers)) {
         response.setHeader(key, result.headers[key])
       }
     }
-    
+
     if (request.headers["accept-encoding"] && request.headers["accept-encoding"]!.indexOf("gzip") != -1) {
       response.setHeader("Content-Encoding", "gzip")
       result.result = await promisify(gzip)(result.result)

@@ -21,13 +21,13 @@ enum I18nMarkdownType {
 }
 
 let cache: I18nCache = {}
-let mdCache: I18nMdCache = {}
+const mdCache: I18nMdCache = {}
 let defaultStrings: I18nSection = {}
 
 const log = new Log("i18n")
 export const showdownConverter = new showdown.Converter({
-  tables: true, 
-  simpleLineBreaks: true, 
+  tables: true,
+  simpleLineBreaks: true,
   smartIndentationFix: true,
   openLinksInNewWindow: true,
   emoji: true,
@@ -36,10 +36,10 @@ export const showdownConverter = new showdown.Converter({
 
 export async function init() {
   if (Object.keys(defaultStrings).length === 0) { // first-time load
-    if (!await promisify(exists)(`${rootDir}/i18n/${Config.i18n.defaultLanguage}.json`)) 
+    if (!await promisify(exists)(`${rootDir}/i18n/${Config.i18n.defaultLanguage}.json`))
       throw new Error(`File with default language is not exists`)
   }
-  for (let localCode of Object.values(Config.i18n.languages)) {
+  for (const localCode of Object.values(Config.i18n.languages)) {
     let sections
     try {
       sections = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${localCode}.json`, `utf-8`))
@@ -86,7 +86,7 @@ export class I18n {
     } else {
       code = (await this.connection.first("SELECT language FROM users WHERE user_id=:user", { user: input })).language
     }
-    
+
     if (!Object.values(Config.i18n.languages).includes(code)) {
       log.warn(`Language code ${code} is not exists in config. Using default language instead`)
       return Config.i18n.defaultLanguage
@@ -106,11 +106,11 @@ export class I18n {
     } else if (typeof input === "string") languageCode = input
 
     if (Config.server.debug_mode) await I18n.clearCache()
-    let result: any = {}
-    for (let section of sections) {
+    const result: any = {}
+    for (const section of sections) {
       extend(true, result, defaultStrings[section], cache[languageCode][section])
     }
-    extend(true, result, defaultStrings["common"] || {}, cache[languageCode]["common"] || {})
+    extend(true, result, defaultStrings.common || {}, cache[languageCode].common || {})
 
     return result
   }
@@ -131,8 +131,8 @@ export class I18n {
     try {
       md = await promisify(readFile)(`${rootDir}/i18n/TOS/${languageCode}.md`, "UTF-8")
     } catch (err) {
-      let i18n = await this.getStrings(languageCode)
-      md += `*${i18n.notTranslated}*\n\n` 
+      const i18n = await this.getStrings(languageCode)
+      md += `*${i18n.notTranslated}*\n\n`
       md += await promisify(readFile)(`${rootDir}/i18n/TOS/${Config.i18n.defaultLanguage}.md`, "UTF-8")
     }
 

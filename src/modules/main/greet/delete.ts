@@ -11,7 +11,7 @@ export default class extends MainAction {
     super(requestData)
   }
 
-  public paramTypes() { 
+  public paramTypes() {
     return {
       is_send_mail: TYPE.BOOLEAN,
       mail_notice_id: TYPE.INT
@@ -24,18 +24,18 @@ export default class extends MainAction {
 
   public async execute() {
     // check if notice is exists
-    let notice = await this.connection.first(`SELECT * FROM user_greet WHERE notice_id = :id`, { 
-      id: this.params.mail_notice_id 
+    const notice = await this.connection.first(`SELECT * FROM user_greet WHERE notice_id = :id`, {
+      id: this.params.mail_notice_id
     })
     if (notice.length === 0) throw new ErrorUser(`Notice ${this.params.mail_notice_id} doesn't exists`, this.user_id)
 
     if (this.params.is_send_mail === true && notice.affector_id === this.user_id) {
-      await this.connection.query(`UPDATE user_greet SET deleted_from_affector = 1 WHERE notice_id = :id`, { 
-        id: this.params.mail_notice_id 
+      await this.connection.query(`UPDATE user_greet SET deleted_from_affector = 1 WHERE notice_id = :id`, {
+        id: this.params.mail_notice_id
       })
     } else if (this.params.is_send_mail === false && notice.receiver_id === this.user_id) {
-      await this.connection.query(`UPDATE user_greet SET deleted_from_receiver = 1 WHERE notice_id = :id`, { 
-        id: this.params.mail_notice_id 
+      await this.connection.query(`UPDATE user_greet SET deleted_from_receiver = 1 WHERE notice_id = :id`, {
+        id: this.params.mail_notice_id
       })
     } else {
       throw new ErrorUser(`You're not receiver or owner of this notice`, this.user_id)

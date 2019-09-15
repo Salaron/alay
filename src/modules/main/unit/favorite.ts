@@ -19,13 +19,13 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let unitData = await this.connection.first("SELECT unit_owning_user_id FROM units WHERE deleted=0 AND user_id=:user AND unit_owning_user_id=:unit", { 
-      user: this.user_id, 
-      unit: this.params.unit_owning_user_id 
+    const unitData = await this.connection.first("SELECT unit_owning_user_id FROM units WHERE deleted=0 AND user_id=:user AND unit_owning_user_id=:unit", {
+      user: this.user_id,
+      unit: this.params.unit_owning_user_id
     })
     if (unitData.length == 0) throw new ErrorCode(1311) // ERROR_CODE_UNIT_NOT_EXIST
 
-    await this.connection.query("UPDATE units SET favorite_flag=:fav WHERE unit_owning_user_id=:unit", { 
+    await this.connection.query("UPDATE units SET favorite_flag=:fav WHERE unit_owning_user_id=:unit", {
       unit: this.params.unit_owning_user_id,
       fav: this.params.favorite_flag === 1 ? 1 : 0 // injection save
     })

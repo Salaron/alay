@@ -1,6 +1,6 @@
-import { 
-  secretboxSettings, 
-  costSettings, 
+import {
+  secretboxSettings,
+  costSettings,
   unitData,
   secretbox,
   stepInfo,
@@ -33,8 +33,8 @@ export class Secretbox {
   }
 
   public async generateList(userId: number): Promise<secretbox[]> {
-    let list = await this.connection.query(`SELECT * FROM secretbox_list`)
-    let result: secretbox[] = []
+    const list = await this.connection.query(`SELECT * FROM secretbox_list`)
+    const result: secretbox[] = []
     await Promise.all(list.map(async (dbData: any) => {
       if (dbData.enabled === 0) return // disabled box
       if (
@@ -50,7 +50,7 @@ export class Secretbox {
     const item = new Item(this.connection)
     const user = new User(this.connection)
 
-    let [, beforeUserInfo, costSettings, secretBoxInfo, cost] = await Promise.all([
+    const [, beforeUserInfo, costSettings, secretBoxInfo, cost] = await Promise.all([
       this.connection.query(`INSERT INTO secretbox_pon (user_id, secretbox_id, pon_count) VALUES (:user, :sbId, 0) ON DUPLICATE KEY UPDATE pon_count = pon_count + 0`, {
         user: userId,
         sbId: secretBoxId
@@ -58,8 +58,8 @@ export class Secretbox {
       user.getUserInfo(userId),
       this.generateSettingsAndEffect(secretBoxId, costId),
       this.connection.first(`
-        SELECT * FROM secretbox_list 
-        LEFT JOIN secretbox_pon ON secretbox_pon.secretbox_id = secretbox_list.secretbox_id 
+        SELECT * FROM secretbox_list
+        LEFT JOIN secretbox_pon ON secretbox_pon.secretbox_id = secretbox_list.secretbox_id
         WHERE secretbox_list.secretbox_id = :secretbox AND (user_id = :user OR user_id IS NULL)`, {
         secretbox: secretBoxId,
         user: userId
@@ -68,39 +68,39 @@ export class Secretbox {
         cost: costId
       })
     ])
-    // check additional 
-    let additionalInfo = await this.generateAdditionalInfo(secretBoxId, secretBoxInfo.secretbox_type, userId)
+    // check additional
+    const additionalInfo = await this.generateAdditionalInfo(secretBoxId, secretBoxInfo.secretbox_type, userId)
     switch (secretBoxInfo.secretbox_type) {
       case 1: {
-        let stepCost = await this.connection.first(`SELECT * FROM secretbox_cost JOIN secretbox_button ON secretbox_cost.button_id = secretbox_button.button_id WHERE secretbox_id = :id AND step_id = :step AND cost_id = :cost`, {
+        const stepCost = await this.connection.first(`SELECT * FROM secretbox_cost JOIN secretbox_button ON secretbox_cost.button_id = secretbox_button.button_id WHERE secretbox_id = :id AND step_id = :step AND cost_id = :cost`, {
           id: secretBoxId,
           step: additionalInfo!.step,
           cost: costId
         })
         if (!stepCost) throw new Error(`Cost id doesn't match with step id`)
-      }    
+      }
     }
 
-    let unitData = costSettings.settings[costId]
+    const unitData = costSettings.settings[costId]
     if (secretBoxInfo.upper_limit != null && secretBoxInfo.upper_limit != 0) {
       if (secretBoxInfo.pon_count >= secretBoxInfo.upper_limit) throw new ErrorCode(1509)
     }
-    let unitCount = cost.unit_count
-    let ponCount = secretBoxInfo.pon_count == null ? 1 : secretBoxInfo.pon_count + 1
+    const unitCount = cost.unit_count
+    const ponCount = secretBoxInfo.pon_count == null ? 1 : secretBoxInfo.pon_count + 1
 
     await item.addItemToUser(userId, {
       name: cost.item_name
     }, parseInt(`-${cost.amount}`))
 
-    let cardsIds: number[] = []
-    let cardsRarity: number[] = []
-    let guaranteeGainedList: number[] = []
+    const cardsIds: number[] = []
+    const cardsRarity: number[] = []
+    const guaranteeGainedList: number[] = []
 
     const getValue = (rarity: number) => {
       let result: unitData
-      for (let j = 0; j < unitData.length; j++) {
-        if (unitData[j].rarity == rarity) {
-          result = unitData[j]
+      for (const data of unitData) {
+        if (data.rarity == rarity) {
+          result = data
         }
       }
       if (result!.rateup && result!.rateup.length != 0 && typeof result!.rateup[0] === "number") {
@@ -111,17 +111,17 @@ export class Secretbox {
       return result!
     }
     while (cardsIds.length < unitCount) {
-      let rarityList = []
-      for (let j = 0; j < unitData.length; j++) {
-        if (unitData[j].guarantee && guaranteeGainedList.indexOf(unitData[j].rarity) === -1) guaranteeGainedList.push(unitData[j].rarity)
-        for (let k = 0; k < unitData[j].weight; k++) {
-          rarityList.push(unitData[j].rarity)
+      const rarityList = []
+      for (const data of unitData) {
+        if (data.guarantee && guaranteeGainedList.indexOf(data.rarity) === -1) guaranteeGainedList.push(data.rarity)
+        for (let k = 0; k < data.weight; k++) {
+          rarityList.push(data.rarity)
         }
       }
 
-      let selectedRarity = rarityList.randomValue()
+      const selectedRarity = rarityList.randomValue()
 
-      let result = getValue(selectedRarity)
+      const result = getValue(selectedRarity)
       cardsRarity.push(result.rarity)
       cardsIds.push(result!.value.randomValue().unit_id)
     }
@@ -130,8 +130,8 @@ export class Secretbox {
     if (unitCount > 1) {
       await guaranteeGainedList.forEachAsync(async (rarity) => {
         if (cardsRarity.indexOf(rarity) != -1) return
-        let result = getValue(rarity)
-        let rndIndex = Math.floor(Math.random() * cardsIds.length)
+        const result = getValue(rarity)
+        const rndIndex = Math.floor(Math.random() * cardsIds.length)
 
         if (cardsRarity[rndIndex] >= rarity) return // don't kill this card
         cardsRarity[rndIndex] = rarity
@@ -139,13 +139,13 @@ export class Secretbox {
       })
     }
 
-    let existingCards = (await this.connection.query(`SELECT unit_id FROM user_unit_album WHERE unit_id IN (${cardsIds.join(",")}) AND user_id = :user`, { user: userId })).map((c: any) => {
+    const existingCards = (await this.connection.query(`SELECT unit_id FROM user_unit_album WHERE unit_id IN (${cardsIds.join(",")}) AND user_id = :user`, { user: userId })).map((c: any) => {
       return c.unit_id
     })
 
-    let cardsResult: any[] = []
+    const cardsResult: any[] = []
     await cardsIds.forEachAsync(async (card: number) => {
-      let res = await item.addPresent(userId, {
+      const res = await item.addPresent(userId, {
         name: "card",
         id: card
       }, `Gained from Scouting Box "${secretBoxInfo.name}"`, 1, true)
@@ -155,14 +155,14 @@ export class Secretbox {
       cardsResult.push(res)
     })
 
-    let [afterUserInfo, items, supports] = await Promise.all([
+    const [afterUserInfo, items, supports] = await Promise.all([
       user.getUserInfo(userId),
       this.connection.first("SELECT bt_tickets, green_tickets, box_gauge FROM users WHERE user_id=:user", { user: userId }),
       user.getSupportUnits(userId)
     ])
 
-    let addedGauge = secretBoxInfo.add_gauge * unitCount
-    let result: any = {
+    const addedGauge = secretBoxInfo.add_gauge * unitCount
+    const result: any = {
       is_unit_max: false,
       item_list: [ // TODO
         {
@@ -207,7 +207,7 @@ export class Secretbox {
       unit_support_list: supports
     }
 
-    let totalGauge = items.box_gauge + addedGauge
+    const totalGauge = items.box_gauge + addedGauge
     if (totalGauge >= 100) {
       result.secret_box_items.item.push({
         owning_item_id: 0,
@@ -232,13 +232,13 @@ export class Secretbox {
   }
 
   private async generateTab(dbData: any, userId: number): Promise<secretbox> {
-    let settingsAndEffects = await this.generateSettingsAndEffect(dbData.secretbox_id)
+    const settingsAndEffects = await this.generateSettingsAndEffect(dbData.secretbox_id)
     let pon = await this.connection.first(`SELECT pon_count FROM secretbox_pon WHERE user_id = :user AND secretbox_id = :id`, {
       user: userId,
       id: dbData.secretbox_id
     })
     if (!pon) pon = { pon_count: 1}
-    let result: secretbox = {
+    const result: secretbox = {
       page_title_asset: dbData.menu_title_asset,
       url: `/webview.php/secretbox/detail?id=${dbData.secretbox_id}`,
       animation_assets: {
@@ -271,10 +271,10 @@ export class Secretbox {
     return result
   }
   private async generateButton(secretBoxId: number, secretBoxName: string, secretBoxType: number, userId: number): Promise<secretboxButton[]> {
-    let result: secretboxButton[] = []
+    const result: secretboxButton[] = []
     switch (secretBoxType) {
       case 1: { // step up
-        let stepSettings = await this.connection.first(`SELECT * FROM secretbox_step_up_settings WHERE secretbox_id = :id`, { id: secretBoxId })
+        const stepSettings = await this.connection.first(`SELECT * FROM secretbox_step_up_settings WHERE secretbox_id = :id`, { id: secretBoxId })
         if (!stepSettings) throw new Error(`Box #${secretBoxId} doesn't have step up settings`)
         let userPon = await this.connection.first(`SELECT pon_count FROM secretbox_pon WHERE user_id = :user AND secretbox_id = :id`, {
           user: userId,
@@ -284,11 +284,11 @@ export class Secretbox {
         let currentStep = userPon.pon_count + 1
         if (currentStep % stepSettings.end_step === 0) currentStep = stepSettings.end_step
         else if (stepSettings.reset_type === 1) currentStep = currentStep % stepSettings.end_step
-        let stepCost = await this.connection.first(`SELECT * FROM secretbox_button WHERE secretbox_id = :id AND step_id = :step`, {
+        const stepCost = await this.connection.first(`SELECT * FROM secretbox_button WHERE secretbox_id = :id AND step_id = :step`, {
           id: secretBoxId,
           step: currentStep
         })
-        let button: any = {
+        const button: any = {
           secret_box_button_type: 2, // default is 2
           cost_list: [],
           secret_box_name: secretBoxName,
@@ -308,7 +308,7 @@ export class Secretbox {
         break
       }
       default: {
-        let buttons = await this.connection.query(`SELECT * FROM secretbox_button WHERE secretbox_id = :id ORDER BY type ASC LIMIT 3`, {
+        const buttons = await this.connection.query(`SELECT * FROM secretbox_button WHERE secretbox_id = :id ORDER BY type ASC LIMIT 3`, {
           id: secretBoxId
         })
 
@@ -326,15 +326,15 @@ export class Secretbox {
     return result
   }
   private async generateCost(buttonId: number, userId: number): Promise<secretboxCost[]> {
-    let costs = await this.connection.query(`SELECT cost_id, unit_count, amount, item_name FROM secretbox_cost WHERE button_id = :id`, {
+    const costs = await this.connection.query(`SELECT cost_id, unit_count, amount, item_name FROM secretbox_cost WHERE button_id = :id`, {
       id: buttonId
     })
-    let amount = await this.connection.first("SELECT sns_coin, green_tickets, bt_tickets, game_coin, social_point FROM users WHERE user_id=:user", {
+    const amount = await this.connection.first("SELECT sns_coin, green_tickets, bt_tickets, game_coin, social_point FROM users WHERE user_id=:user", {
       user: userId
     })
-    let result: secretboxCost[] = []
+    const result: secretboxCost[] = []
     await Promise.all(costs.map((cost: any) => {
-      let item = Item.nameToType(cost.item_name)
+      const item = Item.nameToType(cost.item_name)
       let payable = false
       if (item.itemType === 3001) payable = amount.sns_coint >= cost.amount
       else if (item.itemType === 3000 && item.itemId === 2) payable = amount.game_coin >= cost.amount
@@ -343,7 +343,7 @@ export class Secretbox {
       else if (item.itemType === 1000 && item.itemId === 5) payable = amount.bt_tickets >= cost.amount
       result.push({
         id: cost.cost_id,
-        payable: payable,
+        payable,
         unit_count: cost.unit_count,
         type: item.itemType,
         item_id: item.itemId,
@@ -353,29 +353,29 @@ export class Secretbox {
     return result
   }
   private async generateSettingsAndEffect(secretboxId: number, costId?: number) {
-    let query = `SELECT unit_data_file, cost_id FROM secretbox_cost 
+    let query = `SELECT unit_data_file, cost_id FROM secretbox_cost
       JOIN secretbox_button ON secretbox_cost.button_id = secretbox_button.button_id
-      JOIN secretbox_list ON secretbox_button.secretbox_id = secretbox_list.secretbox_id 
+      JOIN secretbox_list ON secretbox_button.secretbox_id = secretbox_list.secretbox_id
       WHERE secretbox_list.secretbox_id = :secretbox`
     if (costId) query += ` AND secretbox_cost.cost_id = :cost`
-    let costs = await this.connection.query(query, { secretbox: secretboxId, cost: costId })
+    const costs = await this.connection.query(query, { secretbox: secretboxId, cost: costId })
     if (costs.length === 0) throw new Error(`Cost data is missing`)
 
-    let result = {
+    const result = {
       settings: <costSettings>{},
       effect_list: <secretboxEffect[]>[],
       effect_detail_list: <secretboxEffectDetail[]>[]
     }
-    // just for optimization 
-    let processedFiles = <any>{}
+    // just for optimization
+    const processedFiles = <any>{}
     await costs.forEachAsync(async (cost: any) => {
       try {
         if (processedFiles[cost.unit_data_file] != undefined) {
           result.settings[cost.cost_id] = result.settings[processedFiles[cost.unit_data_file]]
           return
         }
-        let data = await promisify(readFile)(`${rootDir}/data/secretbox/${cost.unit_data_file}`, "utf-8")
-        let settings: unitData[] = []
+        const data = await promisify(readFile)(`${rootDir}/data/secretbox/${cost.unit_data_file}`, "utf-8")
+        const settings: unitData[] = []
         await JSON.parse(data).forEachAsync(async (unitData: unitData) => {
           if (
             !(Type.isNull(unitData.unit_type_id) || Type.isArray(unitData.unit_type_id)) ||
@@ -394,7 +394,7 @@ export class Secretbox {
           ) {
             excludeRateup = true
             await unitData.rateup!.forEachAsync(async (rateup: any) => {
-              let sbAsset = await secretboxDB.get("SELECT secret_box_asset_id FROM secret_box_asset_m WHERE unit_id=?", [rateup])
+              const sbAsset = await secretboxDB.get("SELECT secret_box_asset_id FROM secret_box_asset_m WHERE unit_id=?", [rateup])
               if (!sbAsset) return // this unit doesn't have sb asset and client can't show this card
               result.effect_list.push({
                 type: 1,
@@ -408,7 +408,7 @@ export class Secretbox {
               })
             })
             await unitData.rateup_hidden!.forEachAsync(async (rateup: number) => {
-              let sbAsset = await secretboxDB.get("SELECT secret_box_asset_id FROM secret_box_asset_m WHERE unit_id=?", [rateup])
+              const sbAsset = await secretboxDB.get("SELECT secret_box_asset_id FROM secret_box_asset_m WHERE unit_id=?", [rateup])
               if (!sbAsset) return // this unit doesn't have sb asset and client can't show this card
               result.effect_detail_list.push({
                 type: 1,
@@ -419,9 +419,9 @@ export class Secretbox {
             unitData.rateup = Utils.mergeArrayDedupe([unitData.rateup, unitData.rateup_hidden]) // concat rateup and hidden rateup
             rateupIds = unitData.rateup
             unitData.rateup = await Promise.all(unitData.rateup.map(async (rateup: any) => {
-              let result = await unitDB.get(`
-                SELECT unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name 
-                FROM unit_m JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id 
+              const result = await unitDB.get(`
+                SELECT unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+                FROM unit_m JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
                 WHERE unit_id=?`, [rateup])
               return {
                 unit_id: result.unit_id,
@@ -435,22 +435,22 @@ export class Secretbox {
 
           // Prepare units
           if (unitData.unit_type_id != null) {
-            let result = await unitDB.all(`
-                SELECT unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name 
-                FROM unit_m LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id 
+            const result = await unitDB.all(`
+                SELECT unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+                FROM unit_m LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
                 WHERE rarity = ? AND unit_id NOT IN (${rateupIds.join(",")}) AND unit_type_id IN (${unitData.unit_type_id.join(",")})`, [unitData.rarity])
-            for (let i = 0; i < result.length; i++) {
+            for (const data of result) {
               unitData.value.push({
-                unit_id: result[i].unit_id,
-                unit_number: result[i].unit_number,
-                name: result[i].unit_name,
-                attribute: result[i].attribute_id,
-                skill: result[i].skill_name
+                unit_id: data.unit_id,
+                unit_number: data.unit_number,
+                name: data.unit_name,
+                attribute: data.attribute_id,
+                skill: data.skill_name
               })
             }
           }
           if (unitData.query != null && unitData.query.length > 0) {
-            let _query: string[] = []
+            let _query: string[] = [] // tslint:disable-line
             if (Type.isString(unitData.query)) _query.push(unitData.query.toString())
             else _query = <string[]>unitData.query
             await _query.forEachAsync(async (q: string) => {
@@ -466,12 +466,12 @@ export class Secretbox {
                 }
               }
               q += " ORDER BY unit_id DESC"
-              let result = await unitDB.all(q)
-              for (let i = 0; i < result.length; i++) {
-                let res = await unitDB.get(`
-                  SELECT unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name 
-                  FROM unit_m LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id 
-                  WHERE unit_id=?`, [result[i].unit_id])
+              const result = await unitDB.all(q)
+              for (const data of result) {
+                const res = await unitDB.get(`
+                  SELECT unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+                  FROM unit_m LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
+                  WHERE unit_id=?`, [data.unit_id])
                 unitData.value!.push({
                   unit_id: res.unit_id,
                   unit_number: res.unit_number,
@@ -496,10 +496,10 @@ export class Secretbox {
     return result
   }
 
-  async generateAdditionalInfo(secretBoxId: number, secretBoxType: number, userId: number) {
+  public async generateAdditionalInfo(secretBoxId: number, secretBoxType: number, userId: number) {
     switch (secretBoxType) {
       case 1: {
-        let stepSettings = await this.connection.first(`SELECT * FROM secretbox_step_up_settings WHERE secretbox_id = :id`, { id: secretBoxId })
+        const stepSettings = await this.connection.first(`SELECT * FROM secretbox_step_up_settings WHERE secretbox_id = :id`, { id: secretBoxId })
         if (!stepSettings) throw new Error(`Box #${secretBoxId} doesn't have step up settings`)
         let userPon = await this.connection.first(`SELECT pon_count FROM secretbox_pon WHERE user_id = :user AND secretbox_id = :id`, {
           user: userId,

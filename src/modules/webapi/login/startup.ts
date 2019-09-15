@@ -26,24 +26,25 @@ export default class extends WebApiAction {
 
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
-    
+
     const i18n = new I18n(this.connection)
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
       await Utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
     }
-    
-    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup", "mailer")
 
-    let pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
+    const strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup", "mailer")
+
+    const pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     if (!checkPass(pass)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
 
-    let _mailCheck = await this.connection.first(`SELECT * FROM users WHERE mail = :mail`, {
+    // tslint:disable-next-line
+    const _mailCheck = await this.connection.first(`SELECT * FROM users WHERE mail = :mail`, {
       mail: this.params.mail
     })
     if (_mailCheck) throw new ErrorWebApi(strings.emailExists, true)
 
-    let userData = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
+    const userData = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
       token: this.requestData.auth_token
     })
     if (!userData) throw new ErrorWebApi("Token is expired")
@@ -56,7 +57,7 @@ export default class extends WebApiAction {
 
     this.user_id = (await this.connection.execute("INSERT INTO users (introduction, name, password, language, mail, tutorial_state) VALUES ('Hello!', :name, :pass, :lang, :mail, 1)", {
       name: this.params.name,
-      pass: pass, 
+      pass,
       lang: userData.language,
       mail: this.params.mail
     })).insertId
@@ -65,12 +66,12 @@ export default class extends WebApiAction {
       key: userData.login_key,
       pass: userData.login_passwd
     })
-    await this.connection.query("INSERT INTO user_exchange_point VALUES (:user,2, 10),(:user,3, 0),(:user,4,0),(:user,5, 0);", { 
-      user: this.user_id 
+    await this.connection.query("INSERT INTO user_exchange_point VALUES (:user,2, 10),(:user,3, 0),(:user,4,0),(:user,5, 0);", {
+      user: this.user_id
     })
 
     // send mail
-    let status = await Mailer.sendMail(this.params.mail, strings.subjectWelcome, Utils.prepareTemplate(strings.bodyWelcome, {
+    const status = await Mailer.sendMail(this.params.mail, strings.subjectWelcome, Utils.prepareTemplate(strings.bodyWelcome, {
       userName: this.params.name
     }))
 
@@ -89,6 +90,6 @@ function checkPass(input: string) {
   return input.match(/^[A-Za-z0-9]\w{1,32}$/)
 }
 function checkMail(input: string) {
-  let regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,6})+$/
+  const regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,6})+$/
   return regex.test(input)
 }

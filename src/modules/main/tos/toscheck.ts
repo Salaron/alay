@@ -12,7 +12,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let check = await this.connection.first(`SELECT * FROM user_tos WHERE user_id = :user`, { user: this.user_id })
+    const check = await this.connection.first(`SELECT * FROM user_tos WHERE user_id = :user`, { user: this.user_id })
     return {
       status: 200,
       result: {

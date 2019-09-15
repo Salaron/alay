@@ -14,43 +14,43 @@ const marathonDB = sqlite3.getMarathon()
 const unitDB = sqlite3.getUnit()
 
 const expTable = [0, 12, 26, 46, 65, 71, 84]
-let availableLiveList: number[] = []
-let normalLiveList: number[] = []
-let specialLiveList: number[] = []
-let marathonLiveList: { [eventId: number]: number[] } = {}
+const availableLiveList: number[] = []
+const normalLiveList: number[] = []
+const specialLiveList: number[] = []
+const marathonLiveList: { [eventId: number]: number[] } = {}
 export async function init() {
-  let liveSettings = await liveNotesDB.all("SELECT DISTINCT live_setting_id FROM live_note")
-  for (let i = 0; i < liveSettings.length; i++) {
-    availableLiveList.push(liveSettings[i].live_setting_id)
+  const liveSettings = await liveNotesDB.all("SELECT DISTINCT live_setting_id FROM live_note")
+  for (const liveSetting of liveSettings) {
+    availableLiveList.push(liveSetting.live_setting_id)
   }
   log.info(`Found note data for ${availableLiveList.length} lives`)
 
-  let normal = await liveDB.all("SELECT live_difficulty_id, live_setting_id FROM normal_live_m")
-  for (let i = 0; i < normal.length; i++) {
-    if (availableLiveList.includes(normal[i].live_setting_id)) {
-      normalLiveList.push(normal[i].live_difficulty_id)
+  const normal = await liveDB.all("SELECT live_difficulty_id, live_setting_id FROM normal_live_m")
+  for (const liveSetting of normal) {
+    if (availableLiveList.includes(liveSetting.live_setting_id)) {
+      normalLiveList.push(liveSetting.live_difficulty_id)
     } else {
-      log.verbose(`Missing Note Data for Normal Live #${normal[i].live_difficulty_id} (Setting #${normal[i].live_setting_id})`)
+      log.verbose(`Missing Note Data for Normal Live #${liveSetting.live_difficulty_id} (Setting #${liveSetting.live_setting_id})`)
     }
   }
   log.info(`Found data for ${normalLiveList.length} normal lives`)
 
-  let special = await liveDB.all("SELECT live_difficulty_id, live_setting_id FROM special_live_m")
-  for (let i = 0; i < special.length; i++) {
-    if (availableLiveList.includes(special[i].live_setting_id)) {
-      specialLiveList.push(special[i].live_difficulty_id)
+  const special = await liveDB.all("SELECT live_difficulty_id, live_setting_id FROM special_live_m")
+  for (const liveSetting of special) {
+    if (availableLiveList.includes(liveSetting.live_setting_id)) {
+      specialLiveList.push(liveSetting.live_difficulty_id)
     } else {
-      log.verbose(`Missing Note Data for Special Live #${special[i].live_difficulty_id} (Setting #${special[i].live_setting_id})`)
+      log.verbose(`Missing Note Data for Special Live #${liveSetting.live_difficulty_id} (Setting #${liveSetting.live_setting_id})`)
     }
   }
   log.info(`Found data for ${specialLiveList.length} special lives`)
 
-  let marathon = await marathonDB.all(`
-  SELECT 
-    event_id, live.live_difficulty_id, live_setting_id 
-  FROM 
-    event_marathon_live_m as live 
-  JOIN event_marathon_live_schedule_m as schedule 
+  const marathon = await marathonDB.all(`
+  SELECT
+    event_id, live.live_difficulty_id, live_setting_id
+  FROM
+    event_marathon_live_m as live
+  JOIN event_marathon_live_schedule_m as schedule
     ON schedule.live_difficulty_id = live.live_difficulty_id`)
   for (const live of marathon) {
     if (availableLiveList.includes(live.live_setting_id)) {
@@ -69,9 +69,9 @@ export class Live {
   }
 
   public async getLiveNotes(userId: number, liveSettingId: number, isEvent = false) {
-    let params = await new User(this.connection).getParams(userId)
-    
-    // make mirror and vanish on-the-fly 
+    const params = await new User(this.connection).getParams(userId)
+
+    // make mirror and vanish on-the-fly
     let mirror = 0
     let vanish = 0
     if ((isEvent === true && params.event === 1) || isEvent === false) {
@@ -79,12 +79,12 @@ export class Live {
       mirror = params.mirror === 1 ? 10 : 0
     }
 
-    let notes = await liveNotesDB.all(`
-    SELECT 
-      timing_sec, notes_attribute, notes_level, effect, 
-      effect_value, (abs(${mirror} - position)) as position, 
-      ${vanish} as vanish 
-    FROM live_note 
+    const notes = await liveNotesDB.all(`
+    SELECT
+      timing_sec, notes_attribute, notes_level, effect,
+      effect_value, (abs(${mirror} - position)) as position,
+      ${vanish} as vanish
+    FROM live_note
     WHERE live_setting_id = :id`, { id: liveSettingId })
     if (notes.length === 0) throw new Error(`Live notes data for LSID #${liveSettingId} is missing in database`)
 
@@ -94,40 +94,40 @@ export class Live {
   // only for special, normal lives or marathon lives not other
   public async getLiveDataByDifficultyId(liveDifficultyId: number): Promise<liveData> {
     let data = await liveDB.get(`
-    SELECT 
-      c_rank_score, b_rank_score, a_rank_score, s_rank_score, 
-      c_rank_combo, b_rank_combo, a_rank_combo, s_rank_combo, 
-      c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete, 
+    SELECT
+      c_rank_score, b_rank_score, a_rank_score, s_rank_score,
+      c_rank_combo, b_rank_combo, a_rank_combo, s_rank_combo,
+      c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete,
       difficulty, ac_flag, swing_flag, setting.live_setting_id, difficulty.live_difficulty_id,
       capital_type, capital_value
     FROM live_setting_m as setting INNER JOIN (
-      SELECT 
+      SELECT
         live_setting_id, live_difficulty_id, capital_type, capital_value,
         c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete
-      FROM special_live_m 
-      UNION 
-      SELECT 
+      FROM special_live_m
+      UNION
+      SELECT
         live_setting_id, live_difficulty_id, capital_type, capital_value,
-        c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete 
+        c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete
       FROM normal_live_m
-    ) as difficulty ON setting.live_setting_id = difficulty.live_setting_id 
+    ) as difficulty ON setting.live_setting_id = difficulty.live_setting_id
     WHERE live_difficulty_id = :ldid`, { ldid: liveDifficultyId })
     if (!data) {
       // Token live?
       data = {
         marathon_live: true
       }
-      let tokenData = await marathonDB.get(`
-      SELECT 
+      const tokenData = await marathonDB.get(`
+      SELECT
         live_difficulty_id, live_setting_id, capital_type, capital_value, random_flag,
         c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete
       FROM event_marathon_live_m
       WHERE live_difficulty_id = :ldid`, { ldid: liveDifficultyId })
       if (!tokenData) throw new Error(`Live data for live difficulty id #${liveDifficultyId} is missing`)
-      let settingData = await liveDB.get(`
-      SELECT 
-        c_rank_score, b_rank_score, a_rank_score, s_rank_score, 
-        c_rank_combo, b_rank_combo, a_rank_combo, s_rank_combo, 
+      const settingData = await liveDB.get(`
+      SELECT
+        c_rank_score, b_rank_score, a_rank_score, s_rank_score,
+        c_rank_combo, b_rank_combo, a_rank_combo, s_rank_combo,
         difficulty, ac_flag, swing_flag, live_setting_id
       FROM live_setting_m a WHERE live_setting_id = :lsid`, { lsid: tokenData.live_setting_id })
       if (!settingData) throw new Error(`Live data for live setting id #${tokenData.live_setting_id} is missing`)
@@ -163,14 +163,14 @@ export class Live {
     let deck = await this.connection.query(`
     SELECT
       max_removable_skill_capacity, units.unit_owning_user_id, slot_id, unit_id,
-      stat_smile, stat_pure, stat_cool, max_hp, attribute, love, level, unit_skill_level, 
+      stat_smile, stat_pure, stat_cool, max_hp, attribute, love, level, unit_skill_level,
       max_love, 'rank', max_rank, max_level, max_skill_level
-    FROM user_unit_deck_slot 
+    FROM user_unit_deck_slot
     JOIN units
       ON units.unit_owning_user_id = user_unit_deck_slot.unit_owning_user_id
     WHERE user_unit_deck_slot.user_id = :user AND deck_id = :deck`, { user: userId, deck: deckId })
     if (deck.length === 0) throw new Error(`Deck doesn't exists`)
-    deck = deck.map(unit => {
+    deck = deck.map((unit) => {
       return {
         unit_owning_user_id: unit.unit_owning_user_id,
         unit_id: unit.unit_id,
@@ -199,7 +199,7 @@ export class Live {
       await this.calculateScoreBonus(userId, deck, guestUnitId, cleanup)
     }
 
-    let units = []
+    const units = []
     let smile = 0
     let pure = 0
     let cool = 0
@@ -229,7 +229,7 @@ export class Live {
 
   public async calculateScoreBonus(userId: number, deck: any[], guestUnitId?: number, cleanup = true) {
     // 1. Apply love (kizuna) bonus
-    // 2. Apply SIS bonus 
+    // 2. Apply SIS bonus
     // 3. Calculate Center and Extra bonus of center unit
     // 4. Caclulate Center and Extra bonus of guest if exists
     // 5. Apply Center and Extra bonus
@@ -272,24 +272,24 @@ export class Live {
     return deck
   }
   private async applySISbonus(userId: number, deck: any[]) {
-    // Check if our team composed only 
+    // Check if our team composed only
     // of Aqours or Muse (or something else) members
     let fullyComposed = false
     let composedMemberTag = 0
-    let _unitTypeIds: number[] = []
+    const _unitTypeIds: number[] = [] // tslint:disable-line
 
     // get member tags that will be trigger for SIS
-    let memberTagTrigger = (await unitDB.all("SELECT DISTINCT trigger_type FROM unit_removable_skill_m WHERE trigger_reference_type = 4")).map((type) => {
+    const memberTagTrigger = (await unitDB.all("SELECT DISTINCT trigger_type FROM unit_removable_skill_m WHERE trigger_reference_type = 4")).map((type) => {
       return type.trigger_type
     })
     await deck.forEachAsync(async (unit) => {
-      let unitTypeId = (await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", {
+      const unitTypeId = (await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", {
         id: unit.unit_id
       })).unit_type_id
 
-      let memberTags = (await unitDB.all("SELECT member_tag_id FROM unit_type_member_tag_m WHERE unit_type_id = :type", {
+      const memberTags = (await unitDB.all("SELECT member_tag_id FROM unit_type_member_tag_m WHERE unit_type_id = :type", {
         type: unitTypeId
-      })).map(tag => tag.member_tag_id)
+      })).map((tag) => tag.member_tag_id)
 
       for (const tag of memberTags) {
         if (memberTagTrigger.includes(tag)) {
@@ -300,12 +300,12 @@ export class Live {
     })
     if (_unitTypeIds.length === 9) fullyComposed = true
 
-    let removableSkills = await new User(this.connection).getRemovableSkillInfo(userId)
+    const removableSkills = await new User(this.connection).getRemovableSkillInfo(userId)
     await deck.forEachAsync(async (unit) => {
       if (!removableSkills.equipment_info[unit.unit_owning_user_id]) return
 
       await removableSkills.equipment_info[unit.unit_owning_user_id].detail.forEachAsync(async (skill: any) => {
-        let skillInfo = await unitDB.get("SELECT * FROM unit_removable_skill_m WHERE unit_removable_skill_id = :id", {
+        const skillInfo = await unitDB.get("SELECT * FROM unit_removable_skill_m WHERE unit_removable_skill_id = :id", {
           id: skill.unit_removable_skill_id
         })
         if (!skillInfo) throw new Error(`Data for removable skill #${skill.unit_removable_skill_id} is missing`)
@@ -341,36 +341,36 @@ export class Live {
     return deck
   }
   private async calculateCenterUnitBonus(deck: any[], guestUnitId?: number) {
-    let skillId = await unitDB.get("SELECT default_leader_skill_id FROM unit_m WHERE unit_id = :id", {
+    const skillId = await unitDB.get("SELECT default_leader_skill_id FROM unit_m WHERE unit_id = :id", {
       id: Type.isInt(guestUnitId) ? guestUnitId : deck[4].unit_id
     })
-    let leaderSkill = await unitDB.get("SELECT leader_skill_effect_type, effect_value FROM unit_leader_skill_m WHERE unit_leader_skill_id = :id", {
+    const leaderSkill = await unitDB.get("SELECT leader_skill_effect_type, effect_value FROM unit_leader_skill_m WHERE unit_leader_skill_id = :id", {
       id: skillId.default_leader_skill_id
     })
     if (!leaderSkill) return deck // This card doesn't have leader skill (and leader extra) bonus
 
-    let attribute = String(leaderSkill.leader_skill_effect_type).split("") // Small hack
+    const attribute = String(leaderSkill.leader_skill_effect_type).split("") // Small hack
     attribute.length > 1 ? attribute[0] = attribute[2] : attribute[1] = attribute[0]
     for (const unit of deck) {
       unit[centerBonus(attribute[0])] += Math.ceil(unit[stat(attribute[1])] * leaderSkill.effect_value / 100)
     }
 
-    let extraSkill = await unitDB.get("SELECT member_tag_id, leader_skill_effect_type, effect_value FROM unit_leader_skill_extra_m WHERE unit_leader_skill_id = :id", {
+    const extraSkill = await unitDB.get("SELECT member_tag_id, leader_skill_effect_type, effect_value FROM unit_leader_skill_extra_m WHERE unit_leader_skill_id = :id", {
       id: skillId.default_leader_skill_id
     })
     if (!extraSkill) return deck
 
-    let typeIds = (await unitDB.all("SELECT unit_type_id FROM unit_type_member_tag_m WHERE member_tag_id = :tag", {
+    const typeIds = (await unitDB.all("SELECT unit_type_id FROM unit_type_member_tag_m WHERE member_tag_id = :tag", {
       tag: extraSkill.member_tag_id
-    })).map(t => t.unit_type_id)
+    })).map((t) => t.unit_type_id)
 
     await Promise.all(deck.map(async (unit) => {
-      let typeId = await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", {
+      const typeId = await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", {
         id: unit.unit_id
       })
       if (typeIds.indexOf(typeId.unit_type_id) === -1) return
 
-      let atb = extraSkill.leader_skill_effect_type
+      const atb = extraSkill.leader_skill_effect_type
       unit[centerBonus(atb)] += Math.ceil(unit[stat(atb)] * extraSkill.effect_value / 100)
     }))
     return deck
@@ -379,19 +379,19 @@ export class Live {
   public async liveGoalAccomp(userId: number, liveDifficultyId: number, scoreRank: number, comboRank: number, completeRank: number) {
     const item = new Item(this.connection)
 
-    let result = {
+    const result = {
       achieved_ids: <number[]>[],
       rewards: <any>[]
     }
 
-    let existingGoals = (await this.connection.query(`SELECT * FROM user_live_goal_rewards WHERE user_id=:user AND live_difficulty_id=:diff`, {
+    const existingGoals = (await this.connection.query(`SELECT * FROM user_live_goal_rewards WHERE user_id=:user AND live_difficulty_id=:diff`, {
       user: userId,
       diff: liveDifficultyId
-    })).map(e => e.live_goal_reward_id)
-    let liveGoals = await liveDB.all(`SELECT * FROM live_goal_reward_m WHERE live_difficulty_id = :ldid AND live_goal_reward_id NOT IN (${existingGoals.join(",")})`, {
+    })).map((e) => e.live_goal_reward_id)
+    const liveGoals = await liveDB.all(`SELECT * FROM live_goal_reward_m WHERE live_difficulty_id = :ldid AND live_goal_reward_id NOT IN (${existingGoals.join(",")})`, {
       ldid: liveDifficultyId
     })
-    await Promise.all(liveGoals.map(async goal => {
+    await Promise.all(liveGoals.map(async (goal) => {
       if (
         (goal.live_goal_type === 1 && goal.rank >= scoreRank) ||
         (goal.live_goal_type === 2 && goal.rank >= comboRank) ||
@@ -421,9 +421,9 @@ export class Live {
   }
 
   public async applyKizunaBonusToDeck(userId: number, deck: any[], kizuna: number) {
-    for (let i = 0; i < deck.length; i++) {
-      deck[i].kizuna_add = 0
-      deck[i].fpt_add = 0
+    for (const unit of deck) {
+      unit.kizuna_add = 0
+      unit.fpt_add = 0
     }
 
     let centerKizuna = Math.ceil(kizuna * 5 / 10)

@@ -37,8 +37,8 @@ export class config {
     this.mailer = Mailer
   }
 
-  async prepareConfig(): Promise<void> {
-    const log = new Log("Config Manager")  
+  public async prepareConfig(): Promise<void> {
+    const log = new Log("Config Manager")
     if (this.server.debug_mode) this.server.XMC_check = false
 
     this.specialKey = Buffer.concat([Utils.xor(this.client.application_key.slice(0, 16), this.client.XMC_base.slice(16, 32)), Utils.xor(this.client.application_key.slice(16, 32), this.client.XMC_base.slice(0, 16))])
@@ -59,7 +59,7 @@ export class config {
     log.info("Bundle version: " + Config.client.application_version)
   }
 
-  async reloadConfig() {
+  public async reloadConfig() {
     // remove modules from cache
     delete require.cache[require.resolve("../config/server")]
     delete require.cache[require.resolve("../config/client")]
@@ -81,7 +81,7 @@ export class config {
     this.i18n = <typeof I18n><unknown>(await import("../config/i18n")).default
     this.maintenance = <typeof Maintenance><unknown>(await import("../config/maintenance")).default
     this.mailer = <typeof Mailer><unknown>(await import("../config/mailer")).default
-    
+
     await this.prepareConfig()
   }
 }

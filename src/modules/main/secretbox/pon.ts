@@ -13,7 +13,7 @@ export default class extends MainAction {
   }
 
   public paramTypes() {
-    return { 
+    return {
       id: TYPE.INT,
       secret_box_id: TYPE.INT
     }

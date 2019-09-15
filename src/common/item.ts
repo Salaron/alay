@@ -155,11 +155,11 @@ export class Item {
   }
 
   public static correctName(name: string, itemId?: number | null) {
-    let type = this.nameToType(name, itemId)
+    const type = this.nameToType(name, itemId)
     return this.typeToName(type.itemType, itemId || type.itemId)
   }
   public static getIncentiveId(itemType: number, itemId?: number | null) {
-    switch(itemType){
+    switch(itemType) {
       case 1000:
       case 1001: return itemId
       case 3000: return 1
@@ -181,13 +181,13 @@ export class Item {
     }
 
     if (
-      (item.type === 1001 || 
-      item.type === 3006 || 
+      (item.type === 1001 ||
+      item.type === 3006 ||
       item.type === 5500
       ) && item.id === null
     ) throw new Error("You should need to provide itemId")
 
-    switch(item.type){
+    switch(item.type) {
       case 1000:
       case 3000:
       case 3001:
@@ -197,8 +197,8 @@ export class Item {
       }
 
       case 1001: {
-        let unit = new Unit(this.connection)
-        return await unit.addUnit(userId, <number>item.id, { amount: amount })
+        const unit = new Unit(this.connection)
+        return await unit.addUnit(userId, <number>item.id, { amount })
       }
 
       case 3006: {
@@ -237,22 +237,22 @@ export class Item {
   public async addPresent(userId: number, item: ItemObject, message: string, amount = 1, history = false) {
     if (!item.name && !item.type && !item.id) throw new Error(`Item object is empty`)
     if (typeof item.name === "string" && item.type == null) {
-      let ntt = Item.nameToType(item.name, item.id)
+      const ntt = Item.nameToType(item.name, item.id)
       item.type = ntt.itemType
       item.id = ntt.itemId
       item.name = Item.correctName(item.name, item.id)
-      
+
     }
     if (typeof item.type === "number" && item.name == null) {
       item.name = Item.typeToName(item.type, item.id)
     }
 
-    let res = await this.connection.query(`
+    const res = await this.connection.query(`
     INSERT INTO reward_table (user_id, amount, item_type, incentive_message, item_id) VALUES (
-      ${userId}, 
-      ${amount}, 
-      ${item.type}, 
-      '${message.replace(/[\'']/g, "\\'")}', 
+      ${userId},
+      ${amount},
+      ${item.type},
+      '${message.replace(/[\'']/g, "\\'")}',
       ${item.id || null}
     )`)
     if (!history) return (<any>res).insertId
@@ -261,9 +261,9 @@ export class Item {
   }
 
   public async openPresent(userId: number, incentiveId: number) {
-    let present = await this.connection.first(`SELECT amount, item_id, item_type FROM reward_table WHERE user_id= :user AND incentive_id = :id AND opened_date IS NULL`, { 
-      user: userId, 
-      id: incentiveId 
+    const present = await this.connection.first(`SELECT amount, item_id, item_type FROM reward_table WHERE user_id= :user AND incentive_id = :id AND opened_date IS NULL`, {
+      user: userId,
+      id: incentiveId
     })
     if (!present) throw new Error(`Present is already collected`)
 
@@ -272,8 +272,8 @@ export class Item {
       id: incentiveId
     })
 
-    let result: any = await this.addItemToUser(userId, { 
-      type: present.item_type, 
+    const result: any = await this.addItemToUser(userId, {
+      type: present.item_type,
       id: present.item_id
     }, present.amount)
     if (present.item_type === 1001) {

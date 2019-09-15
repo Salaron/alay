@@ -16,7 +16,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let response: any = {
+    const response: any = {
       event_list: [],
       live_list: [],
       limited_bonus_list: [],
@@ -26,7 +26,7 @@ export default class extends MainAction {
     }
 
     if (Config.modules.live.unlockAll) {
-      let specialLiveList = Live.getSpecialLiveList()
+      const specialLiveList = Live.getSpecialLiveList()
       for (const live of specialLiveList) {
         response.live_list.push({
           live_difficulty_id: live,
@@ -36,8 +36,8 @@ export default class extends MainAction {
         })
       }
     }
-    
-    let events = await this.connection.query("SELECT * FROM events_list WHERE open_date <= :now AND close_date > :now", {
+
+    const events = await this.connection.query("SELECT * FROM events_list WHERE open_date <= :now AND close_date > :now", {
       now: Utils.toSpecificTimezone(9)
     })
 
@@ -58,11 +58,11 @@ export default class extends MainAction {
       })
     }
 
-    let marathonEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+    const marathonEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
     if (marathonEvent.active) {
-      let marathonLives = (await marathonDB.all("SELECT live_difficulty_id FROM event_marathon_live_schedule_m WHERE event_id = :id", {
+      const marathonLives = (await marathonDB.all("SELECT live_difficulty_id FROM event_marathon_live_schedule_m WHERE event_id = :id", {
         id: marathonEvent.id
-      })).map(live => live.live_difficulty_id)
+      })).map((live) => live.live_difficulty_id)
       for (const live of marathonLives) {
         response.live_list.push({
           live_difficulty_id: live,

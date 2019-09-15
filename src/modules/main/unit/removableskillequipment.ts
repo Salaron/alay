@@ -26,7 +26,7 @@ export default class extends MainAction {
     await this.params.remove.forEachAsync(async (sis: any) => {
       if (!Type.isInt(sis.unit_owning_user_id)) throw new Error(`uouid should be int`)
 
-      let check = await this.connection.first("SELECT unit_owning_user_id FROM units WHERE user_id = :user AND unit_owning_user_id = :id AND deleted = 0", {
+      const check = await this.connection.first("SELECT unit_owning_user_id FROM units WHERE user_id = :user AND unit_owning_user_id = :id AND deleted = 0", {
         user: this.user_id,
         id: sis.unit_owning_user_id
       })
@@ -38,22 +38,22 @@ export default class extends MainAction {
     })
 
     // Prepare SIS owning info
-    let _owningSkill = await new User(this.connection).getRemovableSkillInfo(this.user_id)
-    let owningSkill = <any>{}
+    const _owningSkill = await new User(this.connection).getRemovableSkillInfo(this.user_id) // tslint:disable-line
+    const owningSkill = <any>{}
 
     for (const skill of _owningSkill.owning_info) {
       owningSkill[skill.unit_removable_skill_id] = skill.total_amount - skill.equipped_amount
       assert(owningSkill[skill.unit_removable_skill_id] >= 0, "Not enough sis [owningCheck]")
     }
 
-    let _skillInfo = await unitDB.all("SELECT unit_removable_skill_id, size FROM unit_removable_skill_m")
-    let skillInfo = <any>{}
+    const _skillInfo = await unitDB.all("SELECT unit_removable_skill_id, size FROM unit_removable_skill_m") // tslint:disable-line
+    const skillInfo = <any>{}
 
-    for (let i = 0; i < _skillInfo.length; i++) {
-      skillInfo[_skillInfo[i].unit_removable_skill_id] = {
-        size: _skillInfo[i].size,
-        target_ref: _skillInfo[i].target_reference_type,
-        target_type: _skillInfo[i].target_type
+    for (const skill of _skillInfo) {
+      skillInfo[skill.unit_removable_skill_id] = {
+        size: skill.size,
+        target_ref: skill.target_reference_type,
+        target_type: skill.target_type
       }
     }
 
@@ -65,11 +65,11 @@ export default class extends MainAction {
 
     // Insert sis
     await this.params.equip.forEachAsync(async (sis: any) => {
-      let sisData = skillInfo[sis.unit_removable_skill_id]
+      const sisData = skillInfo[sis.unit_removable_skill_id]
       if (!sisData) throw new Error("Invalid sis id")
       if (!Type.isInt(sis.unit_owning_user_id)) throw new Error(`uouid should be int`)
 
-      let unit = await this.connection.first("SELECT unit_owning_user_id, unit_id, removable_skill_capacity, attribute FROM units WHERE user_id = :user AND unit_owning_user_id = :id AND deleted = 0", {
+      const unit = await this.connection.first("SELECT unit_owning_user_id, unit_id, removable_skill_capacity, attribute FROM units WHERE user_id = :user AND unit_owning_user_id = :id AND deleted = 0", {
         user: this.user_id,
         id: sis.unit_owning_user_id
       })
@@ -77,7 +77,7 @@ export default class extends MainAction {
 
       // Is there a free space for this SIS?
       let spaceAvailable = unit.removable_skill_capacity + 0
-      let spaceUsed = await this.connection.query("SELECT unit_removable_skill_id FROM user_unit_removable_skill_equip WHERE unit_owning_user_id=:id", {
+      const spaceUsed = await this.connection.query("SELECT unit_removable_skill_id FROM user_unit_removable_skill_equip WHERE unit_owning_user_id=:id", {
         id: sis.unit_owning_user_id
       })
       for (const equipedSIS of spaceUsed) {
@@ -93,7 +93,7 @@ export default class extends MainAction {
           break
         }
         case 2: {
-          let unitType = await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", { id: unit.unit_id })
+          const unitType = await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", { id: unit.unit_id })
           if (unitType.unit_type_id != sisData.target_type) throw new Error("Invalid unit_type")
           break
         }

@@ -22,22 +22,22 @@ export default class extends MainAction {
   public async execute() {
     const user = new User(this.connection)
 
-    let profile = await this.connection.first(`
-    SELECT 
+    const profile = await this.connection.first(`
+    SELECT
       user_id, name, level, unit_max, energy_max, friend_max, introduction, last_login,
       (SELECT count(*) FROM units WHERE unit_owning_user_id=:user AND deleted=0) as unit_cnt,
       (SELECT last_activity FROM user_login WHERE user_id = :user) as last_activity,
       setting_award_id, setting_background_id
-    FROM users 
-    WHERE user_id = :user`, { 
+    FROM users
+    WHERE user_id = :user`, {
       user: this.params.user_id
     })
 
-    let dateNow = moment(new Date())
-    let dateLastLogin = moment(new Date(profile.last_activity || profile.last_login))
-    let lastLogin = Math.floor(moment.duration(dateNow.diff(dateLastLogin)).asMinutes())
+    const dateNow = moment(new Date())
+    const dateLastLogin = moment(new Date(profile.last_activity || profile.last_login))
+    const lastLogin = Math.floor(moment.duration(dateNow.diff(dateLastLogin)).asMinutes())
 
-    let response = {
+    const response = {
       user_info: {
         user_id: profile.user_id,
         name: profile.name,

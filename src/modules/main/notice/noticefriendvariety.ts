@@ -24,14 +24,14 @@ export default class extends MainAction {
 
   public async execute() {
     this.User = new User(this.connection)
-    let list: any = []
+    const list: any = []
     let count = 0
     let noticeList: any
-    let offset = this.params.page * 40
+    const offset = this.params.page * 40
 
     const stubQuery = `(
-      SELECT 
-        notice_id, 
+      SELECT
+        notice_id,
         affector_id,
         receiver_id,
         readed,
@@ -40,18 +40,18 @@ export default class extends MainAction {
         insert_date,
         type_id,
         (
-          SELECT 
-            status 
-          FROM 
-            user_friend 
-          WHERE 
-            (initiator_id = :user OR recipient_id = :user) AND 
-            (initiator_id = user_notice.affector_id OR recipient_id = user_notice.affector_id) 
-            AND STATUS = 1 
+          SELECT
+            status
+          FROM
+            user_friend
+          WHERE
+            (initiator_id = :user OR recipient_id = :user) AND
+            (initiator_id = user_notice.affector_id OR recipient_id = user_notice.affector_id)
+            AND STATUS = 1
           LIMIT 1
-        ) as friend_status 
-      FROM 
-        user_notice 
+        ) as friend_status
+      FROM
+        user_notice
     ) s WHERE ((receiver_id IS NULL AND friend_status = 1) OR (receiver_id = :user))`
 
     if (this.params.filter_id === 0) {
@@ -81,12 +81,12 @@ export default class extends MainAction {
       })).count
     }
 
-    let dateNow = moment(new Date())
-    await noticeList.forEachAsync(async(notice: any) => {
-      let dateInsert = moment(new Date(notice.insert_date))
-      let elapsedTime = Math.floor(moment.duration(dateNow.diff(dateInsert)).asMinutes())
-      let readed = notice.receiver_id == null ? true : !!notice.readed
-      let affector = await this.getAffectorInfo(notice.affector_id)
+    const dateNow = moment(new Date())
+    await noticeList.forEachAsync(async (notice: any) => {
+      const dateInsert = moment(new Date(notice.insert_date))
+      const elapsedTime = Math.floor(moment.duration(dateNow.diff(dateInsert)).asMinutes())
+      const readed = notice.receiver_id == null ? true : !!notice.readed
+      const affector = await this.getAffectorInfo(notice.affector_id)
 
       if (notice.message === null) {
         notice.message = await new Notice(this.connection).getPreparedMessage(this.user_id, notice.type_id, {
@@ -98,7 +98,7 @@ export default class extends MainAction {
         filter_id: notice.filter_id,
         notice_template_id: notice.filter_id,
         message: notice.message,
-        readed: readed,
+        readed,
         insert_date: elapsedTime > 1440 ? ` ${Math.floor(elapsedTime/1440)} day(s) ago` : elapsedTime > 60 ? ` ${Math.floor(elapsedTime/60)} hour(s) ago` : ` ${elapsedTime} min(s) ago`,
         affector: await this.getAffectorInfo(notice.affector_id)
       })
@@ -114,7 +114,7 @@ export default class extends MainAction {
   }
 
   private async getAffectorInfo(userId: number) {
-    let profileInfo = await this.connection.first(`SELECT user_id, name, level, setting_award_id FROM users WHERE user_id = :user`, {
+    const profileInfo = await this.connection.first(`SELECT user_id, name, level, setting_award_id FROM users WHERE user_id = :user`, {
       user: userId
     })
     return {

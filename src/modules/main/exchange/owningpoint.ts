@@ -14,8 +14,8 @@ export default class extends MainAction {
     return {
       status: 200,
       result: {
-        exchange_point_list: await this.connection.query("SELECT rarity, exchange_point FROM user_exchange_point WHERE user_id=:user", { 
-          user: this.user_id 
+        exchange_point_list: await this.connection.query("SELECT rarity, exchange_point FROM user_exchange_point WHERE user_id=:user", {
+          user: this.user_id
         })
       }
     }

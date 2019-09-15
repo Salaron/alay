@@ -20,10 +20,10 @@ export default class extends MainAction {
   public async execute() {
     const events = new Events(this.connection)
 
-    let currentEvent = await events.getEventById(this.params.event_id)
+    const currentEvent = await events.getEventById(this.params.event_id)
     if (currentEvent.opened === false) throw new ErrorCode(720)
 
-    let status = await events.getEventUserStatus(this.user_id, currentEvent.id)
+    const status = await events.getEventUserStatus(this.user_id, currentEvent.id)
 
     return {
       status: 200,

@@ -15,14 +15,14 @@ export default class extends MainAction {
   public async execute() {
     const user = new User(this.connection)
 
-    let mails = await this.connection.query(`SELECT * FROM user_greet WHERE affector_id = :user AND deleted_from_affector = 0 ORDER BY notice_id DESC`, {
+    const mails = await this.connection.query(`SELECT * FROM user_greet WHERE affector_id = :user AND deleted_from_affector = 0 ORDER BY notice_id DESC`, {
       user: this.user_id
     })
 
-    let list: any[] = []
+    const list: any[] = []
     await mails.forEachAsync(async (mail: any) => {
-      let insertDate: string | number = Math.floor(moment.duration(moment(new Date()).diff(moment(new Date(mail.insert_date)))).asMinutes())
-      let profileInfo = await this.connection.first(`SELECT user_id, name, level, setting_award_id FROM users WHERE user_id = :user`, {
+      const insertDate: string | number = Math.floor(moment.duration(moment(new Date()).diff(moment(new Date(mail.insert_date)))).asMinutes())
+      const profileInfo = await this.connection.first(`SELECT user_id, name, level, setting_award_id FROM users WHERE user_id = :user`, {
         user: mail.receiver_id
       })
 
@@ -47,8 +47,8 @@ export default class extends MainAction {
       })
     })
 
-    await this.connection.query(`UPDATE user_greet SET readed = 1 WHERE receiver_id = :user AND readed = 0`, { 
-      user: this.user_id 
+    await this.connection.query(`UPDATE user_greet SET readed = 1 WHERE receiver_id = :user AND readed = 0`, {
+      user: this.user_id
     })
 
     return {

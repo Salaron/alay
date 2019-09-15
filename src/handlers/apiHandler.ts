@@ -13,7 +13,7 @@ export async function writeJsonResponse(response: ServerResponse, options: Optio
   response.setHeader("status_code", options.jsonStatusCode || options.httpStatusCode || 200)
   if (Config.server.server_version.length > 0) response.setHeader("Server-Version", Config.server.server_version)
 
-  let authHeader: Authorize = {
+  const authHeader: Authorize = {
     consumerKey: Config.client.consumer_key.length > 0 ? Config.client.consumer_key : "lovelive_test",
     timeStamp: Utils.timeStamp(),
     version: "1.1",

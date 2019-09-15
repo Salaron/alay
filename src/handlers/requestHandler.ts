@@ -17,7 +17,7 @@ export default async function requestHandler(request: IncomingMessage, response:
     request.url = request.url!.split("../").join("")
     if (request.url!.includes("favicon.ico")) return response.end() // ignore favicon.ico
     log.verbose(request.method + " " + request.url)
-    let urlSplit = request.url!.toLowerCase().split("/")
+    const urlSplit = request.url!.toLowerCase().split("/")
     if (urlSplit.length < 2) return response.end()
 
     switch (urlSplit[1]) {
@@ -28,7 +28,7 @@ export default async function requestHandler(request: IncomingMessage, response:
             request.headers["bundle-version"] &&
             request.headers["client-version"] &&
             request.headers["application-id"] &&
-            request.headers["authorize"] &&
+            request.headers.authorize &&
             request.headers["x-message-code"])
         ) return sendError(`[main.php] Invalid request`)
 
@@ -58,7 +58,7 @@ export default async function requestHandler(request: IncomingMessage, response:
         ) return sendError(`[webview.php] Invalid request`)
 
         if (
-          Utils.isUnderMaintenance() && 
+          Utils.isUnderMaintenance() &&
           !Utils.canBypassMaintenance(parseInt(<string>request.headers["user-id"])) &&
           !request.url!.includes("webview.php/static/index?id=10")
         ) {
@@ -73,7 +73,7 @@ export default async function requestHandler(request: IncomingMessage, response:
           !(urlSplit.length >= 3 &&
             request.method === "POST" &&
             request.headers["client-version"] &&
-            request.headers["authorize"]) &&
+            request.headers.authorize) &&
           request.headers["x-requested-with"] === "XMLHttpRequest"
         ) return sendError(`[webapi] Invalid request`)
         return await webapiHandler(request, response)

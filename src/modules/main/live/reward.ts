@@ -46,27 +46,27 @@ export default class extends MainAction {
     let eventLive = false
 
     // check if live session is active
-    let session = await this.connection.first("SELECT * FROM user_live_progress WHERE user_id = :user", { user: this.user_id })
+    const session = await this.connection.first("SELECT * FROM user_live_progress WHERE user_id = :user", { user: this.user_id })
     if (!session) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
     if (session.live_difficulty_id != this.params.live_difficulty_id) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
 
-    let [beforeUserInfo, currentEvent, liveData] = await Promise.all([
+    const [beforeUserInfo, currentEvent, liveData] = await Promise.all([
       user.getUserInfo(this.user_id),
       event.getEventStatus(Events.getEventTypes().TOKEN),
       live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     ])
-    
+
     if (liveData.capital_type === 2) { // token live
       if (!currentEvent.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
       if (currentEvent.active && Live.getMarathonLiveList(currentEvent.id).includes(this.params.live_difficulty_id)) eventLive = true
     }
 
-    let maxKizuna = Live.calculateMaxKizuna(liveData.s_rank_combo)
+    const maxKizuna = Live.calculateMaxKizuna(liveData.s_rank_combo)
     if (this.params.love_cnt > maxKizuna) throw new ErrorUser(`Too more kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`, this.user_id)
     let deck = (await live.getUserDeck(this.user_id, session.deck_id, false, undefined, true)).deck
     deck = await live.applyKizunaBonusToDeck(this.user_id, deck!, this.params.love_cnt)
 
-    await this.connection.execute(`INSERT INTO user_live_status VALUES (:user, :diff, :setting, 2, :score,:combo, clear_cnt + 1) 
+    await this.connection.execute(`INSERT INTO user_live_status VALUES (:user, :diff, :setting, 2, :score,:combo, clear_cnt + 1)
     ON DUPLICATE KEY UPDATE clear_cnt=clear_cnt + 1`, {
       user: this.user_id,
       setting: session.live_setting_id,
@@ -74,36 +74,36 @@ export default class extends MainAction {
       combo: this.params.max_combo,
       diff: session.live_difficulty_id
     })
-    let liveStatus = await this.connection.first(`SELECT hi_score, hi_combo, clear_cnt FROM user_live_status WHERE user_id=:user AND live_difficulty_id = :ldid`, {
+    const liveStatus = await this.connection.first(`SELECT hi_score, hi_combo, clear_cnt FROM user_live_status WHERE user_id=:user AND live_difficulty_id = :ldid`, {
       user: this.user_id,
       ldid: this.params.live_difficulty_id
     })
 
-    let hi_score = Math.max(liveStatus.hi_score, totalScore)
-    let max_combo = Math.max(liveStatus.hi_combo, this.params.max_combo)
+    const hiScore = Math.max(liveStatus.hi_score, totalScore)
+    const maxCombo = Math.max(liveStatus.hi_combo, this.params.max_combo)
     await this.connection.execute(`UPDATE user_live_status SET hi_score = :score, hi_combo = :combo WHERE user_id = :user AND live_difficulty_id = :ldid`, {
-      score: hi_score,
-      combo: max_combo,
+      score: hiScore,
+      combo: maxCombo,
       user: this.user_id,
       ldid: this.params.live_difficulty_id
     })
 
-    let scoreRank = Live.getRank(liveData.score_rank_info, totalScore)
-    let comboRank = Live.getRank(liveData.combo_rank_info, this.params.max_combo)
-    let completeRank = Live.getRank(liveData.complete_rank_info, liveStatus.clear_cnt)
-    let goalAccomp = await live.liveGoalAccomp(this.user_id, this.params.live_difficulty_id, scoreRank, comboRank, completeRank)
+    const scoreRank = Live.getRank(liveData.score_rank_info, totalScore)
+    const comboRank = Live.getRank(liveData.combo_rank_info, this.params.max_combo)
+    const completeRank = Live.getRank(liveData.complete_rank_info, liveStatus.clear_cnt)
+    const goalAccomp = await live.liveGoalAccomp(this.user_id, this.params.live_difficulty_id, scoreRank, comboRank, completeRank)
 
     let exp = Live.getExpAmount(liveData.difficulty)
     if (scoreRank === 5) exp = Math.floor(exp / 2)
-    let [nextLevelInfo, , afterUserInfo] = await Promise.all([
+    const [nextLevelInfo, , afterUserInfo] = await Promise.all([
       user.addExp(this.user_id, exp),
       item.addPresent(this.user_id, {
         name: "coins",
       }, "Live Show! Reward", 150000, true),
       user.getUserInfo(this.user_id)
     ])
-    
-    let response = {
+
+    const response = {
       live_info: [
         {
           live_difficulty_id: session.live_difficulty_id,
@@ -160,7 +160,7 @@ export default class extends MainAction {
 
     await live.writeToLog(this.user_id, {
       live_setting_id: liveData.live_setting_id,
-      is_event: false, 
+      is_event: false,
       score: totalScore,
       combo: this.params.max_combo,
       combo_rank: comboRank,
@@ -168,7 +168,7 @@ export default class extends MainAction {
     })
     await this.connection.query(`DELETE FROM user_live_progress WHERE user_id = :user`, { user: this.user_id })
     if (currentEvent.active) {
-      let userStatus = await this.connection.first(`SELECT token_point, score FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
+      const userStatus = await this.connection.first(`SELECT token_point, score FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
         user: this.user_id,
         event: currentEvent.id
       })

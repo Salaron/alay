@@ -22,16 +22,16 @@ export default class extends WebViewAction {
     assert(parseInt(this.params.id) === parseInt(this.params.id), "id should be int")
   }
   public async execute() {
-    let [template, announce] = await Promise.all([
+    const [template, announce] = await Promise.all([
       WebView.getTemplate("announce", "detail"),
       this.connection.first("SELECT * FROM webview_announce WHERE id = :id AND body IS NOT NULL", {
         id: this.params.id
       })
     ])
     if (!announce) throw new Error("Announce doesn't have a body")
-    
+
     announce.body = showdownConverter.makeHtml(announce.body.replace(/--/gi, "—"))
-    let values = {
+    const values = {
       announce,
       external: this.requestData.requestFromBrowser
     }

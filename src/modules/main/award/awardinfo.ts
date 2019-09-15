@@ -4,10 +4,10 @@ import { Utils } from "../../../common/utils"
 
 const defaultUnlock = [1, 23]
 const itemDB = sqlite3.getItem()
-let awardList = [1, 23]
+const awardList = [1, 23]
 
 export async function init(): Promise<void> {
-  let awards = await itemDB.all(`SELECT award_id as id FROM award_m WHERE award_id NOT IN (${awardList.join(",")})`)
+  const awards = await itemDB.all(`SELECT award_id as id FROM award_m WHERE award_id NOT IN (${awardList.join(",")})`)
   for (const award of awards) awardList.push(award.id)
 }
 
@@ -21,38 +21,38 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let response = {
+    const response = {
       award_info: <any>[]
     }
 
-    let currAward = await this.connection.first("SELECT setting_award_id as id FROM users WHERE user_id=:user", {
+    const currAward = await this.connection.first("SELECT setting_award_id as id FROM users WHERE user_id=:user", {
       user: this.user_id
     })
     if (Config.modules.award.unlockAll) {
       let awardExists = false
-      for (let i = 0; i < awardList.length; i++) {
-        if (currAward.id == awardList[i]) awardExists = true
+      for (const award of awardList) {
+        if (currAward.id == award) awardExists = true
         response.award_info.push({
-          award_id: awardList[i],
-          is_set: currAward.id == awardList[i],
+          award_id: award,
+          is_set: currAward.id == award,
           insert_date: "2018-01-01 00:00:01"
         })
       }
-      if (awardExists === false) response.award_info[0].is_set = true 
+      if (awardExists === false) response.award_info[0].is_set = true
       return {
         status: 200,
         result: response
       }
     }
 
-    let unlockedAwardList = <any>{}
-    let unlockedAwardData = await this.connection.query("SELECT award_id, insert_date FROM user_award_unlock WHERE user_id=:user;", {
+    const unlockedAwardList = <any>{}
+    const unlockedAwardData = await this.connection.query("SELECT award_id, insert_date FROM user_award_unlock WHERE user_id=:user;", {
       user: this.user_id
     })
     let unlockedCurrentAward = defaultUnlock.includes(currAward.id)
-    for (let i = 0; i < unlockedAwardData.length; i++) {
-      unlockedAwardList[unlockedAwardData[i].award_id] = Utils.parseDate(unlockedAwardData[i].insert_date)
-      if (unlockedAwardData[i].award_id === currAward.id) {
+    for (const award of unlockedAwardData) {
+      unlockedAwardList[award.award_id] = Utils.parseDate(award.insert_date)
+      if (award.award_id === currAward.id) {
         unlockedCurrentAward = true
       }
     }
@@ -60,20 +60,20 @@ export default class extends MainAction {
       currAward.id = 1
     }
 
-    for (let i = 0; i < awardList.length; i++) {
-      if (unlockedAwardList[awardList[i]]) {
+    for (const award of awardList) {
+      if (unlockedAwardList[award]) {
         response.award_info.push({
-          award_id: awardList[i],
-          is_set: currAward.id == awardList[i],
-          insert_date: unlockedAwardList[awardList[i]]
+          award_id: award,
+          is_set: currAward.id == award,
+          insert_date: unlockedAwardList[award]
         })
         continue
       }
 
-      if (defaultUnlock.includes(awardList[i])) {
+      if (defaultUnlock.includes(award)) {
         response.award_info.push({
-          award_id: awardList[i],
-          is_set: currAward.id == awardList[i],
+          award_id: award,
+          is_set: currAward.id == award,
           insert_date: "2018-01-01 00:00:01"
         })
       }

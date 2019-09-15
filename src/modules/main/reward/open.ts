@@ -22,12 +22,12 @@ export default class extends MainAction {
   public async execute() {
     const user = new User(this.connection)
 
-    let beforeUserInfo = await user.getUserInfo(this.user_id)
+    const beforeUserInfo = await user.getUserInfo(this.user_id)
     let result
     try {
       result = await new Item(this.connection).openPresent(this.user_id, this.params.incentive_id)
     } catch (err) {
-      if (err.message == "Present is already collected") throw new ErrorCode(1201) // ERROR_CODE_INCENTIVE_NONE 
+      if (err.message == "Present is already collected") throw new ErrorCode(1201) // ERROR_CODE_INCENTIVE_NONE
       else throw err
     }
 

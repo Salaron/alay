@@ -40,8 +40,8 @@ export default class extends MainAction {
     const supportUnitData = Unit.getSupportUnitData()
     const noExchangePointList = Unit.getNoExchangePointList()
 
-    let _owningSupportUnit = await user.getSupportUnits(this.user_id)
-    let owningSupportUnit = <{ [id: number]: number }>{}
+    const _owningSupportUnit = await user.getSupportUnits(this.user_id) // tslint:disable-line
+    const owningSupportUnit = <{ [id: number]: number }>{}
     for (const support of _owningSupportUnit) owningSupportUnit[support.unit_id] = support.amount
 
     let cardsCount = 0
@@ -61,7 +61,7 @@ export default class extends MainAction {
 
     if (cardsCount < 1 || cardsCount > 12) throw new Error(`Invalid number of sacrifice cards`)
 
-    let baseUnitData = await this.connection.first("SELECT * FROM units WHERE unit_owning_user_id=:unit AND user_id=:user AND deleted=0", {
+    const baseUnitData = await this.connection.first("SELECT * FROM units WHERE unit_owning_user_id=:unit AND user_id=:user AND deleted=0", {
       user: this.user_id,
       unit: this.params.base_owning_unit_user_id
     })
@@ -69,34 +69,34 @@ export default class extends MainAction {
     if (
       baseUnitData.level >= baseUnitData.max_level && baseUnitData.unit_skill_level >= baseUnitData.max_skill_level
     ) throw new ErrorCode(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
-    let baseUnitDataDef = await unitDB.get("SELECT * FROM unit_m WHERE unit_id = :id", {
+    const baseUnitDataDef = await unitDB.get("SELECT * FROM unit_m WHERE unit_id = :id", {
       id: baseUnitData.unit_id
     })
     if (!baseUnitDataDef) throw new Error(`Failed to find info (unit_id ${baseUnitData.unit_id})`)
     baseUnitData.default_unit_skill_id = baseUnitDataDef.default_unit_skill_id
     baseUnitData.unit_level_up_pattern_id = baseUnitDataDef.unit_level_up_pattern_id
-    let beforeUserInfo = await user.getUserInfo(this.user_id)
-    let beforeUnitInfo = await unit.getUnitDetail(baseUnitData.unit_owning_user_id)
+    const beforeUserInfo = await user.getUserInfo(this.user_id)
+    const beforeUnitInfo = await unit.getUnitDetail(baseUnitData.unit_owning_user_id)
 
     let expMultiplier = 1
     let gainExp = 0
     let gainSkillExp = 0
     let coinCost = 0
-    let seals: any = {
+    const seals: any = {
       2: 0,
       3: 0,
       4: 0,
       5: 0
     }
-    let _rndNumber = Utils.getRandomNumber(1, 100)
-    if (_rndNumber === 1) {
+    const rndNumber = Utils.getRandomNumber(1, 100)
+    if (rndNumber === 1) {
       expMultiplier = 2
-    } else if (_rndNumber % 10 === 0) {
+    } else if (rndNumber % 10 === 0) {
       expMultiplier = 1.5
     }
 
     for (const support of this.params.unit_support_list) {
-      let attrMatch = (
+      const attrMatch = (
         supportUnitData[support.unit_id].attribute == 5 ||
         supportUnitData[support.unit_id].attribute == baseUnitData.attribute
       )
@@ -110,26 +110,25 @@ export default class extends MainAction {
       })
     }
 
-
     if (this.params.unit_owning_user_ids.length > 0) {
-      let unitData = await this.connection.query(`SELECT * FROM v_units_not_locked WHERE user_id=:user AND unit_owning_user_id IN (${this.params.unit_owning_user_ids.join(",")})`, {
+      const unitData = await this.connection.query(`SELECT * FROM v_units_not_locked WHERE user_id=:user AND unit_owning_user_id IN (${this.params.unit_owning_user_ids.join(",")})`, {
         user: this.user_id
       })
       if (unitData.length != this.params.unit_owning_user_ids.length) throw new ErrorCode(1311)
 
       await unitData.forEachAsync(async (unit: any) => {
         if (unit.unit_owning_user_id === this.params.base_owning_unit_user_id) throw new Error("Nice try :)")
-        let data = await unitDB.get(`
-        SELECT 
-          merge_cost, merge_exp, default_unit_skill_id, sl.grant_exp as grant_skill_exp, attribute_id, rarity 
-        FROM 
-          unit_m as u 
-        JOIN unit_level_up_pattern_m as l 
-          ON u.unit_level_up_pattern_id=l.unit_level_up_pattern_id 
-        LEFT JOIN unit_skill_m as s 
-          ON u.default_unit_skill_id = s.unit_skill_id 
-        LEFT JOIN unit_skill_level_m as sl 
-          ON s.unit_skill_id = sl.unit_skill_id 
+        const data = await unitDB.get(`
+        SELECT
+          merge_cost, merge_exp, default_unit_skill_id, sl.grant_exp as grant_skill_exp, attribute_id, rarity
+        FROM
+          unit_m as u
+        JOIN unit_level_up_pattern_m as l
+          ON u.unit_level_up_pattern_id=l.unit_level_up_pattern_id
+        LEFT JOIN unit_skill_m as s
+          ON u.default_unit_skill_id = s.unit_skill_id
+        LEFT JOIN unit_skill_level_m as sl
+          ON s.unit_skill_id = sl.unit_skill_id
         WHERE unit_id = :id AND unit_level = :level AND (skill_level = :skill OR skill_level IS NULL)`
         , { id: unit.unit_id, level: unit.level, skill: unit.unit_skill_level })
         if (!data) throw new Error(`Failed to find info (unit_id ${unit.unit_id})`)
@@ -160,19 +159,19 @@ export default class extends MainAction {
     }
     if (beforeUserInfo.game_coin < coinCost) throw new ErrorCode(1104, "ERROR_CODE_NOT_ENOUGH_GAME_COIN")
 
-    let newExp = baseUnitData.exp + (gainExp * expMultiplier)
-    let newSkillExp = baseUnitData.default_unit_skill_id ? (baseUnitData.unit_skill_exp + gainSkillExp) : 0
+    const newExp = baseUnitData.exp + (gainExp * expMultiplier)
+    const newSkillExp = baseUnitData.default_unit_skill_id ? (baseUnitData.unit_skill_exp + gainSkillExp) : 0
     let newLevel = baseUnitData.level
     let newLevelData: any = null
     let newSkillLevel = baseUnitData.unit_skill_level
     let newSkillData: any = null
 
-    // some recursion funcs 
+    // some recursion funcs
     const levelUp = async () => {
       if (newLevel >= baseUnitData.max_level) return
       newLevelData = await unitDB.get(`
-      SELECT next_exp, hp_diff, smile_diff, pure_diff, cool_diff 
-      FROM unit_level_up_pattern_m 
+      SELECT next_exp, hp_diff, smile_diff, pure_diff, cool_diff
+      FROM unit_level_up_pattern_m
       WHERE unit_level_up_pattern_id = :pattern AND unit_level = :level`, { pattern: baseUnitData.unit_level_up_pattern_id, level: newLevel })
       if (newExp >= newLevelData.next_exp) {
         newLevel += 1
@@ -182,10 +181,10 @@ export default class extends MainAction {
     const skillLevelUp = async () => {
       if (newSkillLevel >= baseUnitData.max_skill_level) return
       newSkillData = await unitDB.get(`
-      SELECT next_exp 
-      FROM unit_skill_level_up_pattern_m 
-      JOIN unit_skill_m 
-        ON unit_skill_m.unit_skill_level_up_pattern_id = unit_skill_level_up_pattern_m.unit_skill_level_up_pattern_id 
+      SELECT next_exp
+      FROM unit_skill_level_up_pattern_m
+      JOIN unit_skill_m
+        ON unit_skill_m.unit_skill_level_up_pattern_id = unit_skill_level_up_pattern_m.unit_skill_level_up_pattern_id
       WHERE unit_skill_id = :skill AND skill_level = :level`, { skill: baseUnitData.default_unit_skill_id, level: newSkillLevel })
       if (!newSkillData) return
       if (newSkillExp >= newSkillData.next_exp) {
@@ -199,7 +198,7 @@ export default class extends MainAction {
       skillLevelUp()
     ])
 
-    let newData = {
+    const newData = {
       unit: baseUnitData.unit_owning_user_id,
       hp: newLevel >= baseUnitData.max_level ? baseUnitDataDef.hp_max : baseUnitDataDef.hp_max - newLevelData.hp_diff,
       smile: newLevel >= baseUnitData.max_level ? baseUnitDataDef.smile_max : baseUnitDataDef.smile_max - newLevelData.smile_diff,
@@ -212,13 +211,13 @@ export default class extends MainAction {
       skillexp: newSkillExp
     }
 
-    let isMaxRank = baseUnitData.rank >= baseUnitData.max_rank
+    const isMaxRank = baseUnitData.rank >= baseUnitData.max_rank
     await Promise.all([
       this.connection.query(`
-      UPDATE 
-        units 
-      SET 
-        max_hp = :hp, stat_smile = :smile, stat_pure = :pure, stat_cool = :cool, level = :level, 
+      UPDATE
+        units
+      SET
+        max_hp = :hp, stat_smile = :smile, stat_pure = :pure, stat_cool = :cool, level = :level,
         exp = :exp, next_exp = :nextexp, unit_skill_level = :skilllevel, unit_skill_exp = :skillexp
       WHERE unit_owning_user_id = :unit`, newData),
       this.connection.query("UPDATE users SET game_coin=game_coin - :cost WHERE user_id = :user", {
@@ -239,11 +238,11 @@ export default class extends MainAction {
       })
     ])
 
-    let afterUserInfo = await user.getUserInfo(this.user_id)
-    let pointList = <any>[]
+    const afterUserInfo = await user.getUserInfo(this.user_id)
+    const pointList = <any>[]
     for (const rarity of Object.keys(seals)) {
       if (seals[rarity] > 0) pointList.push({
-        rarity: rarity,
+        rarity,
         exchange_point: seals[rarity]
       })
     }

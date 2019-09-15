@@ -15,11 +15,11 @@ export class Mailer {
   public async sendMail(receivers: string, subject: string, text: string) {
     if (this.available === false) return false
     try {
-      let result = await this.transporter.sendMail({
+      const result = await this.transporter.sendMail({
         from: `${Config.mailer.name} ${(<any>Config.mailer.transportSettings).auth.user}`,
         to: receivers,
-        subject: subject,
-        text: text
+        subject,
+        text
       })
       return result
     } catch (err) {

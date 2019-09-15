@@ -16,15 +16,15 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
-    let code = await i18n.getUserLocalizationCode(this.user_id)
-    let [strings, template, announceList, changeLanguageModal] = await Promise.all([
+    const code = await i18n.getUserLocalizationCode(this.user_id)
+    let [strings, template, announceList, changeLanguageModal] = await Promise.all([ // tslint:disable-line
       i18n.getStrings(code, "common", "announce-index"),
       WebView.getTemplate("announce", "index"),
       this.connection.query(`SELECT * FROM webview_announce ORDER BY insert_date DESC LIMIT 5`),
       webview.getLanguageModalTemplate(this.user_id)
     ])
 
-    announceList = announceList.map(announce => {
+    announceList = announceList.map((announce) => {
       return {
         id: announce.id,
         title: announce.title,
@@ -34,7 +34,7 @@ export default class extends WebViewAction {
       }
     })
 
-    let values = {
+    const values = {
       changeLanguageModal,
       announceList,
       code,

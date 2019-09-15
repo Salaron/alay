@@ -6,23 +6,23 @@ import { WebView } from "../../../common/webview"
 export default class extends WebViewAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
-  
+
   constructor(requestData: RequestData) {
     super(requestData)
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) 
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
       throw new ErrorCode(1234, "Access only with a certain auth level")
     const i18n = new I18n(this.connection)
 
-    let [strings, template, changeLanguageModal] = await Promise.all([
+    const [strings, template, changeLanguageModal] = await Promise.all([
       i18n.getStrings(<string>this.requestData.auth_token, "login-hello"),
       WebView.getTemplate("login", "hello"),
       new WebView(this.connection).getLanguageModalTemplate(<string>this.requestData.auth_token)
     ])
 
-    let values = {
+    const values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       i18n: strings,
       changeLanguageModal,

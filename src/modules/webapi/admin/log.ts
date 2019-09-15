@@ -22,8 +22,8 @@ export default class extends WebApiAction {
     return {
       status: 200,
       result: {
-        warn: warn,
-        error: error
+        warn,
+        error
       }
     }
   }

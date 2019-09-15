@@ -27,13 +27,13 @@ export class Notice {
 
   public async getNoticeStrings(userId: number) {
     // based on current user language
-    let i18n = new I18n(this.connection)
+    const i18n = new I18n(this.connection)
     return i18n.getStrings(userId, "notice")
   }
 
   public async getPreparedMessage(userId: number, noticeTypeId: noticeType | number, values: any) {
-    let strings = await this.getNoticeStrings(userId)
-    let message = strings[noticeType[noticeTypeId]]
+    const strings = await this.getNoticeStrings(userId)
+    const message = strings[noticeType[noticeTypeId]]
     if (!message) throw new Error(`Unknown noticeTypeId: ${noticeTypeId}`)
     return Utils.prepareTemplate(message, values)
   }

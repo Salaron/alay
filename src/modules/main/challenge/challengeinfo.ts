@@ -10,9 +10,9 @@ export default class extends MainAction {
   constructor(requestData: RequestData) {
     super(requestData)
   }
-  
+
   public async execute() {
-    let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().CHALLENGE)
+    const currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().CHALLENGE)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []

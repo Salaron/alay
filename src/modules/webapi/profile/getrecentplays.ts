@@ -40,8 +40,8 @@ export default class extends WebApiAction {
   public async execute() {
     const i18n = new I18n(this.connection)
 
-    let code = await i18n.getUserLocalizationCode(this.user_id)
-    let [strings, template, liveDataLog, total] = await Promise.all([
+    const code = await i18n.getUserLocalizationCode(this.user_id)
+    const [strings, template, liveDataLog, total] = await Promise.all([
       i18n.getStrings(code, "profile-index"),
       WebView.getTemplate("profile", "recentplays"),
       this.connection.query(`SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC LIMIT ${this.params.offset}, ${this.params.limit}`, {
@@ -50,25 +50,25 @@ export default class extends WebApiAction {
       this.connection.first("SELECT COUNT(*) as count FROM user_live_log WHERE user_id = :user", { user: this.params.userId })
     ])
 
-    let recentPlays = await Promise.all(liveDataLog.map(async live => {
+    const recentPlays = await Promise.all(liveDataLog.map(async (live) => {
       if (!live.live_setting_id && !live.live_setting_ids) throw new Error("live setting id is missing")
 
       // mf support
-      let liveSettingId = live.live_setting_id === null ? live.live_setting_ids.split(",") : live.live_setting_id
-      let liveInfoList = await liveDB.all(`
-      SELECT 
-        name, stage_level, s_rank_combo, s_rank_score, difficulty, live_time 
-      FROM live_setting_m 
-      JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id 
+      const liveSettingId = live.live_setting_id === null ? live.live_setting_ids.split(",") : live.live_setting_id
+      const liveInfoList = await liveDB.all(`
+      SELECT
+        name, stage_level, s_rank_combo, s_rank_score, difficulty, live_time
+      FROM live_setting_m
+      JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id
       JOIN live_track_m ON live_setting_m.live_track_id = live_track_m.live_track_id
       WHERE live_setting_id IN (:lsids)`, {
         lsids: liveSettingId
       })
 
-      let songNames = []
+      const songNames = []
       live.s_rank_combo = 0
       live.s_rank_score = 0
-      for (let liveInfo of liveInfoList) {
+      for (const liveInfo of liveInfoList) {
         songNames.push(`${liveInfo.name} (${convertDifficulty[liveInfo.difficulty]} ${liveInfo.stage_level}☆)`)
         live.s_rank_combo += liveInfo.s_rank_combo
         live.s_rank_score += liveInfo.s_rank_score
@@ -88,7 +88,7 @@ export default class extends WebApiAction {
         total: total.count,
         added: recentPlays.length,
         data: template({
-          recentPlays: recentPlays,
+          recentPlays,
           i18n: strings
         })
       }

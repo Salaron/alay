@@ -33,13 +33,13 @@ import * as modules from "./common";
     await MySQLConnect()
     // Prepare common modules
     // execute init function if exists
-    for (let module in modules) {
+    for (const module in modules) {
       if ((<any>modules)[module].init) await (<any>modules)[module].init()
     }
 
-    let server = http.createServer(requestHandler)
+    const server = http.createServer(requestHandler)
     server.listen(Config.server.port, Config.server.host, () => {
-      let address = server.address() as any
+      const address = server.address() as any
       log.info("Listening on " + address.address + ":" + address.port)
     })
     server.on("error", async (err) => {
@@ -53,7 +53,7 @@ import * as modules from "./common";
 })()
 
 // like 'forEach' but async
-Array.prototype.forEachAsync = async function (callback: <T>(element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void> {
+Array.prototype.forEachAsync = async function(callback: <T>(element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void> {
   for (let index = 0; index < this.length; index++) {
     await callback(this[index], index, this)
   }
@@ -64,8 +64,8 @@ Array.prototype.randomValue = function <T>(): T {
 }
 // return object key by value
 Object.defineProperty(Object.prototype, "getKey", {
-  value: function (value: any) {
-    for (let key in this) {
+  value(value: any) {
+    for (const key in this) {
       if (this[key] == value) {
         return key
       }
@@ -73,6 +73,6 @@ Object.defineProperty(Object.prototype, "getKey", {
     return null
   }
 })
-String.prototype.splice = function (start: number, delCount: number, newSubStr: string) {
+String.prototype.splice = function(start: number, delCount: number, newSubStr: string) {
   return this.slice(0, start) + newSubStr + this.slice(start + Math.abs(delCount))
 }

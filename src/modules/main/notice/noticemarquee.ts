@@ -16,18 +16,18 @@ export default class extends MainAction {
   public async execute() {
     const i18n = new I18n(this.connection)
 
-    let langCode = await i18n.getUserLocalizationCode(this.user_id)
-    let strings = await new I18n(this.connection).getStrings(langCode, "noticemarquee")
+    const langCode = await i18n.getUserLocalizationCode(this.user_id)
+    const strings = await new I18n(this.connection).getStrings(langCode, "noticemarquee")
 
-    let response = {
+    const response = {
       item_count: 0,
       marquee_list: <any>[]
     }
     if (Config.maintenance.notice && moment(Config.maintenance.start_date).diff(moment(new Date()).utcOffset(Config.maintenance.time_zone), "h") < 3) {
-      let startDay = moment(Config.maintenance.start_date).locale(langCode).format("D MMMM")
-      let startTime = moment(Config.maintenance.start_date).locale(langCode).format("HH:mm")
-      let endDay = moment(Config.maintenance.end_date).locale(langCode).format("D MMMM")
-      let endTime = moment(Config.maintenance.end_date).locale(langCode).format("HH:mm")
+      const startDay = moment(Config.maintenance.start_date).locale(langCode).format("D MMMM")
+      const startTime = moment(Config.maintenance.start_date).locale(langCode).format("HH:mm")
+      const endDay = moment(Config.maintenance.end_date).locale(langCode).format("D MMMM")
+      const endTime = moment(Config.maintenance.end_date).locale(langCode).format("HH:mm")
       response.marquee_list.push({
         marquee_id: 1,
         text: Utils.prepareTemplate(strings.maintenanceNotice, {

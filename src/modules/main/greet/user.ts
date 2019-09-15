@@ -11,7 +11,7 @@ export default class extends MainAction {
     super(requestData)
   }
 
-  public paramTypes() { 
+  public paramTypes() {
     return {
       to_user_id: TYPE.INT,
       message: TYPE.STRING
@@ -26,16 +26,16 @@ export default class extends MainAction {
     let isReply = false
     if (this.params.replied_notice_id && Type.isInt(this.params.replied_notice_id)) {
       // check if replied notice is exists
-      let reply = await this.connection.first(`SELECT notice_id FROM user_greet WHERE notice_id = :id`, { 
-        id: this.params.replied_notice_id 
+      const reply = await this.connection.first(`SELECT notice_id FROM user_greet WHERE notice_id = :id`, {
+        id: this.params.replied_notice_id
       })
       if (reply.length === 0) throw new Error(`Notice ${this.params.replied_notice_id} doesn't exists`)
       isReply = true
     }
 
     // check if receiver is exists
-    let receiver = await this.connection.first(`SELECT user_id FROM users WHERE user_id = :id`, { 
-      id: this.params.to_user_id 
+    const receiver = await this.connection.first(`SELECT user_id FROM users WHERE user_id = :id`, {
+      id: this.params.to_user_id
     })
     if (receiver.length === 0) throw new Error(`User #${this.params.replied_notice_id} doesn't exists`)
 

@@ -72,8 +72,8 @@ export class Events {
   }
 
   public async getEventStatus(type: eventType): Promise<eventStatus> {
-    let res = await this.connection.first("SELECT event_id, name, start_date, end_date, close_date, open_date, open_date, close_date FROM events_list WHERE event_category_id = :type ORDER BY close_date DESC", {
-      type: type
+    const res = await this.connection.first("SELECT event_id, name, start_date, end_date, close_date, open_date, open_date, close_date FROM events_list WHERE event_category_id = :type ORDER BY close_date DESC", {
+      type
     })
     if (!res) return {
       opened: false,
@@ -83,7 +83,7 @@ export class Events {
       open_date: "0000-00-00 00:00:00",
       close_date: "0000-00-00 00:00:00"
     }
-    let currDate = Utils.toSpecificTimezone(9)
+    const currDate = Utils.toSpecificTimezone(9)
     return {
       opened: res.close_date > currDate && res.open_date < currDate,
       active: (res.end_date > currDate && res.start_date < currDate) && (res.close_date > currDate && res.open_date < currDate),
@@ -94,7 +94,7 @@ export class Events {
     }
   }
   public async getEventById(eventId: number): Promise<eventStatus> {
-    let res = await this.connection.first("SELECT event_id, name, start_date, end_date, close_date, open_date FROM events_list WHERE event_id = :id", {
+    const res = await this.connection.first("SELECT event_id, name, start_date, end_date, close_date, open_date FROM events_list WHERE event_id = :id", {
       id: eventId
     })
     if (!res) return {
@@ -105,7 +105,7 @@ export class Events {
       open_date: "0000-00-00 00:00:00",
       close_date: "0000-00-00 00:00:00"
     }
-    let currDate = Utils.toSpecificTimezone(9)
+    const currDate = Utils.toSpecificTimezone(9)
 
     return {
       opened: res.close_date > currDate && res.open_date < currDate,
@@ -118,7 +118,7 @@ export class Events {
   }
 
   public async getEventUserStatus(userId: number, eventId: number): Promise<eventUserStatus> {
-    let res = await this.connection.first("SELECT event_point, FIND_IN_SET(event_point, (SELECT GROUP_CONCAT( event_point ORDER BY event_point DESC) FROM event_ranking WHERE event_id=:event)) AS 'event_rank' FROM event_ranking WHERE user_id=:user AND event_id=:event AND event_point > 0", {
+    const res = await this.connection.first("SELECT event_point, FIND_IN_SET(event_point, (SELECT GROUP_CONCAT( event_point ORDER BY event_point DESC) FROM event_ranking WHERE event_id=:event)) AS 'event_rank' FROM event_ranking WHERE user_id=:user AND event_id=:event AND event_point > 0", {
       user: userId,
       event: eventId
     })
@@ -132,20 +132,20 @@ export class Events {
   public async eventInfoWithRewards(userId: number, eventId: number, eventName: string, addedEventPoint: number, base?: number) {
     const item = new Item(this.connection)
     const userStatus = await new Events(this.connection).getEventUserStatus(userId, eventId)
-    let eventRewardInfo: any[] = []
-    let nextEventRewardInfo = {
+    const eventRewardInfo: any[] = []
+    const nextEventRewardInfo = {
       event_point: 0,
       rewards: <any[]>[]
     }
 
-    let eventPointReward = await eventDB.all(`
-    SELECT point_count, add_type, item_id, amount, item_category_id FROM event_point_count_m 
-    INNER JOIN event_point_count_reward_m ON event_point_count_m.event_point_count_id = event_point_count_reward_m.event_point_count_id 
+    const eventPointReward = await eventDB.all(`
+    SELECT point_count, add_type, item_id, amount, item_category_id FROM event_point_count_m
+    INNER JOIN event_point_count_reward_m ON event_point_count_m.event_point_count_id = event_point_count_reward_m.event_point_count_id
     WHERE event_id = ${eventId} AND point_count > ${userStatus.event_point + addedEventPoint}`)
 
     await this.connection.execute("INSERT INTO event_ranking (user_id, event_id, event_point, lives_played) VALUES (:user, :eventId, :point, 1) ON DUPLICATE KEY UPDATE event_point=event_point + :point, lives_played = lives_played + 1", {
       point: addedEventPoint,
-      eventId: eventId,
+      eventId,
       user: userId
     })
 
@@ -164,7 +164,8 @@ export class Events {
             reward_box_flag: reward.add_type == 1001, // cards should be added to reward box
             required_event_point: reward.point_count
           })
-        } catch (_) { } // unsupported type
+          // tslint:disable-next-line
+        } catch (_) { } //unsupported type
       } else {
         nextEventRewardInfo.event_point = reward.point_count
         nextEventRewardInfo.rewards.push({
@@ -193,7 +194,7 @@ export class Events {
   }
 
   public async writeHiScore(userId: number, eventId: number, deck: any, liveList: liveInfo[], scoreInfo: scoreInfo) {
-    let json = {
+    const json = {
       live_list: liveList,
       score_info: scoreInfo,
       deck: {

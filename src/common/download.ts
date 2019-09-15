@@ -11,19 +11,19 @@ interface updateUrls {
     }[]
   }
 }
-let updateUrls: updateUrls = {}
+const updateUrls: updateUrls = {}
 
 export async function init() {
-  let files = await promisify(readdir)(rootDir + "/data/update/")
+  const files = await promisify(readdir)(rootDir + "/data/update/")
   files.map((f: string) => // remove extension
     f.split(".").slice(0, -1).join(".")
   ).sort((a, b) =>  // sort by version
     Utils.versionCompare(a, b)
   )
-  for (let i = 0; i < files.length; i++) {
-    let file = files[i].split(".")
-    if (!updateUrls[file[0]]) updateUrls[file[0]] = {}
-    updateUrls[file[0]][file[1]] = JSON.parse(await promisify(readFile)(rootDir + "/data/update/" + files[i], "utf-8"))
+  for (const file of files) {
+    const fileNameSplit = file.split(".")
+    if (!updateUrls[fileNameSplit[0]]) updateUrls[fileNameSplit[0]] = {}
+    updateUrls[fileNameSplit[0]][fileNameSplit[1]] = JSON.parse(await promisify(readFile)(rootDir + "/data/update/" + file, "utf-8"))
   }
 }
 (async () => {

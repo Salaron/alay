@@ -53,7 +53,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let currentStep = (await this.connection.first(`SELECT tutorial_state FROM users WHERE user_id = :user`, {
+    const currentStep = (await this.connection.first(`SELECT tutorial_state FROM users WHERE user_id = :user`, {
       user: this.user_id
     })).tutorial_state
 

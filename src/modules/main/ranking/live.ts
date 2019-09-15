@@ -17,25 +17,25 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let number = this.params.live_difficulty_id.match(/\d+/g)
-    if (number === null) throw new ErrorCode(1, "live_difficulty_id doesn't contain numbers")
-    this.params.live_difficulty_id = number[0]
+    const parsedNumber = this.params.live_difficulty_id.match(/\d+/g)
+    if (parsedNumber === null) throw new ErrorCode(1, "live_difficulty_id doesn't contain numbers")
+    this.params.live_difficulty_id = parsedNumber[0]
 
-    let users = await this.connection.query(`
-    SELECT 
-      users.user_id, users.name, users.level, 
-      unit_id, units.level as unit_level, units.max_level, 
-      units.rank as unit_rank, units.max_rank as unit_max_rank, units.love, units.max_love, units.unit_skill_level, units.display_rank, units.unit_skill_exp, 
+    const users = await this.connection.query(`
+    SELECT
+      users.user_id, users.name, users.level,
+      unit_id, units.level as unit_level, units.max_level,
+      units.rank as unit_rank, units.max_rank as unit_max_rank, units.love, units.max_love, units.unit_skill_level, units.display_rank, units.unit_skill_exp,
       units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool, user_live_status.hi_score,
-      FIND_IN_SET(user_live_status.hi_score, (SELECT GROUP_CONCAT(hi_score ORDER BY hi_score DESC) FROM user_live_status WHERE live_difficulty_id=:diff )) AS rank 
-    FROM users 
-      JOIN user_live_status ON users.user_id=user_live_status.user_id AND user_live_status.live_difficulty_id=:diff 
+      FIND_IN_SET(user_live_status.hi_score, (SELECT GROUP_CONCAT(hi_score ORDER BY hi_score DESC) FROM user_live_status WHERE live_difficulty_id=:diff )) AS rank
+    FROM users
+      JOIN user_live_status ON users.user_id=user_live_status.user_id AND user_live_status.live_difficulty_id=:diff
       JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id
-      JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
-      JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
+      JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id
+      JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
     ORDER BY hi_score DESC LIMIT 10`, { diff: this.params.live_difficulty_id })
 
-    let result = []
+    const result = []
     for (const user of users) {
       result.push({
         rank: user.rank,

@@ -22,11 +22,11 @@ export default class extends WebApiAction {
   public async execute() {
     const i18n = new I18n(this.connection)
 
-    let [strings, template, eventData, total] = await Promise.all([
+    const [strings, template, eventData, total] = await Promise.all([
       i18n.getStrings(this.user_id, "profile-index"),
       WebView.getTemplate("profile", "eventdata"),
       this.connection.query(`
-      SELECT 
+      SELECT
         name as type, start_date, end_date, lives_played,
         FIND_IN_SET(score, (SELECT GROUP_CONCAT( score ORDER BY score DESC) FROM event_ranking WHERE event_id = events_list.event_id)) AS scoreRank,
         FIND_IN_SET(event_point, (SELECT GROUP_CONCAT( event_point ORDER BY event_point DESC) FROM event_ranking WHERE event_id = events_list.event_id AND event_point != 0)) AS ptRank
@@ -36,14 +36,14 @@ export default class extends WebApiAction {
         user: this.params.userId
       }),
       this.connection.first(`
-      SELECT 
+      SELECT
         count(*) as count
       FROM event_ranking
       RIGHT JOIN events_list ON event_ranking.event_id = events_list.event_id
       WHERE user_id = :user`, { user: this.params.userId })
     ])
 
-    let values = {
+    const values = {
       i18n: strings,
       eventData
     }

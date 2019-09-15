@@ -11,12 +11,12 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let response = {
+    const response = {
       general_item_list: <any[]>[],
       buff_item_list: []
     }
-    let items = await this.connection.first("SELECT green_tickets, bt_tickets FROM users WHERE user_id = :user", { 
-      user: this.user_id 
+    const items = await this.connection.first("SELECT green_tickets, bt_tickets FROM users WHERE user_id = :user", {
+      user: this.user_id
     })
     // green tickets
     response.general_item_list.push({

@@ -12,7 +12,7 @@ export default class extends MainAction {
 
   public async execute() {
     let offset = 0
-    let limit = 20
+    const limit = 20
     let page = 0
 
     if (typeof this.params.page != "undefined") {
@@ -23,7 +23,7 @@ export default class extends MainAction {
     if (typeof this.params.id != "undefined") {
       if (typeof this.params.id != "number" || parseInt(this.params.id) != this.params.id) throw new ErrorCode(1601)
 
-      let pos = await this.connection.first(`SELECT FIND_IN_SET(level, (SELECT GROUP_CONCAT(level ORDER BY level DESC) FROM users)) as rank FROM users WHERE user_id=:user`, {
+      const pos = await this.connection.first(`SELECT FIND_IN_SET(level, (SELECT GROUP_CONCAT(level ORDER BY level DESC) FROM users)) as rank FROM users WHERE user_id=:user`, {
         user: this.params.id
       })
       if (pos.rank === 0) throw new ErrorCode(1601)
@@ -32,20 +32,20 @@ export default class extends MainAction {
       offset = page * 20
     }
 
-    let users = await this.connection.query(`
-    SELECT 
-    users.user_id, users.name, users.level, 
-    unit_id, units.level as unit_level, units.max_level, 
-    units.rank as unit_rank, units.max_rank as unit_max_rank, units.love, units.max_love, units.unit_skill_level, units.display_rank, units.unit_skill_exp, 
+    const users = await this.connection.query(`
+    SELECT
+    users.user_id, users.name, users.level,
+    unit_id, units.level as unit_level, units.max_level,
+    units.rank as unit_rank, units.max_rank as unit_max_rank, units.love, units.max_love, units.unit_skill_level, units.display_rank, units.unit_skill_exp,
     units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool,
-    FIND_IN_SET(users.level, (SELECT GROUP_CONCAT(level ORDER BY level DESC) FROM users)) AS rank 
-    FROM users 
+    FIND_IN_SET(users.level, (SELECT GROUP_CONCAT(level ORDER BY level DESC) FROM users)) AS rank
+    FROM users
     JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id
-    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
-    JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
+    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id
+    JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
     ORDER BY users.level DESC LIMIT ${offset}, ${limit}`)
 
-    let result = []
+    const result = []
     for (const user of users) {
       result.push({
         rank: user.rank,
@@ -76,13 +76,13 @@ export default class extends MainAction {
     }
 
     if (result.length === 0) throw new ErrorCode(1601)
-    let count = await this.connection.first(`SELECT count(level) as cnt FROM users`)
+    const count = await this.connection.first(`SELECT count(level) as cnt FROM users`)
 
     return {
       status: 200,
       result: {
         total_cnt: count.cnt,
-        page: page,
+        page,
         items: result
       }
     }

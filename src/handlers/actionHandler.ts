@@ -6,7 +6,7 @@ import "./actions/main"
 import { TYPE } from "../common/type"
 
 const log = new Log("Action Handler")
-let cache = <any>{}
+const cache = <any>{}
 
 interface Options {
   xmc?: string
@@ -34,28 +34,28 @@ export default async function executeAction(module: string, action: string, requ
   try {
     // load action
     if (!cache[`${moduleFolder}/${module}/${action}`]) {
-      let loaded = await import(`${moduleFolder}/${module}/${action}`)
+      const loaded = await import(`${moduleFolder}/${module}/${action}`)
       if (loaded.init) await loaded.init()
       cache[`${moduleFolder}/${module}/${action}`] = loaded
     }
 
-    let body = new cache[`${moduleFolder}/${module}/${action}`].default(requestData)
+    const body = new cache[`${moduleFolder}/${module}/${action}`].default(requestData)
     // Main related things
     if (requestData.handlerType === HANDLER_TYPE.MAIN) {
       if (options.responseType != body.requestType && body.requestType != REQUEST_TYPE.BOTH) throw new Error(`Invalid request type (action: ${body.requestType}, param: ${options.responseType}) on ${module}/${action}`)
       // XMC check in api should be done in mainHandler
       if ((body.permission != PERMISSION.NOXMC) && options.responseType != RESPONSE_TYPE.MULTI) {
-        let xmcStatus = await requestData.checkXMC(body.permission === PERMISSION.STATIC)
+        const xmcStatus = await requestData.checkXMC(body.permission === PERMISSION.STATIC)
         if (xmcStatus === false) throw new Error(`Invalid X-Message-Code (${module}/${action}); user #${requestData.user_id}`)
       }
     }
 
-    let startTime = Date.now()
+    const startTime = Date.now()
     if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUser(`No permissions`, requestData.user_id)
     if (body.paramTypes) checkParamTypes(requestData.params, body.paramTypes())
     if (body.paramCheck) body.paramCheck()
-    let result = await body.execute()
-    let endTime = Date.now()
+    const result = await body.execute()
+    const endTime = Date.now()
     log.debug(`${module}/${action} -- ${endTime - startTime} ms`, "Execution")
     return result
   } catch (err) {
@@ -86,7 +86,7 @@ function checkParamTypes(input: any, inputType: any) {
   if (Array.isArray(inputType)) {
     log.warn("Checking arrays is not support")
   } else if (typeof inputType === "object") {
-    Object.keys(inputType).forEach(field => {
+    Object.keys(inputType).forEach((field) => {
       if (typeof inputType[field] === "object") checkParamTypes(input[field], inputType[field])
       else if (Type.isNullDef(input[field])) throw new Error(`Field "${field}" is missing in input`)
       else if (!checkType(input[field], inputType[field])) throw new Error(`Expected type "${TYPE[inputType[field]]}" in "${field}" field`)

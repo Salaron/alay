@@ -12,7 +12,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+    const currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []
@@ -23,7 +23,7 @@ export default class extends MainAction {
       event: currentEvent.id
     })
 
-    if (!ranking){
+    if (!ranking) {
       await this.connection.query("INSERT INTO event_ranking (user_id, event_id, event_point) VALUES (:user, :event, 0)", {
         user: this.user_id,
         event: currentEvent.id

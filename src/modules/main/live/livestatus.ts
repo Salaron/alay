@@ -35,7 +35,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let [liveGoalResult, liveStatusList] = await Promise.all([
+    const [liveGoalResult, liveStatusList] = await Promise.all([
       this.connection.query("SELECT live_goal_reward_id, live_difficulty_id FROM user_live_goal_rewards WHERE user_id= :user;", {
         user: this.user_id
       }),
@@ -43,12 +43,12 @@ export default class extends MainAction {
         user: this.user_id
       })
     ])
-    let liveGoalList = <any>{}
-    for (let i = 0; i < liveGoalResult.length; i++) {
-      if (!liveGoalList[liveGoalResult[i].live_difficulty_id]) {
-        liveGoalList[liveGoalResult[i].live_difficulty_id] = []
+    const liveGoalList = <any>{}
+    for (const result of liveGoalResult) {
+      if (!liveGoalList[result.live_difficulty_id]) {
+        liveGoalList[result.live_difficulty_id] = []
       }
-      liveGoalList[liveGoalResult[i].live_difficulty_id].push(liveGoalResult[i].live_goal_reward_id)
+      liveGoalList[result.live_difficulty_id].push(result.live_goal_reward_id)
     }
     this.liveStatusList = liveStatusList
     this.liveGoalList = liveGoalList
@@ -71,10 +71,10 @@ export default class extends MainAction {
     if (type === liveType.MARATHON && this.marathonEvent.active) {
       liveList = (await marathonDB.all("SELECT live_difficulty_id FROM event_marathon_live_schedule_m WHERE event_id = :id", {
         id: this.marathonEvent.id
-      })).map(live => live.live_difficulty_id)
+      })).map((live) => live.live_difficulty_id)
     }
 
-    let unlockedList = <any>{}
+    const unlockedList = <any>{}
     for (const live of this.liveStatusList) {
       if (live.status > 0 && liveList.includes(live.live_difficulty_id)) {
         unlockedList[live.live_difficulty_id] = {
@@ -117,10 +117,10 @@ export default class extends MainAction {
       }
     }
 
-    let result = <any[]>[]
-    for (let ldid in unlockedList) {
+    const result = <any[]>[]
+    for (const ldid in unlockedList) {
       if (!unlockedList.hasOwnProperty(ldid)) continue
-      let status = unlockedList[ldid]
+      const status = unlockedList[ldid]
 
       result.push({
         live_difficulty_id: parseInt(ldid),

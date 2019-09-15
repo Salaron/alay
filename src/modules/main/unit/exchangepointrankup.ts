@@ -38,22 +38,22 @@ export default class extends MainAction {
     const unit = new Unit(this.connection)
     const user = new User(this.connection)
 
-    let baseUnit = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
+    const baseUnit = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
     if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorCode(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
 
-    let baseUnitData = await unitDB.get("SELECT exchange_point_rank_up_cost, disable_rank_up, after_love_max, after_level_max, rarity FROM unit_m WHERE unit_id = :id", {
+    const baseUnitData = await unitDB.get("SELECT exchange_point_rank_up_cost, disable_rank_up, after_love_max, after_level_max, rarity FROM unit_m WHERE unit_id = :id", {
       id: baseUnit.unit_id
     })
     assert(baseUnitData, `Failed to find unit data [${baseUnit.unit_id}]`)
     assert(baseUnitData.disable_rank_up === 0, "This unit can't be ranked up")
 
-    let beforeUserInfo = await user.getUserInfo(this.user_id)
-    let ePoints = await this.connection.first("SELECT exchange_point FROM user_exchange_point WHERE user_id=:user AND rarity=:rarity", { 
-      user: this.user_id, 
-      rarity: this.params.exchange_point_id 
+    const beforeUserInfo = await user.getUserInfo(this.user_id)
+    const ePoints = await this.connection.first("SELECT exchange_point FROM user_exchange_point WHERE user_id=:user AND rarity=:rarity", {
+      user: this.user_id,
+      rarity: this.params.exchange_point_id
     })
     if (
-      !rankUpCost[baseUnitData.rarity] || 
+      !rankUpCost[baseUnitData.rarity] ||
       !rankUpCost[baseUnitData.rarity][this.params.exchange_point_id] ||
       ePoints.exchange_point < rankUpCost[baseUnitData.rarity][this.params.exchange_point_id]
     ) throw new ErrorCode(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
@@ -63,9 +63,9 @@ export default class extends MainAction {
     if (baseUnit.rank === baseUnit.max_rank) gainSlots += 1
 
     await this.connection.query(`
-    UPDATE units 
-    SET 
-    \`rank\` = max_rank, display_rank = max_rank, removable_skill_capacity = :skillcap, 
+    UPDATE units
+    SET
+    \`rank\` = max_rank, display_rank = max_rank, removable_skill_capacity = :skillcap,
     max_love = :maxlove, max_level = :maxlevel WHERE unit_owning_user_id = :unit`, {
       unit: baseUnit.unit_owning_user_id,
       skillcap: Math.min(baseUnit.max_removable_skill_capacity, baseUnit.unit_removable_skill_capacity + gainSlots),
@@ -86,8 +86,8 @@ export default class extends MainAction {
     await unit.updateAlbum(this.user_id, baseUnit.unit_id, {
       maxRank: true
     })
-    let afterUserInfo = await user.getUserInfo(this.user_id)
-    let afterUnitInfo = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
+    const afterUserInfo = await user.getUserInfo(this.user_id)
+    const afterUnitInfo = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
 
     return {
       status: 200,

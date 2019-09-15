@@ -4,10 +4,10 @@ import { Utils } from "../../../common/utils"
 
 const defaultUnlock = [1]
 const itemDB = sqlite3.getItem()
-let bgList = [1]
+const bgList = [1]
 
 export async function init(): Promise<void> {
-  let backgrounds = await itemDB.all(`SELECT background_id as id FROM background_m WHERE background_id NOT IN (${bgList.join(",")})`)
+  const backgrounds = await itemDB.all(`SELECT background_id as id FROM background_m WHERE background_id NOT IN (${bgList.join(",")})`)
   for (const background of backgrounds) bgList.push(background.id)
 }
 
@@ -21,34 +21,34 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let response = {
+    const response = {
       background_info: <any>[]
     }
 
-    let currBG = await this.connection.first("SELECT setting_background_id as id FROM users WHERE user_id=:user", { user: this.user_id })
+    const currBG = await this.connection.first("SELECT setting_background_id as id FROM users WHERE user_id=:user", { user: this.user_id })
     if (Config.modules.background.unlockAll) {
       let bgExists = false
-      for (let i = 0; i < bgList.length; i++) {
-        if (currBG.id == bgList[i]) bgExists = true
+      for (const bg of bgList) {
+        if (currBG.id == bg) bgExists = true
         response.background_info.push({
-          background_id: bgList[i],
-          is_set: currBG.id == bgList[i],
+          background_id: bg,
+          is_set: currBG.id == bg,
           insert_date: "2018-01-01 00:00:01"
         })
       }
-      if (bgExists === false) response.background_info[0].is_set = true 
+      if (bgExists === false) response.background_info[0].is_set = true
       return {
         status: 200,
         result: response
       }
     }
 
-    let unlockedBackgroundList = <any>{}
-    let unlockedBackgroundData = await this.connection.query("SELECT background_id, insert_date FROM user_background_unlock WHERE user_id=:user;", { user: this.user_id })
+    const unlockedBackgroundList = <any>{}
+    const unlockedBackgroundData = await this.connection.query("SELECT background_id, insert_date FROM user_background_unlock WHERE user_id=:user;", { user: this.user_id })
     let unlockedCurrentBackground = defaultUnlock.includes(currBG.id)
-    for (let i = 0; i < unlockedBackgroundData.length; i++) {
-      unlockedBackgroundList[unlockedBackgroundData[i].background_id] = Utils.parseDate(unlockedBackgroundData[i].insert_date)
-      if (unlockedBackgroundData[i].background_id === currBG.id) {
+    for (const bgData of unlockedBackgroundData) {
+      unlockedBackgroundList[bgData.background_id] = Utils.parseDate(bgData.insert_date)
+      if (bgData.background_id === currBG.id) {
         unlockedCurrentBackground = true
       }
     }
@@ -56,20 +56,20 @@ export default class extends MainAction {
       currBG.id = 1
     }
 
-    for (let i = 0; i < bgList.length; i++) {
-      if (unlockedBackgroundList[bgList[i]]) {
+    for (const bg of bgList) {
+      if (unlockedBackgroundList[bg]) {
         response.background_info.push({
-          background_id: bgList[i],
-          is_set: currBG.id == bgList[i],
-          insert_date: unlockedBackgroundList[bgList[i]]
+          background_id: bg,
+          is_set: currBG.id == bg,
+          insert_date: unlockedBackgroundList[bg]
         })
         continue
       }
 
-      if (defaultUnlock.includes(bgList[i])) {
+      if (defaultUnlock.includes(bg)) {
         response.background_info.push({
-          background_id: bgList[i],
-          is_set: currBG.id == bgList[i],
+          background_id: bg,
+          is_set: currBG.id == bg,
           insert_date: "2018-01-01 00:00:01"
         })
       }

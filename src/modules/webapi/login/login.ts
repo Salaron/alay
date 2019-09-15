@@ -20,27 +20,27 @@ export default class extends WebApiAction {
   }
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
-    
+
     const i18n = new I18n(this.connection)
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
       await Utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
     }
-    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup")
+    const strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup")
 
     this.user_id = parseInt(Buffer.from(Utils.RSADecrypt(this.params.user_id), "base64").toString())
-    let password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
+    const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
 
     if (!checkUser(this.user_id)) throw new ErrorWebApi(strings.userIdShouldBeInt, true)
     if (!checkPass(password)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
 
-    let data = await this.connection.first(`SELECT * FROM users WHERE user_id = :user AND password = :pass`, {
+    const data = await this.connection.first(`SELECT * FROM users WHERE user_id = :user AND password = :pass`, {
       user: this.user_id,
       pass: password
     })
     if (!data) throw new ErrorWebApi(strings.invalidLoginOrPass, true)
 
-    let cred = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
+    const cred = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
       token: this.requestData.auth_token
     })
     if (!cred) throw new ErrorWebApi("Token is expired")
@@ -51,7 +51,7 @@ export default class extends WebApiAction {
       (!cred.login_passwd.match(/^[0-9A-Z]{128}/gi))
     ) throw new Error(`Invalid credentials`)
     // check if this credentials already used
-    let check = await this.connection.first(`SELECT * FROM user_login WHERE login_key = :key AND login_passwd = :pass`, {
+    const check = await this.connection.first(`SELECT * FROM user_login WHERE login_key = :key AND login_passwd = :pass`, {
       key: cred.login_key,
       pass: cred.login_passwd
     })

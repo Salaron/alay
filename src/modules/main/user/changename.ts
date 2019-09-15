@@ -28,7 +28,7 @@ export default class extends MainAction {
   public async execute() {
     try {
       await this.connection.query("UPDATE users SET name=:name WHERE user_id=:user", {
-        name: this.params.name, 
+        name: this.params.name,
         user: this.user_id
       })
     } catch (err) {

@@ -1,11 +1,11 @@
 {
   "name": "alay",
-  "version": "0.0.1",
-  "description": "...",
+  "version": "0.9.5",
+  "description": "Future of SunLight",
   "main": "alay.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ./src/ --ext .ts, .tsx"
+    "lint": "tslint -c tslint.json 'src/**/*.ts'"
   },
   "author": "Salaron",
   "license": "ISC",
@@ -15,18 +15,13 @@
     "@types/formidable": "^1.0.31",
     "@types/mime": "^2.0.1",
     "@types/mysql": "^2.15.7",
-    "@types/node": "^12.7.4",
+    "@types/node": "^12.7.5",
     "@types/nodemailer": "^6.2.1",
-    "@types/request": "^2.48.2",
+    "@types/request": "^2.48.3",
     "@types/showdown": "^1.9.3",
     "@types/sqlite3": "^3.1.5",
-    "@typescript-eslint/eslint-plugin": "^2.1.0",
-    "@typescript-eslint/parser": "^2.1.0",
-    "eslint": "^6.3.0",
-    "eslint-import-resolver-typescript": "^1.1.1",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-json": "^1.4.0",
-    "typescript": "^3.6.2"
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "chalk": "^2.4.2",

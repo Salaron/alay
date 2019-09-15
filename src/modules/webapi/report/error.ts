@@ -14,7 +14,7 @@ export default class extends WebApiAction {
       message: TYPE.STRING
     }
   }
-  
+
   public async execute() {
     await this.connection.query(`INSERT INTO error_log (user_id, message, stacktrace) VALUES (:user, :msg, :stack)`, {
       user: this.user_id,

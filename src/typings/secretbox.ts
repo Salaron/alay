@@ -5,7 +5,7 @@ export interface costSettings {
   [costId: number]: unitData[]
 }
 export interface unitData {
-  rateup: any // number[] 
+  rateup: any // number[]
   rateup_hidden?: number[]
   rateup_weight?: number
   unit_type_id: number[] | null

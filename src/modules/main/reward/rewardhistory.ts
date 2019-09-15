@@ -33,7 +33,7 @@ export default class extends MainAction {
     this.params.filter.map(Number)
 
     let id = ``
-    if (this.params.incentive_history_id){
+    if (this.params.incentive_history_id) {
       if (!Type.isInt(this.params.incentive_history_id)) throw new Error("Invalid id")
       id = ` AND incentive_id > ${this.params.incentive_history_id}`
     }
@@ -72,10 +72,10 @@ export default class extends MainAction {
       default: throw new Error(`Invalid category`)
     }
 
-    let rewardList = await this.connection.query(rewardListQuery)
-    let rewardCount = await this.connection.first(rewardCountQuery)
+    const rewardList = await this.connection.query(rewardListQuery)
+    const rewardCount = await this.connection.first(rewardCountQuery)
 
-    let list: any[] = rewardList.map((reward: any) => {
+    const list: any[] = rewardList.map((reward: any) => {
       return {
         incentive_history_id: reward.incentive_id,
         incentive_id: reward.incentive_id,

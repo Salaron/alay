@@ -11,11 +11,9 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let liveIcon: number[] = [1, 2, 3]
-    let list = Config.modules.liveIcon.list
-    for (let i = 0; i < list.length; i++) {
-      let icon = list[i]
-      if (icon != <any>list[i]) return
+    const liveIcon: number[] = [1, 2, 3]
+    const list = Config.modules.liveIcon.list
+    for (const icon of list) {
       if (!liveIcon.includes(icon)) liveIcon.push(icon)
     }
     return {

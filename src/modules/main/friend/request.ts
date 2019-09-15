@@ -20,7 +20,7 @@ export default class extends MainAction {
 
   public async execute() {
     // Check if this user already send request to us
-    let check = await this.connection.first(`SELECT * FROM user_friend WHERE initiator_id = :recUser AND recipient_id = :thisUser`, {
+    const check = await this.connection.first(`SELECT * FROM user_friend WHERE initiator_id = :recUser AND recipient_id = :thisUser`, {
       recUser: this.params.user_id,
       thisUser: this.user_id
     })
@@ -43,7 +43,7 @@ export default class extends MainAction {
     }
     return {
       status: 200,
-      result: { 
+      result: {
         is_friend: isFriend
       }
     }

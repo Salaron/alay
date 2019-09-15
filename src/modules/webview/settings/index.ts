@@ -24,7 +24,7 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
-    let [strings, template, mods, userData, changeLanguageModal] = await Promise.all([
+    const [strings, template, mods, userData, changeLanguageModal] = await Promise.all([
       i18n.getStrings(this.user_id, "common", "login-login", "login-startup", "settings-index"),
       WebView.getTemplate("settings", "index"),
       new User(this.connection).getParams(this.user_id, supportedMods),
@@ -32,7 +32,7 @@ export default class extends WebViewAction {
       webview.getLanguageModalTemplate(this.user_id)
     ])
 
-    let values = {
+    const values = {
       i18n: strings,
       isAdmin: Config.server.admin_ids.includes(this.user_id),
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),

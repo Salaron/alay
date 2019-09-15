@@ -18,7 +18,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let res = await this.connection.execute(`DELETE FROM user_friend WHERE initiator_id = :thisUser AND recipient_id = :recUser AND status = 0`, {
+    const res = await this.connection.execute(`DELETE FROM user_friend WHERE initiator_id = :thisUser AND recipient_id = :recUser AND status = 0`, {
       thisUser: this.user_id,
       recUser: this.params.user_id
     })
@@ -29,7 +29,7 @@ export default class extends MainAction {
     })
     return {
       status: 200,
-      result: { 
+      result: {
         is_friend: res.affectedRows != 1
       }
     }

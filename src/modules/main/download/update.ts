@@ -21,24 +21,24 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let clientExternal = this.params.external_version
-    let clientInstall = this.params.install_version
+    const clientExternal = this.params.external_version
+    const clientInstall = this.params.install_version
 
-    let serverVersion = Config.server.server_version
-    let clientVersion = Utils.versionCompare(clientExternal, clientInstall) === -1 ? clientExternal : clientInstall
+    const serverVersion = Config.server.server_version
+    const clientVersion = Utils.versionCompare(clientExternal, clientInstall) === -1 ? clientExternal : clientInstall
 
     if (Utils.versionCompare(serverVersion, clientExternal) == -1) throw new Error(`Client version can't be upper than server version`)
 
-    let clientParts = clientVersion.split(".").map(Number)
-    let serverParts = serverVersion.split(".").map(Number)
+    const clientParts = clientVersion.split(".").map(Number)
+    const serverParts = serverVersion.split(".").map(Number)
 
     if (clientParts.length != 2) throw new Error(`only 2 parts supported ("35.2", "35.3", etc...)`)
     let response: any[] = []
-    let updateCache = Download.getUpdateLinks()
+    const updateCache = Download.getUpdateLinks()
 
     while (clientParts[0] < serverParts[0]) {
       clientParts[0]++
-      let arrayofversion = Object.keys(updateCache[clientParts[0]] || {})
+      const arrayofversion = Object.keys(updateCache[clientParts[0]] || {})
       for (let i = 0; i <= parseInt(arrayofversion[arrayofversion.length - 1], 10); i++) {
         if (updateCache[clientParts[0]][arrayofversion[i]] === undefined) continue
         response = response.concat(updateCache[clientParts[0]][arrayofversion[i]])

@@ -11,21 +11,21 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let data = await this.connection.query("SELECT * FROM user_unit_album WHERE user_id=:user", { 
-      user: this.user_id 
+    const userAlbum = await this.connection.query("SELECT * FROM user_unit_album WHERE user_id=:user", {
+      user: this.user_id
     })
-    let albumData = <any>[]
-    
-    for (let i = 0; i < data.length; i++){
+    const albumData = <any>[]
+
+    for (const data of userAlbum) {
       albumData.push({
-        unit_id: data[i].unit_id,
-        rank_max_flag: data[i].rank_max_flag === 1,
-        love_max_flag: data[i].love_max_flag === 1,
-        rank_level_max_flag: data[i].rank_level_max_flag === 1,
-        all_max_flag: data[i].all_max_flag === 1,
-        highest_love_per_unit: data[i].highest_love_per_unit,
-        total_love: data[i].total_love,
-        favorite_point: data[i].favorite_point
+        unit_id: data.unit_id,
+        rank_max_flag: data.rank_max_flag === 1,
+        love_max_flag: data.love_max_flag === 1,
+        rank_level_max_flag: data.rank_level_max_flag === 1,
+        all_max_flag: data.all_max_flag === 1,
+        highest_love_per_unit: data.highest_love_per_unit,
+        total_love: data.total_love,
+        favorite_point: data.favorite_point
       })
     }
 

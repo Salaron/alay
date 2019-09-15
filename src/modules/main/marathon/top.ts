@@ -19,11 +19,11 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let events = new Events(this.connection)
-    let currentEvent = await events.getEventById(this.params.event_id)
+    const events = new Events(this.connection)
+    const currentEvent = await events.getEventById(this.params.event_id)
     if (!currentEvent.opened) throw new ErrorCode(1234, "Event is closed")
 
-    let eventUser = await events.getEventUserStatus(this.user_id, currentEvent.id)
+    const eventUser = await events.getEventUserStatus(this.user_id, currentEvent.id)
     return {
       status: 200,
       result: {

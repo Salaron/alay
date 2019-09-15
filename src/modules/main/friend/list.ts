@@ -39,7 +39,7 @@ export default class extends MainAction {
   public async execute() {
     const user = new User(this.connection)
 
-    let order = sort[this.params.sort]
+    const order = sort[this.params.sort]
     if (!order) throw new Error(`Unknown sort type: ${this.params.sort}`)
 
     let userIds: number[] = []
@@ -47,7 +47,7 @@ export default class extends MainAction {
       case 0: { // friend list
         userIds = (await this.connection.query("SELECT initiator_id, recipient_id FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND STATUS = 1", {
           user: this.user_id
-        })).map(friend => {
+        })).map((friend) => {
           if (friend.initiator_id === this.user_id) return friend.recipient_id
           return friend.initiator_id
         })
@@ -57,7 +57,7 @@ export default class extends MainAction {
       case 1: { // pending
         userIds = (await this.connection.query("SELECT recipient_id FROM user_friend WHERE initiator_id = :user AND status = 0", {
           user: this.user_id
-        })).map(pending => {
+        })).map((pending) => {
           return pending.recipient_id
         })
         if (userIds.length === 0) userIds.push(0)
@@ -66,7 +66,7 @@ export default class extends MainAction {
       case 2: { // approval
         userIds = (await this.connection.query("SELECT initiator_id FROM user_friend WHERE recipient_id = :user AND status = 0", {
           user: this.user_id
-        })).map(approval => {
+        })).map((approval) => {
           return approval.initiator_id
         })
         if (userIds.length === 0) userIds.push(0)
@@ -82,21 +82,21 @@ export default class extends MainAction {
       (SELECT last_activity FROM user_login WHERE user_id = users.user_id) as last_activity,
       (SELECT agree_date FROM user_friend WHERE status = 0 AND (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id)) as agree_date,
       (SELECT insert_date FROM user_friend WHERE status = 0 AND (initiator_id = :user OR recipient_id = :user) AND (initiator_id = users.user_id OR recipient_id = users.user_id)) as insert_date,
-      setting_award_id 
-    FROM 
+      setting_award_id
+    FROM
       users
-    JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id 
-    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
+    JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id
+    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id
     JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
     WHERE partner_unit IS NOT NULL AND users.user_id IN (${userIds.join(",")}) ORDER BY ${order}`, {
       user: this.user_id
     })
-    friends = await Promise.all(friends.map(async friend => {
-      let dateNow = moment(new Date())
-      let dateLastLogin = moment(new Date(friend.last_activity || friend.last_login))
-      let applied = moment(new Date(friend.agree_date || friend.insert_date))
-      let lastLogin = Math.floor(moment.duration(dateNow.diff(dateLastLogin)).asMinutes())
-      let appliedTime = Math.floor(moment.duration(dateNow.diff(applied)).asMinutes())
+    friends = await Promise.all(friends.map(async (friend) => {
+      const dateNow = moment(new Date())
+      const dateLastLogin = moment(new Date(friend.last_activity || friend.last_login))
+      const applied = moment(new Date(friend.agree_date || friend.insert_date))
+      const lastLogin = Math.floor(moment.duration(dateNow.diff(dateLastLogin)).asMinutes())
+      const appliedTime = Math.floor(moment.duration(dateNow.diff(applied)).asMinutes())
 
       return {
         user_data: {

@@ -9,9 +9,9 @@ export default class extends MainAction {
   constructor(requestData: RequestData) {
     super(requestData)
   }
-  
+
   public async execute() {
-    let data = await this.connection.first("SELECT partner_unit FROM users WHERE user_id=:user", { user: this.user_id })
+    const data = await this.connection.first("SELECT partner_unit FROM users WHERE user_id=:user", { user: this.user_id })
 
     return {
       status: 200,

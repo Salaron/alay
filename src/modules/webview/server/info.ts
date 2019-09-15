@@ -18,14 +18,14 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
 
-    let code = await i18n.getUserLocalizationCode(this.user_id)
-    let [strings, template, changeLanguageModal] = await Promise.all([
+    const code = await i18n.getUserLocalizationCode(this.user_id)
+    const [strings, template, changeLanguageModal] = await Promise.all([
       i18n.getStrings(code, "server-info"),
       WebView.getTemplate("server", "info"),
       webview.getLanguageModalTemplate(this.user_id)
     ])
 
-    let serverInfo = {
+    const serverInfo = {
       branch: "Unknown",
       commit: "Unknown",
       commitDate: "Unknown",
@@ -35,19 +35,18 @@ export default class extends WebViewAction {
       currentOnline: await webview.getCurrentOnline()
     }
     try {
-      let branchInfo = (await promisify(readFile)(`${rootDir}/.git/HEAD`, "utf-8")).substring(5).replace(/\n/g, "")
-      let log = (await promisify(readFile)(`${rootDir}/.git/logs/${branchInfo}`, "utf-8")).split(/\n/)
-      let lastCommit = log[log.length - 2].split(/\t|\s/g)
+      const branchInfo = (await promisify(readFile)(`${rootDir}/.git/HEAD`, "utf-8")).substring(5).replace(/\n/g, "")
+      const log = (await promisify(readFile)(`${rootDir}/.git/logs/${branchInfo}`, "utf-8")).split(/\n/)
+      const lastCommit = log[log.length - 2].split(/\t|\s/g)
       serverInfo.branch = branchInfo.split("/")[2]
       serverInfo.commit = lastCommit[1].substring(0, 7)
       serverInfo.commitDate = moment(parseInt(lastCommit[4]) * 1000).format("YYYY-MM-DD HH:mm") + " " + lastCommit[5]
-    } catch (_) {
-    }
+    } catch (_) { } // tslint:disable-line
 
-    let values = {
+    const values = {
       i18n: strings,
       changeLanguageModal,
-      isAdmin: Config.server.admin_ids.includes(this.user_id),  
+      isAdmin: Config.server.admin_ids.includes(this.user_id),
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       serverInfo
     }

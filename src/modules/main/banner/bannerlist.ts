@@ -13,7 +13,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let museBanners = await this.connection.query(`
+    const museBanners = await this.connection.query(`
     SELECT * FROM (
       SELECT banner_asset_name as asset_path, banner_se_asset_name as asset_path_se, secretbox_id as target_id, 1 as banner_type, 0 as master_is_active_event, member_category, NULL as webview_url, start_date, end_date FROM secretbox_list
       UNION
@@ -23,7 +23,7 @@ export default class extends MainAction {
     ) as b WHERE asset_path IS NOT NULL AND asset_path_se IS NOT NULL AND start_date < :now AND end_date > :now ORDER BY member_category ASC, master_is_active_event DESC`, {
       now: Utils.toSpecificTimezone(9)
     })
-    let aqoursBanners = await this.connection.query(`
+    const aqoursBanners = await this.connection.query(`
     SELECT * FROM (
       SELECT banner_asset_name as asset_path, banner_se_asset_name as asset_path_se, secretbox_id as target_id, 1 as banner_type, 0 as master_is_active_event, member_category, NULL as webview_url, start_date, end_date FROM secretbox_list
       UNION
@@ -34,17 +34,16 @@ export default class extends MainAction {
       now: Utils.toSpecificTimezone(9)
     })
 
-    let museCategory = {
+    const museCategory = {
       member_category: 1,
       banner_list: <any>[]
     }
-    let aqoursCategory = {
+    const aqoursCategory = {
       member_category: 2,
       banner_list: <any>[]
     }
 
-    for (let i = 0; i < museBanners.length; i++) {
-      let banner = museBanners[i]
+    for (const banner of museBanners) {
       banner.member_category = undefined
       banner.start_date = undefined
       banner.end_date = undefined
@@ -52,8 +51,7 @@ export default class extends MainAction {
       banner.fixed_flag = false
       museCategory.banner_list.push(banner)
     }
-    for (let i = 0; i < aqoursBanners.length; i++) {
-      let banner = aqoursBanners[i]
+    for (const banner of aqoursBanners) {
       banner.member_category = undefined
       banner.start_date = undefined
       banner.end_date = undefined
@@ -62,8 +60,7 @@ export default class extends MainAction {
       aqoursCategory.banner_list.push(banner)
     }
 
-
-    let response = {
+    const response = {
       time_limit: moment(new Date()).utcOffset("+0900").add(1, "hour").format("YYYY-MM-DD HH:mm:SS"),
       member_category_list: [museCategory, aqoursCategory],
       server_timestamp: Utils.timeStamp()

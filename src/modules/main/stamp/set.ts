@@ -2,12 +2,12 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import { TYPE } from "../../../common/type"
 
-let otherDB = sqlite3.getOther()
+const otherDB = sqlite3.getOther()
 let ids: number[] = []
 
 export async function init(): Promise<void> {
-  let all = await otherDB.all("SELECT stamp_id FROM stamp_m ORDER BY unit_type_id ASC")
-  ids = all.map((s: any) => { return s.stamp_id })
+  const all = await otherDB.all("SELECT stamp_id FROM stamp_m ORDER BY unit_type_id ASC")
+  ids = all.map((s: any) => s.stamp_id)
 }
 
 export default class extends MainAction {
@@ -44,7 +44,7 @@ export default class extends MainAction {
       id: this.params.stamp_setting_id
     })
 
-    let stampDeckSlotInsert = []
+    const stampDeckSlotInsert = []
     for (const stamp of this.params.stamp_list) {
       if (
         !Type.isInt(stamp.stamp_id) || !Type.isInt(stamp.position)

@@ -5,6 +5,7 @@ import { ActionResult } from "../../typings/handlers"
 export abstract class WebApiAction {
   public abstract requiredAuthLevel: AUTH_LEVEL;
 
+  // tslint:disable-next-line
   protected user_id: number;
   protected connection: Connection;
   protected requestData: RequestData;
@@ -21,7 +22,7 @@ export abstract class WebApiAction {
     return {}
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  // tslint:disable-next-line
   public paramCheck(): void {
   }
 

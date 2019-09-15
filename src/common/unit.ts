@@ -19,20 +19,20 @@ const updateAlbumDefault: updateAlbumOptions = {
   addFavPt: 0
 }
 
-let supportUnitData: { [unitId: number]: supportUnitData } = {}
+const supportUnitData: { [unitId: number]: supportUnitData } = {}
 let supportUnitList: number[] = []
-let noExchangePointList: number[] = []
-let attributeUnits: { [attribute: number]: number[] } = {}
-let rarityUnits: { [rarity: number]: number[] } = {}
+const noExchangePointList: number[] = []
+const attributeUnits: { [attribute: number]: number[] } = {}
+const rarityUnits: { [rarity: number]: number[] } = {}
 
 export async function init() {
-  let supports = await unitDB.all(`
-  SELECT 
+  const supports = await unitDB.all(`
+  SELECT
     name, unit_id, attribute_id, rarity, disable_rank_up, merge_exp, sale_price, merge_cost, grant_exp
-  FROM 
-    unit_m 
+  FROM
+    unit_m
   JOIN unit_level_up_pattern_m
-   ON unit_m.unit_level_up_pattern_id = unit_level_up_pattern_m.unit_level_up_pattern_id 
+   ON unit_m.unit_level_up_pattern_id = unit_level_up_pattern_m.unit_level_up_pattern_id
   JOIN unit_skill_level_m
    ON unit_m.default_unit_skill_id = unit_skill_level_m.unit_skill_id
   WHERE disable_rank_up != 0`)
@@ -49,13 +49,13 @@ export async function init() {
     return unit.unit_id
   })
 
-  let noEpList = await exchangeDB.all("SELECT * FROM exchange_nopoint_unit_m")
+  const noEpList = await exchangeDB.all("SELECT * FROM exchange_nopoint_unit_m")
   for (const unit of noEpList) {
     noExchangePointList.push(unit.unit_id)
   }
 
-  let allUnits = await unitDB.all("SELECT rarity, attribute_id, unit_id FROM unit_m")
-  for (let unit of allUnits) {
+  const allUnits = await unitDB.all("SELECT rarity, attribute_id, unit_id FROM unit_m")
+  for (const unit of allUnits) {
     if (!attributeUnits[unit.attribute_id]) attributeUnits[unit.attribute_id] = []
     attributeUnits[unit.attribute_id].push(unit.unit_id)
 
@@ -128,7 +128,7 @@ export class Unit {
   public async addUnit(userId: number, unitId: number, options: addUnitOptions = addUnitDefault) {
     options = extend(true, addUnitDefault, options)
     if (options.useNumber) {
-      let res = await unitDB.get(`SELECT unit_id FROM unit_m WHERE unit_number = :number`, { number: unitId })
+      const res = await unitDB.get(`SELECT unit_id FROM unit_m WHERE unit_number = :number`, { number: unitId })
       if (!res) throw new Error(`Unit Number "${unitId} does not exist`)
       unitId = res.unit_id
     }
@@ -169,18 +169,18 @@ export class Unit {
         unit_removable_skill_capacity: 0
       }
     } else {
-      let unitData = await unitDB.get(`
-      SELECT 
-        unit_id, attribute_id, disable_rank_up, after_love_max, 
-        before_love_max, after_level_max, before_level_max, default_unit_skill_id, 
-        max_removable_skill_capacity, default_removable_skill_capacity, unit_level_up_pattern_id, 
-        smile_max, pure_max, cool_max, hp_max, unit_skill_m.max_level as max_skill_level 
-      FROM 
-        unit_m 
-      LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id 
+      const unitData = await unitDB.get(`
+      SELECT
+        unit_id, attribute_id, disable_rank_up, after_love_max,
+        before_love_max, after_level_max, before_level_max, default_unit_skill_id,
+        max_removable_skill_capacity, default_removable_skill_capacity, unit_level_up_pattern_id,
+        smile_max, pure_max, cool_max, hp_max, unit_skill_m.max_level as max_skill_level
+      FROM
+        unit_m
+      LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
       WHERE unit_id = :unit`, { unit: unitId })
       if (!unitData) throw new Error(`Unit Id "${unitId} does not exist`)
-      let insertData: any = {
+      const insertData: any = {
         user_id: userId,
         unit_id: null,
         exp: 0,
@@ -215,29 +215,29 @@ export class Unit {
       insertData.removable_skill_capacity = Math.min(unitData.max_removable_skill_capacity, insertData.rank == insertData.max_rank ? (unitData.default_removable_skill_capacity + 1) : unitData.default_removable_skill_capacity)
       insertData.max_removable_skill_capacity = unitData.max_removable_skill_capacity
 
-      let level = await unitDB.all("SELECT * FROM unit_level_up_pattern_m WHERE unit_level_up_pattern_id = ? AND (unit_level IN (?,?))", [
+      const levels = await unitDB.all("SELECT * FROM unit_level_up_pattern_m WHERE unit_level_up_pattern_id = ? AND (unit_level IN (?,?))", [
         unitData.unit_level_up_pattern_id,
         insertData.level,
         insertData.level - 1
       ])
 
-      for (let i = 0; i < level.length; i++) {
-        if (level[i].unit_level == insertData.level) {
-          insertData.next_exp = level[i].next_exp
-          insertData.stat_smile = unitData.smile_max - level[i].smile_diff
-          insertData.stat_pure = unitData.pure_max - level[i].pure_diff
-          insertData.stat_cool = unitData.cool_max - level[i].cool_diff
-          insertData.max_hp = unitData.hp_max - level[i].hp_diff
-        } else if (level[i].unit_level == (insertData.level - 1)) {
-          insertData.exp = level[i].next_exp
+      for (const level of levels) {
+        if (level.unit_level == insertData.level) {
+          insertData.next_exp = level.next_exp
+          insertData.stat_smile = unitData.smile_max - level.smile_diff
+          insertData.stat_pure = unitData.pure_max - level.pure_diff
+          insertData.stat_cool = unitData.cool_max - level.cool_diff
+          insertData.max_hp = unitData.hp_max - level.hp_diff
+        } else if (level.unit_level == (insertData.level - 1)) {
+          insertData.exp = level.next_exp
         }
       }
 
       if (!options.amount) options.amount = 1 // fix complier error
-      let addedIds = []
+      const addedIds = []
       let lastId = 0
       for (let i = 0; i < options.amount; i++) {
-        let result = await this.connection.execute("\
+        const result = await this.connection.execute("\
         INSERT INTO units (\
           user_id, unit_id, `exp`, next_exp, `level`, max_level, `rank`, \
           max_rank, love, max_love, unit_skill_level, max_skill_level, max_hp, \
@@ -253,14 +253,14 @@ export class Unit {
         lastId = result.insertId
       }
 
-      let isMaxRank = (insertData.rank == insertData.max_rank)
+      const isMaxRank = (insertData.rank == insertData.max_rank)
       await this.updateAlbum(insertData.user_id, insertData.unit_id, {
         maxRank: isMaxRank,
         maxLove: insertData.love == insertData.max_love && isMaxRank,
         maxLevel: insertData.level == insertData.max_level && isMaxRank,
         addLove: insertData.love
       })
-      let res: detailUnitData & { unit_owning_ids?: number[] } = await this.getUnitDetail(lastId)
+      const res: detailUnitData & { unit_owning_ids?: number[] } = await this.getUnitDetail(lastId)
       res.unit_owning_ids = addedIds
       return res
     }
@@ -270,7 +270,7 @@ export class Unit {
     options = extend(true, updateAlbumDefault, options)
     let data = await this.connection.first("SELECT * FROM user_unit_album WHERE user_id=:user AND unit_id=:unit", { user: userId, unit: unitId })
     if (!data) { // new unit
-      let values = {
+      const values = {
         user: userId,
         unit: unitId,
         rank: options.maxRank ? 1 : 0,
@@ -292,7 +292,7 @@ export class Unit {
       }
     }
     // existing
-    let values = {
+    const values = {
       user: userId,
       unit: unitId,
       rank: (options.maxRank || data.rank_max_flag) ? 1 : 0,
@@ -309,7 +309,7 @@ export class Unit {
   public async getUnitDetail(unitOwningUserId: number, userId?: number): Promise<detailUnitData> {
     let query = "SELECT * FROM units WHERE unit_owning_user_id = :uouid AND deleted = 0"
     if (userId) query = "SELECT * FROM units WHERE unit_owning_user_id = :uouid AND deleted = 0 AND user_id = :user"
-    let data = await this.connection.first(query, {
+    const data = await this.connection.first(query, {
       uouid: unitOwningUserId,
       user: userId
     })
@@ -355,13 +355,13 @@ export class Unit {
   }
 
   public async getUnitSiS(unitOwningUserId: number): Promise<number[]> {
-    let data = await this.connection.query(`
-    SELECT unit_removable_skill_id 
-    FROM user_unit_removable_skill_equip 
+    const data = await this.connection.query(`
+    SELECT unit_removable_skill_id
+    FROM user_unit_removable_skill_equip
     WHERE unit_owning_user_id = :id`, { id: unitOwningUserId })
     if (!data) throw new Error(`Data for uouid is missing`)
 
-    return data.map((val: any) => { return val.unit_removable_skill_id })
+    return data.map((val: any) => val.unit_removable_skill_id)
   }
 
   public static getSupportUnitList() {

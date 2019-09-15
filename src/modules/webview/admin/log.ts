@@ -13,7 +13,7 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    let values = {
+    const values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders())
     }
     return {

@@ -13,11 +13,11 @@ export default class extends MainAction {
 
   public async execute() {
     // TODO: add wait units
-    let active = await this.connection.query("SELECT * FROM units WHERE user_id = :user AND deleted = 0", { user: this.user_id })
+    const active = await this.connection.query("SELECT * FROM units WHERE user_id = :user AND deleted = 0", { user: this.user_id })
     return {
       status: 200,
       result: {
-        active: active.map((unit: any) => { return Unit.parseUnitData(unit) }),
+        active: active.map((unit: any) => Unit.parseUnitData(unit)),
         waiting: []
       }
     }

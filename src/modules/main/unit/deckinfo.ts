@@ -11,18 +11,17 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let mainDeck = (await this.connection.first("SELECT main_deck as deck FROM users WHERE user_id=:user", { 
-      user: this.user_id 
+    const mainDeck = (await this.connection.first("SELECT main_deck as deck FROM users WHERE user_id=:user", {
+      user: this.user_id
     })).deck
-    let data = await this.connection.query(`
-    SELECT deck.user_id, deck.deck_name, deck.unit_deck_id, slot.slot_id, slot.unit_owning_user_id 
-    FROM user_unit_deck as deck INNER JOIN user_unit_deck_slot as slot ON (deck.unit_deck_id = slot.deck_id AND deck.user_id = slot.user_id) WHERE deck.user_id=:user 
+    const data = await this.connection.query(`
+    SELECT deck.user_id, deck.deck_name, deck.unit_deck_id, slot.slot_id, slot.unit_owning_user_id
+    FROM user_unit_deck as deck INNER JOIN user_unit_deck_slot as slot ON (deck.unit_deck_id = slot.deck_id AND deck.user_id = slot.user_id) WHERE deck.user_id=:user
     AND unit_deck_id IN (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)`, { user: this.user_id })
 
-    let decks: any = {}
-    let deckIDs = []
-    for (let i = 0; i < data.length; i++) {
-      let s = data[i]
+    const decks: any = {}
+    const deckIDs = []
+    for (const s of data) {
       if (!decks[s.unit_deck_id]) {
         deckIDs.push(s.unit_deck_id)
         decks[s.unit_deck_id] = {
@@ -37,10 +36,10 @@ export default class extends MainAction {
         unit_owning_user_id: s.unit_owning_user_id
       })
     }
-    let response = []
-    for (let i = 0; i < deckIDs.length; i++) {
-      response.push(decks[deckIDs[i]])
-    }
+    const response: any[] = []
+    deckIDs.map(id => {
+      response.push(decks[id])
+    })
 
     return {
       status: 200,

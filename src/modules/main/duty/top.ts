@@ -20,21 +20,21 @@ export default class extends MainAction {
   public async execute() {
     const events = new Events(this.connection)
 
-    let currentEvent = await events.getEventById(this.params.event_id)
+    const currentEvent = await events.getEventById(this.params.event_id)
     if (currentEvent.opened === false) throw new ErrorCode(720)
 
-    // remove user from existing rooms 
+    // remove user from existing rooms
     await this.connection.query(`UPDATE event_duty_users SET status = 0 WHERE room_id IN (SELECT room_id FROM event_duty_rooms WHERE start_flag = 0 AND user_id = :user)`, {
       user: this.user_id
     })
     await this.connection.query(`UPDATE event_duty_live_progress SET status = 0 WHERE status = 1 AND user_id = :user`, { user: this.user_id })
-    let status = await events.getEventUserStatus(this.user_id, this.params.event_id)
-    let history = await this.connection.query(`
-		SELECT mission_result FROM event_duty_rooms 
-		JOIN event_duty_users ON event_duty_rooms.room_id = event_duty_users.room_id 
+    const status = await events.getEventUserStatus(this.user_id, this.params.event_id)
+    const history = await this.connection.query(`
+		SELECT mission_result FROM event_duty_rooms
+		JOIN event_duty_users ON event_duty_rooms.room_id = event_duty_users.room_id
 		WHERE mission_result IS NOT NULL AND user_id = :user`, { user: this.user_id })
 
-    let response = {
+    const response = {
       event_status: {
         total_event_point: status.event_point,
         event_rank: status.event_rank
@@ -46,7 +46,7 @@ export default class extends MainAction {
         title: "Хрень какая-то",
         accomplished_value: 1,
         has_played: false,
-        goal_list: [ //one goal is needed
+        goal_list: [ // one goal is needed
           {
             goal_value: 1,
             achieved: true,

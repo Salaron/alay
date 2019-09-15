@@ -11,7 +11,7 @@ import { MultiResponse, ActionResult } from "../typings/handlers"
 const log = new Log("Main Handler")
 
 export default async function moduleHandler(request: IncomingMessage, response: ServerResponse) {
-  let requestData = await RequestData.Create(request, response, HANDLER_TYPE.MAIN)
+  const requestData = await RequestData.Create(request, response, HANDLER_TYPE.MAIN)
   try {
     // get auth level
     await requestData.getAuthLevel()
@@ -39,17 +39,17 @@ export default async function moduleHandler(request: IncomingMessage, response: 
 
     switch (module) {
       case "api": {
-        let apiList = requestData.params
+        const apiList = requestData.params
         if (apiList.length > Config.server.API_request_limit) throw new ErrorUser(`[mainHandler] API request limit reached ${apiList.length}/${Config.server.API_request_limit}`, requestData.user_id)
 
-        let responseData: any[] = []
+        const responseData: any[] = []
 
-        let xmcStatus = await requestData.checkXMC(false)
+        const xmcStatus = await requestData.checkXMC(false)
         if (xmcStatus === false) throw new ErrorUser(`[mainHandler] Invalid X-Message-Code; user #${requestData.user_id}`, requestData.user_id)
 
         await apiList.forEachAsync(async (data: any, i: number) => {
           await log.verbose(chalk.yellow(`${data.module}/${data.action} [${i + 1}/${apiList.length}]`), "api/multirequest")
-          let res: MultiResponse = {
+          const res: MultiResponse = {
             result: {},
             timeStamp: Utils.timeStamp(),
             status: 0,
@@ -68,7 +68,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
             return responseData.push(res)
           }
           if (result.headers && Object.keys(result.headers).length > 0) {
-            for (let key of Object.keys(result.headers)) {
+            for (const key of Object.keys(result.headers)) {
               response.setHeader(key, result.headers[key])
             }
           }
@@ -79,7 +79,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
 
         return writeJsonResponse(response, {
           httpStatusCode: 200,
-          responseData: responseData,
+          responseData,
           authToken: requestData.auth_token,
           userId: requestData.user_id,
           xmc: <string>request.headers["x-message-code"],
@@ -92,7 +92,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
       default: {
         if (!urlSplit[3]) throw new Error(`Invalid action (${urlSplit[3]})`)
         const action = urlSplit[3].replace(/[^a-z]/g, "")
-        let result: ActionResult = await executeAction(module, action, requestData, {
+        const result: ActionResult = await executeAction(module, action, requestData, {
           responseType: RESPONSE_TYPE.SINGLE,
           xmc: <string>request.headers["x-message-code"]
         })
@@ -100,7 +100,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
           result.result.server_timestamp = Utils.timeStamp()
         }
         if (result.headers && Object.keys(result.headers).length > 0) {
-          for (let key of Object.keys(result.headers)) {
+          for (const key of Object.keys(result.headers)) {
             response.setHeader(key, result.headers[key])
           }
         }

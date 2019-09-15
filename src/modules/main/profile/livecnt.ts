@@ -20,7 +20,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let response = [
+    const response = [
       { difficulty: 1, clear_cnt: 0 },
       { difficulty: 2, clear_cnt: 0 },
       { difficulty: 3, clear_cnt: 0 },
@@ -28,11 +28,11 @@ export default class extends MainAction {
       { difficulty: 6, clear_cnt: 0 }
     ]
 
-    let rows = await this.connection.query("SELECT live_setting_id FROM user_live_status WHERE user_id = :user", {
+    const rows = await this.connection.query("SELECT live_setting_id FROM user_live_status WHERE user_id = :user", {
       user: this.params.user_id
     })
     await Promise.all(rows.map(async (row: any) => {
-      let d = await liveDB.get("SELECT difficulty FROM live_setting_m WHERE live_setting_id = :s", {
+      const d = await liveDB.get("SELECT difficulty FROM live_setting_m WHERE live_setting_id = :s", {
         s: row.live_setting_id
       })
       switch (d.difficulty) {

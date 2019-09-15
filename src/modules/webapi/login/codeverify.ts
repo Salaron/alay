@@ -24,15 +24,15 @@ export default class extends WebApiAction {
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorWebApi("Access only with a certain auth level")
 
-    let strings = await new I18n(this.connection).getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
+    const strings = await new I18n(this.connection).getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
 
-    let recoveryData = await this.connection.first("SELECT * FROM auth_recovery_codes WHERE token = :token AND expire > CURRENT_TIMESTAMP", {
+    const recoveryData = await this.connection.first("SELECT * FROM auth_recovery_codes WHERE token = :token AND expire > CURRENT_TIMESTAMP", {
       token: this.requestData.auth_token
     })
     if (!recoveryData) throw new ErrorWebApi(strings.confirmationCodeNotExists, true)
     if (recoveryData.code != this.params.code.toUpperCase()) throw new ErrorWebApi(strings.confirmationCodeNotMatch, true)
 
-    let newPassword = Utils.randomString(10, "upper")
+    const newPassword = Utils.randomString(10, "upper")
     // TODO: "salt" passwords
     await this.connection.execute("UPDATE users SET password = :pass WHERE mail = :mail", {
       mail: recoveryData.mail,
@@ -41,11 +41,11 @@ export default class extends WebApiAction {
     await this.connection.execute("DELETE FROM auth_recovery_codes WHERE token = :token", {
       token: this.requestData.auth_token
     })
-    let userData = await this.connection.first("SELECT user_id FROM users WHERE mail = :mail", {
+    const userData = await this.connection.first("SELECT user_id FROM users WHERE mail = :mail", {
       mail: recoveryData.mail
     })
 
-    let result = await Mailer.sendMail(recoveryData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovered, {
+    const result = await Mailer.sendMail(recoveryData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovered, {
       userId: userData.user_id,
       password: newPassword
     }))

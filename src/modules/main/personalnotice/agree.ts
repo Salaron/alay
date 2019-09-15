@@ -12,7 +12,7 @@ export default class extends MainAction {
   }
 
   public paramTypes() {
-    return { 
+    return {
       notice_id : TYPE.INT
     }
   }
@@ -23,7 +23,7 @@ export default class extends MainAction {
 
   public async execute() {
     // check if this notice is exists
-    let check = await this.connection.first("SELECT * FROM user_personal_notice WHERE user_id = :user AND notice_id = :id", {
+    const check = await this.connection.first("SELECT * FROM user_personal_notice WHERE user_id = :user AND notice_id = :id", {
       user: this.user_id,
       id: this.params.notice_id
     })

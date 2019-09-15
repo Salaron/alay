@@ -62,7 +62,7 @@ export default class extends WebViewAction {
       case "13": {
         if (this.requiredAuthLevel <= AUTH_LEVEL.UPDATE)
           throw new Error(`No permissions`)
-        let data = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
+        const data = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
           user: this.user_id
         })
         if (!data) return {

@@ -11,7 +11,7 @@ export default class extends MainAction {
     super(requestData)
   }
 
-  public paramTypes() { 
+  public paramTypes() {
     return {
       introduction: TYPE.STRING
     }
@@ -23,11 +23,11 @@ export default class extends MainAction {
 
   public async execute() {
     try {
-      await this.connection.query(`UPDATE users SET introduction = :intro WHERE user_id = :user`, { 
-        intro: this.params.introduction, 
-        user: this.params.user_id 
+      await this.connection.query(`UPDATE users SET introduction = :intro WHERE user_id = :user`, {
+        intro: this.params.introduction,
+        user: this.params.user_id
       })
-    } catch (err){
+    } catch (err) {
       throw new ErrorCode(1234, "Used banned characters")
     }
 

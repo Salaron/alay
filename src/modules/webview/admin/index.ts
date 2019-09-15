@@ -24,9 +24,9 @@ export default class extends WebViewAction {
       case AUTH_LEVEL.NONE: {
         template = await WebView.getTemplate("login", "login")
 
-        let token = Utils.randomString(80 + Math.floor(Math.random() * 10))
+        const token = Utils.randomString(80 + Math.floor(Math.random() * 10))
         await this.connection.query("INSERT INTO auth_tokens (token, expire, session_key, login_key, login_passwd) VALUES (:token, :expire, :sk, :lk, :lp)", {
-          token: token,
+          token,
           expire: Utils.parseDate(Date.now() + 1200000),
           sk: "",
           lk: "",
@@ -40,9 +40,9 @@ export default class extends WebViewAction {
         throw new ErrorUser("Attempt to get access to admin panel", this.user_id)
       }
     }
-    let strings = await new I18n(this.connection).getStrings(Config.i18n.defaultLanguage, "login-login", "login-startup")
-    
-    let values = {
+    const strings = await new I18n(this.connection).getStrings(Config.i18n.defaultLanguage, "login-login", "login-startup")
+
+    const values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       publicKey: Config.server.PUBLIC_KEY.toString(),
       redirect: "webview.php/admin/index",

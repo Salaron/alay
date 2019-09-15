@@ -28,7 +28,7 @@ export default class extends WebApiAction {
       name: this.params.name,
       value: this.params.value
     })
-      
+
     return {
       status: 200,
       result: true

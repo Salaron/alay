@@ -19,23 +19,23 @@ export default class extends MainAction {
   public async execute() {
     const item = new Item(this.connection)
 
-    let currentYear = moment(new Date()).utcOffset("+0900").format("YYYY")
-    let currentMonth = moment(new Date()).utcOffset("+0900").format("M")
-    let currentDay = moment(new Date()).utcOffset("+0900").format("D")
-    let currentDate = moment(new Date()).utcOffset("+0900").format("YYYY-MM-DD")
-    let futureYear = moment(new Date()).utcOffset("+0900").add(1, "month").format("YYYY")
-    let futureMonth = moment(new Date()).utcOffset("+0900").add(1, "month").format("M")
+    const currentYear = moment(new Date()).utcOffset("+0900").format("YYYY")
+    const currentMonth = moment(new Date()).utcOffset("+0900").format("M")
+    const currentDay = moment(new Date()).utcOffset("+0900").format("D")
+    const currentDate = moment(new Date()).utcOffset("+0900").format("YYYY-MM-DD")
+    const futureYear = moment(new Date()).utcOffset("+0900").add(1, "month").format("YYYY")
+    const futureMonth = moment(new Date()).utcOffset("+0900").add(1, "month").format("M")
 
-    let currentMonthCalendar = await this.getCalendar(currentYear, currentMonth)
-    let futureMonthCalendar = await this.getCalendar(futureYear, futureMonth)
+    const currentMonthCalendar = await this.getCalendar(currentYear, currentMonth)
+    const futureMonthCalendar = await this.getCalendar(futureYear, futureMonth)
 
-    let receivedList = (await this.connection.query("SELECT day_of_month FROM login_received_list WHERE user_id=:user AND year=:year AND month=:month", {
+    const receivedList = (await this.connection.query("SELECT day_of_month FROM login_received_list WHERE user_id=:user AND year=:year AND month=:month", {
       user: this.user_id,
       year: currentYear,
       month: currentMonth
-    })).map(function (r: any) { return r.day_of_month })
+    })).map(r => r.day_of_month )
 
-    let response: any = {
+    const response: any = {
       sheets: await this.getSheets(),
       calendar_info: {
         current_date: currentDate,
@@ -64,8 +64,7 @@ export default class extends MainAction {
       server_timestamp: Utils.timeStamp()
     }
 
-    for (let i = 0; i < currentMonthCalendar.length; i++) {
-      let day = currentMonthCalendar[i]
+    for (const day of currentMonthCalendar) {
       response.calendar_info.current_month.days.push({
         day: day.day_of_month,
         day_of_the_week: day.day_of_week,
@@ -82,7 +81,7 @@ export default class extends MainAction {
       })
     }
     for (let i = 0; i < 14; i++) {
-      let day = futureMonthCalendar[i]
+      const day = futureMonthCalendar[i]
       response.calendar_info.next_month.days.push({
         day: day.day_of_month,
         day_of_the_week: day.day_of_week,
@@ -98,7 +97,6 @@ export default class extends MainAction {
         }
       })
     }
-
 
     await this.connection.query("UPDATE users SET last_login = :now WHERE user_id = :user", {
       user: this.user_id,
@@ -116,7 +114,7 @@ export default class extends MainAction {
       month: currentMonth,
       day: currentDay
     })
-    let reward = await this.connection.first("SELECT item_id, item_type, amount FROM login_calendar_table WHERE year=:year AND month=:month AND day_of_month=:day", {
+    const reward = await this.connection.first("SELECT item_id, item_type, amount FROM login_calendar_table WHERE year=:year AND month=:month AND day_of_month=:day", {
       year: currentYear,
       month: currentMonth,
       day: currentDay
@@ -140,19 +138,19 @@ export default class extends MainAction {
     // Total Login Bonus
     await Object.keys(Config.lbonus.total_login_bonus).forEachAsync(async (day: string) => {
       if (response.total_login_info.login_count >= day) {
-        let check = await this.connection.first(`SELECT * FROM login_bonus_total WHERE user_id = :user AND days = :days`, {
+        const check = await this.connection.first(`SELECT * FROM login_bonus_total WHERE user_id = :user AND days = :days`, {
           user: this.user_id,
           days: day
         })
         if (check) return
 
-        await this.connection.query(`INSERT INTO login_bonus_total (user_id, days) VALUES (:user, :day)`, { user: this.user_id, day: day })
+        await this.connection.query(`INSERT INTO login_bonus_total (user_id, days) VALUES (:user, :day)`, { user: this.user_id, day })
         await item.addPresent(this.user_id, {
           name: Config.lbonus.total_login_bonus[day].name,
           id: Config.lbonus.total_login_bonus[day].item_id
         }, `Total Login Bonus Reward! [${day} day(s)]`, Config.lbonus.total_login_bonus[day].amount)
       } else if (response.total_login_info.remaining_count == 0) {
-        let itemInfo = Item.nameToType(Config.lbonus.total_login_bonus[day].name)
+        const itemInfo = Item.nameToType(Config.lbonus.total_login_bonus[day].name)
         response.total_login_info.remaining_count = parseInt(day) - response.total_login_info.login_count
         response.total_login_info.reward.push({
           item_id: Config.lbonus.total_login_bonus[day].item_id || itemInfo.itemId,
@@ -169,15 +167,15 @@ export default class extends MainAction {
   }
 
   private async getSheets() {
-    let sheets = await this.connection.query(`SELECT * FROM login_bonus_sheets WHERE :now >= start_date AND :now < end_date`, {
+    const sheets = await this.connection.query(`SELECT * FROM login_bonus_sheets WHERE :now >= start_date AND :now < end_date`, {
       now: Utils.toSpecificTimezone(9)
     })
     if (sheets.length === 0) return []
-    let result: any[] = []
+    const result: any[] = []
     const item = new Item(this.connection)
 
     await sheets.forEachAsync(async (sheet: any) => {
-      let data = {
+      const data = {
         nlbonus_id: sheet.nlbonus_id,
         nlbonus_item_num: sheet.item_num,
         detail_text: sheet.detail_text,
@@ -188,11 +186,11 @@ export default class extends MainAction {
         get_item: <any>[]
       }
 
-      let items = await this.connection.query(`
-      SELECT 
-        items.nlbonus_id, items.nlbonus_item_id, items.item_id, items.item_type, 
+      const items = await this.connection.query(`
+      SELECT
+        items.nlbonus_id, items.nlbonus_item_id, items.item_id, items.item_type,
         items.amount, items.seq, rec.insert_date, rec.user_id, rec.nlbonus_item_id AS received
-      FROM login_bonus_sheets_items AS items 
+      FROM login_bonus_sheets_items AS items
         LEFT JOIN login_bonus_sheets_received AS rec ON items.nlbonus_item_id = rec.nlbonus_item_id AND rec.user_id = :user
       WHERE nlbonus_id = :nlbonus ORDER BY seq ASC`, { user: this.user_id, nlbonus: sheet.nlbonus_id })
 
@@ -250,31 +248,31 @@ export default class extends MainAction {
   }
 
   private async getCalendar(year: string, month: string) {
-    let calendar = await this.connection.query("SELECT * FROM login_calendar_table WHERE year=:year AND month=:month", {
-      year: year,
-      month: month
+    const calendar = await this.connection.query("SELECT * FROM login_calendar_table WHERE year=:year AND month=:month", {
+      year,
+      month
     })
     if (calendar.length > 0) return calendar
 
     // generate random calendar
-    let insertData: string[] = []
+    const insertData: string[] = []
     let cardLimit = Utils.createObjCopy(Config.lbonus.calendar_generator.card_limit)
-    let cards = (await unitDB.all(Config.lbonus.calendar_generator.cards_query)).map((u: any) => {
+    const cards = (await unitDB.all(Config.lbonus.calendar_generator.cards_query)).map((u: any) => {
       return u.unit_id
     })
 
-    let days = moment(month, "MM").daysInMonth()
+    const days = moment(month, "MM").daysInMonth()
     for (let i = 0; i < days; i++) {
-      let dayOfWeek = moment([year, parseInt(month, 10) - 1]).add(i, "days").day()
-      let dayOfMonth = i + 1
+      const dayOfWeek = moment([year, parseInt(month, 10) - 1]).add(i, "days").day()
+      const dayOfMonth = i + 1
 
-      let items = Utils.createObjCopy(Config.lbonus.calendar_generator.items)
+      const items = Utils.createObjCopy(Config.lbonus.calendar_generator.items)
       if (cardLimit > 0) items.push({
         name: "card",
         amount: 1
       })
 
-      let _item = items.randomValue()
+      const _item = items.randomValue() // tslint:disable-line
       let amount = 0
 
       if (Type.isInt(_item.min_amount) && Type.isInt(_item.max_amount)) amount = Utils.getRandomNumber(_item.min_amount, _item.max_amount)
@@ -282,8 +280,8 @@ export default class extends MainAction {
       else if (Type.isInt(_item.amount)) amount = _item.amount
       else throw new Error(`'Amount' field is missing`)
 
-      let itemInfo = Item.nameToType(_item.name)
-      let specialFlag = Config.lbonus.calendar_generator.special_flag_types.includes(itemInfo.itemType) == true ? 1 : 0
+      const itemInfo = Item.nameToType(_item.name)
+      const specialFlag = Config.lbonus.calendar_generator.special_flag_types.includes(itemInfo.itemType) == true ? 1 : 0
       if (itemInfo.itemType === 1001) {
         cardLimit -= 1
         itemInfo.itemId = cards.randomValue()
@@ -294,8 +292,8 @@ export default class extends MainAction {
 
     await this.connection.query(`INSERT INTO login_calendar_table (year, month, day_of_month, day_of_week, special_flag, item_type, item_id, amount) VALUES ${insertData.join(",")}`)
     return await this.connection.query("SELECT * FROM login_calendar_table WHERE year=:year AND month=:month", {
-      year: year,
-      month: month
+      year,
+      month
     })
   }
 }

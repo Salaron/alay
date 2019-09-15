@@ -12,12 +12,12 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().DUTY)
+    const currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().DUTY)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []
     }
-    // remove user from existing rooms 
+    // remove user from existing rooms
     await this.connection.query(`UPDATE event_duty_users SET status = 0 WHERE room_id IN (SELECT room_id FROM event_duty_rooms WHERE start_flag = 0 AND user_id = :user)`, {
       user: this.user_id
     })
@@ -37,7 +37,7 @@ export default class extends MainAction {
       }
     }
 
-    let response: any = {
+    const response: any = {
       base_info: {
         event_id: currentEvent.id,
         asset_bgm_id: 201,

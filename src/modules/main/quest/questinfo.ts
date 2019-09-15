@@ -12,7 +12,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().QUEST)
+    const currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().QUEST)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []

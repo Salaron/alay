@@ -26,12 +26,12 @@ export default class extends MainAction {
     const user = new User(this.connection)
     const item = new Item(this.connection)
 
-    let exchangeItem = await this.connection.first(`
-    SELECT 
-      * 
-    FROM 
-      exchange_item 
-    JOIN exchange_cost 
+    const exchangeItem = await this.connection.first(`
+    SELECT
+      *
+    FROM
+      exchange_item
+    JOIN exchange_cost
       ON exchange_item.exchange_item_id = exchange_cost.exchange_item_id
     WHERE exchange_item.exchange_item_id = :id AND rarity = :rarity`, { id: this.params.exchange_item_id, rarity: this.params.rarity })
     if (!exchangeItem) throw new ErrorCode(4204, "ERROR_CODE_EXCHANGE_INVALID")
@@ -40,18 +40,18 @@ export default class extends MainAction {
       id: exchangeItem.exchange_item_id,
       user: this.user_id
     })
-    let ep = await this.connection.first(`SELECT exchange_point as count FROM user_exchange_point WHERE user_id = :user AND rarity = :rarity`, {
+    const ep = await this.connection.first(`SELECT exchange_point as count FROM user_exchange_point WHERE user_id = :user AND rarity = :rarity`, {
       user: this.user_id,
       rarity: this.params.rarity
     })
-    let beforeUserInfo = await user.getUserInfo(this.user_id)
+    const beforeUserInfo = await user.getUserInfo(this.user_id)
     if (!gotCount) gotCount = { got_item_count: 0 }
-    if (exchangeItem.max_count && gotCount.got_item_count >= exchangeItem.max_count) throw new ErrorCode(4201, "ERROR_CODE_OVER_ADD_EXCHANGE_ITEM_COUNT_MAX_LIMIT") 
+    if (exchangeItem.max_count && gotCount.got_item_count >= exchangeItem.max_count) throw new ErrorCode(4201, "ERROR_CODE_OVER_ADD_EXCHANGE_ITEM_COUNT_MAX_LIMIT")
     if (exchangeItem.end_date && Utils.toSpecificTimezone(9) > exchangeItem.end_date) throw new ErrorCode(4203, "ERROR_CODE_EXCHANGE_ITEM_OUT_OF_DATE")
     if (exchangeItem.cost_value * this.params.amount * exchangeItem.amount > ep.exchange_point) throw new ErrorCode(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
 
-    let itemInfo = Item.nameToType(exchangeItem.item_name, exchangeItem.item_id)
-    let reward = []
+    const itemInfo = Item.nameToType(exchangeItem.item_name, exchangeItem.item_id)
+    const reward = []
 
     if (itemInfo.itemType === 1001) {
       for (let i = 0; i < this.params.amount * exchangeItem.amount; i++) {
@@ -80,7 +80,7 @@ export default class extends MainAction {
         new_unit_flag: true
       })
     }
-    
+
     await this.connection.execute("UPDATE user_exchange_point SET exchange_point = exchange_point - :val WHERE user_id = :user AND rarity = :rarity", {
       user: this.user_id,
       rarity: this.params.rarity,
@@ -98,8 +98,8 @@ export default class extends MainAction {
         exchange_reward: reward,
         before_user_info: beforeUserInfo,
         after_user_info: await user.getUserInfo(this.user_id),
-        exchange_point_list: await this.connection.query("SELECT rarity, exchange_point FROM user_exchange_point WHERE user_id = :user", { 
-          user: this.user_id 
+        exchange_point_list: await this.connection.query("SELECT rarity, exchange_point FROM user_exchange_point WHERE user_id = :user", {
+          user: this.user_id
         })
       }
     }

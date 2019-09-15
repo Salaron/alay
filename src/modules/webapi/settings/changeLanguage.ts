@@ -20,7 +20,7 @@ export default class extends WebApiAction {
 
   public async execute() {
     if (!langCodes.includes(this.params.code)) throw new Error(`Unsupported language code`)
-    let input: any = this.user_id === null ? this.requestData.auth_token : this.user_id
+    const input: any = this.user_id === null ? this.requestData.auth_token : this.user_id
     await new I18n(this.connection).setUserLocalizationCode(input, this.params.code)
 
     return {

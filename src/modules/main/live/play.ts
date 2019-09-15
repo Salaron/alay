@@ -16,7 +16,7 @@ export default class extends MainAction {
     super(requestData)
   }
 
-  public paramTypes() { 
+  public paramTypes() {
     return {
       party_user_id: TYPE.INT,
       unit_deck_id: TYPE.INT,
@@ -32,24 +32,24 @@ export default class extends MainAction {
 
   public async execute() {
     const live = new Live(this.connection)
-    let eventStatus = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+    const eventStatus = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
     // clear data about any previous live session
     await this.connection.query("DELETE FROM user_live_progress WHERE user_id=:user", { user: this.user_id })
-    let guest = await this.connection.first(`
-    SELECT units.unit_id FROM users  
-    JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id 
-    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 
-    AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
-    JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
+    const guest = await this.connection.first(`
+    SELECT units.unit_id FROM users
+    JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id
+    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5
+    AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id
+    JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
     WHERE user_unit_deck.user_id=:user`, { user: this.params.party_user_id })
 
     let eventLive = false
-    let liveInfo = await live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    const liveInfo = await live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     if (liveInfo.capital_type === 2) { // token live
       if (!eventStatus.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
-      let eventLives = Live.getMarathonLiveList(eventStatus.id)
+      const eventLives = Live.getMarathonLiveList(eventStatus.id)
       if (!eventLives.includes(liveInfo.live_difficulty_id)) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
-      let tokenCnt = await this.connection.first(`SELECT token_point FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
+      const tokenCnt = await this.connection.first(`SELECT token_point FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
         user: this.user_id,
         event: eventStatus.id
       })
@@ -62,7 +62,7 @@ export default class extends MainAction {
       eventLive = true
     }
 
-    let [liveNotes, deckInfo, mods] = await Promise.all([
+    const [liveNotes, deckInfo, mods] = await Promise.all([
       live.getLiveNotes(this.user_id, liveInfo.live_setting_id, eventLive),
       live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id),
       new User(this.connection).getParams(this.user_id, ["hp", "event"]),
@@ -79,7 +79,7 @@ export default class extends MainAction {
       if (mods.hp === 1) deckInfo.total_hp = 200
       if (mods.hp === 2) deckInfo.total_hp = 1
     }
-    let response = {
+    const response = {
       rank_info: liveInfo.score_rank_info,
       energy_full_time: Utils.toSpecificTimezone(9),
       over_max_energy: 0,
@@ -96,7 +96,7 @@ export default class extends MainAction {
           deck_info: deckInfo
         }
       ],
-      is_marathon_event: liveInfo.capital_type === 2 ? false : eventStatus.active, 
+      is_marathon_event: liveInfo.capital_type === 2 ? false : eventStatus.active,
       marathon_event_id: eventStatus.active ? eventStatus.id : undefined,
       no_skill: false,
       can_activate_effect: true

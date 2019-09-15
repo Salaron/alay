@@ -13,45 +13,45 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let birth = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", { 
-      user: this.user_id 
-    })
-    let isTodayBirthday = moment(birth.birth_day, "DD").isSame(Date.now(), "day") && moment(birth.birth_month, "MM").isSame(Date.now(), "month")
-    let presents = await this.connection.first("SELECT count(*) as count FROM reward_table WHERE user_id=:user AND opened_date IS NULL", { 
-      user: this.user_id 
-    })
-    let greets = await this.connection.first(`SELECT count(notice_id) as count FROM user_greet WHERE receiver_id = :user AND deleted_from_receiver = 0 AND readed = 0`, { 
-      user: this.user_id 
-    })
-    let approval = await this.connection.first(`SELECT count(*) as count FROM user_friend WHERE recipient_id = :user AND status = 0 AND readed = 0`, { 
+    const birth = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
       user: this.user_id
     })
-    let variety = await this.connection.first(`
+    const isTodayBirthday = moment(birth.birth_day, "DD").isSame(Date.now(), "day") && moment(birth.birth_month, "MM").isSame(Date.now(), "month")
+    const presents = await this.connection.first("SELECT count(*) as count FROM reward_table WHERE user_id=:user AND opened_date IS NULL", {
+      user: this.user_id
+    })
+    const greets = await this.connection.first(`SELECT count(notice_id) as count FROM user_greet WHERE receiver_id = :user AND deleted_from_receiver = 0 AND readed = 0`, {
+      user: this.user_id
+    })
+    const approval = await this.connection.first(`SELECT count(*) as count FROM user_friend WHERE recipient_id = :user AND status = 0 AND readed = 0`, {
+      user: this.user_id
+    })
+    const variety = await this.connection.first(`
     SELECT COUNT(*) as count FROM (
-      SELECT 
-        notice_id, 
+      SELECT
+        notice_id,
         receiver_id,
         readed,
         (
-          SELECT 
-            status 
-          FROM 
-            user_friend 
-          WHERE 
-            (initiator_id = :user OR recipient_id = :user) AND 
-            (initiator_id = user_notice.affector_id OR recipient_id = user_notice.affector_id) 
-            AND STATUS = 1 
+          SELECT
+            status
+          FROM
+            user_friend
+          WHERE
+            (initiator_id = :user OR recipient_id = :user) AND
+            (initiator_id = user_notice.affector_id OR recipient_id = user_notice.affector_id)
+            AND STATUS = 1
           LIMIT 1
-        ) as friend_status 
-      FROM 
-        user_notice 
+        ) as friend_status
+      FROM
+        user_notice
     ) s
-    WHERE 
-      (receiver_id IS NULL AND friend_status = 1) 
+    WHERE
+      (receiver_id IS NULL AND friend_status = 1)
       OR (receiver_id = :user AND readed = 0)`, { user: this.user_id })
 
-    if (variety.count == null) variety.count = 0 
-    let response = {
+    if (variety.count == null) variety.count = 0
+    const response = {
       friend_action_cnt: greets.count + variety.count,
       friend_greet_cnt: greets.count,
       friend_variety_cnt: variety.count,

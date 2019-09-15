@@ -26,20 +26,20 @@ export default class extends WebApiAction {
     }
     const i18n = new I18n(this.connection)
 
-    let strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
-    let userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })
+    const strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
+    const userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })
     if (!userData) throw new ErrorWebApi(strings.mailNotExists, true)
 
-    let confirmationCode = Utils.randomString(10, "upper")
+    const confirmationCode = Utils.randomString(10, "upper")
     await this.connection.execute(`
-    INSERT INTO auth_recovery_codes (token, code, mail, expire) VALUES (:token, :code, :mail, DATE_ADD(NOW(), INTERVAL 30 MINUTE)) 
+    INSERT INTO auth_recovery_codes (token, code, mail, expire) VALUES (:token, :code, :mail, DATE_ADD(NOW(), INTERVAL 30 MINUTE))
     ON DUPLICATE KEY UPDATE code = :code, expire = DATE_ADD(NOW(), INTERVAL 30 MINUTE)`, {
       token: this.requestData.auth_token,
       code: confirmationCode,
       mail: userData.mail
     })
 
-    let result = await Mailer.sendMail(userData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovery, {
+    const result = await Mailer.sendMail(userData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovery, {
       userName: userData.name,
       code: confirmationCode,
       ip: this.requestData.request.connection.remoteAddress

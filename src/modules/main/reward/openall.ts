@@ -75,19 +75,19 @@ export default class extends MainAction {
       default: throw new Error(`Invalid category`)
     }
 
-    let rewardList = await this.connection.query(rewardListQuery)
-    let rewardCount = await this.connection.first(rewardCountQuery)
+    const rewardList = await this.connection.query(rewardListQuery)
+    const rewardCount = await this.connection.first(rewardCountQuery)
 
-    let itemList = <any[]>[]
-    let beforeUserInfo = await user.getUserInfo(this.user_id)
+    const itemList = <any[]>[]
+    const beforeUserInfo = await user.getUserInfo(this.user_id)
 
     // do async openning
-    let opened = await Promise.all(rewardList.map((reward: any) => item.openPresent(this.user_id, reward.incentive_id).catch((err: Error) => {
+    const opened = await Promise.all(rewardList.map((reward: any) => item.openPresent(this.user_id, reward.incentive_id).catch((err: Error) => {
       log.error(err) // log errors
       return undefined // return undefined if there an error
     })))
-    for (let i = 0; i < opened.length; i++) {
-      if (!Type.isNullDef(opened[i])) itemList.push(opened[i])
+    for (const result of opened) {
+      if (!Type.isNullDef(result)) itemList.push(result)
     }
 
     return {

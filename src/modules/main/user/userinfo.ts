@@ -13,10 +13,10 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let birth = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
+    const birth = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
       user: this.user_id
     })
-    let response: any = {
+    const response: any = {
       user: await new User(this.connection).getUserInfo(this.user_id),
       server_timestamp: Utils.timeStamp()
     }

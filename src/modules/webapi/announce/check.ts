@@ -16,10 +16,10 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    let announce = await this.connection.first("SELECT * FROM webview_announce WHERE id = :id", {
+    const announce = await this.connection.first("SELECT * FROM webview_announce WHERE id = :id", {
       id: this.params.id
     })
-    
+
     return {
       status: 200,
       result: !Type.isNull(announce)

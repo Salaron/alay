@@ -15,13 +15,13 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let list: any[] = []
-    let loginAc = await achievementDB.all("SELECT * FROM achievement_m WHERE achievement_type = 52 ORDER BY achievement_id ASC")
-    
-    let loginCnt = (await this.connection.first(`SELECT COUNT(*) as cnt FROM login_received_list WHERE user_id = :user`, { user: this.user_id })).cnt
+    const list: any[] = []
+    const loginAc = await achievementDB.all("SELECT * FROM achievement_m WHERE achievement_type = 52 ORDER BY achievement_id ASC")
+
+    const loginCnt = (await this.connection.first(`SELECT COUNT(*) as cnt FROM login_received_list WHERE user_id = :user`, { user: this.user_id })).cnt
     for (const ac of loginAc) {
       if (loginCnt < ac.params1) break
-      let reward: any = Utils.createObjCopy(Config.lbonus.total_login_bonus[ac.params1])
+      const reward: any = Utils.createObjCopy(Config.lbonus.total_login_bonus[ac.params1])
       reward.add_type = Item.nameToType(reward.name).itemType
       reward.item_id = Item.nameToType(reward.name, reward.item_id).itemId
       list.push({

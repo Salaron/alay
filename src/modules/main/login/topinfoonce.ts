@@ -11,7 +11,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let response = {
+    const response = {
       new_achievement_cnt: 0,
       unaccomplished_achievement_cnt: 0,
       handover_expire_status: 0,

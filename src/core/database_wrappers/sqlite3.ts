@@ -28,7 +28,7 @@ class Sqlite3Wrapper {
   }
   public async exec(query: string, values?: any): Promise<void> {
     this.checkIfClosed()
-    let preparedQuery = formatQuery(query, values)
+    const preparedQuery = formatQuery(query, values)
     this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
       this.database.exec(preparedQuery, (err) => {
@@ -39,7 +39,7 @@ class Sqlite3Wrapper {
   }
   public async run(query: string, values?: any): Promise<void> {
     this.checkIfClosed()
-    let preparedQuery = formatQuery(query, values)
+    const preparedQuery = formatQuery(query, values)
     this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
       this.database.run(preparedQuery, (err) => {
@@ -50,7 +50,7 @@ class Sqlite3Wrapper {
   }
   public async get(query: string, values?: any): Promise<any> {
     this.checkIfClosed()
-    let preparedQuery = formatQuery(query, values)
+    const preparedQuery = formatQuery(query, values)
     this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
       this.database.get(preparedQuery, (err, row) => {
@@ -61,7 +61,7 @@ class Sqlite3Wrapper {
   }
   public async all(query: string, values?: any): Promise<any[]> {
     this.checkIfClosed()
-    let preparedQuery = formatQuery(query, values)
+    const preparedQuery = formatQuery(query, values)
     this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
       this.database.all(preparedQuery, (err, rows) => {

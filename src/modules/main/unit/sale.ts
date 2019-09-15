@@ -24,23 +24,23 @@ export default class extends MainAction {
     const beforeUserInfo = await user.getUserInfo(this.user_id)
 
     let gainCoins = 0
-    let detail = <any[]>[]
-    let seals: any = {
+    const detail = <any[]>[]
+    const seals: any = {
       2: 0,
       3: 0,
       4: 0,
       5: 0
     }
     if (this.params.unit_owning_user_id.length > 0) {
-      let units = await this.connection.query("SELECT * FROM v_units_not_locked WHERE user_id = :user AND unit_owning_user_id IN (:units)", {
+      const units = await this.connection.query("SELECT * FROM v_units_not_locked WHERE user_id = :user AND unit_owning_user_id IN (:units)", {
         user: this.user_id,
         units: this.params.unit_owning_user_id
       })
       if (units.length != this.params.unit_owning_user_id.length) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
 
       await Promise.all(units.map(async (unit: any) => {
-        let data = await unitDB.get(`
-        SELECT U.rarity, L.sale_price FROM unit_m as U JOIN unit_level_up_pattern_m as L ON L.unit_level_up_pattern_id = U.unit_level_up_pattern_id 
+        const data = await unitDB.get(`
+        SELECT U.rarity, L.sale_price FROM unit_m as U JOIN unit_level_up_pattern_m as L ON L.unit_level_up_pattern_id = U.unit_level_up_pattern_id
         WHERE U.unit_id=? AND L.unit_level=?`, [unit.unit_id, unit.level])
 
         gainCoins += data.sale_price
@@ -65,14 +65,14 @@ export default class extends MainAction {
     }
 
     if (this.params.unit_support_list.length > 0) {
-      let _owningSupportUnit = await user.getSupportUnits(this.user_id)
-      let owningSupportUnit = <{ [id: number]: number }>{}
+      const _owningSupportUnit = await user.getSupportUnits(this.user_id) // tslint:disable-line
+      const owningSupportUnit = <{ [id: number]: number }>{}
       for (const support of _owningSupportUnit) owningSupportUnit[support.unit_id] = support.amount
 
       await Promise.all(this.params.unit_support_list.map(async (unit: any) => {
         if (!(unit.unit_id && unit.unit_id in owningSupportUnit && owningSupportUnit[unit.unit_id] >= unit.amount)) throw new ErrorCode(1311)
 
-        let data = await unitDB.get("SELECT U.rarity, L.sale_price FROM unit_m as U JOIN unit_level_up_pattern_m as L ON L.unit_level_up_pattern_id = U.unit_level_up_pattern_id WHERE U.unit_id=? AND L.unit_level=1;", [unit.unit_id])
+        const data = await unitDB.get("SELECT U.rarity, L.sale_price FROM unit_m as U JOIN unit_level_up_pattern_m as L ON L.unit_level_up_pattern_id = U.unit_level_up_pattern_id WHERE U.unit_id=? AND L.unit_level=1;", [unit.unit_id])
         await this.connection.query("UPDATE user_support_unit SET amount=amount-:amount WHERE unit_id=:unit AND user_id=:user;", {
           amount: unit.amount,
           unit: unit.unit_id,
@@ -82,9 +82,9 @@ export default class extends MainAction {
       }))
     }
 
-    await this.connection.execute(`UPDATE users SET game_coin = game_coin + :coins WHERE user_id = :user`, { 
-      coins: gainCoins, 
-      user: this.user_id 
+    await this.connection.execute(`UPDATE users SET game_coin = game_coin + :coins WHERE user_id = :user`, {
+      coins: gainCoins,
+      user: this.user_id
     })
     await this.connection.execute(`INSERT INTO user_exchange_point VALUES (:user,2,:s2),(:user,3,:s3),(:user,4,:s4),(:user,5,:s5) ON DUPLICATE KEY UPDATE exchange_point=exchange_point+VALUES(exchange_point)`, {
       user: this.user_id,
@@ -94,12 +94,12 @@ export default class extends MainAction {
       s5: seals[5]
     })
 
-    let afterUserInfo = await user.getUserInfo(this.user_id)
-    let skillInfo = await user.getRemovableSkillInfo(this.user_id)
-    let pointList = <any>[]
+    const afterUserInfo = await user.getUserInfo(this.user_id)
+    const skillInfo = await user.getRemovableSkillInfo(this.user_id)
+    const pointList = <any>[]
     for (const rarity of Object.keys(seals)) {
       if (seals[rarity] > 0) pointList.push({
-        rarity: rarity,
+        rarity,
         exchange_point: seals[rarity]
       })
     }
@@ -108,7 +108,7 @@ export default class extends MainAction {
       status: 200,
       result: {
         total: gainCoins,
-        detail: detail,
+        detail,
         before_user_info: beforeUserInfo,
         after_user_info: afterUserInfo,
         reward_box_flag: false,

@@ -5,7 +5,7 @@ import executeAction from "../handlers/actionHandler"
 import RequestData from "../core/requestData"
 
 export default async function webapiHandler(request: IncomingMessage, response: ServerResponse) {
-  let requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBAPI)
+  const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBAPI)
   try {
     // get auth level
     await requestData.getAuthLevel()
@@ -34,9 +34,9 @@ export default async function webapiHandler(request: IncomingMessage, response: 
     const module = urlSplit[2].replace(/[^a-z]/g, "")
     const action = urlSplit[3].replace(/[^a-z]/g, "")
 
-    let result = await executeAction(module, action, requestData)
+    const result = await executeAction(module, action, requestData)
     if (result.headers && Object.keys(result.headers).length > 0) {
-      for (let key of Object.keys(result.headers)) {
+      for (const key of Object.keys(result.headers)) {
         response.setHeader(key, result.headers[key])
       }
     }

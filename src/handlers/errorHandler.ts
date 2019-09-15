@@ -1,3 +1,4 @@
+// tslint:disable:variable-name
 export class ErrorCode extends Error {
   public code: number
   public response: any
@@ -8,7 +9,7 @@ export class ErrorCode extends Error {
       status: 600,
       result: {
         error_code: this.code,
-        message: message
+        message
       }
     }
   }

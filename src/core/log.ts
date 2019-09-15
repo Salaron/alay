@@ -29,7 +29,7 @@ export class Log {
     if (typeof options.showTime != "boolean") options.showTime = true
     if (typeof options.defaultLabel === "undefined" && typeof defaultLabel === "string") options.defaultLabel = defaultLabel
 
-    let defOptions: CreateOptions = {
+    const defOptions: CreateOptions = {
       labelSize: defLabelSize,
       label: {
         fatal: new Label(options.defaultLabel || "[FATAL]", options.labelSize, "red", "white"),
@@ -72,7 +72,7 @@ export class Log {
     if (Config.server.log_level >= LEVEL.WARN) {
       this.writeOutput(label, message)
       await util.promisify(appendFile)(`${rootDir}/logs/warn.log`, `\n[${new Date().toLocaleTimeString()}] [${label.label}] ${message}`)
-    }    
+    }
   }
   public async error(message: any, label: Label | string = this.options.label.error) {
     if (typeof label === "string")
@@ -97,10 +97,10 @@ export class Log {
   }
 
   public inspect(object: any, options: util.InspectOptions = { depth: null }) {
-    let message = util.inspect(object, options)
-    let s = message.split(/\r\n|\r|\n/gi)
-    let label = new Label("[Inspect]", this.options.label.debug.size, this.options.label.debug.color)
-    for (let i=0; i<s.length; i++){
+    const message = util.inspect(object, options)
+    const s = message.split(/\r\n|\r|\n/gi)
+    const label = new Label("[Inspect]", this.options.label.debug.size, this.options.label.debug.color)
+    for (let i=0; i<s.length; i++) {
       this.writeOutput(label, s[i], i<s.length-1)
     }
   }
@@ -122,7 +122,7 @@ export class Log {
     if (!level || typeof level != "number")
       throw new Error("Invalid Level")
     if (typeof label === "string") {
-      let labelOptions = label
+      const labelOptions = label
       label = this.getLabel(level)
       label = new Label(labelOptions, label.size, label.color)
     }
@@ -172,7 +172,7 @@ export class Log {
 
   private writeOutput(label: Label, message: any, forceNewLine = false) {
     let labelText = label.label + " "
-    let locations = this.options.output || [process.stdout]
+    const locations = this.options.output || [process.stdout]
 
     if (typeof message === "object") {
       if (message instanceof Error) {
@@ -183,13 +183,13 @@ export class Log {
       if (!message || !message.constructor || message.constructor === Object ||
         Array.isArray(message) || (!message.constructor.name)) {
         message = circularJSON.stringify(message, null, 2)
-        let s = message.split(/\r\n|\r|\n/)
+        const s = message.split(/\r\n|\r|\n/)
         for (let i = 0; i < s.length; i++) {
           this.writeOutput(label, s[i], i < s.length - 1)
         }
       } else {
         message = "[" + message.constructor.name + "] " + circularJSON.stringify(message, null, 2)
-        let s = message.split(/\r\n|\r|\n/)
+        const s = message.split(/\r\n|\r|\n/)
         for (let i = 0; i < s.length; i++) {
           this.writeOutput(label, s[i], i < s.length - 1)
         }
@@ -224,18 +224,18 @@ export class Log {
     }
 
     if (message.includes("\n")) {
-      let s = message.split(/\r\n|\r|\n/)
+      const s = message.split(/\r\n|\r|\n/)
       for (let i = 0; i < s.length; i++) {
         this.writeOutput(label, s[i], i < s.length - 1)
       }
       return
     }
 
-    let currentTime = new Date().toLocaleTimeString() // en-GB uses 24h format
+    const currentTime = new Date().toLocaleTimeString() // en-GB uses 24h format
 
     locations.forEach((location) => {
       while (labelText.length < label.size) labelText = " " + labelText
-      
+
       if (location instanceof Output) {
         if (location.removeColor) {
           let outputText = `${labelText} | ${message}`
@@ -291,9 +291,9 @@ export class Output {
   public removeColor: boolean
   public addNewLine: boolean
   public out: any
-  public writeFunc: Function
+  public writeFunc: any
 
-  constructor(out: any, writeFunction: Function, newLine = true, removeColor = false) {
+  constructor(out: any, writeFunction: any, newLine = true, removeColor = false) {
     if (typeof writeFunction != "function") throw new Error("Invalid Function")
 
     this.out = out
@@ -321,11 +321,11 @@ export class Label {
   }
 }
 class Color {
-  public foreground: Function
-  public background: Function
+  public foreground: any
+  public background: any
 
   constructor(background: string, foreground: string) {
-    let chalk = Chalk as any // fix compiler error
+    const chalk = Chalk as any // fix compiler error
 
     if (typeof chalk["bg" + toTitleCase(background)] != "function")
       throw new Error("Invalid Background Color [" + background + "]")

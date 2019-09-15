@@ -32,7 +32,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let offset = this.params.offset || 0
+    const offset = this.params.offset || 0
     this.params.filter.map(Number)
 
     let rewardListQuery = ``
@@ -75,10 +75,10 @@ export default class extends MainAction {
       default: throw new Error(`Invalid category`)
     }
 
-    let rewardList = await this.connection.query(rewardListQuery)
-    let rewardCount = await this.connection.first(rewardCountQuery)
+    const rewardList = await this.connection.query(rewardListQuery)
+    const rewardCount = await this.connection.first(rewardCountQuery)
 
-    let list: any[] = await Promise.all(rewardList.map(async (reward: any) => {
+    const list: any[] = await Promise.all(rewardList.map(async (reward: any) => {
       if (reward.item_type != 1001) return {
         incentive_id: reward.incentive_id,
         incentive_item_id: Item.getIncentiveId(reward.item_type, reward.item_id),
@@ -90,7 +90,7 @@ export default class extends MainAction {
         insert_date: reward.insert_date,
         remaining_time: "No Expiration"
       }
-      let data = await unitDB.get("SELECT * FROM unit_m WHERE unit_id = ?", [reward.item_id])
+      const data = await unitDB.get("SELECT * FROM unit_m WHERE unit_id = ?", [reward.item_id])
       return {
         incentive_id: reward.incentive_id,
         incentive_item_id: reward.item_id,

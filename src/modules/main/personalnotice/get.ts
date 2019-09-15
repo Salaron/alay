@@ -12,7 +12,7 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let response = {
+    const response = {
       has_notice: false,
       notice_id: 1,
       type: 1,
@@ -22,16 +22,16 @@ export default class extends MainAction {
     }
 
     // if welcome message is enabled check if it is agreed
-    if (Config.modules.personalNotice.welcomeMessageEnabled){
-      let notice = Config.modules.personalNotice
-      let data = await this.connection.first("SELECT * FROM user_personal_notice WHERE user_id = :user AND contents = :cont AND title = :title", {
+    if (Config.modules.personalNotice.welcomeMessageEnabled) {
+      const notice = Config.modules.personalNotice
+      const data = await this.connection.first("SELECT * FROM user_personal_notice WHERE user_id = :user AND contents = :cont AND title = :title", {
         user: this.user_id,
         cont: notice.welcomeMessageContents,
         title: notice.welcomeMessageTitle
       })
-      if (!data){ // this notice is missing. let's fix that
+      if (!data) { // this notice is missing. let's fix that
         // insert into db
-        let res = await this.connection.query(`
+        const res = await this.connection.query(`
         INSERT INTO user_personal_notice(user_id, notice_type, title, contents, agreed) VALUES (:user, :type, :title, :contents, 0)
         `, {
           user: this.user_id,
@@ -54,17 +54,17 @@ export default class extends MainAction {
     }
 
     // get first notice from table (game can show only one notice at a time)
-    let notice = await this.connection.first("SELECT * FROM user_personal_notice WHERE user_id = :user AND (agreed IS NULL OR agreed = 0)", {
+    const notice = await this.connection.first("SELECT * FROM user_personal_notice WHERE user_id = :user AND (agreed IS NULL OR agreed = 0)", {
       user: this.user_id
     })
 
-    if (notice){
+    if (notice) {
       response.has_notice = true
       response.notice_id = notice.notice_id
       response.type = notice.notice_type
       response.title = notice.title
       response.contents = notice.contents
-    } 
+    }
 
     return {
       status: 200,

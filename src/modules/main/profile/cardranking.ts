@@ -18,8 +18,8 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let response: any[] = []
-    let rows = await this.connection.query("SELECT unit_id, favorite_point as total_love FROM user_unit_album WHERE user_id=:user ORDER BY total_love DESC", {
+    const response: any[] = []
+    const rows = await this.connection.query("SELECT unit_id, favorite_point as total_love FROM user_unit_album WHERE user_id=:user ORDER BY total_love DESC", {
       user: this.params.user_id
     })
     for (let i = 0; i < rows.length; i++) {

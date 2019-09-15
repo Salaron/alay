@@ -8,7 +8,7 @@ export enum TYPE {
 }
 
 export class Type {
-  // Number 
+  // Number
   public static isInt(variable: any): boolean {
     return (
       (typeof variable === "number" || variable instanceof Number) &&
@@ -33,26 +33,26 @@ export class Type {
   // Boolean
   public static isBoolean(variable: any): boolean {
     return (
-      typeof variable === "boolean" || variable instanceof Boolean 
+      typeof variable === "boolean" || variable instanceof Boolean
     )
   }
   // String
   public static isString(variable: any): boolean {
     return (
-      typeof variable === "string" || variable instanceof String 
+      typeof variable === "string" || variable instanceof String
     )
-  } 
+  }
   // Array
   public static isArray(variable: any): boolean {
     return (
-      (typeof variable === "object" || variable instanceof Array) && 
+      (typeof variable === "object" || variable instanceof Array) &&
       Array.isArray(variable)
     )
   }
   // Object
   public static isObject(variable: any): boolean {
     return (
-      typeof variable === "object" || variable instanceof Object 
+      typeof variable === "object" || variable instanceof Object
     )
   }
   // null
@@ -76,14 +76,14 @@ export class Type {
   // function
   public static isFunc(variable: any): boolean {
     return (
-      typeof variable === "function" || variable instanceof Function 
+      typeof variable === "function" || variable instanceof Function
     )
   }
 
   // Date
   public static isDate(variable: any): boolean {
     return (
-      variable instanceof Date 
+      variable instanceof Date
     )
   }
 

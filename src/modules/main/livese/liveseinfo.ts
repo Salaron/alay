@@ -11,11 +11,9 @@ export default class extends MainAction {
   }
 
   public async execute() {
-    let liveSE: number[] = [1, 99]
-    let list = Config.modules.liveSe.list
-    for (let i = 0; i < list.length; i++) {
-      let se = list[i]
-      if (se != <any>list[i]) return
+    const liveSE: number[] = [1, 99]
+    const list = Config.modules.liveSe.list
+    for (const se of list) {
       if (!liveSE.includes(se)) liveSE.push(se)
     }
     return {

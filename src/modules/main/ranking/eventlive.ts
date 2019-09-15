@@ -45,7 +45,7 @@ export default class extends MainAction {
       if (typeof this.params.id != "number" || parseInt(this.params.id) != this.params.id) throw new Error(`Invalid request [id][2]`)
 
       // find user position at event ranking
-      let pos = await this.connection.first(`SELECT FIND_IN_SET(score, (SELECT GROUP_CONCAT( score ORDER BY score DESC) FROM event_ranking WHERE event_id=:event)) as rank FROM event_ranking WHERE user_id=:user AND event_id=:event`, {
+      const pos = await this.connection.first(`SELECT FIND_IN_SET(score, (SELECT GROUP_CONCAT( score ORDER BY score DESC) FROM event_ranking WHERE event_id=:event)) as rank FROM event_ranking WHERE user_id=:user AND event_id=:event`, {
         user: this.params.id,
         event: this.params.event_id
       })
@@ -65,7 +65,7 @@ export default class extends MainAction {
       if (!Type.isString(this.params.rank)) throw new Error(`Invalid request [rank][2]`)
 
       // find tier starting position
-      let pos = await this.connection.first(`SELECT FIND_IN_SET(score, (SELECT GROUP_CONCAT( score ORDER BY score DESC) FROM event_ranking WHERE event_id=:event)) as rank FROM event_ranking WHERE event_id=:event HAVING rank < :r`, {
+      const pos = await this.connection.first(`SELECT FIND_IN_SET(score, (SELECT GROUP_CONCAT( score ORDER BY score DESC) FROM event_ranking WHERE event_id=:event)) as rank FROM event_ranking WHERE event_id=:event HAVING rank < :r`, {
         r: this.params.rank,
         event: this.params.event_id
       })
@@ -79,23 +79,22 @@ export default class extends MainAction {
       limit = 20
     }
 
-
-    let users = await this.connection.query(`
-    SELECT 
-    users.user_id, users.name, users.level, 
-    unit_id, units.level as unit_level, units.max_level, 
-    units.rank as unit_rank, units.max_rank as unit_max_rank, units.love, units.max_love, units.unit_skill_level, units.display_rank, units.unit_skill_exp, 
-    units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool, score, 
-    FIND_IN_SET(score, (SELECT GROUP_CONCAT( score ORDER BY score DESC) FROM event_ranking WHERE event_id=:event)) AS rank 
-    FROM users 
+    const users = await this.connection.query(`
+    SELECT
+    users.user_id, users.name, users.level,
+    unit_id, units.level as unit_level, units.max_level,
+    units.rank as unit_rank, units.max_rank as unit_max_rank, units.love, units.max_love, units.unit_skill_level, units.display_rank, units.unit_skill_exp,
+    units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool, score,
+    FIND_IN_SET(score, (SELECT GROUP_CONCAT( score ORDER BY score DESC) FROM event_ranking WHERE event_id=:event)) AS rank
+    FROM users
     JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id
-    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id 
-    JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id 
-    JOIN event_ranking ON event_ranking.user_id = users.user_id AND event_ranking.event_id = :event 
-    WHERE score > 0 
+    JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id
+    JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
+    JOIN event_ranking ON event_ranking.user_id = users.user_id AND event_ranking.event_id = :event
+    WHERE score > 0
     ORDER BY score DESC LIMIT ${offset}, ${limit}`, { event: this.params.event_id })
 
-    let result = []
+    const result = []
     for (const user of users) {
       result.push({
         rank: user.rank,
@@ -126,15 +125,15 @@ export default class extends MainAction {
     }
 
     if (result.length === 0) throw new ErrorCode(1601)
-    let count = await this.connection.first(`SELECT count(event_point) as cnt FROM event_ranking WHERE event_id = :event AND event_point > 0`, { 
-      event: this.params.event_id 
+    const count = await this.connection.first(`SELECT count(event_point) as cnt FROM event_ranking WHERE event_id = :event AND event_point > 0`, {
+      event: this.params.event_id
     })
 
     return {
       status: 200,
       result: {
         total_cnt: count.cnt,
-        page: page,
+        page,
         items: result
       }
     }
