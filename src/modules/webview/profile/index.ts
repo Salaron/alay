@@ -143,7 +143,7 @@ export default class extends WebViewAction {
     ])
 
     user.playTime = `${parseInt(moment.utc(Math.floor(total * 1000)).format("D")) - 1}`
-    user.playTime += `d ${moment.utc(Math.floor(total * 1000)).format("H[h] m[m] s[s]")}`
+    user.playTime += `d ${moment.utc(Math.floor(total * 1000)).format("H[h] m[m]")}`
     user.registrationDateFormated = moment(user.registrationDate).locale(code).format("MMMM YYYY")
     user.registrationDate = moment(user.registrationDate).locale(code).format("DD MMMM YYYY HH:mm:ss")
     let diff = moment(user.last_activity || user.last_login).diff(Date.now(), "m")
