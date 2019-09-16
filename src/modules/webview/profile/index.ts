@@ -25,7 +25,7 @@ const convertDifficulty = <any>{
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
-  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
+  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
 
   constructor(requestData: RequestData) {
     super(requestData)
@@ -35,18 +35,30 @@ export default class extends WebViewAction {
     const i18n = new I18n(this.connection)
     const webview = new WebView(this.connection)
     let userId = this.user_id
+
+    const guest = this.requestData.auth_level < AUTH_LEVEL.CONFIRMED_USER
     if (Type.isString(this.params.id)) {
       assert(parseInt(this.params.id), "id should be int")
       userId = parseInt(this.params.id)
+    } else if (guest) {
+      throw new Error("property 'id' is missing")
     }
 
-    const code = await i18n.getUserLocalizationCode(this.user_id)
+    let code = this.params.lang
+    if (!guest) {
+      if (!code) code = await i18n.getUserLocalizationCode(this.user_id)
+    } else if (!code || !Config.i18n.languages.getKey(code)) {
+      code = Config.i18n.defaultLanguage
+    }
+
     const [strings, template, user, userScore, eventData, liveDataStatus, liveDataLog, changeLanguageModal] = await Promise.all([
-      i18n.getStrings(code, "common", "profile-index"),
+      i18n.getStrings(code, "profile-index"),
       WebView.getTemplate("profile", "index"),
       this.connection.first(`
       SELECT
         users.user_id, users.level, name, introduction, users.insert_date as registrationDate,
+        users.last_login,
+        (SELECT last_activity FROM user_login WHERE user_id = :user) as last_activity,
         (SELECT COUNT(*) FROM login_received_list WHERE user_id = :user) as daysInTheGame,
         (
           (SELECT IFNULL(SUM(clear_cnt), 0) FROM user_live_status WHERE user_id=:user AND hi_combo > 150) +
@@ -77,9 +89,10 @@ export default class extends WebViewAction {
       }),
       this.connection.query("SELECT * FROM user_live_status WHERE user_id = :user AND status = 2", { user: userId }),
       this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC", { user: userId }),
-      webview.getLanguageModalTemplate(this.user_id)
+      webview.getLanguageModalTemplate(code)
     ])
 
+    if (!user) throw new Error(`This user not exists`)
     const icons = await unitDB.get("SELECT normal_icon_asset, rank_max_icon_asset FROM unit_m WHERE unit_id = :unit", {
       unit: user.unit_id
     })
@@ -133,6 +146,11 @@ export default class extends WebViewAction {
     user.playTime += `d ${moment.utc(Math.floor(total * 1000)).format("H[h] m[m] s[s]")}`
     user.registrationDateFormated = moment(user.registrationDate).locale(code).format("MMMM YYYY")
     user.registrationDate = moment(user.registrationDate).locale(code).format("DD MMMM YYYY HH:mm:ss")
+    let diff = moment(user.last_activity || user.last_login).diff(Date.now(), "m")
+    if (diff < -5) {
+      user.lastLoginFormated = strings.lastSeen + moment.duration(diff, "m").locale(code).humanize(true)
+      user.lastLogin = moment(user.last_activity || user.last_logi).locale(code).format("DD MMMM YYYY HH:mm:ss")
+    } else user.lastLoginFormated = strings.online
     user.totalScore = userScore.total
 
     recentPlays = recentPlays.slice(0, 4)
@@ -151,6 +169,8 @@ export default class extends WebViewAction {
       recentPlays,
       changeLanguageModal,
       userId,
+      guest,
+      langCode: code,
       icon: user.display_rank === 1 ? icons.normal_icon_asset : icons.rank_max_icon_asset
     }
 

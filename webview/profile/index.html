@@ -48,20 +48,26 @@
 
       <div id="body" class="uk-scrollspy-inview uk-animation-fade">
 
-        <div class="uk-container uk-width-1-1 uk-margin">
+        <div class="uk-container uk-width-1-1">
           <div class="uk-flex uk-margin-small-top">
             <div>
               <div class="avatar-border" style="background-image: url('//r.llsif.win/{{icon}}');">
+
               </div>
             </div>
-            <div class="uk-margin-left">
+
+            <div class="uk-margin-left" style="line-height: 1.2">
+
               <h3 class="uk-text-bold">{{user/name}}</h3>
+
               <span class="uk-text-muted" style="word-wrap: break-word;">{{nl2br user/introduction}}</span>
             </div>
           </div>
+          <div class="uk-text-right uk-text-muted" {{#if user.lastLogin}}
+            uk-tooltip="title: {{user.lastLogin}}; pos: top-right" {{/if}}>{{user/lastLoginFormated}}</div>
         </div>
 
-        <div class="uk-container uk-width-1-1">
+        <div class="uk-container uk-margin-remove-top uk-width-1-1">
           <dl class="stats_entry">
             <dt class="stats_test">User ID</dt>
             <dd class="stats_value">{{numberWithSpaces user/user_id}}</dd>
@@ -200,6 +206,7 @@
     var headers = {{{headers}}}
     var enableResize = true
     var userId = {{{userId}}}
+    var guest = {{{guest}}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -222,6 +229,7 @@
         offset: offset,
         limit: 5,
         userId: userId,
+        lang: "{{langCode}}",
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
         if (response.error || response.maintenance || !response) return
@@ -243,6 +251,7 @@
         offset: offset,
         limit: 5,
         userId: userId,
+        lang: "{{langCode}}",
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
         if (response.error || response.maintenance || !response) return

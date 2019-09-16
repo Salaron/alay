@@ -25,7 +25,7 @@ export class ConnectionPool {
         autoReconnect: true,
         autoReconnectDelay: 1000,
         autoReconnectMaxAttempt: 10,
-        disconnected: () => {}, // tslint:disable-line
+        disconnected: () => { }, // tslint:disable-line
         dateStrings: true,
         queryFormat: formatQuery,
         charset: "utf8mb4",

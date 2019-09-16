@@ -76,7 +76,9 @@
     "combo": "combo",
     "showMore": "SHOW MORE",
     "recentPlaysDataIsMissing": "No records yet :(",
-    "eventDataIsMissing": "The user has not yet participated in the events :c"
+    "eventDataIsMissing": "The user has not yet participated in the events :c",
+    "lastSeen": "last seen ",
+    "online": "online"
   },
   "settings-index": {
     "mods": "Mods",

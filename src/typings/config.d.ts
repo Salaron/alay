@@ -15,7 +15,7 @@ interface Database {
   user: string
   port?: number
   password: string
-  database: string
+  database?: string
 }
 interface I18n {
   languages: langCodes

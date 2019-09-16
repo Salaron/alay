@@ -76,7 +76,9 @@
     "combo": "комбо",
     "showMore": "ПОКАЗАТЬ БОЛЬШЕ",
     "recentPlaysDataIsMissing": "Пока записей нет :(",
-    "eventDataIsMissing": "Пользователь пока не участвовал в ивентах :c"
+    "eventDataIsMissing": "Пользователь пока не участвовал в ивентах :c",
+    "lastSeen": "был в сети ",
+    "online": "сейчас онлайн"
   },
   "settings-index": {
     "mods": "Моды",

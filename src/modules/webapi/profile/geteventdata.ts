@@ -5,7 +5,7 @@ import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
 
 export default class extends WebApiAction {
-  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
+  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
 
   constructor(requestData: RequestData) {
     super(requestData)
@@ -15,7 +15,8 @@ export default class extends WebApiAction {
     return {
       offset: TYPE.INT,
       limit: TYPE.INT,
-      userId: TYPE.INT
+      userId: TYPE.INT,
+      lang: TYPE.STRING
     }
   }
 
@@ -23,7 +24,7 @@ export default class extends WebApiAction {
     const i18n = new I18n(this.connection)
 
     const [strings, template, eventData, total] = await Promise.all([
-      i18n.getStrings(this.user_id, "profile-index"),
+      i18n.getStrings(this.params.lang, "profile-index"),
       WebView.getTemplate("profile", "eventdata"),
       this.connection.query(`
       SELECT

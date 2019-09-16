@@ -23,7 +23,7 @@ const convertDifficulty = <any>{
 }
 
 export default class extends WebApiAction {
-  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
+  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
 
   constructor(requestData: RequestData) {
     super(requestData)
@@ -33,14 +33,15 @@ export default class extends WebApiAction {
     return {
       offset: TYPE.INT,
       limit: TYPE.INT,
-      userId: TYPE.INT
+      userId: TYPE.INT,
+      lang: TYPE.STRING
     }
   }
 
   public async execute() {
     const i18n = new I18n(this.connection)
 
-    const code = await i18n.getUserLocalizationCode(this.user_id)
+    const code = this.params.lang
     const [strings, template, liveDataLog, total] = await Promise.all([
       i18n.getStrings(code, "profile-index"),
       WebView.getTemplate("profile", "recentplays"),

@@ -7,9 +7,9 @@
     <div class="uk-modal-body">
       {{#each languageList}}
       {{#equal this ../currentLanguage}}
-      <label><input class="uk-radio" type="radio" name="language_radio" value="{{this}}" checked> {{@key}}</label>
+      <label><input class="uk-radio" type="radio" name="language_radio" value="{{../this}}" checked> {{@key}}</label>
       {{else}}
-      <label><input class="uk-radio" type="radio" name="language_radio" value="{{this}}"> {{@key}}</label>
+      <label><input class="uk-radio" type="radio" name="language_radio" value="{{../this}}"> {{@key}}</label>
       {{/equal}}
       <br>
       {{/each}}
