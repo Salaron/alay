@@ -39,13 +39,17 @@ export default async function moduleHandler(request: IncomingMessage, response: 
 
     switch (module) {
       case "api": {
-        const apiList: any[] = requestData.params
+        const apiList = requestData.params
         if (apiList.length > Config.server.API_request_limit) throw new ErrorUser(`[mainHandler] API request limit reached ${apiList.length}/${Config.server.API_request_limit}`, requestData.user_id)
+
+        const responseData: any[] = []
 
         const xmcStatus = await requestData.checkXMC(false)
         if (xmcStatus === false) throw new ErrorUser(`[mainHandler] Invalid X-Message-Code; user #${requestData.user_id}`, requestData.user_id)
 
-        const responseData: any[] = await Promise.all(apiList.map(async (data, i) => {
+        await apiList.forEachAsync(async (data: any, i: number) => {
+          data.module = data.module.toLowerCase().replace(/[^a-z]/g, "")
+          data.action = data.action.toLowerCase().replace(/[^a-z]/g, "")
           log.verbose(chalk.yellow(`${data.module}/${data.action} [${i + 1}/${apiList.length}]`), "api/multirequest")
           const res: MultiResponse = {
             result: {},
@@ -63,7 +67,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
           } catch (err) {
             log.error(err)
             res.status = 600
-            return res
+            return responseData.push(res)
           }
           if (result.headers && Object.keys(result.headers).length > 0) {
             for (const key of Object.keys(result.headers)) {
@@ -72,8 +76,8 @@ export default async function moduleHandler(request: IncomingMessage, response: 
           }
           res.status = result.status
           res.result = result.result
-          return res
-        }))
+          responseData.push(res)
+        })
 
         return writeJsonResponse(response, {
           httpStatusCode: 200,
@@ -94,9 +98,6 @@ export default async function moduleHandler(request: IncomingMessage, response: 
           responseType: RESPONSE_TYPE.SINGLE,
           xmc: <string>request.headers["x-message-code"]
         })
-        if (!Array.isArray(result.result) && result.status === 200 && Type.isUndefined(result.result.server_timestamp)) {
-          result.result.server_timestamp = Utils.timeStamp()
-        }
         if (result.headers && Object.keys(result.headers).length > 0) {
           for (const key of Object.keys(result.headers)) {
             response.setHeader(key, result.headers[key])

@@ -1,9 +1,10 @@
-import RequestData, { REQUEST_TYPE, PERMISSION, RESPONSE_TYPE, HANDLER_TYPE } from "../core/requestData"
+import RequestData, { REQUEST_TYPE, PERMISSION, RESPONSE_TYPE, HANDLER_TYPE, AUTH_LEVEL } from "../core/requestData"
 import { Log } from "../core/log"
 import "./actions/webApi"
 import "./actions/webView"
 import "./actions/main"
 import { TYPE } from "../common/type"
+import { Utils } from "../common/utils"
 
 const log = new Log("Action Handler")
 const cache = <any>{}
@@ -53,7 +54,24 @@ export default async function executeAction(module: string, action: string, requ
     if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUser(`No permissions`, requestData.user_id)
     if (body.paramTypes) checkParamTypes(requestData.params, body.paramTypes())
     if (body.paramCheck) body.paramCheck()
-    return await body.execute()
+    let hrTime = process.hrtime()
+    let result = await body.execute()
+    hrTime = process.hrtime(hrTime)
+    log.debug(`[${module}/${action}] ${Math.floor(hrTime[0] * 1000 + hrTime[1] / 1000000)} ms`, `Perfomance`)
+
+    if (requestData.handlerType === HANDLER_TYPE.MAIN) {
+      if (!Array.isArray(result.result) && result.status === 200) {
+        result.result.server_timestamp = Utils.timeStamp()
+        if (requestData.auth_level >= AUTH_LEVEL.CONFIRMED_USER) {
+          try {
+            result.result.present_cnt = (await requestData.connection.first("SELECT count(incentive_id) as count FROM reward_table WHERE user_id = :user AND opened_date IS NULL", {
+              user: requestData.user_id
+            })).count
+          } catch { } // tslint:disable-line
+        }
+      }
+    }
+    return result
   } catch (err) {
     // handle module errors
     if (err instanceof ErrorCode) return err.response

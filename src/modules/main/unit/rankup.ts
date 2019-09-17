@@ -34,14 +34,11 @@ export default class extends MainAction {
     const unit = new Unit(this.connection)
     const user = new User(this.connection)
 
-    const sacrificeUnit = await this.connection.first(`SELECT * FROM v_units_not_locked WHERE user_id = :user AND unit_owning_user_id = :unit`, {
-      user: this.user_id,
-      unit: this.params.unit_owning_user_ids[0]
-    })
-    if (!sacrificeUnit) throw new ErrorCode(1311)
+    const sacrificeUnit = await unit.getNotLockedUnits(this.user_id, [this.params.unit_owning_user_ids[0]])
+    if (sacrificeUnit.length === 0) throw new ErrorCode(1311)
 
     const baseUnit = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
-    if (sacrificeUnit.unit_id != baseUnit.unit_id) throw new Error("Not Same Unit")
+    if (sacrificeUnit[0].unit_id != baseUnit.unit_id) throw new Error("Not Same Unit")
     if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorCode(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
 
     const baseUnitData = await unitDB.get("SELECT rank_up_cost, disable_rank_up, after_love_max, after_level_max FROM unit_m WHERE unit_id = :id", {
@@ -67,25 +64,29 @@ export default class extends MainAction {
       maxlevel: baseUnitData.after_level_max
     })
 
-    if (Config.modules.unit.removeFromDatabase === true) {
-      await this.connection.query("DELETE FROM units WHERE unit_owning_user_id=:unit", {
-        unit: sacrificeUnit.unit_owning_user_id
-      })
-    } else {
-      await this.connection.query("UPDATE units SET deleted = 1 WHERE unit_owning_user_id=:unit", {
-        unit: sacrificeUnit.unit_owning_user_id
-      })
+    let query = "DELETE FROM units WHERE unit_owning_user_id = :unit"
+    if (Config.modules.unit.removeFromDatabase === false) {
+      query = "UPDATE units SET deleted = 1 WHERE unit_owning_user_id = :unit"
     }
-    await this.connection.query("UPDATE users SET game_coin = game_coin - :cost WHERE user_id = :user", {
-      cost: baseUnitData.rank_up_cost,
-      user: this.user_id
-    })
 
-    await unit.updateAlbum(this.user_id, baseUnit.unit_id, {
-      maxRank: true
-    })
-    const afterUserInfo = await user.getUserInfo(this.user_id)
-    const afterUnitInfo = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
+    await Promise.all([
+      this.connection.query(query, {
+        unit: sacrificeUnit[0].unit_owning_user_id
+      }),
+      this.connection.query("UPDATE users SET game_coin = game_coin - :cost WHERE user_id = :user", {
+        cost: baseUnitData.rank_up_cost,
+        user: this.user_id
+      }),
+      unit.updateAlbum(this.user_id, baseUnit.unit_id, {
+        maxRank: true
+      })
+    ])
+
+    const [afterUserInfo, afterUnitInfo, removableSkillInfo] = await Promise.all([
+      user.getUserInfo(this.user_id),
+      unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id),
+      user.getRemovableSkillInfo(this.user_id)
+    ])
 
     return {
       status: 200,
@@ -94,10 +95,10 @@ export default class extends MainAction {
         after: afterUnitInfo,
         before_user_info: beforeUserInfo,
         after_user_info: afterUserInfo,
-        user_game_coin: baseUnitData.rank_up_cost,
+        use_game_coin: baseUnitData.rank_up_cost,
         open_subscenario_id: null,
         get_exchange_point_list: [],
-        unit_removable_skill: await user.getRemovableSkillInfo(this.user_id)
+        unit_removable_skill: removableSkillInfo
       }
     }
   }

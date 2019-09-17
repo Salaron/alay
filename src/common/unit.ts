@@ -364,6 +364,41 @@ export class Unit {
     return data.map((val: any) => val.unit_removable_skill_id)
   }
 
+  public async getNotLockedUnits(userId: number, units: number[]) {
+    if (units.length === 0) units.push(0)
+    return await this.connection.query(`
+    SELECT
+      units.unit_owning_user_id AS unit_owning_user_id,
+      units.user_id AS user_id,
+      units.level AS level,
+      units.unit_id AS unit_id,
+      units.unit_skill_level AS unit_skill_level
+    FROM
+      units
+    WHERE
+    units.unit_owning_user_id NOT IN (
+      SELECT
+        unit_owning_user_id
+      FROM
+        user_unit_deck_slot
+      JOIN users
+        ON users.user_id = user_unit_deck_slot.user_id
+        AND users.main_deck = user_unit_deck_slot.deck_id
+    )
+    AND units.unit_owning_user_id NOT IN (
+      SELECT
+        partner_unit
+      FROM
+        users
+      WHERE users.user_id = units.user_id
+    )
+    AND units.favorite_flag = 0
+    AND units.deleted = 0
+    AND units.unit_owning_user_id IN (${units.join(",")}) AND user_id = :user`, {
+      user: userId
+    })
+  }
+
   public static getSupportUnitList() {
     return supportUnitList
   }

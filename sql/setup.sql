@@ -655,14 +655,6 @@ CREATE TABLE IF NOT EXISTS `user_unit_removable_skill_owning` (
   CONSTRAINT `fk_removable_skill_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `v_units_not_locked` (
-	`unit_owning_user_id` INT(10) UNSIGNED NOT NULL,
-	`user_id` INT(10) UNSIGNED NOT NULL,
-	`level` TINYINT(3) UNSIGNED NOT NULL,
-	`unit_id` SMALLINT(5) UNSIGNED NOT NULL,
-	`unit_skill_level` TINYINT(1) UNSIGNED NOT NULL
-) ENGINE=MyISAM;
-
 CREATE TABLE IF NOT EXISTS `webview_announce` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` text CHARACTER SET utf8mb4 NOT NULL,
@@ -671,9 +663,6 @@ CREATE TABLE IF NOT EXISTS `webview_announce` (
   `announce` text CHARACTER SET utf8mb4 DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `v_units_not_locked`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_units_not_locked` AS select `units`.`unit_owning_user_id` AS `unit_owning_user_id`,`units`.`user_id` AS `user_id`,`units`.`level` AS `level`,`units`.`unit_id` AS `unit_id`,`units`.`unit_skill_level` AS `unit_skill_level` from `units` where ((not(`units`.`unit_owning_user_id` in (select `s`.`unit_owning_user_id` from (`user_unit_deck_slot` `s` join `users` `u` on(((`u`.`user_id` = `s`.`user_id`) and (`u`.`main_deck` = `s`.`deck_id`)))) where (`u`.`user_id` = `units`.`user_id`)))) and (not(`units`.`unit_owning_user_id` in (select `users`.`partner_unit` from `users` where (`users`.`user_id` = `units`.`user_id`)))) and (`units`.`favorite_flag` = 0) and (`units`.`deleted` = 0)) ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

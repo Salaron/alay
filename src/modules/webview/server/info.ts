@@ -31,7 +31,7 @@ export default class extends WebViewAction {
       commitDate: "Unknown",
       clientVersion: Config.server.server_version,
       bundleVersion: this.requestData.request.headers["bundle-version"] ? this.requestData.request.headers["bundle-version"] : "Unknown",
-      uptime: moment.duration(Math.ceil(process.uptime()), "seconds").locale(code).humanize(true),
+      uptime: moment.duration(0 - Math.ceil(process.uptime()), "seconds").locale(code).humanize(true),
       currentOnline: await webview.getCurrentOnline()
     }
     try {

@@ -6,7 +6,7 @@ import { Item } from "../../../common/item"
 const achievementDB = sqlite3.getAchievement()
 
 export default class extends MainAction {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
+  public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 

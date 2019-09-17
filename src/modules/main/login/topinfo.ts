@@ -17,7 +17,7 @@ export default class extends MainAction {
       user: this.user_id
     })
     const isTodayBirthday = moment(birth.birth_day, "DD").isSame(Date.now(), "day") && moment(birth.birth_month, "MM").isSame(Date.now(), "month")
-    const presents = await this.connection.first("SELECT count(*) as count FROM reward_table WHERE user_id=:user AND opened_date IS NULL", {
+    const presents = await this.connection.first("SELECT count(incentive_id) as count FROM reward_table WHERE user_id = :user AND opened_date IS NULL", {
       user: this.user_id
     })
     const greets = await this.connection.first(`SELECT count(notice_id) as count FROM user_greet WHERE receiver_id = :user AND deleted_from_receiver = 0 AND readed = 0`, {

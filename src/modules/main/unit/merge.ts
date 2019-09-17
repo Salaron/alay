@@ -111,9 +111,8 @@ export default class extends MainAction {
     }
 
     if (this.params.unit_owning_user_ids.length > 0) {
-      const unitData = await this.connection.query(`SELECT * FROM v_units_not_locked WHERE user_id=:user AND unit_owning_user_id IN (${this.params.unit_owning_user_ids.join(",")})`, {
-        user: this.user_id
-      })
+      const unitData = await unit.getNotLockedUnits(this.user_id, this.params.unit_owning_user_ids)
+
       if (unitData.length != this.params.unit_owning_user_ids.length) throw new ErrorCode(1311)
 
       await unitData.forEachAsync(async (unit: any) => {
@@ -238,7 +237,6 @@ export default class extends MainAction {
       })
     ])
 
-    const afterUserInfo = await user.getUserInfo(this.user_id)
     const pointList = <any>[]
     for (const rarity of Object.keys(seals)) {
       if (seals[rarity] > 0) pointList.push({
@@ -246,19 +244,25 @@ export default class extends MainAction {
         exchange_point: seals[rarity]
       })
     }
+
+    const [afterUserInfo, afterUnitInfo, removableSkillInfo] = await Promise.all([
+      user.getUserInfo(this.user_id),
+      unit.getUnitDetail(baseUnitData.unit_owning_user_id),
+      user.getRemovableSkillInfo(this.user_id)
+    ])
     return {
       status: 200,
       result: {
         before_user_info: beforeUserInfo,
         after_user_info: afterUserInfo,
         before: beforeUnitInfo,
-        after: await unit.getUnitDetail(baseUnitData.unit_owning_user_id),
-        user_game_coin: coinCost,
-        evolution_setting_id: expMultiplier == 2 ? 3 : (expMultiplier == 1.5 ? 2 : 1),
+        after: afterUnitInfo,
+        use_game_coin: coinCost,
+        evolution_bonus_type: expMultiplier == 2 ? 3 : (expMultiplier == 1.5 ? 2 : 1),
         bonus_value: expMultiplier,
         open_subscenario_id: null,
         get_exchange_point_list: pointList,
-        unit_removable_skill: await user.getRemovableSkillInfo(this.user_id)
+        unit_removable_skill: removableSkillInfo
       }
     }
   }

@@ -62,32 +62,36 @@ export default class extends MainAction {
     let gainSlots = 0 // slots will be gained only after idolize
     if (baseUnit.rank === baseUnit.max_rank) gainSlots += 1
 
-    await this.connection.query(`
-    UPDATE units
-    SET
-    \`rank\` = max_rank, display_rank = max_rank, removable_skill_capacity = :skillcap,
-    max_love = :maxlove, max_level = :maxlevel WHERE unit_owning_user_id = :unit`, {
-      unit: baseUnit.unit_owning_user_id,
-      skillcap: Math.min(baseUnit.max_removable_skill_capacity, baseUnit.unit_removable_skill_capacity + gainSlots),
-      maxlove: baseUnitData.after_love_max,
-      maxlevel: baseUnitData.after_level_max
-    })
+    await Promise.all([
+      this.connection.query(`
+      UPDATE units
+      SET
+      \`rank\` = max_rank, display_rank = max_rank, removable_skill_capacity = :skillcap,
+      max_love = :maxlove, max_level = :maxlevel WHERE unit_owning_user_id = :unit`, {
+        unit: baseUnit.unit_owning_user_id,
+        skillcap: Math.min(baseUnit.max_removable_skill_capacity, baseUnit.unit_removable_skill_capacity + gainSlots),
+        maxlove: baseUnitData.after_love_max,
+        maxlevel: baseUnitData.after_level_max
+      }),
+      this.connection.query("UPDATE user_exchange_point SET exchange_point=exchange_point-:amount WHERE user_id=:user AND rarity=:rarity", {
+        user: this.user_id,
+        rarity: this.params.exchange_point_id,
+        amount: rankUpCost[baseUnitData.rarity][this.params.exchange_point_id]
+      }),
+      this.connection.query("UPDATE users SET game_coin = game_coin - :cost WHERE user_id = :user", {
+        cost: baseUnitData.exchange_point_rank_up_cost,
+        user: this.user_id
+      }),
+      unit.updateAlbum(this.user_id, baseUnit.unit_id, {
+        maxRank: true
+      })
+    ])
 
-    await this.connection.query("UPDATE user_exchange_point SET exchange_point=exchange_point-:amount WHERE user_id=:user AND rarity=:rarity", {
-      user: this.user_id,
-      rarity: this.params.exchange_point_id,
-      amount: rankUpCost[baseUnitData.rarity][this.params.exchange_point_id]
-    })
-    await this.connection.query("UPDATE users SET game_coin = game_coin - :cost WHERE user_id = :user", {
-      cost: baseUnitData.exchange_point_rank_up_cost,
-      user: this.user_id
-    })
-
-    await unit.updateAlbum(this.user_id, baseUnit.unit_id, {
-      maxRank: true
-    })
-    const afterUserInfo = await user.getUserInfo(this.user_id)
-    const afterUnitInfo = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
+    const [afterUserInfo, afterUnitInfo, removableSkillInfo] = await Promise.all([
+      user.getUserInfo(this.user_id),
+      unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id),
+      user.getRemovableSkillInfo(this.user_id)
+    ])
 
     return {
       status: 200,
@@ -96,9 +100,9 @@ export default class extends MainAction {
         after: afterUnitInfo,
         before_user_info: beforeUserInfo,
         after_user_info: afterUserInfo,
-        user_game_coin: baseUnitData.exchange_point_rank_up_cost,
+        use_game_coin: baseUnitData.exchange_point_rank_up_cost,
         after_exchange_point: ePoints.exchange_point - rankUpCost[baseUnitData.rarity][this.params.exchange_point_id],
-        unit_removable_skill: await user.getRemovableSkillInfo(this.user_id)
+        unit_removable_skill: removableSkillInfo
       }
     }
   }

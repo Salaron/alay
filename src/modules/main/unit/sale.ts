@@ -1,4 +1,5 @@
 import RequestData from "../../../core/requestData"
+import assert from "assert"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import { User } from "../../../common/user"
 import { Unit } from "../../../common/unit"
@@ -19,9 +20,20 @@ export default class extends MainAction {
   }
 
   public async execute() {
+    const unit = new Unit(this.connection)
     const user = new User(this.connection)
     const noExchangePointList = Unit.getNoExchangePointList()
     const beforeUserInfo = await user.getUserInfo(this.user_id)
+
+    for (const id of this.params.unit_owning_user_ids) {
+      assert(Type.isInt(id) && id > 0, "uouid should be int")
+    }
+    for (const support of this.params.unit_support_list) {
+      assert(typeof support === "object", "support is not an object")
+      assert(Type.isInt(support.amount) && support.amount > 0, "amount should be int")
+      assert(Type.isInt(support.unit_id), "unit_id should be int")
+      assert(Unit.supportUnits.includes(support.unit_id), "This is not support unit")
+    }
 
     let gainCoins = 0
     const detail = <any[]>[]
@@ -32,10 +44,7 @@ export default class extends MainAction {
       5: 0
     }
     if (this.params.unit_owning_user_id.length > 0) {
-      const units = await this.connection.query("SELECT * FROM v_units_not_locked WHERE user_id = :user AND unit_owning_user_id IN (:units)", {
-        user: this.user_id,
-        units: this.params.unit_owning_user_id
-      })
+      const units = await unit.getNotLockedUnits(this.user_id, this.params.unit_owning_user_id)
       if (units.length != this.params.unit_owning_user_id.length) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
 
       await Promise.all(units.map(async (unit: any) => {
