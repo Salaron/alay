@@ -26,7 +26,8 @@
         "no-bitwise": false,
         "no-console": false,
         "arrow-parens": false,
-        "prefer-const": false
+        "prefer-const": false,
+        "no-string-literal": false
     },
     "rulesDirectory": []
 }
