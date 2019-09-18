@@ -23,9 +23,8 @@ export default class extends MainAction {
     if (this.requestData.auth_level > AUTH_LEVEL.UPDATE) throw new Error(`You're already logged in`)
     if (Config.modules.login.webview_login) return {
       status: 200,
-      result: {},
-      headers: {
-        maintenance: 1 // redirect to webview fake maintenance page
+      result: {
+        user_id: 0
       }
     }
     if (Config.modules.login.enable_registration === false) throw new ErrorCode(1234, "Registration is disabled!")

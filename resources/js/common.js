@@ -136,8 +136,7 @@ function updateBodySize() {
   $("#body").height($(window).height() - $("#body").offset().top - 20)
   if (typeof ps != "undefined") ps.update()
 }
-if (!enableResize) var enableResize = false
-if ($ && enableResize) {
+if ($ && typeof enableResize != "undefined") {
   updateBodySize();
   
   $(function () {

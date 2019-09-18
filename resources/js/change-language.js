@@ -7,9 +7,7 @@
     if (!href.includes("lang")) {
       href += "&lang=&"
     }
-    if (guest) {
-      window.location.replace(href.replace(/lang.+&/, "lang=" + $(this).val() + "&"))
-    } else {
+    if (typeof guest === "undefined") {
       var params = {
         module: "settings",
         action: "changeLanguage",
@@ -24,6 +22,8 @@
         );
         setTimeout(window.location.reload.bind(window.location), 1000);
       });
+    } else {
+      window.location.replace(href.replace(/lang.+&/, "lang=" + $(this).val() + "&"))
     };
   });
 })();
