@@ -13,7 +13,9 @@ export default class extends MainAction {
   public async execute() {
     const response = {
       general_item_list: <any[]>[],
-      buff_item_list: []
+      buff_item_list: [],
+      reinforce_item_list: [],
+      reinforce_info: []
     }
     const items = await this.connection.first("SELECT green_tickets, bt_tickets FROM users WHERE user_id = :user", {
       user: this.user_id

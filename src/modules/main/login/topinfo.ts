@@ -69,7 +69,9 @@ export default class extends MainAction {
         licensed_info: []
       },
       using_buff_info: [],
-      show_anniversary: false
+      show_anniversary: false,
+      is_klab_id_task_flag: false,
+      klab_id_tasc_can_sync: false
     }
 
     return {
