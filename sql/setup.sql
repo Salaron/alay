@@ -13,6 +13,14 @@ CREATE TABLE IF NOT EXISTS `auth_log` (
   `date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `auth_recovery_codes` (
+  `token` varchar(100) NOT NULL DEFAULT '',
+  `code` varchar(10) NOT NULL DEFAULT '',
+  `mail` varchar(100) NOT NULL DEFAULT '',
+  `expire` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `auth_tokens` (
   `token` varchar(100) NOT NULL,
   `expire` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -124,8 +132,8 @@ CREATE TABLE IF NOT EXISTS `event_festival_live_progress` (
   `deck_id` smallint(3) NOT NULL,
   `continue_attempts` smallint(3) NOT NULL DEFAULT 0,
   PRIMARY KEY (`event_id`,`user_id`),
-  KEY `FK_festival_lp_user_id` (`user_id`),
   KEY `FK_festival_lp_event_id` (`event_id`),
+  KEY `FK_festival_lp_user_id` (`user_id`),
   CONSTRAINT `FK_festival_lp_event_id` FOREIGN KEY (`event_id`) REFERENCES `events_list` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_festival_lp_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -151,8 +159,9 @@ CREATE TABLE IF NOT EXISTS `event_ranking` (
   `event_id` int(5) unsigned NOT NULL,
   `event_point` int(11) NOT NULL,
   `score` int(11) DEFAULT NULL,
-  `deck` text DEFAULT NULL,
   `lives_played` mediumint(9) DEFAULT 0,
+  `deck` text DEFAULT NULL,
+  `token_point` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`,`event_id`),
   KEY `FK_event_ranking_user` (`user_id`),
   KEY `fk_event_ranking_event` (`event_id`),
@@ -216,8 +225,8 @@ CREATE TABLE IF NOT EXISTS `login_bonus_sheets_received` (
   `user_id` int(10) unsigned NOT NULL,
   `nlbonus_item_id` int(11) NOT NULL,
   `insert_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  KEY `login_bonus_sheets_rec_user_id` (`user_id`),
   KEY `login_bonus_sheets_rec_item` (`nlbonus_item_id`),
+  KEY `login_bonus_sheets_rec_user_id` (`user_id`),
   CONSTRAINT `login_bonus_sheets_rec_item` FOREIGN KEY (`nlbonus_item_id`) REFERENCES `login_bonus_sheets_items` (`nlbonus_item_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `login_bonus_sheets_rec_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -253,7 +262,7 @@ CREATE TABLE IF NOT EXISTS `login_received_list` (
 
 CREATE TABLE IF NOT EXISTS `request_log` (
   `user_id` int(11) DEFAULT NULL,
-  `request` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `request` longtext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' CHECK (json_valid(`request`)),
   `module` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `action` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `request_timestamp` timestamp NULL DEFAULT NULL,
@@ -268,13 +277,9 @@ CREATE TABLE IF NOT EXISTS `reward_table` (
   `amount` int(11) NOT NULL,
   `item_type` int(11) NOT NULL,
   `item_id` int(11) DEFAULT NULL,
-  `attribute` smallint(1) DEFAULT NULL COMMENT 'only for cards',
-  `rarity` smallint(1) DEFAULT NULL COMMENT 'only for cards',
-  `is_support` smallint(1) NOT NULL DEFAULT 0,
   `insert_date` datetime NOT NULL DEFAULT current_timestamp(),
   `opened_date` datetime DEFAULT NULL,
   `item_option` text DEFAULT NULL,
-  `collected` smallint(6) DEFAULT NULL,
   PRIMARY KEY (`incentive_id`),
   KEY `reward_user_id` (`user_id`),
   CONSTRAINT `reward_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -312,7 +317,7 @@ CREATE TABLE IF NOT EXISTS `secretbox_list` (
   `start_date` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'JP Timezone',
   `end_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'JP Timezone',
   `add_gauge` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `upper_limit` int(11) DEFAULT NULL,
+  `upper_limit` int(11) NOT NULL DEFAULT 0,
   `animation_type` tinyint(2) unsigned NOT NULL DEFAULT 0,
   `menu_title_asset` text NOT NULL,
   `bg_asset` text NOT NULL,
@@ -440,6 +445,7 @@ CREATE TABLE IF NOT EXISTS `user_banned` (
   `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `insert_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `expiration_date` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
   KEY `user_banned` (`user_id`),
   CONSTRAINT `user_banned` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -498,6 +504,21 @@ CREATE TABLE IF NOT EXISTS `user_live_goal_rewards` (
   CONSTRAINT `FK_user_live_goal_rewards` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `user_live_log` (
+  `user_id` int(10) unsigned NOT NULL,
+  `live_setting_id` int(11) DEFAULT NULL,
+  `live_setting_ids` varchar(50) DEFAULT NULL,
+  `mods` varchar(50) NOT NULL DEFAULT '',
+  `is_event` tinyint(4) NOT NULL DEFAULT 0,
+  `score` int(11) NOT NULL,
+  `combo` int(11) NOT NULL,
+  `combo_rank` int(11) NOT NULL,
+  `score_rank` int(11) NOT NULL,
+  `insert_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  KEY `FK_user_live_log` (`user_id`),
+  CONSTRAINT `FK_user_live_log` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `user_live_progress` (
   `user_id` int(10) unsigned NOT NULL,
   `live_difficulty_id` int(10) unsigned NOT NULL,
@@ -505,6 +526,7 @@ CREATE TABLE IF NOT EXISTS `user_live_progress` (
   `deck_id` tinyint(1) unsigned NOT NULL,
   `start_time` timestamp NOT NULL DEFAULT current_timestamp(),
   `continue_attempts` smallint(3) NOT NULL DEFAULT 0,
+  `lp_factor` smallint(6) NOT NULL DEFAULT 1,
   PRIMARY KEY (`user_id`,`live_difficulty_id`),
   KEY `FK_live_progress` (`user_id`,`deck_id`),
   CONSTRAINT `FK_live_progress` FOREIGN KEY (`user_id`, `deck_id`) REFERENCES `user_unit_deck` (`user_id`, `unit_deck_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -567,8 +589,8 @@ CREATE TABLE IF NOT EXISTS `user_personal_notice` (
   `contents` text DEFAULT NULL,
   `agreed` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`user_id`,`notice_id`),
-  KEY `FK_user_personal_notice` (`user_id`),
   KEY `notice_id` (`notice_id`),
+  KEY `FK_user_personal_notice` (`user_id`),
   CONSTRAINT `FK_user_personal_notice` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -650,6 +672,7 @@ CREATE TABLE IF NOT EXISTS `user_unit_removable_skill_owning` (
   `user_id` int(10) unsigned NOT NULL,
   `unit_removable_skill_id` tinyint(2) unsigned NOT NULL,
   `total_amount` smallint(4) unsigned DEFAULT 0,
+  `equipped_amount` smallint(6) NOT NULL DEFAULT 0,
   `insert_date` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`user_id`,`unit_removable_skill_id`),
   CONSTRAINT `fk_removable_skill_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -660,7 +683,7 @@ CREATE TABLE IF NOT EXISTS `webview_announce` (
   `title` text CHARACTER SET utf8mb4 NOT NULL,
   `insert_date` datetime NOT NULL DEFAULT current_timestamp(),
   `description` text CHARACTER SET utf8mb4 NOT NULL,
-  `announce` text CHARACTER SET utf8mb4 DEFAULT NULL,
+  `body` text CHARACTER SET utf8mb4 DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
