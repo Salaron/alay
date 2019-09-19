@@ -102,12 +102,12 @@
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
 
     function disableButtons() {
-      $(".uk-button").attr("disabled", "disabled")
+      $(".uk-button").attr("disabled", true)
       $("#back").fadeOut(200)
     }
 
     function enableButtons() {
-      $(".uk-button").removeAttr("disabled")
+      $(".uk-button").attr("disabled", false)
       $("#back").fadeIn(200)
     }
 
