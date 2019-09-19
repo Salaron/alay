@@ -50,14 +50,14 @@
     "passwordInvalidFormat": "Field \"Password\" is invalid",
     "passwordsNotMatch": "Passwords do not match",
     "success": "Success!",
-    "checkMail": "A welcome letter was also sent to your mail ^-^<br>Check the Spam folder if you cannot find it.<br>",
+    "checkMail": "We sent an email to the your email address mail.<br>Check the Spam folder if you cannot find it.<br>",
     "successDescription": "Account #{{userId}} successfully created! Remember/save this number, it will be useful to you when you'll try to login.<br>{{mail}}To continue registration close this window.",
     "recaptchaFailed": "You must pass the reCAPTCHA",
     "emailExists": "An account with the specified E-mail is already registered"
   },
   "profile-index": {
     "registrationDate": "Registration date",
-    "userLevel": "Level", 
+    "userLevel": "Level",
     "userRank": "Rank by level",
     "daysInTheGame": "Days in the game",
     "totalPlayTime": "Total play time",
@@ -116,12 +116,5 @@
   "noticemarquee": {
     "maintenanceNotice": "In the period from {{startDay}} {{startTime}} to {{endDay}} {{endTime}} UTC{{timeZone}}, server will be unavailable due to maintenance"
   },
-  "mailer": {
-    "subjectPasswordRecovery": "Password Recovery",
-    "bodyPasswordRecovery": "Hey {{userName}}!\n\nYou received this email because a request was made to recover the password of your account.\nIf you did not request this password change, please IGNORE and DELETE this email immediately.\nOnly continue if you wish your password to be reset!\n\nTo recover your password, enter this verification code: {{code}}\n\nIP address of sender: {{ip}}",
-    "bodyPasswordRecovered": "The password for your account has been successfully changed!\n\nUse data below to login in your account:\nUser ID: {{userId}}\nPassword: {{password}}\n\nWe recommend changing the password in the settings after login.",
-
-    "subjectWelcome": "Welcome!",
-    "bodyWelcome": "Hey {{userName}}!\n\nYou received this email because your mail was indicated at registration on the private server for the game Love Live! School Idol Festival.\n\nIn the future, this email address mail will be used to notify and confirm actions associated with your account.\n\nThank You for playing! :з"
-  }
+  "mailer": {}
 }

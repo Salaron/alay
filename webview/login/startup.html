@@ -36,9 +36,9 @@
 
   <div class="uk-position-cover uk-overlay-primary"></div>
 
-  <div id="dialog" class="uk-width-medium uk-padding-small uk-position-z-index toggle-class"
-    uk-scrollspy="cls: uk-animation-fade" style>
-    <fieldset class="uk-fieldset">
+  <div class="uk-width-medium uk-padding-small uk-position-z-index toggle-base" uk-scrollspy="cls: uk-animation-fade"
+    style>
+    <fieldset id="dialog" class="uk-fieldset">
       <div class="uk-margin-small">
         <div class="uk-inline uk-width-1-1">
           <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
@@ -75,8 +75,7 @@
     </fieldset>
   </div>
 
-  <div id="notice" class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium"
-    hidden>
+  <div id="notice" class="uk-overlay uk-position-bottom uk-light" hidden>
     <h1>{{i18n/success}}</h1>
     <p>
       {{{i18n/successDescription}}}
@@ -102,8 +101,17 @@
     if (window.history.length != 1) $("body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
 
-    function startUp() {
+    function disableButtons() {
       $(".uk-button").attr("disabled", "disabled")
+      $("#back").fadeOut(200)
+    }
+
+    function enableButtons() {
+      $(".uk-button").removeAttr("disabled")
+      $("#back").fadeIn(200)
+    }
+
+    function startUp() {
       var name = $("#name").val()
       var mail = $("#mail").val()
       var pass = $("#password").val()
@@ -120,6 +128,7 @@
       if (!checkPass(pass)) return sendNotification("{{i18n/passwordInvalidFormat}}", "warning")
       if (pass != pass2) return sendNotification("{{i18n/passwordsNotMatch}}", "warning")
 
+      disableButtons()
       function send(token) {
         $.when(sendRequest({
           module: "login",
@@ -130,16 +139,19 @@
           recaptcha: token || "",
           timestamp: Math.floor(Date.now() / 1000)
         })).done(function (response) {
-          $(".uk-button").removeAttr("disabled")
-          if (!response || !response.response_data) return
+          if (!response || !response.response_data) return enableButtons()
 
-          $("#dialog, #back").hide()
           $("#notice").html(replacePlaceholders($("#notice").html(), {
             userId: response.response_data.user_id,
             mail: response.response_data.mail_sended === true ? "{{{i18n/checkMail}}}" : ""
-          })).removeAttr("hidden").show()
+          }))
+
+          UIkit.toggle("#dialog", {
+            target: "#dialog, #notice",
+            animation: "uk-animation-fade"
+          }).toggle()
         }).fail(function () {
-          $(".uk-button").removeAttr("disabled")
+          enableButtons()
         })
       }
 

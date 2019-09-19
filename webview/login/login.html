@@ -161,7 +161,6 @@
     }
 
     function login() {
-      $(".uk-button").attr("disabled", "disabled")
       var userId = $("#user_id").val()
       var pass = $("#password").val()
 
@@ -170,6 +169,8 @@
       if (pass.length > 32) return sendNotification("{{i18n/passwordLimit}}", "warning")
       if (!checkPass(pass)) return sendNotification("{{i18n/passwordInvalidFormat}}", "warning")
 
+      $(".uk-button").attr("disabled", "disabled")
+      $("#back, .uk-link-reset").fadeOut(200)
       function send(token) {
         $.when(sendRequest({
           module: "{{{module}}}",
@@ -180,11 +181,11 @@
           timestamp: Math.floor(Date.now() / 1000)
         })).done(function (response) {
           $(".uk-button").removeAttr("disabled")
+          
           if (response.error || response.maintenance || !response) return
           if ("{{{redirect}}}".length != 0) {
             window.location.replace(window.location.protocol + "//" + window.location.host + "/{{{redirect}}}")
           } else {
-            $("#back").hide()
             UIkit.toggle("#loginForm", {
               target: "#loginForm, #notice",
               animation: "uk-animation-fade"
@@ -192,6 +193,7 @@
           }
         }).fail(function () {
           $(".uk-button").removeAttr("disabled")
+          $("#back, .uk-link-reset").fadeIn(200)
         })
       }
       if (recaptchaEnabled === true) {
