@@ -4,6 +4,7 @@ import { WebView } from "../../../common/webview"
 import { TYPE } from "../../../common/type"
 import { showdownConverter } from "../../../common/i18n"
 import assert from "assert"
+import moment from "moment"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -31,6 +32,7 @@ export default class extends WebViewAction {
     if (!announce) throw new Error("Announce doesn't have a body")
 
     announce.body = showdownConverter.makeHtml(announce.body.replace(/--/gi, "—"))
+    announce.date = moment(announce.insert_date).format("DD.MM.YYYY H:mm")
     const values = {
       announce,
       external: this.requestData.requestFromBrowser

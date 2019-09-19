@@ -14,10 +14,6 @@ body {
 html, body {
   height: 100%;
 }
-p {
-  margin: 0px;
-}
-
 
 /* SL NavBar */
 .sl-navbar-container:not(.uk-navbar-transparent) {
@@ -136,10 +132,11 @@ ol, ul {
 
 /* SL Profile */
 .avatar-border {
-  width: 106px;
-  height: 106px;
+  width: 75px;
+  height: 75px;
   background-position: center;
   background-size: auto;
+  background-size: 118%;
   background-repeat: no-repeat;
   box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
