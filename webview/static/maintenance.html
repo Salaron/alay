@@ -6,7 +6,7 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=880, user-scalable=no">
+  <meta name="viewport" content="user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
@@ -16,7 +16,15 @@
   <div id="outer">
     <div id="inner">
       <div id="header">
-        <h1 class="title">Maintenance</h1>
+        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
+          uk-sticky="bottom: #offset">
+
+          <div class="uk-navbar-center">
+            <ul class="uk-navbar-nav">
+              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">Maintenance</a></li>
+            </ul>
+          </div>
+        </nav>
       </div>
 
       <div id="body">

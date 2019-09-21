@@ -101,7 +101,6 @@ const commands: CommandInterface = {
     help() {
       log.always("reloadConfig", "Command Usage")
       log.always("  Reload server config", "Command Usage")
-      log.always("  No arguments needed", "Command Usage")
     }
   },
   help: {

@@ -77,7 +77,7 @@ export default class extends MainAction {
             user: id.user_id,
             app_ver: this.requestData.headers["bundle-version"],
             cl_ver: this.requestData.headers["client-version"],
-            ip: this.requestData.request.connection.remoteAddress,
+            ip: Utils.getRemoteIP(this.requestData.request),
             device_info: JSON.stringify(assertation)
           })
         }

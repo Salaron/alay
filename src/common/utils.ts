@@ -4,6 +4,7 @@ import moment from "moment"
 import { promisify } from "util"
 import request from "request"
 import { Connection } from "../core/database_wrappers/mysql"
+import { IncomingMessage } from "http"
 
 const log = new Log("Common: Utils")
 
@@ -220,6 +221,17 @@ export class Utils {
     if (tz < 0) return `-${tz}`
     else if (tz > 0) return `+${tz}`
     else return `${tz}`
+  }
+
+  public static getRemoteIP(request: IncomingMessage): string {
+    if (typeof request.headers["x-real-ip"] === "string") {
+      return request.headers["x-real-ip"]
+    }
+    if (typeof request.headers["x-forwarded-for"] === "string") {
+      return request.headers["x-forwarded-for"]
+    }
+    if (typeof request.connection.remoteAddress != "string") throw new Error("Remote address is missing")
+    return request.connection.remoteAddress
   }
 
   public static checkPass(input: string) {

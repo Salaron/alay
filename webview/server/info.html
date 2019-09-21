@@ -30,8 +30,11 @@
             Date: {{serverInfo/commitDate}} <br>
             Client Version: {{serverInfo/clientVersion}} <br>
             Bundle Version: {{serverInfo/bundleVersion}} <br>
+            {{i18n/currentOnline}}: {{serverInfo/currentOnline}} <br>
             Запущен {{serverInfo/uptime}} <br>
-            {{i18n/currentOnline}}: {{serverInfo/currentOnline}}
+            {{#if serverInfo/supportMail}}
+            {{serverInfo/supportMail}}
+            {{/if}}
           </p>
         </div>
       </div>

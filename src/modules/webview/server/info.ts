@@ -19,10 +19,11 @@ export default class extends WebViewAction {
     const webview = new WebView(this.connection)
 
     const code = await i18n.getUserLocalizationCode(this.user_id)
-    const [strings, template, changeLanguageModal] = await Promise.all([
+    const [strings, template, changeLanguageModal, currentOnline] = await Promise.all([
       i18n.getStrings(code, "server-info"),
       WebView.getTemplate("server", "info"),
-      webview.getLanguageModalTemplate(this.user_id)
+      webview.getLanguageModalTemplate(this.user_id),
+      webview.getCurrentOnline()
     ])
 
     const serverInfo = {
@@ -32,9 +33,11 @@ export default class extends WebViewAction {
       clientVersion: Config.server.server_version,
       bundleVersion: this.requestData.request.headers["bundle-version"] ? this.requestData.request.headers["bundle-version"] : "Unknown",
       uptime: moment.duration(0 - Math.ceil(process.uptime()), "seconds").locale(code).humanize(true),
-      currentOnline: await webview.getCurrentOnline()
+      supportMail: Config.mailer.supportMail.length > 0 ? Config.mailer.supportMail : null,
+      currentOnline
     }
     try {
+      // get git info lol
       const branchInfo = (await promisify(readFile)(`${rootDir}/.git/HEAD`, "utf-8")).substring(5).replace(/\n/g, "")
       const log = (await promisify(readFile)(`${rootDir}/.git/logs/${branchInfo}`, "utf-8")).split(/\n/)
       const lastCommit = log[log.length - 2].split(/\t|\s/g)

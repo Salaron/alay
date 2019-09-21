@@ -22,7 +22,7 @@ export default class extends WebApiAction {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorWebApi("Access only with a certain auth level")
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
-      await Utils.reCAPTCHAverify(this.params.recaptcha, this.requestData.request.connection.remoteAddress)
+      await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteIP(this.requestData.request))
     }
     const i18n = new I18n(this.connection)
 
@@ -42,7 +42,7 @@ export default class extends WebApiAction {
     const result = await Mailer.sendMail(userData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovery, {
       userName: userData.name,
       code: confirmationCode,
-      ip: this.requestData.request.connection.remoteAddress
+      ip: Utils.getRemoteIP(this.requestData.request)
     }))
     if (!result) throw new ErrorWebApi(strings.sendError, true)
     return {
