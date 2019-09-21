@@ -3,6 +3,7 @@ import { AUTH_LEVEL } from "../../../core/requestData"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
 import { I18n } from "../../../common/i18n"
+import moment = require("moment")
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -32,8 +33,8 @@ export default class extends WebApiAction {
 
     const confirmationCode = Utils.randomString(10, "upper")
     await this.connection.execute(`
-    INSERT INTO auth_recovery_codes (token, code, mail, expire) VALUES (:token, :code, :mail, DATE_ADD(NOW(), INTERVAL 30 MINUTE))
-    ON DUPLICATE KEY UPDATE code = :code, expire = DATE_ADD(NOW(), INTERVAL 30 MINUTE)`, {
+    INSERT INTO auth_recovery_codes (token, code, mail, expire) VALUES (:token, :code, :mail, DATE_ADD(NOW(), INTERVAL 10 MINUTE))
+    ON DUPLICATE KEY UPDATE code = :code, expire = DATE_ADD(NOW(), INTERVAL 10 MINUTE)`, {
       token: this.requestData.auth_token,
       code: confirmationCode,
       mail: userData.mail
@@ -42,7 +43,8 @@ export default class extends WebApiAction {
     const result = await Mailer.sendMail(userData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovery, {
       userName: userData.name,
       code: confirmationCode,
-      ip: Utils.getRemoteIP(this.requestData.request)
+      ip: Utils.getRemoteIP(this.requestData.request),
+      sendTime: moment().format("YYYY.MM.DD HH:mm Z")
     }))
     if (!result) throw new ErrorWebApi(strings.sendError, true)
     return {
