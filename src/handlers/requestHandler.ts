@@ -106,7 +106,7 @@ export default async function requestHandler(request: IncomingMessage, response:
       response.setHeader("Content-Type", "text/plain")
       response.statusCode = 600
       response.end(Config.server.debug_mode ? message : "ERROR") // send errors to client only in debug mode
-      log.error(message)
+      if (message != "ERROR") log.error(message)
     }
   } catch (err) {
     log.error(err)

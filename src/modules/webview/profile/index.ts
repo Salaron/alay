@@ -38,10 +38,16 @@ export default class extends WebViewAction {
 
     const guest = this.requestData.auth_level < AUTH_LEVEL.CONFIRMED_USER
     if (Type.isString(this.params.id)) {
-      assert(parseInt(this.params.id), "id should be int")
+      if (!parseInt(this.params.id)) return {
+        status: 500,
+        result: "id should be int"
+      }
       userId = parseInt(this.params.id)
     } else if (guest) {
-      throw new Error("property 'id' is missing")
+      return {
+        status: 500,
+        result: "You are not authorized. To get profile information for a specific account, specify the account id in querystring (profile/index?id= )"
+      }
     }
 
     let code = this.params.lang
@@ -92,7 +98,10 @@ export default class extends WebViewAction {
       webview.getLanguageModalTemplate(code)
     ])
 
-    if (!user) throw new Error(`This user not exists`)
+    if (!user) return {
+      status: 404,
+      result: "User not exists"
+    }
     const icons = await unitDB.get("SELECT normal_icon_asset, rank_max_icon_asset FROM unit_m WHERE unit_id = :unit", {
       unit: user.unit_id
     })

@@ -30,11 +30,18 @@ export default class extends MainAction {
         user: this.user_id,
         id: sis.unit_owning_user_id
       })
-      if (!check) throw new Error(`You don't have this unit!`)
-      await this.connection.execute(`DELETE FROM user_unit_removable_skill_equip WHERE unit_owning_user_id = :id AND unit_removable_skill_id = :skill`, {
-        id: sis.unit_owning_user_id,
-        skill: sis.unit_removable_skill_id
-      })
+      if (!check) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
+
+      await Promise.all([
+        this.connection.execute(`DELETE FROM user_unit_removable_skill_equip WHERE unit_owning_user_id = :id AND unit_removable_skill_id = :skill`, {
+          id: sis.unit_owning_user_id,
+          skill: sis.unit_removable_skill_id
+        }),
+        this.connection.execute("UPDATE user_unit_removable_skill_owning SET equipped_amount = equipped_amount - 1 WHERE user_id = :user AND unit_removable_skill_id = :skill", {
+          user: this.user_id,
+          skill: sis.unit_removable_skill_id
+        })
+      ])
     })
 
     // Prepare SIS owning info
@@ -73,7 +80,7 @@ export default class extends MainAction {
         user: this.user_id,
         id: sis.unit_owning_user_id
       })
-      if (!unit) throw new Error("You don't have this cards!")
+      if (!unit) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
 
       // Is there a free space for this SIS?
       let spaceAvailable = unit.removable_skill_capacity + 0
@@ -100,10 +107,16 @@ export default class extends MainAction {
       }
 
       // Insert this sis into slot
-      await this.connection.query("INSERT INTO user_unit_removable_skill_equip VALUES (:id,:skill)", {
-        id: sis.unit_owning_user_id,
-        skill: sis.unit_removable_skill_id
-      })
+      await Promise.all([
+        this.connection.execute("INSERT INTO user_unit_removable_skill_equip VALUES (:id,:skill)", {
+          id: sis.unit_owning_user_id,
+          skill: sis.unit_removable_skill_id
+        }),
+        this.connection.execute("UPDATE user_unit_removable_skill_owning SET equipped_amount = equipped_amount + 1 WHERE user_id = :user AND unit_removable_skill_id = :skill", {
+          user: this.user_id,
+          skill: sis.unit_removable_skill_id
+        })
+      ])
     })
 
     return {
