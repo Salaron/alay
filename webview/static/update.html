@@ -6,21 +6,19 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="user-scalable=no">
-  <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
 </head>
 
 <body>
   <div id="outer">
     <div id="inner">
       <div id="header">
-        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
-          uk-sticky="bottom: #offset">
-
+        <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
           <div class="uk-navbar-center">
             <ul class="uk-navbar-nav">
-              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">Update required</a></li>
+              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">Update Required</a></li>
             </ul>
           </div>
         </nav>
@@ -50,6 +48,13 @@
       </div>
     </div>
   </div>
+
+  <script type="">
+    var enableResize = true
+  </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
 </body>
 
 </html>

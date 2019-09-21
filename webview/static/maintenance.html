@@ -6,7 +6,7 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="user-scalable=no">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
@@ -16,9 +16,7 @@
   <div id="outer">
     <div id="inner">
       <div id="header">
-        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
-          uk-sticky="bottom: #offset">
-
+        <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
           <div class="uk-navbar-center">
             <ul class="uk-navbar-nav">
               <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">Maintenance</a></li>
@@ -28,7 +26,7 @@
       </div>
 
       <div id="body">
-        <p class="uk-text-lead">
+        <p>
           На данный момент сервер находится на техническом обслуживании для обновления. <br>
           {{#if haveDate}}
           <br>
@@ -39,7 +37,7 @@
           Приносим извинения за неудобства и благодарим за терпение.
         </p>
         <hr>
-        <p class="uk-text-lead">
+        <p>
           We are currently performing maintenance for an update. <br>
           {{#if haveDate}}
           <br>
@@ -52,6 +50,13 @@
       </div>
     </div>
   </div>
+
+  <script type="">
+    var enableResize = true
+  </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
 </body>
 
 </html>

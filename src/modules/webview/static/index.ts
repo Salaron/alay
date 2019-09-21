@@ -1,11 +1,9 @@
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
-import { readFile } from "fs"
-import { promisify } from "util"
 import moment from "moment"
-import Handlebars from "handlebars"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
+import { WebView } from "../../../common/webview"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -20,22 +18,19 @@ export default class extends WebViewAction {
       id: TYPE.STRING
     }
   }
-  public paramCheck() {
-    return true
-  }
 
   public async execute() {
     // 10 -- maintenance (custom)
     // 11 -- iOS update
     // 12 -- android update
     // 13 -- banned
-    let html = ""
+    let template
     let values = {}
     switch (this.params.id) {
       case "10": {
         if (Utils.isUnderMaintenance() === false)
           throw new Error(`Server is not under maintenance`)
-        html = await promisify(readFile)(`${rootDir}/webview/static/maintenance.html`, "UTF-8")
+        template = await WebView.getTemplate("static", "maintenance")
         values = {
           haveDate: Config.maintenance.notice,
           startTime: moment(Config.maintenance.start_date).format("HH:mm"),
@@ -52,7 +47,7 @@ export default class extends WebViewAction {
       }
       case "11":
       case "12": {
-        html = await promisify(readFile)(`${rootDir}/webview/static/update.html`, "UTF-8")
+        template = await WebView.getTemplate("static", "update")
         values = {
           latestVersion: Config.client.application_version,
           clientVersion: this.requestData.request.headers["bundle-version"] || "N/A"
@@ -60,7 +55,7 @@ export default class extends WebViewAction {
         break
       }
       case "13": {
-        if (this.requiredAuthLevel <= AUTH_LEVEL.UPDATE)
+        if (this.requestData.auth_level !== AUTH_LEVEL.BANNED)
           throw new Error(`No permissions`)
         const data = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
           user: this.user_id
@@ -69,7 +64,7 @@ export default class extends WebViewAction {
           status: 403,
           result: ""
         }
-        html = await promisify(readFile)(`${rootDir}/webview/static/banned.html`, "UTF-8")
+        template = await WebView.getTemplate("static", "banned")
         values = {
           expiration_date: data.expiration_date,
           expiration_date_human: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").humanize() : null,
@@ -84,7 +79,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: <string>Handlebars.compile(html)(values)
+      result: template(values)
     }
   }
 }
