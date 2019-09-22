@@ -32,7 +32,7 @@ export default class extends MainAction {
       assert(typeof support === "object", "support is not an object")
       assert(Type.isInt(support.amount) && support.amount > 0, "amount should be int")
       assert(Type.isInt(support.unit_id), "unit_id should be int")
-      assert(Unit.supportUnits.includes(support.unit_id), "This is not support unit")
+      assert(Unit.getSupportUnitList().includes(support.unit_id), "This is not support unit")
     }
 
     let gainCoins = 0

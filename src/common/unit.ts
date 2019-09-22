@@ -33,7 +33,7 @@ export async function init() {
     unit_m
   LEFT JOIN unit_level_up_pattern_m
    ON unit_m.unit_level_up_pattern_id = unit_level_up_pattern_m.unit_level_up_pattern_id
-   LEFT JOIN unit_skill_level_m
+  LEFT JOIN unit_skill_level_m
    ON unit_m.default_unit_skill_id = unit_skill_level_m.unit_skill_id
   WHERE disable_rank_up != 0`)
   supportUnitList = supports.map((unit: any) => {
@@ -80,8 +80,6 @@ interface updateAlbumOptions {
 }
 
 export class Unit {
-  public static supportUnits = supportUnitList
-  public supportUnits = supportUnitList
   public static attributeUnits = attributeUnits
   public attributeUnits = attributeUnits
   public static rarityUnits = rarityUnits

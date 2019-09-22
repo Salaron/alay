@@ -105,7 +105,7 @@ export default class extends MainAction {
         max_rank: (data.disable_rank_up >= 1 ? 1 : 2),
         max_love: data.before_love_max,
         unit_id: reward.item_id,
-        is_support_member: Unit.supportUnits.includes(reward.item_id),
+        is_support_member: Unit.getSupportUnitList().includes(reward.item_id),
         exp: 0,
         next_exp: 24,
         max_hp: data.hp_max,
