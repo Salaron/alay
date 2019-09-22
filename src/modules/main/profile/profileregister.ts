@@ -18,11 +18,12 @@ export default class extends MainAction {
   }
 
   public paramCheck() {
-    if (this.params.introduction.length > 200) throw new ErrorCode(1234, "Too long introduction")
+    if (this.params.introduction.length > 200) throw new ErrorCode(1112, "Too long introduction")
   }
 
   public async execute() {
     try {
+      if (this.params.introduction.split(/\n/gm).length > 6) throw new ErrorCode(1106, "ERROR_CODE_ONLY_WHITESPACE_CHARACTERS")
       await this.connection.query(`UPDATE users SET introduction = :intro WHERE user_id = :user`, {
         intro: this.params.introduction,
         user: this.params.user_id
