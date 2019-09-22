@@ -25,7 +25,7 @@ export default class extends MainAction {
     const noExchangePointList = Unit.getNoExchangePointList()
     const beforeUserInfo = await user.getUserInfo(this.user_id)
 
-    for (const id of this.params.unit_owning_user_ids) {
+    for (const id of this.params.unit_owning_user_id) {
       assert(Type.isInt(id) && id > 0, "uouid should be int")
     }
     for (const support of this.params.unit_support_list) {
