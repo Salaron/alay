@@ -86,7 +86,7 @@ export default class extends MainAction {
       rarity: this.params.rarity,
       val: this.params.amount * exchangeItem.cost_value * exchangeItem.amount
     })
-    await this.connection.execute("UPDATE exchange_log SET got_item_count = got_item_count + :val WHERE user_id = :user AND exchange_item_id = :id", {
+    await this.connection.execute("INSERT INTO exchange_log VALUES (:id, :user, val) ON DUPLICATE KEY UPDATE exchange_log SET got_item_count = got_item_count + :val", {
       id: exchangeItem.exchange_item_id,
       user: this.user_id,
       val: this.params.amount

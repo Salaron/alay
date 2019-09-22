@@ -277,6 +277,60 @@ export class Events {
     })
   }
 
+  public async getDutyMatchingUsers(roomId: number, eventId: number) {
+    let users = await this.connection.query(`
+      SELECT
+        event_duty_users.user_id, name, users.level, units.unit_id, units.love, units.max_love,
+        units.level as unit_level, units.max_level, units.stat_smile, units.stat_pure,
+        units.stat_cool, units.rank, units.max_rank, units.display_rank,
+        units.unit_skill_exp, units.removable_skill_capacity,
+        chat_id, event_duty_users.deck_id AS selected_deck, deck_mic, event_point, setting_award_id,
+        FIND_IN_SET(event_point, (SELECT GROUP_CONCAT( event_point ORDER BY event_point DESC) FROM event_ranking WHERE event_id=:event)) AS rank
+      FROM event_duty_users
+      JOIN users ON event_duty_users.user_id = users.user_id JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id
+      JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id
+      JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
+      JOIN event_ranking ON event_ranking.user_id = event_duty_users.user_id
+      WHERE room_id = :room AND event_id = :event AND event_duty_users.status = 1 ORDER BY event_duty_users.insert_date_ms ASC`, { room: roomId, event: eventId })
+
+    let result = users.map(user => {
+      return {
+        user_info: {
+          user_id: user.user_id,
+          name: user.name,
+          level: user.level,
+        },
+        event_status: {
+          total_event_point: user.event_point,
+          event_rank: user.rank
+        },
+        center_unit_info: {
+          unit_id: user.unit_id,
+          love: user.love,
+          level: user.unit_level,
+          smile: user.stat_smile,
+          cute: user.stat_pure,
+          cool: user.stat_cool,
+          rank: user.rank,
+          display_rank: user.display_rank,
+          is_rank_max: user.rank >= user.max_rank,
+          is_love_max: user.love >= user.max_love,
+          is_level_max: user.unit_level >= user.max_level,
+          unit_skill_exp: user.unit_skill_exp,
+          unit_removable_skill_capacity: user.removable_skill_capacity,
+          removable_skill_ids: []
+        },
+        setting_award_id: user.setting_award_id,
+        chat_id: user.chat_id,
+        room_user_status: {
+          has_selected_deck: user.selected_deck != null,
+          event_team_duty_base_point: user.deck_mic || 0
+        }
+      }
+    })
+    return result
+  }
+
   public static getEventTypes() {
     return eventType
   }
