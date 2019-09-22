@@ -3,8 +3,8 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../core/requestData"
 import { TYPE } from "../../../common/type"
 
 export default class extends MainAction {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
-  public permission: PERMISSION = PERMISSION.NOXMC
+  public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
+  public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
   constructor(requestData: RequestData) {
