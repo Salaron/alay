@@ -31,9 +31,9 @@ export async function init() {
     name, unit_id, attribute_id, rarity, disable_rank_up, merge_exp, sale_price, merge_cost, grant_exp
   FROM
     unit_m
-  JOIN unit_level_up_pattern_m
+  LEFT JOIN unit_level_up_pattern_m
    ON unit_m.unit_level_up_pattern_id = unit_level_up_pattern_m.unit_level_up_pattern_id
-  JOIN unit_skill_level_m
+   LEFT JOIN unit_skill_level_m
    ON unit_m.default_unit_skill_id = unit_skill_level_m.unit_skill_id
   WHERE disable_rank_up != 0`)
   supportUnitList = supports.map((unit: any) => {
@@ -44,7 +44,7 @@ export async function init() {
       merge_cost: unit.merge_cost,
       sale_price: unit.sale_price,
       exp: unit.merge_exp,
-      skill_exp: unit.grant_exp
+      skill_exp: unit.grant_exp || 0
     }
     return unit.unit_id
   })

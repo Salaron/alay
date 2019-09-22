@@ -87,7 +87,7 @@ export async function init() {
     await promisify(writeFile)(`${rootDir}/data/download/additional.json`, JSON.stringify(additional))
     await promisify(writeFile)(`${rootDir}/data/download/batch.json`, JSON.stringify(batch))
   } catch (err) {
-    log.warn(err)
+    if (err != "Update is not required") log.warn(err)
   }
 
   try {
