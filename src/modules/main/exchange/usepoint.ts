@@ -48,7 +48,7 @@ export default class extends MainAction {
     if (!gotCount) gotCount = { got_item_count: 0 }
     if (exchangeItem.max_count && gotCount.got_item_count >= exchangeItem.max_count) throw new ErrorCode(4201, "ERROR_CODE_OVER_ADD_EXCHANGE_ITEM_COUNT_MAX_LIMIT")
     if (exchangeItem.end_date && Utils.toSpecificTimezone(9) > exchangeItem.end_date) throw new ErrorCode(4203, "ERROR_CODE_EXCHANGE_ITEM_OUT_OF_DATE")
-    if (exchangeItem.cost_value * this.params.amount * exchangeItem.amount > ep.exchange_point) throw new ErrorCode(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
+    if (exchangeItem.cost_value * this.params.amount * exchangeItem.amount > ep.count) throw new ErrorCode(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
 
     const itemInfo = Item.nameToType(exchangeItem.item_name, exchangeItem.item_id)
     const reward = []

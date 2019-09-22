@@ -259,7 +259,7 @@ export class Secretbox {
         description: dbData.description,
         start_date: dbData.start_date,
         end_date: dbData.end_date,
-        show_end_date: dbData.enabled === 1,
+        show_end_date: dbData.enabled === 1 ? dbData.end_date : undefined,
         add_gauge: dbData.add_gauge,
         pon_count: pon.pon_count,
         pon_upper_limit: dbData.upper_limit,
