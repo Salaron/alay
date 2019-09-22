@@ -59,9 +59,6 @@ export default class extends MainAction {
       banner.fixed_flag = false
       aqoursCategory.banner_list.push(banner)
     }
-    let museBannersCopy = Utils.createObjCopy(museCategory.banner_list)
-    museCategory.banner_list = Utils.mergeArrayDedupe([museCategory.banner_list, aqoursCategory.banner_list])
-    aqoursCategory.banner_list = Utils.mergeArrayDedupe([aqoursCategory.banner_list, museBannersCopy])
 
     const response = {
       time_limit: moment(new Date()).utcOffset("+0900").add(1, "hour").format("YYYY-MM-DD HH:mm:ss"),
