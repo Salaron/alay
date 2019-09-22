@@ -63,7 +63,7 @@
               <span class="uk-text-muted" style="word-wrap: break-word;">{{nl2br user/introduction}}</span>
             </div>
           </div>
-          <div class="uk-text-right uk-text-muted" {{#if user.lastLogin}}
+          <div class="uk-text-right uk-text-mutedb uk-margin-small-top" {{#if user.lastLogin}}
             uk-tooltip="title: {{user.lastLogin}}; pos: top-right" {{/if}}>{{user/lastLoginFormated}}</div>
         </div>
 
@@ -125,7 +125,7 @@
                   <td class="rank-icon" style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
                   </td>
                   <td>{{nl2br this/name}} <br><span class="uk-text-small">{{this/timeAgo}}</span></td>
-                  <td uk-tooltip="{{../i18n/combo}}"> {{this/combo}}/{{this/s_rank_combo}}</td>
+                  <td uk-tooltip="{{../i18n/combo}}">{{this/combo}}/{{this/s_rank_combo}}</td>
                 </tr>
                 {{/if}}
                 {{/each}}

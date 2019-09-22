@@ -17,7 +17,7 @@
     "query": "SELECT unit_id FROM unit_m WHERE unit_type_id NOT IN (101, 102, 103, 104, 105, 106, 107, 108, 109) AND rarity = 3",
     "rarity": 3,
     "weight": 4,
-    "guarantee": true
+    "guarantee": false
   },
   {
     "rateup": [],
@@ -26,7 +26,17 @@
     "unit_type_id": null,
     "query": "SELECT unit_id FROM unit_m WHERE unit_type_id NOT IN (101, 102, 103, 104, 105, 106, 107, 108, 109) AND rarity = 2",
     "rarity": 2,
-    "weight": 95,
+    "weight": 5,
+    "guarantee": false
+  },
+  {
+    "rateup": [],
+    "rateup_hidden": [],
+    "rateup_weight": 50,
+    "unit_type_id": null,
+    "query": "SELECT unit_id FROM unit_m WHERE unit_type_id NOT IN (101, 102, 103, 104, 105, 106, 107, 108, 109) AND rarity = 1",
+    "rarity": 1,
+    "weight": 90,
     "guarantee": false
   }
 ]

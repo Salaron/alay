@@ -25,11 +25,11 @@ export default class extends WebApiAction {
     if (!Utils.checkPass(password)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
     if (!Utils.checkMail(this.params.mail)) throw new ErrorWebApi(strings.mailInvalidFormat, true)
 
-    const passwordCheck = await this.connection.first("SELECT name, mail FROM users WHERE user_id = :user AND password = :pass", {
+    const userData = await this.connection.first("SELECT name, mail FROM users WHERE user_id = :user AND password = :pass", {
       user: this.user_id,
       pass: password
     })
-    if (!passwordCheck) throw new ErrorWebApi(strings.invalidPassword, true)
+    if (!userData) throw new ErrorWebApi(strings.invalidPassword, true)
 
     const mailCheck = await this.connection.first("SELECT user_id FROM users WHERE mail = :mail", {
       mail: this.params.mail
@@ -41,9 +41,9 @@ export default class extends WebApiAction {
       user: this.user_id
     })
 
-    if (passwordCheck.mail != null) {
-      await Mailer.sendMail(passwordCheck.mail, strings.subjectMailChange, Utils.prepareTemplate(strings.bodyMailChange, {
-        userName: passwordCheck.name,
+    if (!Type.isNullDef(userData.mail) && userData.mail.length > 0) {
+      await Mailer.sendMail(userData.mail, strings.subjectMailChange, Utils.prepareTemplate(strings.bodyMailChange, {
+        userName: userData.name,
         supportMail: Config.mailer.supportMail.length > 0 ? Config.mailer.supportMail : ""
       }))
     }
