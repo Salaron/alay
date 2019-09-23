@@ -131,7 +131,7 @@ export default class extends MainAction {
           before: beforeUserInfo.energy_max,
           after: afterUserInfo.energy_max
         },
-        game_coin: 150000,
+        game_coin: 50000,
         game_coin_reward_box_flag: false,
         social_point: 0
       },
@@ -151,7 +151,7 @@ export default class extends MainAction {
       goal_accomp_info: goalAccomp,
       special_reward_info: [],
       event_info: <any>[],
-      daily_reward_info: [],
+      daily_reward_info: await live.getDefaultBonuses(this.user_id, comboRank),
       can_send_friend_request: false,
       unit_support_list: await user.getSupportUnits(this.user_id),
       unite_info: [],

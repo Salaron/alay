@@ -162,9 +162,10 @@ export class Live {
   public async getUserDeck(userId: number, deckId: number, calculateScore = true, guestUnitId?: number, includeDeckData?: boolean, cleanup = true) {
     let deck = await this.connection.query(`
     SELECT
-      max_removable_skill_capacity, units.unit_owning_user_id, slot_id, unit_id,
-      stat_smile, stat_pure, stat_cool, max_hp, attribute, love, level, unit_skill_level,
-      max_love, 'rank', max_rank, max_level, max_skill_level
+      max_removable_skill_capacity, u.unit_owning_user_id,
+      slot_id, unit_id, stat_smile, stat_pure, stat_cool, max_hp,
+      attribute, love, level, unit_skill_level, max_love, 'rank',
+      max_rank, max_level, max_skill_level
     FROM user_unit_deck_slot
     JOIN units
       ON units.unit_owning_user_id = user_unit_deck_slot.unit_owning_user_id
@@ -479,6 +480,28 @@ export class Live {
       combo_r: result.combo_rank,
       score_r: result.score_rank
     })
+  }
+
+  public async getDefaultBonuses(userId: number, comboRank: number) {
+    let item = new Item(this.connection)
+
+    let rndGT = Math.floor(Math.random() * (5)) + 1
+    let rndBT = Math.floor(Math.random() * (3)) + 1
+    let rndLG = Math.floor(Math.random() * (10 * (7 - comboRank) - 10 * (6 - comboRank) + 1)) + 10 * (6 - comboRank)
+    return await Promise.all([
+      item.addPresent(userId, {
+        name: "gt"
+      }, "Live Show! Reward", rndGT),
+      item.addPresent(userId, {
+        name: "bt"
+      }, "Live Show! Reward", rndBT),
+      item.addPresent(userId, {
+        name: "lg"
+      }, "Live Show! Reward", rndLG),
+      item.addPresent(userId, {
+        name: "coins"
+      }, "Live Show! Reward", 50000, true)
+    ])
   }
 
   public static getAvailableLiveList() {

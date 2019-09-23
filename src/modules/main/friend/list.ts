@@ -51,7 +51,6 @@ export default class extends MainAction {
           if (friend.initiator_id === this.user_id) return friend.recipient_id
           return friend.initiator_id
         })
-        if (userIds.length === 0) userIds.push(0)
         break
       }
       case 1: { // pending
@@ -60,7 +59,6 @@ export default class extends MainAction {
         })).map((pending) => {
           return pending.recipient_id
         })
-        if (userIds.length === 0) userIds.push(0)
         break
       }
       case 2: { // approval
@@ -69,13 +67,13 @@ export default class extends MainAction {
         })).map((approval) => {
           return approval.initiator_id
         })
-        if (userIds.length === 0) userIds.push(0)
         await this.connection.query(`UPDATE user_friend SET readed = 1 WHERE recipient_id = :user`, { user: this.user_id })
         break
       }
       default: throw new Error(`Invalid type: ${this.params.type}; user_id: ${this.user_id}`)
     }
 
+    if (userIds.length === 0) userIds.push(0)
     let friends = await this.connection.query(`
     SELECT
       users.user_id, name, users.level, introduction, last_login,

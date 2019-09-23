@@ -1,11 +1,17 @@
 import { Connection } from "../core/database_wrappers/mysql"
 import { Unit } from "./unit"
 
-const unitDB = sqlite3.getUnit()
 interface ItemObject {
   name?: string
   type?: number
   id?: number | null
+}
+
+interface IItemRewardInfo {
+  item_id: number | null
+  add_type: number
+  reward_box_flag: boolean
+  amount: number
 }
 
 export class Item {
@@ -125,7 +131,7 @@ export class Item {
       }
 
       default: {
-        throw new Error(`"${name}" is not support`)
+        throw new Error(`"${name}" is not implemented`)
       }
     }
   }
@@ -159,7 +165,7 @@ export class Item {
     return this.typeToName(type.itemType, itemId || type.itemId)
   }
   public static getIncentiveId(itemType: number, itemId?: number | null) {
-    switch(itemType) {
+    switch (itemType) {
       case 1000:
       case 1001: return itemId
       case 3000: return 1
@@ -182,28 +188,34 @@ export class Item {
 
     if (
       (item.type === 1001 ||
-      item.type === 3006 ||
-      item.type === 5500
+        item.type === 3006 ||
+        item.type === 5500
       ) && item.id === null
     ) throw new Error("You should need to provide itemId")
 
-    switch(item.type) {
+    let itemInfo: IItemRewardInfo = {
+      item_id: item.id || null,
+      add_type: <number>item.type,
+      reward_box_flag: false,
+      amount
+    }
+    switch (item.type) {
+      case 1001: { // card
+        const unit = new Unit(this.connection)
+        return await unit.addUnit(userId, <number>item.id, { amount })
+      }
+
       case 1000:
       case 3000:
       case 3001:
       case 3002: {
         await this.connection.query(`UPDATE users SET ${item.name}=${item.name} + ${amount} WHERE user_id=${userId}`)
-        return
-      }
-
-      case 1001: {
-        const unit = new Unit(this.connection)
-        return await unit.addUnit(userId, <number>item.id, { amount })
+        break
       }
 
       case 3006: {
         await this.connection.query(`UPDATE user_exchange_point SET amount=amount + ${amount} WHERE user_id=${userId} AND rarity=${item.id}`)
-        return
+        break
       }
 
       case 5000: {
@@ -214,27 +226,29 @@ export class Item {
           user: userId,
           award: item.id
         })
-        return
+        break
       }
       case 5200: {
         await this.connection.query(`INSERT IGNORE INTO user_background_unlock (user_id, background_id) VALUES (:user, :bg)`, {
           user: userId,
           bg: item.id
         })
-        return
+        break
       }
       case 5500: {
         await this.connection.query(`INSERT INTO user_unit_removable_skill_owning (user_id, unit_removable_skill_id, total_amount) VALUES (${userId}, ${item.id}, ${amount}) \
         ON DUPLICATE KEY UPDATE total_amount=total_amount + ${amount}`)
-        return
+        break
       }
       default: {
-        throw new Error(`Type "${item.type}" not supported`)
+        throw new Error(`Type "${item.type}" is not implemented`)
       }
     }
+
+    return itemInfo
   }
 
-  public async addPresent(userId: number, item: ItemObject, message: string, amount = 1, history = false) {
+  public async addPresent(userId: number, item: ItemObject, message: string, amount = 1, open = false) {
     if (!item.name && !item.type && !item.id) throw new Error(`Item object is empty`)
     if (typeof item.name === "string" && item.type == null) {
       const ntt = Item.nameToType(item.name, item.id)
@@ -247,7 +261,7 @@ export class Item {
       item.name = Item.typeToName(item.type, item.id)
     }
 
-    const res = await this.connection.query(`
+    const res = await this.connection.execute(`
     INSERT INTO reward_table (user_id, amount, item_type, incentive_message, item_id) VALUES (
       ${userId},
       ${amount},
@@ -255,9 +269,14 @@ export class Item {
       '${message.replace(/[\'']/g, "\\'")}',
       ${item.id || null}
     )`)
-    if (!history) return (<any>res).insertId
+    if (!open) return <IItemRewardInfo>{
+      item_id: item.id || null,
+      add_type: item.type,
+      reward_box_flag: true,
+      amount
+    }
 
-    return await this.openPresent(userId, (<any>res).insertId)
+    return await this.openPresent(userId, res.insertId)
   }
 
   public async openPresent(userId: number, incentiveId: number) {
@@ -284,7 +303,7 @@ export class Item {
       result.new_unit_flag = true
       return result
     }
-    return {
+    return <IItemRewardInfo>{
       item_id: present.item_id || null,
       add_type: present.item_type,
       amount: present.amount,
