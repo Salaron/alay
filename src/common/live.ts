@@ -162,7 +162,7 @@ export class Live {
   public async getUserDeck(userId: number, deckId: number, calculateScore = true, guestUnitId?: number, includeDeckData?: boolean, cleanup = true) {
     let deck = await this.connection.query(`
     SELECT
-      max_removable_skill_capacity, u.unit_owning_user_id,
+      max_removable_skill_capacity, units.unit_owning_user_id,
       slot_id, unit_id, stat_smile, stat_pure, stat_cool, max_hp,
       attribute, love, level, unit_skill_level, max_love, 'rank',
       max_rank, max_level, max_skill_level
