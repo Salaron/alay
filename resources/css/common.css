@@ -6,7 +6,7 @@
   border: 0;
 }
 body {
-  font-size: 1rem;
+  font-size: 100%;
   padding: 0 2px;
   -webkit-text-size-adjust : 100%;
   background: transparent;

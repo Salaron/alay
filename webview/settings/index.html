@@ -29,8 +29,8 @@
       <div id="body" class="uk-scrollspy-inview uk-animation-fade">
         <div class="uk-container uk-container-small">
           <div class="uk-text-bold" href="#">{{i18n/mods}}</div>
-          <h6>{{nl2br i18n/modsNotice}}</h6>
-          <h4 uk-tooltip="title: {{nl2br i18n/vanishTooltip}}; pos: bottom-left">Vanish:</h4>
+          <h6 class="uk-margin-remove">{{nl2br i18n/modsNotice}}</h6>
+          <h5 uk-tooltip="title: {{nl2br i18n/vanishTooltip}}; pos: bottom-left">Vanish:</h5>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="0" {{setChecked 0 mods/vanish}}>
             Disable</label>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="1" {{setChecked 1 mods/vanish}}>
@@ -38,13 +38,13 @@
           <label><input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="2" {{setChecked 2 mods/vanish}}>
             Sudden</label>
 
-          <h4 uk-tooltip="title: {{nl2br i18n/mirrorTooltip}}; pos: bottom-left">Mirror:</h4>
+          <h5 uk-tooltip="title: {{nl2br i18n/mirrorTooltip}}; pos: bottom-left">Mirror:</h5>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="mirror" value="0" {{setChecked 0 mods/mirror}}>
             Disable</label>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="mirror" value="1" {{setChecked 1 mods/mirror}}>
             Enable</label>
 
-          <h4 uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left">HP:</h4>
+          <h5 uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left">HP:</h5>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="hp" value="0" {{setChecked 0 mods/hp}}>
             Default</label>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="hp" value="1" {{setChecked 1 mods/hp}}> 200
@@ -52,7 +52,7 @@
           <label><input class="uk-radio sl-mod-radio" type="radio" name="hp" value="2" {{setChecked 2 mods/hp}}> 1 HP
             (Sudden Death)</label>
 
-          <h4 uk-tooltip="title: {{nl2br i18n/applyForEventTooltip}}; pos: bottom-left">{{i18n/applyForEvent}}</h4>
+          <h5 uk-tooltip="title: {{nl2br i18n/applyForEventTooltip}}; pos: bottom-left">{{i18n/applyForEvent}}</h5>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="event" value="0" {{setChecked 0 mods/event}}>
             {{i18n/no}}</label>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="event" value="1" {{setChecked 1 mods/event}}>

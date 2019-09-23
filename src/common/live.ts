@@ -497,10 +497,7 @@ export class Live {
       }, "Live Show! Reward", rndBT),
       item.addPresent(userId, {
         name: "lg"
-      }, "Live Show! Reward", rndLG),
-      item.addPresent(userId, {
-        name: "coins"
-      }, "Live Show! Reward", 50000, true)
+      }, "Live Show! Reward", rndLG)
     ])
   }
 

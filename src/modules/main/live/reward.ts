@@ -99,7 +99,7 @@ export default class extends MainAction {
       user.addExp(this.user_id, exp),
       item.addPresent(this.user_id, {
         name: "coins",
-      }, "Live Show! Reward", 150000, true),
+      }, "Live Show! Reward", 100000, true),
       user.getUserInfo(this.user_id)
     ])
 
@@ -131,7 +131,7 @@ export default class extends MainAction {
           before: beforeUserInfo.energy_max,
           after: afterUserInfo.energy_max
         },
-        game_coin: 50000,
+        game_coin: 100000,
         game_coin_reward_box_flag: false,
         social_point: 0
       },
