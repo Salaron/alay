@@ -35,7 +35,6 @@ export default class extends MainAction {
         if (mainDeckId != 0) throw new Error(`main deck flag used twice`)
         mainDeckId = deck.unit_deck_id
       }
-      if (deck.unit_deck_detail.length != 9) continue
 
       const usedPositions: number[] = []
       const usedUnitIds: number[] = []
