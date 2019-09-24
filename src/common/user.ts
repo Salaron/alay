@@ -32,14 +32,7 @@ export class User {
     })
   }
   public async getRemovableSkillInfo(userId: number) {
-    const skills = await this.connection.query(`
-    SELECT o.user_id AS user_id,
-    o.unit_removable_skill_id AS unit_removable_skill_id,
-    o.total_amount AS total_amount,
-    (SELECT count(*) FROM (
-      user_unit_removable_skill_equip e join units ON units.unit_owning_user_id = e.unit_owning_user_id
-    ) WHERE e.unit_removable_skill_id = o.unit_removable_skill_id AND units.user_id = o.user_id) AS equipped_amount,
-    o.insert_date AS insert_date FROM user_unit_removable_skill_owning o WHERE user_id=:user`, { user: userId })
+    const skills = await this.connection.query("SELECT user_id, unit_removable_skill_id, total_amount, equipped_amount, insert_date FROM user_unit_removable_skill_owning WHERE user_id = :user", { user: userId })
     const equip = await this.connection.query("SELECT e.unit_owning_user_id, unit_removable_skill_id FROM user_unit_removable_skill_equip as e JOIN units as u ON e.unit_owning_user_id=u.unit_owning_user_id WHERE user_id=:user;", { user: userId })
     const result = {
       owning_info: skills,
