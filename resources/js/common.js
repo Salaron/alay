@@ -136,13 +136,16 @@ function updateBodySize() {
   $("#body").height($(window).height() - $("#body").offset().top - 20)
   if (typeof ps != "undefined") ps.update()
 }
-if ($ && typeof enableResize != "undefined") {
-  updateBodySize();
-  
-  $(function () {
+
+(() => {
+  if ($ && typeof enableResize != "undefined") {
     updateBodySize();
-  })
-  $(window).resize(function () {
-    updateBodySize();
-  });
-}
+    
+    $(function () {
+      updateBodySize();
+    })
+    $(window).resize(function () {
+      updateBodySize();
+    });
+  }
+})()

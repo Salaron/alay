@@ -1,5 +1,4 @@
-<nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
-  uk-sticky="bottom: #offset" uk-navbar="mode: click">
+<nav class="uk-navbar-container sl-navbar-container" style="z-index: 1;" uk-navbar>
 
   <div class="uk-navbar-left">
     <ul class="uk-navbar-nav">
@@ -8,8 +7,8 @@
         <a id="changeLanguage"><span uk-icon="world" class="uk-icon"></span></a>
         {{else}}
         <a uk-icon="menu"></a>
-        <div class="uk-navbar-dropdown">
-          <ul class="uk-nav uk-dropdown-nav">
+        <div class="uk-width-auto uk-navbar-dropdown">
+          <ul class="uk-nav uk-navbar-dropdown-nav">
             <li {{#equal i18n/pageName i18n/announce}} class="uk-active" {{/equal}}>
               <a href="/webview.php/announce/index" {{#equal i18n/pageName i18n/announce}} onclick="return false;"
                 {{/equal}}>
