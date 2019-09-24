@@ -60,7 +60,7 @@
 
               <h3 class="uk-text-bold">{{user/name}}</h3>
 
-              <span class="uk-text-muted" style="word-wrap: break-word;">{{nl2br user/introduction}}</span>
+              <div class="uk-text-muted uk-width-1-3" style="word-wrap: break-word; overflow-wrap: break-word;">{{nl2br user/introduction}}</div>
             </div>
           </div>
           <div class="uk-text-right uk-text-mutedb uk-margin-small-top" {{#if user.lastLogin}}
@@ -217,7 +217,7 @@
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
 
   <script>
-    var ps = new PerfectScrollbar('#body', { suppressScrollX: false })
+    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
 
     function loadRecentPlaysData() {
       $("#loadMoreRecentPlaysButton").attr("disabled", "disabled")
