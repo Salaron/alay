@@ -21,6 +21,7 @@ const updateAlbumDefault: updateAlbumOptions = {
 
 const supportUnitData: { [unitId: number]: supportUnitData } = {}
 let supportUnitList: number[] = []
+let removableSkillList: number[] = []
 const noExchangePointList: number[] = []
 const attributeUnits: { [attribute: number]: number[] } = {}
 const rarityUnits: { [rarity: number]: number[] } = {}
@@ -61,6 +62,11 @@ export async function init() {
 
     if (!rarityUnits[unit.rarity]) rarityUnits[unit.rarity] = []
     rarityUnits[unit.rarity].push(unit.unit_id)
+  }
+
+  const skills = await unitDB.all("SELECT unit_removable_skill_id FROM unit_removable_skill_m")
+  for (const skill of skills) {
+    removableSkillList.push(skill.unit_removable_skill_id)
   }
 }
 
@@ -406,7 +412,7 @@ export class Unit {
   public static getNoExchangePointList() {
     return noExchangePointList
   }
-  public static getRemovableSkillList() {
-    // TODO
+  public static getRemovableSkillIds() {
+    return removableSkillList
   }
 }

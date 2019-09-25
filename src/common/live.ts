@@ -482,13 +482,13 @@ export class Live {
     })
   }
 
-  public async getDefaultBonuses(userId: number, comboRank: number) {
+  public async getDefaultRewards(userId: number, scoreRank: number, comboRank: number) {
     let item = new Item(this.connection)
 
     let rndGT = Math.floor(Math.random() * (5)) + 1
     let rndBT = Math.floor(Math.random() * (3)) + 1
     let rndLG = Math.floor(Math.random() * (10 * (7 - comboRank) - 10 * (6 - comboRank) + 1)) + 10 * (6 - comboRank)
-    return await Promise.all([
+    let dailyReward = await Promise.all([
       item.addPresent(userId, {
         name: "gt"
       }, "Live Show! Reward", rndGT),
@@ -499,6 +499,68 @@ export class Live {
         name: "lg"
       }, "Live Show! Reward", rndLG)
     ])
+
+    // Random SiS
+    if (Math.random() < 0.2) {
+      dailyReward.push(await item.addPresent(userId, {
+        name: "sis",
+        id: Unit.getRemovableSkillIds().randomValue()
+      }, "Live Show! Reward", 2))
+    }
+
+    let rewardUnitList = {
+      live_clear: <any[]>[],
+      live_rank: <any[]>[],
+      live_combo: <any[]>[]
+    }
+
+    const [r, sr, ur] = await Promise.all([
+      unitDB.all("SELECT unit_id FROM unit_m WHERE disable_rank_up != 0 AND rarity = 2"),
+      unitDB.all("SELECT unit_id FROM unit_m WHERE disable_rank_up != 0 AND rarity = 3"),
+      unitDB.all("SELECT unit_id FROM unit_m WHERE disable_rank_up != 0 AND rarity = 4")
+    ])
+
+    let scoreReward = null
+    let comboReward = null
+    switch (scoreRank) {
+      case 1: scoreReward = ur.randomValue().unit_id; break;
+      case 2: scoreReward = sr.randomValue().unit_id; break;
+      case 3:
+      case 4: scoreReward = r.randomValue().unit_id; break
+    }
+    switch (comboRank) {
+      case 1: comboReward = ur.randomValue().unit_id; break;
+      case 2: comboReward = sr.randomValue().unit_id; break;
+      case 3:
+      case 4: comboReward = r.randomValue().unit_id; break
+    }
+    if (scoreReward != null) {
+      let res = await item.addPresent(userId, {
+        name: "card",
+        id: scoreReward
+      }, "Live Show! Reward", 1, true)
+      res.new_unit_flag = false
+      rewardUnitList.live_rank.push(res)
+    }
+    if (comboReward != null) {
+      let res = await item.addPresent(userId, {
+        name: "card",
+        id: comboReward
+      }, "Live Show! Reward", 1, true)
+      res.new_unit_flag = false
+      rewardUnitList.live_combo.push(res)
+    }
+    let res = await item.addPresent(userId, {
+      name: "card",
+      id: Unit.getSupportUnitList().randomValue()
+    }, "Live Show! Reward", 1, true)
+    res.new_unit_flag = false
+    rewardUnitList.live_clear.push(res)
+
+    return {
+      daily_reward_info: dailyReward,
+      reward_unit_list: rewardUnitList
+    }
   }
 
   public static getAvailableLiveList() {

@@ -95,13 +95,14 @@ export default class extends MainAction {
 
     let exp = Live.getExpAmount(liveData.difficulty)
     if (scoreRank === 5) exp = Math.floor(exp / 2)
-    const [nextLevelInfo, , afterUserInfo] = await Promise.all([
+    const [nextLevelInfo, defaultRewards] = await Promise.all([
       user.addExp(this.user_id, exp),
+      live.getDefaultRewards(this.user_id, scoreRank, comboRank),
       item.addPresent(this.user_id, {
         name: "coins",
-      }, "Live Show! Reward", 100000, true),
-      user.getUserInfo(this.user_id)
+      }, "Live Show! Reward", 100000, true)
     ])
+    let afterUserInfo = await user.getUserInfo(this.user_id)
 
     const response = {
       live_info: [
@@ -135,11 +136,7 @@ export default class extends MainAction {
         game_coin_reward_box_flag: false,
         social_point: 0
       },
-      reward_unit_list: {
-        live_clear: [],
-        live_rank: [],
-        live_combo: []
-      },
+      reward_unit_list: defaultRewards.reward_unit_list,
       unlocked_subscenario_ids: [],
       effort_point: [],
       is_effort_point_visible: false,
@@ -151,7 +148,7 @@ export default class extends MainAction {
       goal_accomp_info: goalAccomp,
       special_reward_info: [],
       event_info: <any>[],
-      daily_reward_info: await live.getDefaultBonuses(this.user_id, comboRank),
+      daily_reward_info: defaultRewards.daily_reward_info,
       can_send_friend_request: false,
       unit_support_list: await user.getSupportUnits(this.user_id),
       unite_info: [],
