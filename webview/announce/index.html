@@ -6,7 +6,7 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.75, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
@@ -96,7 +96,7 @@
 
     function loadNews(callback) {
       if (loadAttempt > 3 || $(".uk-card-header").length === announceTotal) return
-      let before = $(".uk-card-header").length
+      var before = $(".uk-card-header").length
       $.when(sendRequest({
         module: "announce",
         action: "get",

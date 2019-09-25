@@ -6,7 +6,7 @@
   <title>SunLight WebView</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.75, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
@@ -56,11 +56,11 @@
               </div>
             </div>
 
-            <div class="uk-margin-left" style="line-height: 1.2">
+            <div class="uk-margin-left uk-width-1-2" style="line-height: 1.2">
 
               <h3 class="uk-text-bold">{{user/name}}</h3>
 
-              <div class="uk-text-muted uk-width-1-3" style="word-wrap: break-word; overflow-wrap: break-word;">{{nl2br user/introduction}}</div>
+              <div class="uk-text-muted uk-width-auto" style="word-wrap: break-word; overflow-wrap: break-word;">{{nl2br user/introduction}}</div>
             </div>
           </div>
           <div class="uk-text-right uk-text-mutedb uk-margin-small-top" {{#if user.lastLogin}}
