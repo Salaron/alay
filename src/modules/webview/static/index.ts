@@ -28,8 +28,10 @@ export default class extends WebViewAction {
     let values = {}
     switch (this.params.id) {
       case "10": {
-        if (Utils.isUnderMaintenance() === false)
-          throw new Error(`Server is not under maintenance`)
+        if (Utils.isUnderMaintenance() === false) return {
+          status: 403,
+          result: ""
+        }
         template = await WebView.getTemplate("static", "maintenance")
         values = {
           haveDate: Config.maintenance.notice,
@@ -55,12 +57,10 @@ export default class extends WebViewAction {
         break
       }
       case "13": {
-        if (this.requestData.auth_level !== AUTH_LEVEL.BANNED)
-          throw new Error(`No permissions`)
         const data = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
           user: this.user_id
         })
-        if (!data) return {
+        if (!data || this.requestData.auth_level !== AUTH_LEVEL.BANNED) return {
           status: 403,
           result: ""
         }
