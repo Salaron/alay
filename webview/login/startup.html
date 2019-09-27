@@ -6,7 +6,7 @@
   <title>SunLight Registration</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, user-scalable=no">
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
 </head>
 
@@ -85,6 +85,7 @@
   <script type="">
     var headers = {{{headers}}}
     var recaptchaEnabled = {{{enableRecaptcha}}}
+    var publicKey = {{{publicKey}}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -96,7 +97,7 @@
   {{/if}}
   <script>
     var RSAEncrypt = new JSEncrypt()
-    RSAEncrypt.setKey(`{{publicKey}}`)
+    RSAEncrypt.setKey(publicKey)
 
     if (window.history.length != 1) $("body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))

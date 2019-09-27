@@ -112,6 +112,7 @@
 
   <script type="">
     var headers = {{{headers}}}
+    var publicKey = {{{publicKey}}}
     var enableResize = true
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
@@ -125,7 +126,7 @@
 
   <script>
     var RSAEncrypt = new JSEncrypt()
-    RSAEncrypt.setKey(`{{publicKey}}`)
+    RSAEncrypt.setKey(publicKey)
     var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
 
     function changePassword() {

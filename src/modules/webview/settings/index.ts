@@ -36,7 +36,7 @@ export default class extends WebViewAction {
       i18n: strings,
       isAdmin: Config.server.admin_ids.includes(this.user_id),
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      publicKey: Config.server.PUBLIC_KEY,
+      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
       mods,
       userData,
       changeLanguageModal

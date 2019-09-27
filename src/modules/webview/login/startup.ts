@@ -23,7 +23,7 @@ export default class extends WebViewAction {
 
     const values = {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      publicKey: Config.server.PUBLIC_KEY.toString(),
+      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
       external: this.requestData.requestFromBrowser,
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,
