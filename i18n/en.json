@@ -16,7 +16,8 @@
     "login": "Login",
     "registration": "Registration",
     "tos": "TOS",
-    "hello": "Hello!"
+    "hello": "Hello!",
+    "introduction": "Welcome to the Love Live! School Idol Festival! private server.\nPlease do not post screenshots, videos and other content from this server and client in open sources to avoid blocking from Klab, and also follow our TOS.\nThank you!"
   },
   "login-login": {
     "login": "LOG IN",
