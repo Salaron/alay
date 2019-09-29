@@ -16,14 +16,18 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
+    min-height: 100vh;
+    overflow: hidden;
   }
 </style>
 
-<body
-  class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden"
-  data-uk-height-viewport>
+<body class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden">
 
   <div class="uk-overlay-primary uk-position-cover">
+    {{#unless external}}
+    <a id="external" style="margin: 10px;" class="uk-icon-button uk-position-left"
+      uk-icon="icon: expand; ratio: 1.25"></a>
+    {{/unless}}
     <a id="changeLanguage" style="margin: 10px;" class="uk-icon-button uk-position-right lang-button"
       uk-icon="icon: world; ratio: 1.25"></a>
   </div>
@@ -43,6 +47,7 @@
 
   <script type="">
     var headers = {{{headers}}}
+    var external = {{{external}}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -50,6 +55,10 @@
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script>
+    if (external && isChrome()) {
+      $("body").css("min-height", "calc(100vh - 56px)")
+    }
+    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
     setCookie("user_id", "", 1)
     var values = window.location.href.split("?")[1]
     if (values) {

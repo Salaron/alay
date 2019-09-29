@@ -11,6 +11,15 @@
 </head>
 
 <style>
+  body {
+    background-image: url("/resources/img/startup_bg.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
   .sl-icon-back {
     background: white;
     border-radius: 12px;
@@ -21,18 +30,9 @@
     width: 40px;
   }
 </style>
-<style>
-  body {
-    background-image: url("/resources/img/startup_bg.png");
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-</style>
 
 <body
-  class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light"
-  data-uk-height-viewport>
+  class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light">
 
   <div class="uk-position-cover uk-overlay-primary"></div>
 
@@ -86,6 +86,7 @@
     var headers = {{{headers}}}
     var recaptchaEnabled = {{{enableRecaptcha}}}
     var publicKey = {{{publicKey}}}
+    var external = {{{external}}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -96,6 +97,9 @@
   <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?render={{siteKey}}"></script>
   {{/if}}
   <script>
+    if (external && isChrome()) {
+      $("body").css("min-height", "calc(100vh - 56px)")
+    }
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(publicKey)
 

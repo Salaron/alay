@@ -11,6 +11,15 @@
 </head>
 
 <style>
+  body {
+    background-image: url("/resources/img/login_bg.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
   .sl-icon-back {
     background: white;
     border-radius: 12px;
@@ -21,18 +30,9 @@
     width: 40px;
   }
 </style>
-<style>
-  body {
-    background-image: url("/resources/img/login_bg.png");
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-</style>
 
 <body
-  class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-height-viewport uk-overflow-hidden uk-light"
-  data-uk-height-viewport>
+  class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light">
   <!-- overlay -->
   <div class="uk-position-cover uk-overlay-primary"></div>
   <!-- /overlay -->
@@ -145,6 +145,9 @@
   {{/if}}
 
   <script type="text/javascript">
+    if (external && isChrome()) {
+      $("body").css("min-height", "calc(100vh - 56px)")
+    }
     // RSA preparation
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(publicKey)
@@ -199,7 +202,7 @@
               animation: "uk-animation-fade"
             }).toggle()
           }
-        }).fail(function() {
+        }).fail(function () {
           enableButtons()
         })
       }
@@ -240,7 +243,7 @@
             toggle.$destroy()
             sendNotification("{{i18n/mailSuccess}}", "success")
           }
-        }).always(function() {
+        }).always(function () {
           enableButtons()
         })
       }

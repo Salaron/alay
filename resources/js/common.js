@@ -136,11 +136,25 @@ function updateBodySize() {
   $("#body").height($(window).height() - $("#body").offset().top - 20)
   if (typeof ps != "undefined") ps.update()
 }
+function isChrome() {
+  var isChromium = window.chrome;
+  var winNav = window.navigator;
+  var vendorName = winNav.vendor;
+  var isOpera = typeof window.opr !== "undefined";
+  var isIEedge = winNav.userAgent.indexOf("Edge") > -1;
+  return (
+    isChromium !== null &&
+    typeof isChromium !== "undefined" &&
+    vendorName === "Google Inc." &&
+    isOpera === false &&
+    isIEedge === false
+  )
+}
 
 (() => {
   if ($ && typeof enableResize != "undefined") {
     updateBodySize();
-    
+
     $(function () {
       updateBodySize();
     })

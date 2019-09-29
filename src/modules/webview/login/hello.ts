@@ -26,7 +26,8 @@ export default class extends WebViewAction {
       headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       i18n: strings,
       changeLanguageModal,
-      regEnabled: Config.modules.login.enable_registration
+      regEnabled: Config.modules.login.enable_registration,
+      external: this.requestData.requestFromBrowser
     }
     return {
       status: 200,
