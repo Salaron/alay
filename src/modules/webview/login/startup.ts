@@ -14,6 +14,10 @@ export default class extends WebViewAction {
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
       throw new ErrorCode(1234, "Access only with a certain auth level")
+    if (!Config.modules.login.enable_registration) return {
+      status: 403,
+      result: "Registration is disabled!"
+    }
     const i18n = new I18n(this.connection)
 
     const [strings, template] = await Promise.all([

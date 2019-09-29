@@ -161,6 +161,16 @@
       sendNotification("{{i18n/mailSuccess}}", "success")
     }
 
+    function disableButtons() {
+      $(".uk-button").attr("disabled", true)
+      $("#back").fadeOut(200)
+    }
+
+    function enableButtons() {
+      $(".uk-button").attr("disabled", false)
+      $("#back").fadeIn(200)
+    }
+
     function login() {
       var userId = $("#user_id").val()
       var pass = $("#password").val()
@@ -170,7 +180,7 @@
       if (pass.length > 32) return sendNotification("{{i18n/passwordLimit}}", "warning")
       if (!checkPass(pass)) return sendNotification("{{i18n/passwordInvalidFormat}}", "warning")
 
-      $(".uk-button").attr("disabled", true)
+      disableButtons()
       function send(token) {
         $.when(sendRequest({
           module: "{{{module}}}",
@@ -189,8 +199,8 @@
               animation: "uk-animation-fade"
             }).toggle()
           }
-        }).always(function() {
-          $(".uk-button").attr("disabled", false)
+        }).fail(function() {
+          enableButtons()
         })
       }
       if (recaptchaEnabled === true) {
@@ -208,7 +218,7 @@
       var mail = $("#mail").val()
       if (!checkMail(mail)) return sendNotification("{{i18n/mailInvalidFormat}}", "warning")
 
-      $(".uk-button").attr("disabled", true)
+      disableButtons()
       function send(token) {
         $.when(sendRequest({
           module: "login",
@@ -231,7 +241,7 @@
             sendNotification("{{i18n/mailSuccess}}", "success")
           }
         }).always(function() {
-          $(".uk-button").attr("disabled", false)
+          enableButtons()
         })
       }
 
@@ -252,7 +262,7 @@
 
       if (!checkPass(code) || code.length != 10) return sendNotification("{{i18n/confirmationCodeInvalidFormat}}", "warning")
 
-      $(".uk-button").attr("disabled", true)
+      disableButtons()
       $.when(sendRequest({
         module: "login",
         action: "codeVerify",
@@ -268,7 +278,7 @@
         toggle.$destroy()
         sendNotification("{{i18n/passwordResetSuccess}}", "success")
       }).always(function () {
-        $(".uk-button").attr("disabled", false)
+        enableButtons()
       })
     }
   </script>

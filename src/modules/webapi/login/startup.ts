@@ -26,6 +26,7 @@ export default class extends WebApiAction {
 
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
+    if (!Config.modules.login.enable_registration) throw new ErrorWebApi("Registration is disabled!", true)
 
     const i18n = new I18n(this.connection)
     if (Config.modules.login.enable_recaptcha) {
