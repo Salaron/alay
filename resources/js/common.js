@@ -142,12 +142,14 @@ function isChrome() {
   var vendorName = winNav.vendor;
   var isOpera = typeof window.opr !== "undefined";
   var isIEedge = winNav.userAgent.indexOf("Edge") > -1;
+  var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   return (
     isChromium !== null &&
     typeof isChromium !== "undefined" &&
     vendorName === "Google Inc." &&
     isOpera === false &&
-    isIEedge === false
+    isIEedge === false &&
+    isMobile === true
   )
 }
 

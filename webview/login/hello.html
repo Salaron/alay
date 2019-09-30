@@ -6,7 +6,7 @@
   <title>{{i18n/hello}}</title>
 
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8, user-scalable=no">
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
 </head>
 
@@ -25,10 +25,10 @@
 
   <div class="uk-overlay-primary uk-position-cover">
     {{#unless external}}
-    <a id="external" style="margin: 10px;" class="uk-icon-button uk-position-left"
+    <a id="external" style="margin: 10px; z-index: 1;" class="uk-icon-button uk-position-left"
       uk-icon="icon: expand; ratio: 1.25"></a>
     {{/unless}}
-    <a id="changeLanguage" style="margin: 10px;" class="uk-icon-button uk-position-right lang-button"
+    <a id="changeLanguage" style="margin: 10px; z-index: 1;" class="uk-icon-button uk-position-right lang-button"
       uk-icon="icon: world; ratio: 1.25"></a>
   </div>
   <div class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium">
