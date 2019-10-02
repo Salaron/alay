@@ -97,15 +97,17 @@
   <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?render={{siteKey}}"></script>
   {{/if}}
   <script>
-    if (external && isChrome()) {
-      $("body").css("min-height", "calc(100vh - 56px)")
-    }
     var RSAEncrypt = new JSEncrypt()
-    RSAEncrypt.setKey(publicKey)
+    $(document).ready(function () {
+      if (external && isChrome()) {
+        $("body").css("min-height", "calc(100vh - 56px)")
+      }
 
-    if (window.history.length != 1) $("body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
-    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
+      RSAEncrypt.setKey(publicKey)
 
+      if (window.history.length != 1) $("body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
+    })
     function disableButtons() {
       $(".uk-button").attr("disabled", true)
       $("#back").fadeOut(200)

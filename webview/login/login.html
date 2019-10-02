@@ -145,24 +145,24 @@
   {{/if}}
 
   <script type="text/javascript">
-    if (external && isChrome()) {
-      $("body").css("min-height", "calc(100vh - 56px)")
-    }
-    // RSA preparation
     var RSAEncrypt = new JSEncrypt()
-    RSAEncrypt.setKey(publicKey)
-    if (window.history.length != 1) $("body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
-    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
-
-    if (window.location.href.split("?")[1] && parseQueryString(window.location.href.split("?")[1]).recovery) {
-      var toggle = UIkit.toggle("#loginForm", {
-        target: "#loginForm, #confirmForm",
-        animation: "uk-animation-fade"
-      })
-      toggle.toggle()
-      toggle.$destroy()
-      sendNotification("{{i18n/mailSuccess}}", "success")
-    }
+    $(document).ready(function () {
+      if (external && isChrome()) {
+        $("body").css("min-height", "calc(100vh - 56px)")
+      }
+      RSAEncrypt.setKey(publicKey)
+      if (window.history.length != 1) $("body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
+      if (window.location.href.split("?")[1] && parseQueryString(window.location.href.split("?")[1]).recovery) {
+        var toggle = UIkit.toggle("#loginForm", {
+          target: "#loginForm, #confirmForm",
+          animation: "uk-animation-fade"
+        })
+        toggle.toggle()
+        toggle.$destroy()
+        sendNotification("{{i18n/mailSuccess}}", "success")
+      }
+    })
 
     function disableButtons() {
       $(".uk-button").attr("disabled", true)
