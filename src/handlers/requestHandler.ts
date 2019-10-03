@@ -30,7 +30,7 @@ export default async function requestHandler(request: IncomingMessage, response:
             request.headers["application-id"] &&
             request.headers.authorize &&
             request.headers["x-message-code"])
-        ) return sendError(`[main.php] Invalid request`)
+        ) throw new Error("nope")
 
         if (
           Utils.isUnderMaintenance() &&
@@ -55,7 +55,7 @@ export default async function requestHandler(request: IncomingMessage, response:
         if (
           !(urlSplit.length >= 3 &&
             request.method === "GET")
-        ) return sendError(`[webview.php] Invalid request`)
+        ) throw new Error("nope")
 
         if (
           Utils.isUnderMaintenance() &&
@@ -75,9 +75,10 @@ export default async function requestHandler(request: IncomingMessage, response:
             request.headers["client-version"] &&
             request.headers.authorize) &&
           request.headers["x-requested-with"] === "XMLHttpRequest"
-        ) return sendError(`[webapi] Invalid request`)
+        ) throw new Error("nope")
         return await webapiHandler(request, response)
       }
+      // If you'll use reverse-proxy, then don't forget to add path maintenace/* to exceptions
       case "resources": {
         if (request.url!.includes("maintenace/update.php")) {
           response.statusCode = 302
@@ -99,17 +100,11 @@ export default async function requestHandler(request: IncomingMessage, response:
         return await resourcesHandler(request, response)
       }
       default: { // Not support
-        return sendError()
+        throw new Error("nope")
       }
     }
-    function sendError(message = "ERROR") {
-      response.setHeader("Content-Type", "text/plain")
-      response.statusCode = 600
-      response.end(Config.server.debug_mode ? message : "ERROR") // send errors to client only in debug mode
-      if (message != "ERROR") log.error(message)
-    }
   } catch (err) {
-    log.error(err)
+    if (err.message != "nope") log.error(err)
     await writeJsonResponse(response, {
       responseData: Config.server.debug_mode ? { message: err.message } : { message: "Internal Server Error" },
       direct: true,
