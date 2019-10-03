@@ -1,0 +1,1 @@
+UPDATE user_unit_album SET love_max_flag = 0, rank_level_max_flag = 0 WHERE rank_max_flag = 0 AND (love_max_flag = 1 OR rank_level_max_flag = 1)

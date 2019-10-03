@@ -164,13 +164,13 @@ export class Live {
     SELECT
       max_removable_skill_capacity, units.unit_owning_user_id,
       slot_id, unit_id, stat_smile, stat_pure, stat_cool, max_hp,
-      attribute, love, level, unit_skill_level, max_love, 'rank',
-      max_rank, max_level, max_skill_level
+      attribute, love, level, unit_skill_level, max_love,
+      max_rank, max_level, max_skill_level, display_rank
     FROM user_unit_deck_slot
     JOIN units
       ON units.unit_owning_user_id = user_unit_deck_slot.unit_owning_user_id
     WHERE user_unit_deck_slot.user_id = :user AND deck_id = :deck`, { user: userId, deck: deckId })
-    if (deck.length === 0) throw new Error(`Deck doesn't exists`)
+    if (deck.length != 9) throw new ErrorCode(1234, `Deck is invalid`)
     deck = deck.map((unit) => {
       return {
         unit_owning_user_id: unit.unit_owning_user_id,
@@ -188,10 +188,11 @@ export class Live {
         stat_pure: unit.stat_pure,
         stat_cool: unit.stat_cool,
         attribute: unit.attribute,
-        rank: unit.rank,
+        rank: unit.display_rank,
+        display_rank: unit.display_rank,
         is_rank_max: unit.rank >= unit.max_rank,
-        is_love_max: unit.love >= unit.max_love,
-        is_level_max: unit.level >= unit.max_level,
+        is_love_max: unit.love >= unit.max_love && unit.rank >= unit.max_rank,
+        is_level_max: unit.level >= unit.max_level && unit.rank >= unit.max_rank,
         is_skill_level_max: unit.unit_skill_level >= unit.max_skill_level
       }
     })
@@ -422,6 +423,8 @@ export class Live {
   }
 
   public async applyKizunaBonusToDeck(userId: number, deck: any[], kizuna: number) {
+    const unitModule = new Unit(this.connection)
+
     for (const unit of deck) {
       unit.kizuna_add = 0
       unit.fpt_add = 0
@@ -448,12 +451,11 @@ export class Live {
       }
     }
 
-    await deck.forEachAsync(async (unit) => {
-      unit.love = unit.love + unit.kizuna_add
-      await new Unit(this.connection).updateAlbum(userId, unit.unit_id, {
+    deck = await Promise.all(deck.map(async unit => {
+      await unitModule.updateAlbum(userId, unit.unit_id, {
         maxRank: unit.is_rank_max,
-        maxLove: unit.love + unit.kizuna_add === unit.max_love && unit.rank === unit.max_rank,
-        maxLevel: unit.is_level_max,
+        maxLove: Math.min(unit.love + unit.kizuna_add, unit.max_love) === unit.max_love && unit.rank === unit.max_rank,
+        maxLevel: unit.is_level_max && unit.rank === unit.max_rank,
         addLove: unit.kizuna_add,
         addFavPt: unit.fpt_add
       })
@@ -464,7 +466,8 @@ export class Live {
       })
       unit.kizuna_add = undefined
       unit.fpt_add = undefined
-    })
+      return unit
+    }))
 
     return deck
   }
