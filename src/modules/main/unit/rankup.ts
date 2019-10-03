@@ -85,7 +85,7 @@ export default class extends MainAction {
     const [afterUserInfo, afterUnitInfo, removableSkillInfo] = await Promise.all([
       user.getUserInfo(this.user_id),
       unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id),
-      user.getRemovableSkillInfo(this.user_id)
+      user.getRemovableSkillInfo(this.user_id, true)
     ])
 
     return {

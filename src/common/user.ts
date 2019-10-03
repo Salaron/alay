@@ -31,12 +31,16 @@ export class User {
       user: userId
     })
   }
-  public async getRemovableSkillInfo(userId: number) {
-    const skills = await this.connection.query("SELECT user_id, unit_removable_skill_id, total_amount, equipped_amount, insert_date FROM user_unit_removable_skill_owning WHERE user_id = :user", { user: userId })
+  public async getRemovableSkillInfo(userId: number, onlyInfo = false) {
+    const skills = await this.connection.query("SELECT unit_removable_skill_id, total_amount, equipped_amount, insert_date FROM user_unit_removable_skill_owning WHERE user_id = :user", { user: userId })
     const equip = await this.connection.query("SELECT e.unit_owning_user_id, unit_removable_skill_id FROM user_unit_removable_skill_equip as e JOIN units as u ON e.unit_owning_user_id=u.unit_owning_user_id WHERE user_id=:user;", { user: userId })
     const result = {
       owning_info: skills,
       equipment_info: <any>{}
+    }
+    if (onlyInfo) {
+      result.equipment_info = undefined
+      return result
     }
     for (let i = 0; i < equip.length; i++) { // tslint:disable-line
       const e = equip[i]

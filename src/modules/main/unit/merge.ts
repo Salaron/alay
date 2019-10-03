@@ -248,15 +248,15 @@ export default class extends MainAction {
     const [afterUserInfo, afterUnitInfo, removableSkillInfo] = await Promise.all([
       user.getUserInfo(this.user_id),
       unit.getUnitDetail(baseUnitData.unit_owning_user_id),
-      user.getRemovableSkillInfo(this.user_id)
+      user.getRemovableSkillInfo(this.user_id, true)
     ])
     return {
       status: 200,
       result: {
-        before_user_info: beforeUserInfo,
-        after_user_info: afterUserInfo,
         before: beforeUnitInfo,
         after: afterUnitInfo,
+        before_user_info: beforeUserInfo,
+        after_user_info: afterUserInfo,
         use_game_coin: coinCost,
         evolution_bonus_type: expMultiplier == 2 ? 3 : (expMultiplier == 1.5 ? 2 : 1),
         bonus_value: expMultiplier,
