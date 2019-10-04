@@ -28,8 +28,8 @@
 
       <div id="body" class="uk-scrollspy-inview uk-animation-fade">
         <div class="uk-container uk-container-small">
-          <div class="uk-text-bold" href="#">{{i18n/mods}}</div>
-          <h6 class="uk-margin-remove">{{nl2br i18n/modsNotice}}</h6>
+          <h4 class="uk-text-bold" href="#">{{i18n/mods}}</h4>
+          <h5 class="uk-margin-remove">{{nl2br i18n/modsNotice}}</h5>
           <h5 uk-tooltip="title: {{nl2br i18n/vanishTooltip}}; pos: bottom-left">Vanish:</h5>
           <label><input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="0" {{setChecked 0 mods/vanish}}>
             Disable</label>
@@ -60,8 +60,8 @@
 
           <hr>
 
-          <div class="uk-text-bold" href="#">{{i18n/passwordAndEmail}}</div>
-          <h6 style="color: red">{{nl2br i18n/passwordNotice}}</h6>
+          <h4 class="uk-text-bold" href="#">{{i18n/passwordAndEmail}}</h4>
+          <h5 style="color: red">{{nl2br i18n/passwordNotice}}</h5>
           <div class="uk-flex uk-margin-small">
             <div class="uk-width-1-2">
               <div class="uk-margin-small">
@@ -103,10 +103,56 @@
 
           <hr>
 
+          <h4 class="uk-text-bold" href="#">Массовое удаление карт</h4>
+          <h5 class="uk-margin-remove">Позволяет удалить карты, которые не состоят в командах, не выбраны в качестве
+            партнёра и не помечены замочком.</h5>
+          <div class="uk-margin-small">
+            <h5>Редкость:
+              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="4"> UR</label>
+              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="5"> SSR</label>
+              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="3"> SR</label>
+              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="2"> R</label>
+              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="1"> N</label>
+            </h5>
+            <button id="bulk-delete-button" type="button" class="uk-button uk-button-primary uk-border-pill"
+              href="#bulk-delete-modal" uk-toggle disabled>Удалить!</button>
+          </div>
+
+          <hr class="uk-margin-bottom">
         </div>
       </div>
 
       {{{changeLanguageModal}}}
+
+      <div id="bulk-delete-modal" uk-modal="bg-close: false;">
+        <div class="uk-modal-dialog">
+          <button class="uk-modal-close-default" type="button" uk-close></button>
+          <div class="uk-modal-header">
+            <h3 class="uk-modal-title uk-dark">Вы уверены?</h3>
+          </div>
+          <div class="uk-modal-body">
+            <p id="deleteNotice" style="color: red" class="uk-dark"></p>
+            <p>Введите пароль / Handover ID для подтверждения действия.</p>
+            <div class="uk-margin-small">
+              <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+                <input id="currentPasswordConfirmation" class="uk-input uk-border-pill" required
+                  placeholder="{{i18n/password}}" autocomplete="off" readonly
+                  onfocus="this.removeAttribute('readonly');" type="password">
+              </div>
+            </div>
+
+            <h5 class="uk-text-muted uk-margin-remove">Выполнение запроса может занять до двух минут.</h5>
+          </div>
+          <div class="uk-modal-footer">
+            
+            <div class="uk-text-right">
+              <button type="button" class="uk-button uk-button-primary uk-border-pill"
+                onclick="bulkDelete()">Подтвердить</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -181,6 +227,29 @@
         sendNotification("{{i18n/mailChangeSuccess}}", "success")
       })
     }
+    function bulkDelete() {
+      var pass = $("#currentPasswordConfirmation").val()
+
+      if (pass.length === 0) return sendNotification("{{i18n/currentPasswordBlank}}", "warning")
+      if (pass.length > 32) return sendNotification("{{i18n/currentPasswordLimit}}", "warning")
+      if (!checkPass(pass)) return sendNotification("{{i18n/currentPasswordInvalidFormat}}", "warning")
+
+      $.when(sendRequest({
+        module: "settings",
+        action: "bulkDelete",
+        password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+        rarity: parseInt($("input[name=bulk-delete]:checked").val()),
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+
+        UIkit.modal("#bulk-delete-modal").hide()
+        $("#currentPasswordConfirmation").val("")
+        sendNotification(replacePlaceholders(response.response_data, {
+          points: response.response_data.points
+        }), "success")
+      })
+    }
 
     $(".sl-mod-radio").change(function () {
       sendRequest({
@@ -190,6 +259,19 @@
         value: parseInt(this.value),
         timestamp: Math.floor(Date.now() / 1000)
       })
+    })
+    $(".sl-bulk-delete").change(function () {
+      var rarity = {
+        "1": "N",
+        "2": "R",
+        "3": "SR",
+        "4": "UR",
+        "5": "SSR"
+      }
+      $("#deleteNotice").text(replacePlaceholders("Вы собираетесь удалить карты редкости \{{rarity\}}. Это действие невозможно отменить!", {
+        rarity: rarity[this.value]
+      }))
+      $("#bulk-delete-button").prop("disabled", false)
     })
   </script>
 </body>

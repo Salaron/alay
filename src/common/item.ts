@@ -214,7 +214,7 @@ export class Item {
       }
 
       case 3006: {
-        await this.connection.query(`UPDATE user_exchange_point SET amount=amount + ${amount} WHERE user_id=${userId} AND rarity=${item.id}`)
+        await this.connection.query(`UPDATE user_exchange_point SET exchange_point=exchange_point + ${amount} WHERE user_id=${userId} AND rarity=${item.id}`)
         break
       }
 

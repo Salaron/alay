@@ -90,7 +90,7 @@
     "newPassword": "New password",
     "newPasswordBlank": "Поле \"New password\" не может быть пустым",
     "newPasswordLimit": "Поле \"New password\" не может быть больше 32 символов",
-    "newPasswordInvalidFormat": "Поле \"Password\" некорректно",
+    "newPasswordInvalidFormat": "Поле \"New password\" некорректно",
     "passwordNotice": "Handover ID is a PASSWORD from your account.\nDon't send it to anyone, and in case of compromentation, change it.",
     "modsNotice": "Tap on the name of the mod to find out what it affects.",
     "vanishTooltip": "Исчезание нот (как хидден в osu!)\nHidden — ноты исчезают перед приближением к кольцу.\nSudden — ноты появляются перед приближением к кольцу.",

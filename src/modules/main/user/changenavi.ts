@@ -22,7 +22,7 @@ export default class extends MainAction {
       user: this.user_id,
       unit: this.params.unit_owning_user_id
     })
-    if (!check.unit_owning_user_id) throw new ErrorCode(1311)
+    if (!check) throw new ErrorCode(1311)
 
     await this.connection.query("UPDATE users SET partner_unit = :unit WHERE user_id = :user", {
       user: this.user_id,
