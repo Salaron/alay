@@ -1,10 +1,10 @@
-(() => {
+(function() {
   $("#changeLanguage").on("click", function () {
     UIkit.modal("#languageSelect").toggle();
   });
   $("input[type=radio][name='language_radio']").change(function () {
     var href = window.location.href
-    if (!href.includes("lang")) {
+    if (!href.indexOf("lang") >= 0) {
       href += "&lang=&"
     }
     if (typeof guest === "undefined") {

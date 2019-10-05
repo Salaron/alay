@@ -11,9 +11,6 @@ body {
   -webkit-text-size-adjust : 100%;
   background: transparent;
 }
-html, body {
-  height: 100vh;
-}
 
 /* SL NavBar */
 .sl-navbar-container:not(.uk-navbar-transparent) {

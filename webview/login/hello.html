@@ -25,12 +25,15 @@
   <div class="uk-overlay-primary uk-position-cover">
 
   </div>
-  {{#unless external}}
-  <a id="external" style="margin: 10px; z-index: 99999;" class="uk-icon-button uk-position-left"
-    uk-icon="icon: expand; ratio: 1.25"></a>
-  {{/unless}}
-  <a id="changeLanguage" style="margin: 10px; z-index: 99999;" class="uk-icon-button uk-position-right lang-button"
-    uk-icon="icon: world; ratio: 1.25"></a>
+  <div class="uk-light">
+    {{#unless external}}
+    <a id="external" style="margin: 10px;" class="uk-icon-button uk-position-left uk-position-z-index"
+      uk-icon="icon: expand; ratio: 1.25"></a>
+    {{/unless}}
+    <a id="changeLanguage" style="margin: 10px;" class="uk-icon-button uk-position-right uk-position-z-index lang-button"
+      uk-icon="icon: world; ratio: 1.25"></a>
+  </div>
+
   <div class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium">
     <h2>{{i18n/hello}}</h2>
     <p>
