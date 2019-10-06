@@ -37,7 +37,7 @@ export interface secretbox {
     description: string
     start_date: string
     end_date: string
-    show_end_date: boolean
+    show_end_date?: string
     add_gauge: number
     pon_count: number
     pon_upper_limit: number
@@ -130,4 +130,36 @@ export enum animationType {
   SELECT = 4,
   BOX_TYPE_A = 5,
   BOX_TYPE_B = 6
+}
+
+export interface stepUpSettings {
+  secretbox_id: number
+  reset_type: stepUpResetType
+  start_step: number
+  end_step: number
+}
+export enum stepUpResetType {
+  NO_RESET,
+  START_FROM_BEGGINING
+}
+
+export interface secretboxData {
+  secretbox_id: number
+  secretbox_type: secretboxType
+  member_category: number
+  name: string
+  description: string
+  start_date: string
+  end_date: string
+  add_gauge: number
+  upper_limit: number
+  animation_type: animationType
+  menu_title_asset: string
+  bg_asset: string
+  navi_asset: string
+  title_asset: string
+  appeal_asset: string
+  banner_asset_name: string
+  banner_se_asset_name: string
+  enabled: 0 | 1 | 2
 }
