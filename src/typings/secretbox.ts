@@ -2,18 +2,29 @@ export interface secretboxSettings {
   [sbId: number]: costSettings
 }
 export interface costSettings {
-  [costId: number]: unitData[]
+  [costId: number]: rarityData[]
 }
-export interface unitData {
-  rateup: any // number[]
-  rateup_hidden?: number[]
-  rateup_weight?: number
+export interface rarityData {
+  rateup_unit_id?: number[]
+  rateup_limited_unit_id?: number[]
+  rateup_weight?: number // 100 - rateup_weight
+  unit_id: number[] | null
   unit_type_id: number[] | null
   query: string[] | string | null
   rarity: number
   weight: number
-  value: any
   guarantee?: boolean
+  // fields from below should NOT to be used in json
+  unit_data_by_id: {
+    [unitId: number]: {
+      unit_id: number
+      unit_number: number
+      name: string
+      attribute: 1 | 2 | 3 | 5
+      skill: string
+    }
+  }
+  rateup_unit_ids: number[]
 }
 
 export interface secretbox {
@@ -161,5 +172,6 @@ export interface secretboxData {
   appeal_asset: string
   banner_asset_name: string
   banner_se_asset_name: string
+  always_visible: 0 | 1
   enabled: 0 | 1 | 2
 }

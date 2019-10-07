@@ -17,7 +17,8 @@ export default class extends MainAction {
     const data = await this.connection.first("SELECT sns_coin, unit_max, box_gauge, bt_tickets, green_tickets, (SELECT count(*) FROM units WHERE user_id=:user AND deleted=0) as unit_count FROM users WHERE user_id=:user", {
       user: this.user_id
     })
-    const sbList = await secretbox.generateList(this.user_id)
+    const sbList = await secretbox.getSecretboxList(this.user_id)
+
     const response: any = {
       use_cache: 1,
       is_unit_max: data.unit_count >= data.unit_max,
@@ -47,15 +48,15 @@ export default class extends MainAction {
       ]
     }
 
-    await sbList.forEachAsync(async (secretbox) => {
-      const category = secretbox.secret_box_info.member_category
+    sbList.forEach(secretbox => {
+      const category: number = secretbox.secret_box_info.member_category || 0
       secretbox.secret_box_info.member_category = undefined
       if (category === 0) {
         response.member_category_list[0].page_list.push(secretbox)
         response.member_category_list[1].page_list.push(secretbox)
         return
       } else {
-        response.member_category_list[<number>category - 1].page_list.push(secretbox)
+        response.member_category_list[category - 1].page_list.push(secretbox)
       }
     })
 
