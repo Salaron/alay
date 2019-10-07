@@ -6,7 +6,7 @@ export interface costSettings {
 }
 export interface rarityData {
   rateup_unit_id?: number[]
-  rateup_limited_unit_id?: number[]
+  rateup_hidden_unit_id?: number[]
   rateup_weight?: number // 100 - rateup_weight
   unit_id: number[] | null
   unit_type_id: number[] | null

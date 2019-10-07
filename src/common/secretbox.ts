@@ -8,6 +8,7 @@ import { readFile } from "fs"
 
 const log = new Log("Secretbox")
 const unitDB = sqlite3.getUnit()
+const secretboxDB = sqlite3.getSecretbox()
 
 let secretboxSettings: types.secretboxSettings = {}
 async function updateSettings() {
@@ -42,7 +43,7 @@ async function updateSettings() {
         let excludeRateup = false
         if (Type.isArray(rarityData.rateup_unit_id) && Type.isInt(rarityData.rateup_weight)) {
           excludeRateup = true
-          rarityData.rateup_unit_ids = Utils.mergeArrayDedupe([rarityData.rateup_unit_id, rarityData.rateup_limited_unit_id])
+          rarityData.rateup_unit_ids = Utils.mergeArrayDedupe([rarityData.rateup_unit_id, rarityData.rateup_hidden_unit_id])
         }
 
         if (Array.isArray(rarityData.unit_type_id) && rarityData.unit_type_id.length > 0) {
@@ -109,7 +110,6 @@ async function updateSettings() {
             }
           })
         }
-
         return rarityData
       }))).filter(rarityData => {
         if (!rarityData) return false
@@ -122,17 +122,20 @@ async function updateSettings() {
 }
 
 export async function init() {
+  setInterval(updateSettings, 1200000)
   await updateSettings()
-  console.log(secretboxSettings[1][1])
 }
 
 export class Secretbox {
+  private secretboxSettings = secretboxSettings
   private connection: Connection
   constructor(connection: Connection) {
     this.connection = connection
   }
 
   public async getSecretboxList(userId: number): Promise<types.secretbox[]> {
+    if (Config.server.debug_mode) await updateSettings()
+
     let list = await this.connection.query(`SELECT * FROM secretbox_list WHERE (start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2`, {
       date: Utils.toSpecificTimezone(9)
     })
@@ -145,10 +148,11 @@ export class Secretbox {
   }
 
   private async generateTab(userId: number, secretboxData: types.secretboxData): Promise<types.secretbox | undefined> {
-    let [buttons, ponData, additionalInfo] = await Promise.all([
+    let [buttons, ponData, additionalInfo, effect] = await Promise.all([
       this.generateButtons(userId, secretboxData),
       this.getUserPon(userId, secretboxData.secretbox_id),
-      this.generateAdditionalInfo(userId, secretboxData)
+      this.generateAdditionalInfo(userId, secretboxData),
+      this.generateEffects(secretboxData.secretbox_id)
     ])
     if (!buttons) return
 
@@ -162,8 +166,8 @@ export class Secretbox {
         additional_asset_2: secretboxData.title_asset,
         additional_asset_3: secretboxData.appeal_asset
       },
-      effect_list: [],
-      effect_detail_list: [],
+      effect_list: effect.effectList,
+      effect_detail_list: effect.effectDetailList,
       button_list: buttons,
       secret_box_info: {
         member_category: secretboxData.member_category,
@@ -280,6 +284,53 @@ export class Secretbox {
         }
       }
       default: return undefined
+    }
+  }
+  private async generateEffects(secretboxId: number) {
+
+    let effectList: types.secretboxEffect[] = []
+    let effectDetailList: types.secretboxEffectDetail[] = []
+
+    for (let cost of Object.keys(this.secretboxSettings[secretboxId])) {
+      let costData = this.secretboxSettings[secretboxId][parseInt(cost)]
+      for (let rarity of costData) {
+        if (rarity.rateup_unit_id) {
+          for (let unitId of rarity.rateup_unit_id) {
+            let asset = await secretboxDB.get("SELECT secret_box_asset_id FROM secret_box_asset_m WHERE unit_id = :unit", {
+              unit: unitId
+            })
+            if (!asset) continue
+            effectList.push({
+              type: 1,
+              secret_box_asset_id: asset.secret_box_asset_id,
+              start_date: "2018-11-03 00:00:00",
+              end_date: "2036-11-03 00:00:00"
+            })
+            effectDetailList.push({
+              type: 1,
+              secret_box_asset_id: asset.secret_box_asset_id
+            })
+          }
+        }
+
+        if (rarity.rateup_hidden_unit_id) {
+          for (let unitId of rarity.rateup_hidden_unit_id) {
+            let asset = await secretboxDB.get("SELECT secret_box_asset_id FROM secret_box_asset_m WHERE unit_id = :unit", {
+              unit: unitId
+            })
+            if (!asset) continue
+            effectDetailList.push({
+              type: 1,
+              secret_box_asset_id: asset.secret_box_asset_id
+            })
+          }
+        }
+      }
+    }
+
+    return {
+      effectList,
+      effectDetailList
     }
   }
 
