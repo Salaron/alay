@@ -44,6 +44,24 @@ async function updateSettings() {
         if (Type.isArray(rarityData.rateup_unit_id) && Type.isInt(rarityData.rateup_weight)) {
           excludeRateup = true
           rarityData.rateup_unit_ids = Utils.mergeArrayDedupe([rarityData.rateup_unit_id, rarityData.rateup_hidden_unit_id])
+          const units = await unitDB.all(`
+            SELECT
+              unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+            FROM
+              unit_m
+            LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
+            WHERE rarity = :rarity AND unit_id IN (${rarityData.rateup_unit_ids.join(",")})`, {
+            rarity: rarityData.rarity
+          })
+          for (let unit of units) {
+            rarityData.unit_data_by_id[unit.unit_id] = {
+              unit_id: unit.unit_id,
+              unit_number: unit.unit_number,
+              name: unit.unit_name,
+              attribute: unit.attribute_id,
+              skill: unit.skill_name
+            }
+          }
         }
 
         if (Array.isArray(rarityData.unit_type_id) && rarityData.unit_type_id.length > 0) {
@@ -53,7 +71,7 @@ async function updateSettings() {
             FROM
               unit_m
             LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
-            WHERE rarity = :rarity AND unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")}) AND unit_type_id IN (${rarityData.unit_type_id.join(",")})`, {
+            WHERE rarity = :rarity AND unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")}) AND unit_type_id IN (${rarityData.unit_type_id.join(",")}) ORDER BY unit_id DESC`, {
             rarity: rarityData.rarity
           })
           for (let unit of units) {
@@ -122,12 +140,14 @@ async function updateSettings() {
 }
 
 export async function init() {
-  setInterval(updateSettings, 1200000)
+  setInterval(() => {
+    updateSettings().catch(err => log.error(err))
+  }, 1200000)
   await updateSettings()
 }
 
 export class Secretbox {
-  private secretboxSettings = secretboxSettings
+  public secretboxSettings = secretboxSettings
   private connection: Connection
   constructor(connection: Connection) {
     this.connection = connection
@@ -291,34 +311,25 @@ export class Secretbox {
     let effectList: types.secretboxEffect[] = []
     let effectDetailList: types.secretboxEffectDetail[] = []
 
+    let ids: number[] = []
     for (let cost of Object.keys(this.secretboxSettings[secretboxId])) {
       let costData = this.secretboxSettings[secretboxId][parseInt(cost)]
       for (let rarity of costData) {
         if (rarity.rateup_unit_id) {
-          for (let unitId of rarity.rateup_unit_id) {
+          for (let unitId of rarity.rateup_unit_ids) {
             let asset = await secretboxDB.get("SELECT secret_box_asset_id FROM secret_box_asset_m WHERE unit_id = :unit", {
               unit: unitId
             })
-            if (!asset) continue
-            effectList.push({
-              type: 1,
-              secret_box_asset_id: asset.secret_box_asset_id,
-              start_date: "2018-11-03 00:00:00",
-              end_date: "2036-11-03 00:00:00"
-            })
-            effectDetailList.push({
-              type: 1,
-              secret_box_asset_id: asset.secret_box_asset_id
-            })
-          }
-        }
-
-        if (rarity.rateup_hidden_unit_id) {
-          for (let unitId of rarity.rateup_hidden_unit_id) {
-            let asset = await secretboxDB.get("SELECT secret_box_asset_id FROM secret_box_asset_m WHERE unit_id = :unit", {
-              unit: unitId
-            })
-            if (!asset) continue
+            if (!asset || ids.includes(unitId)) continue
+            ids.push(unitId)
+            if (rarity.rateup_hidden_unit_id && !rarity.rateup_hidden_unit_id.includes(unitId)) {
+              effectList.push({
+                type: 1,
+                secret_box_asset_id: asset.secret_box_asset_id,
+                start_date: "2018-11-03 00:00:00",
+                end_date: "2036-11-03 00:00:00"
+              })
+            }
             effectDetailList.push({
               type: 1,
               secret_box_asset_id: asset.secret_box_asset_id
