@@ -38,7 +38,6 @@ async function updateSettings() {
         }
         rarityData.unit_data_by_id = {}
         rarityData.rateup_unit_ids = []
-        if (!Type.isArray(rarityData.unit_id)) rarityData.unit_id = []
 
         let excludeRateup = false
         if (Type.isArray(rarityData.rateup_unit_id) && Type.isInt(rarityData.rateup_weight)) {
@@ -64,6 +63,28 @@ async function updateSettings() {
           }
         }
 
+        if (Type.isArray(rarityData.unit_id)) {
+          const units = await unitDB.all(`
+            SELECT
+              unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+            FROM
+              unit_m
+            LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
+            WHERE rarity = :rarity AND unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")}) AND unit_id IN (${rarityData.unit_id.join(",")}) ORDER BY unit_id DESC`, {
+            rarity: rarityData.rarity
+          })
+          for (let unit of units) {
+            rarityData.unit_data_by_id[unit.unit_id] = {
+              unit_id: unit.unit_id,
+              unit_number: unit.unit_number,
+              name: unit.unit_name,
+              attribute: unit.attribute_id,
+              skill: unit.skill_name
+            }
+          }
+        } else {
+          rarityData.unit_id = []
+        }
         if (Array.isArray(rarityData.unit_type_id) && rarityData.unit_type_id.length > 0) {
           const units = await unitDB.all(`
             SELECT
@@ -166,6 +187,9 @@ export class Secretbox {
       return true
     })
   }
+  public async updateSecretboxSettings() {
+    await updateSettings()
+  }
 
   private async generateTab(userId: number, secretboxData: types.secretboxData): Promise<types.secretbox | undefined> {
     let [buttons, ponData, additionalInfo, effect] = await Promise.all([
@@ -251,7 +275,9 @@ export class Secretbox {
         }
         return [button]
       }
-      default: throw new Error(`Secretbox type "${secretboxData.secretbox_type}" is not implemented yet.`)
+      default: {
+        throw new Error(`Secretbox type "${secretboxData.secretbox_type}" is not implemented yet.`)
+      }
     }
   }
   private async generateCost(userId: number, buttonId: number): Promise<types.secretboxCost[]> {

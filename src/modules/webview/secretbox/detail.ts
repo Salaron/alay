@@ -42,43 +42,59 @@ export default class extends WebViewAction {
       if (isNaN(parseInt(this.params.id))) throw new Error("id should be int")
       const secretboxModule = new Secretbox(this.connection)
 
+      if (Config.server.debug_mode) await secretboxModule.updateSecretboxSettings()
       let secretbox = await this.connection.first("SELECT * FROM secretbox_list WHERE secretbox_id = :id", {
         id: this.params.id
       })
       if (!secretbox) throw new Error("secretbox doesn't exist")
 
       let template
+      let query = `
+      SELECT
+        cost_id, step_id
+      FROM
+        secretbox_list
+      JOIN secretbox_button ON secretbox_list.secretbox_id = secretbox_button.secretbox_id
+      JOIN secretbox_cost ON secretbox_button.button_id = secretbox_cost.button_id
+      WHERE secretbox_list.secretbox_id = :id`
       switch (secretbox.secretbox_type) {
         case 0: {
-          template = await WebView.getTemplate("secretbox", "honor")
+          template = await WebView.getTemplate("secretbox", "default")
+          query += " GROUP BY unit_data_file"
           break
         }
         case 1: {
           template = await WebView.getTemplate("secretbox", "stepup")
           break
         }
+        case 5: {
+          template = await WebView.getTemplate("secretbox", "default")
+          query += " ORDER BY cost_id ASC"
+          secretbox.stubBox = true
+          break
+        }
         default: throw new Error("<center><h4>Not implemented yet.</h4></center>")
       }
 
-      let costs = await this.connection.query(`
-      SELECT
-        cost_id
-      FROM
-        secretbox_list
-      JOIN secretbox_button ON secretbox_list.secretbox_id = secretbox_button.secretbox_id
-      JOIN secretbox_cost ON secretbox_button.button_id = secretbox_cost.button_id
-      WHERE secretbox_list.secretbox_id = :id GROUP BY unit_data_file`, {
+      let costs = await this.connection.query(query, {
         id: secretbox.secretbox_id
       })
 
-      let rarityList = []
-      let total = 0
-
-      for (let cost of costs) {
-        let settings = secretboxModule.secretboxSettings[secretbox.secretbox_id][cost.cost_id]
+      let costList = []
+      for (let i = 0; i < costs.length; i++) {
+        let settings = secretboxModule.secretboxSettings[secretbox.secretbox_id][costs[i].cost_id]
+        let cost = {
+          total: 0,
+          default: i === 0,
+          rarityString: "",
+          rarityList: <any[]>[]
+        }
 
         for (let rarity of settings) {
-          total += Object.values(rarity.unit_data_by_id).length
+          cost.total += Object.values(rarity.unit_data_by_id).length
+
+          if (cost.rarityString.length > 0) cost.rarityString += "/"
+          cost.rarityString += getRarityString(rarity.rarity)
 
           let rateup = rarity.rateup_unit_ids.map(unitId => {
             let data = rarity.unit_data_by_id[unitId]
@@ -98,7 +114,8 @@ export default class extends WebViewAction {
               cardAttribute: getAttributeString(data.attribute)
             }
           })
-          rarityList.push({
+
+          let result = {
             rarity: getRarityString(rarity.rarity),
             rate: rarity.weight,
             total: Object.values(rarity.unit_data_by_id).length,
@@ -106,16 +123,17 @@ export default class extends WebViewAction {
             ratePerRateup: ((rarity.rateup_weight || 0) / rarity.rateup_unit_ids.length).toFixed(3),
             rateup,
             cards
-          })
+          }
+          cost.rarityList.push(result)
         }
+        costList.push(cost)
       }
 
       return {
         status: 200,
         result: template({
           secretbox,
-          rarityList,
-          total,
+          costList,
           headers: JSON.stringify(this.requestData.getWebapiHeaders())
         })
       }

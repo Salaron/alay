@@ -79,7 +79,7 @@
 
         function loadUntil() {
           if ($("#announce-" + queryObject.id).length != 0) {
-            ps.scrollTo(0, $("#announce-" + queryObject.id).offset().top - 75, 800)
+            ps.scrollTo(0, $("#announce-" + queryObject.id).position().top, 800)
             return
           }
           loadNews(loadUntil)

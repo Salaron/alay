@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/secretbox-detail.css">
 </head>
 
@@ -19,10 +19,10 @@
     <div id="inner">
       <div id="header">
         <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
-        uk-sticky="bottom: #offset">
+          uk-sticky="bottom: #offset">
           <div class="uk-navbar-left">
             <ul id="2back" class="uk-navbar-nav">
-                <li class="uk-active"><a class="uk-text-bold uk-text-uppercase"> </a></li>
+              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase"> </a></li>
             </ul>
           </div>
           <div class="uk-navbar-center">
@@ -33,9 +33,22 @@
         </nav>
       </div>
 
-      <div id="body" class="uk-scrollspy-inview uk-animation-fade">
-        <div class="uk-container uk-container-large">
+      {{#if secretbox/stubBox}}
+      <ul class="uk-flex-center uk-nav uk-nav-default" uk-scrollspy-nav="closest: li; scroll: true" uk-tab>
+        {{#each costList}}
+        {{#if default}}
+        <li class="uk-active"><a onclick='ps.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{rarityString}}</a></li>
+        {{else}}
+        <li><a onclick='ps.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{rarityString}}</a></li>
+        {{/if}}
+        {{/each}}
+      </ul>
+      {{/if}}
 
+      <div id="body" data-scrollbar>
+
+        {{#each costList}}
+        <div id="cost-{{@index}}" class="uk-container uk-container-large">
           <div id="secretbox-rates">
             <h3><b>■ Scouting rates by rarity</b></h3>
             <ul>
@@ -47,6 +60,7 @@
 
           <h3><b>■ Note</b></h3>
           <ul>
+              <li>Loading this page can take somee time. Please wait a bit.</li>
             <li>Rates are rounded to three decimal places, so there may by cases when the total does not add up to
               exactly
               100%</li>
@@ -118,7 +132,8 @@
             {{/each}}
           </div>
         </div>
-
+        <hr>
+        {{/each}}
       </div>
     </div>
   </div>
@@ -129,16 +144,15 @@
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
-  <script>
-      var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
-      if (window.history.length != 1) {
-        $("#2back").prepend('<a onclick="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
-      }
-    </script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
-
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script>
+    var ps = Scrollbar.init($("#body")[0]);
+    if (window.history.length != 1) {
+      $("#2back").prepend('<a onclick="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    }
+  </script>
 </body>
 
 </html>
