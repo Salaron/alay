@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
 </head>
 
@@ -19,14 +19,14 @@
   }
 </style>
 
-<body>
+<body >
   <div id="outer">
     <div id="inner">
       <div id="header">
         {{{header i18n/settings this}}}
       </div>
 
-      <div id="body" class="uk-scrollspy-inview uk-animation-fade">
+      <div id="body">
         <div class="uk-container uk-container-small">
           <h4 class="uk-text-bold" href="#">{{i18n/mods}}</h4>
           <h5 class="uk-margin-remove">{{nl2br i18n/modsNotice}}</h5>
@@ -166,14 +166,14 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
 
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
 
   <script>
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(publicKey)
-    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
+    var ps = Scrollbar.init($("#body")[0])
 
     function changePassword() {
       var currentPass = $("#currentPassword").val()

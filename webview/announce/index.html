@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/perfect-scrollbar.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
 </head>
 
@@ -20,7 +20,7 @@
         {{{header i18n/announce this}}}
       </div>
 
-      <div id="body" class="uk-scrollspy-inview uk-animation-fade">
+      <div id="body">
         {{#each announceList}}
         <br>
         <div id="announce-{{id}}" class="uk-card uk-card-default uk-width-1-1">
@@ -58,13 +58,12 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
 
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/perfect-scrollbar.min.js"></script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script>
     var announceTotal = null
     var loadAttempt = 0 // Just in case, in order not to overload the server
-    var ps = new PerfectScrollbar('#body', { suppressScrollX: true })
-
+    var ps = Scrollbar.init($("#body")[0])
     $(document).ready(function () {
       // check if current url contains query string
       var queryString = window.location.href.split("?")[1]
@@ -80,9 +79,7 @@
 
         function loadUntil() {
           if ($("#announce-" + queryObject.id).length != 0) {
-            $('#body,html').animate({
-              scrollTop: $("#announce-" + queryObject.id).offset().top - 75
-            }, 'slow')
+            ps.scrollTo(0, $("#announce-" + queryObject.id).offset().top - 75, 800)
             return
           }
           loadNews(loadUntil)
@@ -90,8 +87,11 @@
         loadUntil()
       })
     })
-    $("#body").on('ps-y-reach-end', function() {
-      loadNews()
+
+    ps.addListener(function (status) {
+      if (status.limit.y === status.offset.y) {
+        loadNews()
+      }
     })
 
     function loadNews(callback) {
