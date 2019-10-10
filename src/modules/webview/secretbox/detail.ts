@@ -61,10 +61,13 @@ export default class extends WebViewAction {
         case 0: {
           template = await WebView.getTemplate("secretbox", "default")
           query += " GROUP BY unit_data_file"
+          secretbox.honorBox = true
           break
         }
         case 1: {
-          template = await WebView.getTemplate("secretbox", "stepup")
+          template = await WebView.getTemplate("secretbox", "default")
+          query += " ORDER BY step_id ASC"
+          secretbox.stepBox = true
           break
         }
         case 5: {
@@ -86,15 +89,18 @@ export default class extends WebViewAction {
         let cost = {
           total: 0,
           default: i === 0,
-          rarityString: "",
+          label: "",
           rarityList: <any[]>[]
         }
+        if (secretbox.secretbox_type === 1) cost.label = "STEP " + costs[i].step_id
 
         for (let rarity of settings) {
           cost.total += Object.values(rarity.unit_data_by_id).length
 
-          if (cost.rarityString.length > 0) cost.rarityString += "/"
-          cost.rarityString += getRarityString(rarity.rarity)
+          if (secretbox.secretbox_type === 5 && cost.label.length > 0) {
+            cost.label += "/"
+          }
+          cost.label += getRarityString(rarity.rarity)
 
           let rateup = rarity.rateup_unit_ids.map(unitId => {
             let data = rarity.unit_data_by_id[unitId]
@@ -119,7 +125,7 @@ export default class extends WebViewAction {
             rarity: getRarityString(rarity.rarity),
             rate: rarity.weight,
             total: Object.values(rarity.unit_data_by_id).length,
-            ratePerCard: ((100 - (rarity.rateup_weight || 0)) / Object.values(rarity.unit_data_by_id).length).toFixed(3),
+            ratePerCard: ((100 - (rarity.rateup_weight || 0)) / rarity.unit_id!.length).toFixed(3),
             ratePerRateup: ((rarity.rateup_weight || 0) / rarity.rateup_unit_ids.length).toFixed(3),
             rateup,
             cards

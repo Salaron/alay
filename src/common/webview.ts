@@ -69,10 +69,8 @@ export class WebView {
 
 // Helpers
 
-Handlebars.registerHelper("equal", (a, b, options) => {
-  // @ts-ignore: Unreachable code error
+Handlebars.registerHelper("equal", function(this: any, a, b, options) {
   if (a == b) { return options.fn(this) }
-  // @ts-ignore: Unreachable code error
   return options.inverse(this)
 })
 
@@ -109,3 +107,30 @@ Handlebars.registerHelper("numberWithSpaces", (value) => {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ")
   return new Handlebars.SafeString(parts.join("."))
 })
+
+Handlebars.registerHelper("ifcond", function(this: any, v1, operator, v2, options) {
+  switch (operator) {
+    case "==":
+      return (v1 == v2) ? options.fn(this) : options.inverse(this)
+    case "===":
+      return (v1 === v2) ? options.fn(this) : options.inverse(this)
+    case "!=":
+      return (v1 != v2) ? options.fn(this) : options.inverse(this)
+    case "!==":
+      return (v1 !== v2) ? options.fn(this) : options.inverse(this)
+    case "<":
+      return (v1 < v2) ? options.fn(this) : options.inverse(this)
+    case "<=":
+      return (v1 <= v2) ? options.fn(this) : options.inverse(this)
+    case ">":
+      return (v1 > v2) ? options.fn(this) : options.inverse(this)
+    case ">=":
+      return (v1 >= v2) ? options.fn(this) : options.inverse(this)
+    case "&&":
+      return (v1 && v2) ? options.fn(this) : options.inverse(this)
+    case "||":
+      return (v1 || v2) ? options.fn(this) : options.inverse(this)
+    default:
+      return options.inverse(this)
+  }
+});

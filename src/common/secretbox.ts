@@ -70,7 +70,7 @@ async function updateSettings() {
             FROM
               unit_m
             LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
-            WHERE rarity = :rarity AND unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")}) AND unit_id IN (${rarityData.unit_id.join(",")}) ORDER BY unit_id DESC`, {
+            WHERE rarity = :rarity AND unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")}) AND unit_id IN (${rarityData.unit_id.join(",")})`, {
             rarity: rarityData.rarity
           })
           for (let unit of units) {
@@ -92,7 +92,7 @@ async function updateSettings() {
             FROM
               unit_m
             LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
-            WHERE rarity = :rarity AND unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")}) AND unit_type_id IN (${rarityData.unit_type_id.join(",")}) ORDER BY unit_id DESC`, {
+            WHERE rarity = :rarity AND unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")}) AND unit_type_id IN (${rarityData.unit_type_id.join(",")})`, {
             rarity: rarityData.rarity
           })
           for (let unit of units) {
@@ -112,23 +112,11 @@ async function updateSettings() {
           if (Type.isString(rarityData.query)) query.push(rarityData.query)
           else query = rarityData.query
 
-          await query.forEachAsync(async query => {
-            if (query.toLowerCase().includes("order")) {
-              throw new Error(`Never use "ORDER BY" in custom query`)
-            }
-
-            if (excludeRateup) {
-              if (query.slice(-1) === ";") query = query.slice(0, -1) // remove ";" -- the end of query
-              if (query.toLowerCase().includes("where")) { // insert before other conditions
-                query = query.splice(query.toLowerCase().lastIndexOf("where") + 6, 0, `unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")}) AND `)
-              } else { // add our condition
-                query += ` WHERE unit_id NOT IN (${rarityData.rateup_unit_ids.join(",")})`
-              }
-            }
-
-            query += " ORDER BY unit_id DESC" // order should be always from new to old
+          await Promise.all(query.map(async query => {
             const units = await unitDB.all(query)
             for (let unit of units) {
+              if (excludeRateup && rarityData.rateup_unit_ids.includes(unit.unit_id)) continue
+
               const data = await unitDB.get(`
                 SELECT
                   unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
@@ -147,8 +135,12 @@ async function updateSettings() {
                 skill: data.skill_name
               }
             }
-          })
+          }))
         }
+        // sort from older to new
+        rarityData.rateup_unit_ids.sort((a, b) => b - a)
+        rarityData.unit_id = [...new Set(rarityData.unit_id)].sort((a, b) => b - a) // remove duples and sort
+
         return rarityData
       }))).filter(rarityData => {
         if (!rarityData) return false
@@ -234,6 +226,7 @@ export class Secretbox {
 
   private async generateButtons(userId: number, secretboxData: types.secretboxData): Promise<types.secretboxButton[] | false> {
     switch (secretboxData.secretbox_type) {
+      case 5:  // stub a.k.a. blue ticket box
       case 0: { // default
         const buttons = await this.connection.query(`SELECT * FROM secretbox_button WHERE secretbox_id = :id ORDER BY type ASC LIMIT 3`, {
           id: secretboxData.secretbox_id

@@ -33,34 +33,46 @@
         </nav>
       </div>
 
-      {{#if secretbox/stubBox}}
+      {{#ifcond secretbox.stubBox '||' secretbox.stepBox}}
       <ul class="uk-flex-center uk-nav uk-nav-default" uk-scrollspy-nav="closest: li; scroll: true" uk-tab>
         {{#each costList}}
         {{#if default}}
-        <li class="uk-active"><a onclick='ps.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{rarityString}}</a></li>
+        <li class="uk-active"><a onclick='ps.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{label}}</a></li>
         {{else}}
-        <li><a onclick='ps.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{rarityString}}</a></li>
+        <li><a onclick='ps.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{label}}</a></li>
         {{/if}}
         {{/each}}
       </ul>
-      {{/if}}
+      {{else if secretbox.honorBox}}
+      <ul class="uk-flex-center uk-nav uk-nav-default" uk-scrollspy-nav="closest: li; scroll: true" uk-tab>
+        {{#each costList.0.rarityList}}
+        {{#ifcond @index '===' 0}}
+        <li class="uk-active"><a onclick='ps.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a></li>
+        {{else}}
+        <li><a onclick='ps.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a></li>
+        {{/ifcond}}
+        {{/each}}
+      </ul>
+      {{/ifcond}}
 
       <div id="body" data-scrollbar>
 
         {{#each costList}}
         <div id="cost-{{@index}}" class="uk-container uk-container-large">
-          <div id="secretbox-rates">
-            <h3><b>■ Scouting rates by rarity</b></h3>
-            <ul>
-              {{#each rarityList}}
-              <li>{{rarity}}: {{rate}}%</li>
-              {{/each}}
-            </ul>
-          </div>
+          {{#if secretbox.stepup}}
+          <!-- cost info? -->
+          {{/if}}
 
-          <h3><b>■ Note</b></h3>
+          <h3 class="uk-text-bold">■ Scouting rates by rarity</h3>
           <ul>
-              <li>Loading this page can take somee time. Please wait a bit.</li>
+            {{#each rarityList}}
+            <li>{{rarity}}: {{rate}}%</li>
+            {{/each}}
+          </ul>
+
+          <h3 class="uk-text-bold">■ Note</h3>
+          <ul>
+            <li>Loading this page can take some time. Please wait a bit.</li>
             <li>Rates are rounded to three decimal places, so there may by cases when the total does not add up to
               exactly
               100%</li>
@@ -69,11 +81,12 @@
               within that rarity is selected according to the rates as shown in the list of available members.</li>
           </ul>
 
-          <h3><b>■ Members available in total ({{total}} members)</b></h3>
+          <h3 class="uk-text-bold">■ Members available in total ({{total}} members)</h3>
 
-          <div id="secretbox-tables">
-            {{#each rarityList}}
-            <h4><b>&lt;{{rarity}}&gt; ({{total}} members)</b></h4>
+          {{#each rarityList}}
+          <div id="rarity-{{@../index}}-{{@index}}">
+
+            <h4 class="uk-text-bold">&lt;{{rarity}}&gt; ({{total}} members)</h4>
             {{#if rateup.length}}
             <h4 style="color: red;">[{{rarity}} members with increased appearance rate]</h4>
             <ul>
@@ -128,9 +141,8 @@
                 {{/each}}
               </tbody>
             </table>
-            <br>
-            {{/each}}
           </div>
+          {{/each}}
         </div>
         <hr>
         {{/each}}
