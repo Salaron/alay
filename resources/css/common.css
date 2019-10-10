@@ -38,13 +38,13 @@ body {
   box-shadow: 3px 3px 0 0 #cecccd;
   display: block;
   margin: 0 3px 3px 0;
-  height: 98vh;
+  height: calc(100vh - 10px);
 }
 
 #inner {
   border: 2px solid #1e87f0;
   border-radius: 12px;
-  height: 99%;
+  height: calc(100% - 5px);
 }
 
 #header {
@@ -52,7 +52,6 @@ body {
   position: relative;
 }
 #body {
-  height: 70vh;
   margin: 5px 3px 5px;
   padding: 0 19px 0 13px;
   position: relative;

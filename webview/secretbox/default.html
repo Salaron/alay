@@ -47,7 +47,8 @@
       <ul class="uk-flex-center uk-nav uk-nav-default" uk-scrollspy-nav="closest: li; scroll: true" uk-tab>
         {{#each costList.0.rarityList}}
         {{#ifcond @index '===' 0}}
-        <li class="uk-active"><a onclick='ps.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a></li>
+        <li class="uk-active"><a onclick='ps.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a>
+        </li>
         {{else}}
         <li><a onclick='ps.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a></li>
         {{/ifcond}}
@@ -56,12 +57,11 @@
       {{/ifcond}}
 
       <div id="body" data-scrollbar>
-
         {{#each costList}}
         <div id="cost-{{@index}}" class="uk-container uk-container-large">
-          {{#if secretbox.stepup}}
-          <!-- cost info? -->
-          {{/if}}
+          <!--
+            <h3 class="uk-text-bold">■ Costs</h3>
+          -->
 
           <h3 class="uk-text-bold">■ Scouting rates by rarity</h3>
           <ul>
@@ -79,6 +79,10 @@
             <li>A player may Scout the same Member more than once.</li>
             <li>When scouting, the rarity is decided first based on the "Scouting rates by rarity", then a club member
               within that rarity is selected according to the rates as shown in the list of available members.</li>
+
+            {{#ifcond ../secretbox/enabled '==' 1}}
+            <li style="color: red;">Time limit: TODO</li>
+            {{/ifcond}}
           </ul>
 
           <h3 class="uk-text-bold">■ Members available in total ({{total}} members)</h3>
@@ -96,10 +100,10 @@
             <table class="uk-table uk-table-striped">
               <thead>
                 <tr>
-                  <th class="card-number">No.</th>
-                  <th class="unit-name">Name</th>
-                  <th class="card-skill-name">Skill Name</th>
-                  <th class="card-attribute">Attribute</th>
+                  <th>No.</th>
+                  <th>Name</th>
+                  <th>Skill Name</th>
+                  <th>Attribute</th>
                 </tr>
               </thead>
 
@@ -107,14 +111,16 @@
                 {{#each rateup}}
                 <tr>
                   <td class="card-number">{{cardNumber}}</td>
-                  <td class="unit-name">{{unitName}}</td>
-                  <td class="card-skill-name">{{skillName}}</td>
-                  <td class="card-attribute">{{cardAttribute}}</td>
+                  <td>{{unitName}}</td>
+                  <td>{{skillName}}</td>
+                  <td>{{cardAttribute}}</td>
                 </tr>
                 {{/each}}
               </tbody>
             </table>
             {{/if}}
+
+            {{#if cards.length}}
             <h4 style="color: blue;">[{{rarity}} members]</h4>
             <ul>
               <li>Individual appearance rates are equal among the same rarity.</li>
@@ -123,10 +129,10 @@
             <table class="uk-table uk-table-striped">
               <thead>
                 <tr>
-                  <th class="card-number">No.</th>
-                  <th class="unit-name">Name</th>
-                  <th class="card-skill-name">Skill Name</th>
-                  <th class="card-attribute">Attribute</th>
+                  <th>No.</th>
+                  <th>Name</th>
+                  <th>Skill Name</th>
+                  <th>Attribute</th>
                 </tr>
               </thead>
 
@@ -134,13 +140,14 @@
                 {{#each cards}}
                 <tr>
                   <td class="card-number">{{cardNumber}}</td>
-                  <td class="unit-name">{{unitName}}</td>
-                  <td class="card-skill-name">{{skillName}}</td>
-                  <td class="card-attribute">{{cardAttribute}}</td>
+                  <td>{{unitName}}</td>
+                  <td>{{skillName}}</td>
+                  <td>{{cardAttribute}}</td>
                 </tr>
                 {{/each}}
               </tbody>
             </table>
+            {{/if}}
           </div>
           {{/each}}
         </div>

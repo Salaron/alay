@@ -92,15 +92,17 @@ export default class extends WebViewAction {
           label: "",
           rarityList: <any[]>[]
         }
-        if (secretbox.secretbox_type === 1) cost.label = "STEP " + costs[i].step_id
+        if (secretbox.stepBox) {
+          cost.label = "STEP " + costs[i].step_id
+        }
 
         for (let rarity of settings) {
           cost.total += Object.values(rarity.unit_data_by_id).length
 
-          if (secretbox.secretbox_type === 5 && cost.label.length > 0) {
+          if (secretbox.stubBox && cost.label.length > 0) {
             cost.label += "/"
           }
-          cost.label += getRarityString(rarity.rarity)
+          if (secretbox.honorBox || secretbox.stubBox) cost.label += getRarityString(rarity.rarity)
 
           let rateup = rarity.rateup_unit_ids.map(unitId => {
             let data = rarity.unit_data_by_id[unitId]
