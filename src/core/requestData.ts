@@ -91,7 +91,7 @@ export default class RequestData {
         if (Type.isString(this.params.user_id) && Type.isString(this.params.token)) { // queryString
           this.user_id = parseInt(this.params.user_id) || null
           this.auth_token = this.params.token
-          this.requestFromBrowser = true
+          if (!Config.server.debug_mode) this.requestFromBrowser = true
         } else if (
           getCookie(<string>this.headers.cookie || "", "token") != null
         ) { // cookie
@@ -99,7 +99,7 @@ export default class RequestData {
             this.user_id = parseInt(<string>getCookie(<string>this.headers.cookie || "", "user_id"))
           }
           this.auth_token = getCookie(<string>this.headers.cookie || "", "token")
-          this.requestFromBrowser = true
+          if (!Config.server.debug_mode) this.requestFromBrowser = true
         }
       }
       if (this.user_id != null && this.auth_token != null) {

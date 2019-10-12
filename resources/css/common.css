@@ -5,11 +5,11 @@
   padding: 0;
   border: 0;
 }
+
 body {
-  font-size: 100%;
-  padding: 0 2px;
-  -webkit-text-size-adjust : 100%;
+  -webkit-text-size-adjust: 100%;
   background: transparent;
+  height: 1in;
 }
 
 /* SL NavBar */
@@ -20,15 +20,13 @@ body {
 
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
   color: rgba(255,255,255,0.8);
-  font-size: 22px;
+  font-size: 19px;
   min-height: 50px;
-  text-transform: none;
 }
 
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li.uk-active>a {
   color: #fff;
-  font-size: 22px;
-  text-transform: none;
+  font-size: 19px;
 }
 
 #outer {
@@ -38,7 +36,10 @@ body {
   box-shadow: 3px 3px 0 0 #cecccd;
   display: block;
   margin: 0 3px 3px 0;
-  height: calc(100vh - 10px);
+  height: calc(100vh - 8px);
+  width: calc(100vw - 8px);
+  bottom: auto;
+  right: auto;
 }
 
 #inner {
@@ -55,20 +56,9 @@ body {
   margin: 5px 3px 5px;
   padding: 0 19px 0 13px;
   position: relative;
+  height: calc(100vh - 80px);
 }
 
-.title {
-  margin: 3px;
-  background: linear-gradient(to left, #28a5f5, #1e87f0);
-  border-radius: 9px;
-  color: white;
-  font-size: 32px;
-  font-weight: bold;
-  height: 57px;
-  line-height: 57px;
-  padding: 0 2px 0 50px;
-  text-align: center;
-}
 
 /* SL Headers */
 h1, h2, h3, h4, h5, h6 {
@@ -82,7 +72,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .sl-icon-button {
   background: white;
-  border: 5px solid #5bb7f0;
+  border: 4px solid #5bb7f0;
   border-radius: 12px;
   height: 40px;
   width: 40px;
