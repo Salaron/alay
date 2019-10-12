@@ -10,7 +10,10 @@
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/nicescroll.css">
+  {{#if external}}
+  <link rel="stylesheet" type="text/css" href="/resources/css/external.css">
+  {{/if}}
   <link rel="stylesheet" type="text/css" href="/resources/css/secretbox-detail.css">
 </head>
 
@@ -56,7 +59,7 @@
       </ul>
       {{/ifcond}}
 
-      <div id="body" data-scrollbar>
+      <div id="body">
         {{#each costList}}
         <div id="cost-{{@index}}" class="uk-container uk-container-large">
           <!--
@@ -158,16 +161,15 @@
   </div>
 
   <script type="">
-    var enableResize = true
     var headers = {{{headers}}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
+  <script type="text/javascript" src="/resources/js/nicescroll.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script>
-    var ps = Scrollbar.init($("#body")[0]);
+    var scrollbar = $("#body").niceScroll()
     if (window.history.length != 1) {
       $("#2back").prepend('<a onclick="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
     }

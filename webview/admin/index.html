@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/nicescroll.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
 </head>
 
@@ -39,10 +39,10 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
 
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
+  <script type="text/javascript" src="/resources/js/nicescroll.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script>
-    var ps = Scrollbar.init($("#body")[0])
+    var scrollbar = $("#body").niceScroll()
     $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))
   </script>
 </body>

@@ -123,7 +123,7 @@ function replacePlaceholders(input, values) {
 
 function updateBodySize() {
   $("#body").height($(window).height() - $("#body").offset().top - 20)
-  if (typeof ps != "undefined") ps.update()
+  if (typeof scrollbar != "undefined") scrollbar.resize()
 }
 function isChrome() {
   var isChromium = window.chrome;
