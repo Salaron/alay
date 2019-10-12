@@ -347,13 +347,13 @@ export class Secretbox {
       secretboxData = <types.secretboxData>data
     }
 
-    let [buttons, ponData, additionalInfo, effect] = await Promise.all([
+    const [buttons, ponData, additionalInfo] = await Promise.all([
       this.getButtons(userId, secretboxData),
       this.getUserPon(userId, secretboxData.secretbox_id),
-      this.getAdditionalInfo(userId, secretboxData),
-      this.getEffects(secretboxData.secretbox_id)
+      this.getAdditionalInfo(userId, secretboxData)
     ])
     if (!buttons) return
+    const effect = await this.getEffects(secretboxData, additionalInfo)
 
     const tab: types.secretbox = {
       page_title_asset: secretboxData.menu_title_asset,
@@ -511,14 +511,24 @@ export class Secretbox {
       default: return undefined
     }
   }
-  private async getEffects(secretboxId: number) {
+  private async getEffects(secretboxData: types.secretboxData, additionalInfo?: types.stepInfo) {
+    // oh god stupid crutch ...
+    let justObject: any = {}
+    let useObjectFromAbove = false
+    if (secretboxData.secretbox_type === 1) {
+      useObjectFromAbove = true
+      justObject.cost = await this.connection.first(`SELECT * FROM secretbox_cost JOIN secretbox_button ON secretbox_cost.button_id = secretbox_button.button_id WHERE secretbox_id = :id AND step_id = :step`, {
+        id: secretboxData.secretbox_id,
+        step: additionalInfo!.step
+      })
+    }
 
     let effectList: types.secretboxEffect[] = []
     let effectDetailList: types.secretboxEffectDetail[] = []
 
     let ids: number[] = []
-    for (let cost of Object.keys(this.secretboxSettings[secretboxId])) {
-      let costData = this.secretboxSettings[secretboxId][parseInt(cost)]
+    for (let cost of Object.keys(useObjectFromAbove ? justObject : this.secretboxSettings[secretboxData.secretbox_id])) {
+      let costData = this.secretboxSettings[secretboxData.secretbox_id][parseInt(cost)]
       for (let rarity of costData) {
         if (rarity.rateup_unit_id) {
           for (let unitId of rarity.rateup_unit_ids) {
