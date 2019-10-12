@@ -44,3 +44,10 @@ interface detailUnitData {
   total_cool: number
   total_hp: number
 }
+
+interface IAddUnitResult extends Omit<detailUnitData, "unit_owning_user_id"> {
+  unit_owning_user_id: number | null
+  unit_owning_ids: number[]
+  new_unit_flag: boolean
+  unit_rarity_id: 1 | 2 | 3 | 4 | 5
+}

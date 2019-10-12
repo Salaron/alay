@@ -152,7 +152,7 @@ export class Utils {
   public static getRandomNumber(min: number, max: number) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
-  public static createObjCopy(object: any) {
+  public static createObjCopy<T>(object: T): T {
     return JSON.parse(JSON.stringify(object))
   }
 

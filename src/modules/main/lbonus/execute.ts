@@ -268,11 +268,11 @@ export default class extends MainAction {
 
       const items = Utils.createObjCopy(Config.lbonus.calendar_generator.items)
       if (cardLimit > 0) items.push({
-        name: "card",
+        name: "unit",
         amount: 1
       })
 
-      const _item = items.randomValue() // tslint:disable-line
+      const _item: any = items.randomValue() // tslint:disable-line
       let amount = 0
 
       if (Type.isInt(_item.min_amount) && Type.isInt(_item.max_amount)) amount = Utils.getRandomNumber(_item.min_amount, _item.max_amount)

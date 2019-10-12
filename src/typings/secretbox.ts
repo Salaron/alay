@@ -63,6 +63,7 @@ export interface stepInfo {
   show_step: number
   term_count: number
   step_up_bonus_bonus_item_list: []
+  reset_type: 0 | 1 | 2
 }
 export interface knapsackInfo {
   secret_box_type: number

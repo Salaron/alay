@@ -129,7 +129,7 @@ export class Unit {
     }
   }
 
-  public async addUnit(userId: number, unitId: number, options: addUnitOptions = addUnitDefault) {
+  public async addUnit(userId: number, unitId: number, options: addUnitOptions = addUnitDefault): Promise<IAddUnitResult> {
     options = extend(true, addUnitDefault, options)
     if (options.useNumber) {
       const res = await unitDB.get(`SELECT unit_id FROM unit_m WHERE unit_number = :number`, { number: unitId })
@@ -153,11 +153,14 @@ export class Unit {
         id: unitId,
         amount: options.amount
       })
-      await this.updateAlbum(userId, unitId)
-      return {
+      let isNewUnit = await this.updateAlbum(userId, unitId)
+      let rarity = (await unitDB.get("SELECT rarity FROM unit_m WHERE unit_id=?", [unitId])).rarity
+      return <any>{ // sorry :(
         unit_id: unitId,
         unit_owning_user_id: null,
         is_support_member: true,
+        new_unit_flag: isNewUnit,
+        unit_rarity_id: rarity,
         exp: 0,
         next_exp: 0,
         max_hp: 0,
@@ -178,7 +181,7 @@ export class Unit {
         unit_id, attribute_id, disable_rank_up, after_love_max,
         before_love_max, after_level_max, before_level_max, default_unit_skill_id,
         max_removable_skill_capacity, default_removable_skill_capacity, unit_level_up_pattern_id,
-        smile_max, pure_max, cool_max, hp_max, unit_skill_m.max_level as max_skill_level
+        smile_max, pure_max, cool_max, hp_max, unit_skill_m.max_level as max_skill_level, rarity
       FROM
         unit_m
       LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
@@ -258,56 +261,49 @@ export class Unit {
       }
 
       const isMaxRank = (insertData.rank == insertData.max_rank)
-      await this.updateAlbum(insertData.user_id, insertData.unit_id, {
+      let isNewUnit = await this.updateAlbum(insertData.user_id, insertData.unit_id, {
         maxRank: isMaxRank,
         maxLove: insertData.love == insertData.max_love && isMaxRank,
         maxLevel: insertData.level == insertData.max_level && isMaxRank,
         addLove: insertData.love
       })
-      const res: detailUnitData & { unit_owning_ids?: number[] } = await this.getUnitDetail(lastId)
-      res.unit_owning_ids = addedIds
-      return res
+
+      const res = await this.getUnitDetail(lastId)
+      return {
+        unit_owning_ids: addedIds,
+        new_unit_flag: isNewUnit,
+        unit_rarity_id: unitData.rarity,
+        ...(res)
+      }
     }
   }
 
-  public async updateAlbum(userId: number, unitId: number, options: updateAlbumOptions = {}) {
+  /** Update information about unit in the album
+   * @returns true if unit not exists in the album
+   */
+  public async updateAlbum(userId: number, unitId: number, options: updateAlbumOptions = {}): Promise<boolean> {
     options = extend(true, updateAlbumDefault, options)
     let data = await this.connection.first("SELECT * FROM user_unit_album WHERE user_id=:user AND unit_id=:unit", { user: userId, unit: unitId })
-    if (!data) { // new unit
-      const values = {
-        user: userId,
-        unit: unitId,
-        rank: options.maxRank ? 1 : 0,
-        love: options.maxLove ? 1 : 0,
-        level: options.maxLevel ? 1 : 0,
-        all: (options.maxRank && options.maxLove && options.maxLevel) ? 1 : 0,
-        lovemax: options.addLove,
-        lovetotal: options.addLove,
-        fav: options.addFavPt
-      }
-      try {
-        await this.connection.query("INSERT INTO user_unit_album VALUES (:user, :unit, :rank, :love, :level, :all, :lovemax, :lovetotal, :fav)", values, true)
-        return
-      } catch (err) {
-        if (err.code != "ER_DUP_ENTRY") {
-          throw err
-        }
-        data = await this.connection.first("SELECT * FROM user_unit_album WHERE user_id=:user AND unit_id=:unit", { user: userId, unit: unitId })
-      }
-    }
-    // existing
+    if (!data) data = {}
     const values = {
       user: userId,
       unit: unitId,
-      rank: (options.maxRank || data.rank_max_flag) ? 1 : 0,
-      love: (options.maxLove || data.love_max_flag) ? 1 : 0,
-      level: (options.maxLevel || data.rank_level_max_flag) ? 1 : 0,
-      all: ((options.maxRank && options.maxLove && options.maxLevel) || data.all_max_flag) ? 1 : 0,
-      lovemax: Math.min(data.highest_love_per_unit + options.addLove, data.highest_love_per_unit),
-      lovetotal: data.total_love + options.addLove,
-      fav: data.favorite_point + options.addFavPt
+      rank: options.maxRank ? 1 : 0,
+      love: (options.maxRank || data.rank_max_flag) && (options.maxLove || data.love_max_flag) ? 1 : 0,
+      level: (options.maxRank || data.rank_max_flag) && (options.maxLevel || data.rank_level_max_flag) ? 1 : 0,
+      all: ((options.maxRank && options.maxLove && options.maxLevel) || (data.rank_max_flag && data.love_max_flag && data.rank_level_max_flag)) ? 1 : 0,
+      lovemax: options.addLove,
+      lovetotal: options.addLove,
+      fav: options.addFavPt
     }
-    await this.connection.query("UPDATE user_unit_album SET rank_max_flag=:rank, love_max_flag=:love, rank_level_max_flag=:level,all_max_flag=:all,highest_love_per_unit=:lovemax,total_love=:lovetotal,favorite_point=:fav WHERE user_id=:user AND unit_id=:unit;", values)
+
+    await this.connection.query(`
+    INSERT INTO
+      user_unit_album VALUES (:user, :unit, :rank, :love, :level, :all, :lovemax, :lovetotal, :fav)
+    ON DUPLICATE KEY UPDATE rank_max_flag = :rank, love_max_flag = :love, rank_level_max_flag = :level, all_max_flag = :all, highest_love_per_unit = :lovemax,
+    total_love = :lovetotal,favorite_point = :fav`, values)
+
+    return Object.keys(data).length === 0
   }
 
   public async getUnitDetail(unitOwningUserId: number, userId?: number): Promise<detailUnitData> {

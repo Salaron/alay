@@ -127,7 +127,7 @@ export default class extends WebViewAction {
             rarity: getRarityString(rarity.rarity),
             rate: rarity.weight,
             total: Object.values(rarity.unit_data_by_id).length,
-            ratePerCard: ((100 - (rarity.rateup_weight || 0)) / rarity.unit_id!.length).toFixed(3),
+            ratePerCard: ((100 - (rarity.rateup_weight && rarity.rateup_weight > 0 && rarity.rateup_unit_ids.length > 0 ? rarity.rateup_weight : 0)) / rarity.unit_id!.length).toFixed(3),
             ratePerRateup: ((rarity.rateup_weight || 0) / rarity.rateup_unit_ids.length).toFixed(3),
             rateup,
             cards

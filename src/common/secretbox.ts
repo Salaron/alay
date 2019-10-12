@@ -5,6 +5,7 @@ import * as types from "../typings/secretbox"
 import { Utils } from "./utils"
 import { promisify } from "util"
 import { readFile } from "fs"
+import { User } from "./user"
 
 const log = new Log("Secretbox")
 const unitDB = sqlite3.getUnit()
@@ -173,7 +174,7 @@ export class Secretbox {
       date: Utils.toSpecificTimezone(9)
     })
     return <types.secretbox[]>(await Promise.all(list.map(async secretbox => {
-      return await this.generateTab(userId, secretbox)
+      return await this.getTab(userId, secretbox)
     }))).filter(secretbox => {
       if (!secretbox) return false
       return true
@@ -183,12 +184,174 @@ export class Secretbox {
     await updateSettings()
   }
 
-  private async generateTab(userId: number, secretboxData: types.secretboxData): Promise<types.secretbox | undefined> {
+  public async makePon(userId: number, secretboxId: number, costId: number) {
+    const user = new User(this.connection)
+    const item = new Item(this.connection)
+
+    const rarityData = this.secretboxSettings[secretboxId][costId]
+    const [beforeUserInfo, costData, secretboxTab] = await Promise.all([
+      user.getUserInfo(userId),
+      this.getCosts(userId, costId, true),
+      this.getTab(userId, secretboxId),
+      this.connection.query(`INSERT INTO secretbox_pon (user_id, secretbox_id, pon_count) VALUES (:user, :sbId, 0) ON DUPLICATE KEY UPDATE pon_count = pon_count + 0`, {
+        user: userId,
+        sbId: secretboxId
+      })
+    ])
+    if (!secretboxTab) throw new ErrorCode(1500, "not exists") // ERROR_CODE_SECRET_BOX_NOT_EXIST
+    if (costData.payable === false) throw new ErrorCode(1507, "oops") // ERROR_CODE_SECRET_BOX_REMAINING_COST_IS_NOT_ENOUGH
+    if (secretboxTab.secret_box_info.pon_upper_limit != null && secretboxTab.secret_box_info.pon_upper_limit != 0) {
+      if (secretboxTab.secret_box_info.pon_count >= secretboxTab.secret_box_info.pon_upper_limit) throw new ErrorCode(1509, "nope") // ERROR_CODE_SECRET_BOX_UPPER_LIMIT
+    }
+
+    switch (secretboxTab.secret_box_info.secret_box_type) {
+      case 1: { // step match check
+        let stepCost = await this.connection.first(`SELECT * FROM secretbox_cost JOIN secretbox_button ON secretbox_cost.button_id = secretbox_button.button_id WHERE secretbox_id = :id AND step_id = :step AND cost_id = :cost`, {
+          id: secretboxId,
+          step: secretboxTab.secret_box_info.additional_info!.step,
+          cost: costId
+        })
+
+        if (!stepCost && (<types.stepInfo>secretboxTab.secret_box_info.additional_info).reset_type != 2) throw new Error(`Cost id doesn't match with step id`)
+        stepCost = await this.connection.first("SELECT * FROM secretbox_button WHERE secretbox_id = :id ORDER BY step_id DESC", {
+          id: secretboxId
+        })
+        if ((<types.stepInfo>secretboxTab.secret_box_info.additional_info).reset_type === 2 && secretboxTab.secret_box_info.additional_info!.step < stepCost.step_id) throw new Error(`Same`)
+      }
+    }
+
+    await item.addItemToUser(userId, {
+      type: costData.type,
+      id: costData.item_id
+    }, parseInt(`-${costData.amount}`))
+    beforeUserInfo.gaugePoint = (await this.connection.first("SELECT box_gauge FROM users WHERE user_id = :user", { user: userId })).box_gauge
+
+    // process unit
+    const gainedUnitIds: number[] = [] // first we need to get unit ids
+    const unitRarities: number[] = [] // for guarantee
+
+    for (let count = 0; gainedUnitIds.length < costData.unit_count; count++) {
+      let rarities: types.rarityData[] = []
+      for (const data of rarityData) {
+        for (let i = 0; i < data.weight; i++) {
+          rarities.push(data)
+        }
+      }
+
+      let selectedRarity = rarities.randomValue()
+
+      let type: string[] = []
+      if (selectedRarity.rateup_unit_ids.length > 0 && selectedRarity.rateup_weight && selectedRarity.rateup_weight > 0) {
+        for (let i = 0; i < selectedRarity.rateup_weight; i++) {
+          type.push("rateup")
+        }
+        for (let i = 0; i < Math.max(100 - selectedRarity.rateup_weight, 0); i++) {
+          type.push("normal")
+        }
+      } else {
+        type.push("normal")
+      }
+
+      if (type.randomValue() === "rateup") {
+        gainedUnitIds.push(selectedRarity.rateup_unit_ids.randomValue())
+      } else {
+        gainedUnitIds.push(selectedRarity.unit_id!.randomValue())
+      }
+      unitRarities.push(selectedRarity.rarity)
+    }
+
+    // result
+    const gainedUnits = await Promise.all(gainedUnitIds.map(async id => {
+      let unitData = await item.addPresent(userId, {
+        name: "card",
+        id
+      }, `Gained from Scouting Box "${secretboxTab.secret_box_info.name}"`, 1, true)
+      unitData.is_hit = false
+      return unitData
+    }))
+    const gainedItems: any[] = []
+    const addedGauge = secretboxTab.secret_box_info.add_gauge * costData.unit_count
+    const totalGauge = beforeUserInfo.gaugePoint + addedGauge
+    if (totalGauge >= 100) {
+      gainedItems.push({
+        item_id: 5,
+        add_type: 1000,
+        amount: Math.floor(totalGauge / 100),
+        item_category_id: 5,
+        reward_box_flag: false
+      })
+    }
+
+    // get after info
+    const [afterSecretboxButtons, afterUserInfo, afterSupportList, userItems] = await Promise.all([
+      this.getButtons(userId, secretboxId),
+      user.getUserInfo(userId),
+      user.getSupportUnits(userId),
+      this.connection.first("SELECT sns_coin, bt_tickets, green_tickets FROM users WHERE user_id = :user", {
+        user: userId
+      }),
+      this.connection.execute("UPDATE users SET bt_tickets = bt_tickets + :amount, box_gauge = :gauge WHERE user_id = :user", {
+        amount: Math.floor(totalGauge / 100),
+        gauge: totalGauge % 100,
+        user: userId
+      }),
+      this.connection.execute(`UPDATE secretbox_pon SET pon_count = pon_count + 1 WHERE user_id = :user AND secretbox_id = :sbId`, {
+        user: userId,
+        sbId: secretboxId
+      })
+    ])
+
+    return {
+      is_unit_max: false,
+      item_list: [
+        {
+          item_id: 1,
+          amount: userItems.green_tickets
+        },
+        {
+          item_id: 5,
+          amount: userItems.bt_tickets
+        }
+      ],
+      gauge_info: {
+        max_gauge_point: 100,
+        gauge_point: beforeUserInfo.gaugePoint + addedGauge,
+        added_gauge_point: addedGauge
+      },
+      button_list: afterSecretboxButtons,
+      secret_box_info: secretboxTab.secret_box_info,
+      secret_box_items: {
+        unit: gainedUnits,
+        item: gainedItems
+      },
+      before_user_info: beforeUserInfo,
+      after_user_info: afterUserInfo,
+      lowest_rarity: Utils.createObjCopy(rarityData).sort((a, b) => a.rarity - b.rarity)[0].rarity,
+      promotion_performance_rate: 10, // idk...
+      secret_box_parcel_type: 2, // idk...
+      limit_bonus_info: [],
+      limit_bonus_rewards: [],
+      unit_support_list: afterSupportList
+    }
+  }
+
+  private async getTab(userId: number, secretboxData: types.secretboxData): Promise<types.secretbox | undefined>
+  private async getTab(userId: number, secretboxId: number): Promise<types.secretbox>
+  private async getTab(userId: number, secretboxData: types.secretboxData | number): Promise<types.secretbox | undefined> {
+    if (Type.isInt(secretboxData)) {
+      let data = await this.connection.first(`SELECT * FROM secretbox_list WHERE ((start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2) AND secretbox_id = :id`, {
+        date: Utils.toSpecificTimezone(9),
+        id: secretboxData
+      })
+      if (!data) throw new ErrorCode(1508)
+      secretboxData = <types.secretboxData>data
+    }
+
     let [buttons, ponData, additionalInfo, effect] = await Promise.all([
-      this.generateButtons(userId, secretboxData),
+      this.getButtons(userId, secretboxData),
       this.getUserPon(userId, secretboxData.secretbox_id),
-      this.generateAdditionalInfo(userId, secretboxData),
-      this.generateEffects(secretboxData.secretbox_id)
+      this.getAdditionalInfo(userId, secretboxData),
+      this.getEffects(secretboxData.secretbox_id)
     ])
     if (!buttons) return
 
@@ -224,7 +387,18 @@ export class Secretbox {
     return tab
   }
 
-  private async generateButtons(userId: number, secretboxData: types.secretboxData): Promise<types.secretboxButton[] | false> {
+  private async getButtons(userId: number, secretboxData: types.secretboxData): Promise<types.secretboxButton[] | false>
+  private async getButtons(userId: number, secretboxId: number): Promise<types.secretboxButton[]>
+  private async getButtons(userId: number, secretboxData: types.secretboxData | number): Promise<types.secretboxButton[] | false> {
+    if (Type.isInt(secretboxData)) {
+      let data = await this.connection.first(`SELECT * FROM secretbox_list WHERE ((start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2) AND secretbox_id = :id`, {
+        date: Utils.toSpecificTimezone(9),
+        id: secretboxData
+      })
+      if (!data) throw new ErrorCode(1508)
+      secretboxData = <types.secretboxData>data
+    }
+
     switch (secretboxData.secretbox_type) {
       case 5:  // stub a.k.a. blue ticket box
       case 0: { // default
@@ -236,18 +410,24 @@ export class Secretbox {
         return await Promise.all(buttons.map(async (button: any) => {
           return {
             secret_box_button_type: button.type,
-            cost_list: await this.generateCost(userId, button.button_id),
-            secret_box_name: secretboxData.name,
+            cost_list: await this.getCosts(userId, button.button_id),
+            secret_box_name: (<types.secretboxData>secretboxData).name,
             balloon_asset: button.balloon_asset === null ? undefined : button.balloon_asset
           }
         }))
       }
       case 1: { // step up
-        const secretboxInfo = await this.generateAdditionalInfo(userId, secretboxData)
-        const stepButton = await this.connection.first("SELECT * FROM secretbox_button WHERE secretbox_id = :id AND step_id = :step", {
+        const secretboxInfo = await this.getAdditionalInfo(userId, secretboxData)
+        let stepButton = await this.connection.first("SELECT * FROM secretbox_button WHERE secretbox_id = :id AND step_id = :step", {
           id: secretboxData.secretbox_id,
           step: secretboxInfo!.show_step
         })
+        if (secretboxData.secretbox_type === 1 && secretboxInfo && secretboxInfo.reset_type === 2) {
+          // use last step data instead
+          stepButton = await this.connection.first("SELECT * FROM secretbox_button WHERE secretbox_id = :id ORDER BY step_id DESC", {
+            id: secretboxData.secretbox_id
+          })
+        }
         if (!stepButton && !secretboxData.always_visible) return false
 
         const button: types.secretboxButton = {
@@ -264,7 +444,7 @@ export class Secretbox {
         } else {
           button.secret_box_button_type = stepButton.type
           button.balloon_asset = stepButton.balloon_asset == null ? undefined : stepButton.balloon_asset
-          button.cost_list = await this.generateCost(userId, stepButton.button_id)
+          button.cost_list = await this.getCosts(userId, stepButton.button_id)
         }
         return [button]
       }
@@ -273,17 +453,20 @@ export class Secretbox {
       }
     }
   }
-  private async generateCost(userId: number, buttonId: number): Promise<types.secretboxCost[]> {
+  private async getCosts(userId: number, buttonId: number): Promise<types.secretboxCost[]>
+  private async getCosts(userId: number, costId: number, useCostId: true): Promise<types.secretboxCost>
+  private async getCosts(userId: number, id: number, useCostId: boolean = false): Promise<types.secretboxCost[] | types.secretboxCost> {
     const [costs, userItems] = await Promise.all([
-      this.connection.query(`SELECT cost_id, unit_count, amount, item_name FROM secretbox_cost WHERE button_id = :id`, {
-        id: buttonId
+      this.connection.query(`SELECT cost_id, unit_count, amount, item_name FROM secretbox_cost WHERE ${useCostId ? "cost_id" : "button_id"} = :id`, {
+        id
       }),
       this.connection.first("SELECT user_id, sns_coin, green_tickets, bt_tickets, game_coin, social_point FROM users WHERE user_id = :user", {
         user: userId
       })
     ])
+    if (costs.length === 0) throw new Error(`Costs for ${useCostId ? "cost_id" : "button_id"} #${id} is missing`)
 
-    return costs.map(cost => {
+    let result = costs.map(cost => {
       const item = Item.nameToType(cost.item_name)
       let payable = false
       if (item.itemType === 3001) payable = userItems.sns_coin >= cost.amount
@@ -301,9 +484,11 @@ export class Secretbox {
         amount: cost.amount
       }
     })
+    if (useCostId) return result[0]
+    return result
   }
 
-  private async generateAdditionalInfo(userId: number, secretboxData: types.secretboxData) {
+  private async getAdditionalInfo(userId: number, secretboxData: types.secretboxData) {
     switch (secretboxData.secretbox_type) {
       case 1: { // step up
         const settings = await this.getStepUpSettings(secretboxData.secretbox_id)
@@ -319,13 +504,14 @@ export class Secretbox {
           end_step: settings.end_step,
           show_step: currentStep,
           term_count: 0,
-          step_up_bonus_bonus_item_list: []
+          step_up_bonus_bonus_item_list: [],
+          reset_type: settings.reset_type
         }
       }
       default: return undefined
     }
   }
-  private async generateEffects(secretboxId: number) {
+  private async getEffects(secretboxId: number) {
 
     let effectList: types.secretboxEffect[] = []
     let effectDetailList: types.secretboxEffectDetail[] = []

@@ -20,7 +20,6 @@ export default class extends MainAction {
     const sbList = await secretbox.getSecretboxList(this.user_id)
 
     const response: any = {
-      use_cache: 1,
       is_unit_max: data.unit_count >= data.unit_max,
       item_list: [
         {
