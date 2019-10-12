@@ -1,11 +1,10 @@
 .nicescroll-rails {
   background: #c6dcff !important;
   border-radius: 10px !important;
-  opacity: 0.7 !important;
 }
 
 .nicescroll-cursors {
-  background: #4286f4 !important;
+  background: #4b90ff !important;
   border-radius: 3px !important;
-  width: 6px !important; 
+  width: 6px !important;
 }

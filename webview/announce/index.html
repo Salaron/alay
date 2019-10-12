@@ -79,7 +79,7 @@
 
         function loadUntil() {
           if ($("#announce-" + queryObject.id).length != 0) {
-            ps.scrollTo(0, $("#announce-" + queryObject.id).position().top, 800)
+            scrollbar.doScrollTop($("#announce-" + queryObject.id).position().top, 800)
             return
           }
           loadNews(loadUntil)
@@ -88,8 +88,9 @@
       })
     })
 
-    ps.addListener(function (status) {
-      if (status.limit.y === status.offset.y) {
+    $("#body").scroll(function () {
+      var pos = $("#body").scrollTop()
+      if (pos === scrollbar.page.maxh - 5) {
         loadNews()
       }
     })

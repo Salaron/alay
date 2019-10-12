@@ -30,3 +30,8 @@
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
   min-height: 64px;
 }
+
+.sl-icon-button {
+  left: 10px;
+  top: 10px;
+}

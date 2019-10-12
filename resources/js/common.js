@@ -122,7 +122,7 @@ function replacePlaceholders(input, values) {
 }
 
 function updateBodySize() {
-  $("#body").height($(window).height() - $("#body").offset().top - 20)
+  $("#body").height($(window).height() - $("#body").position().top - 19)
   if (typeof scrollbar != "undefined") scrollbar.resize()
 }
 function isChrome() {
@@ -155,7 +155,7 @@ function isChrome() {
     return false
   }
   
-  if ($ && typeof enableResize != "undefined") {
+  if ($ && document.getElementById("body") !== null) {
     updateBodySize();
 
     $(function () {
