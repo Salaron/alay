@@ -517,10 +517,10 @@ export class Secretbox {
     let useObjectFromAbove = false
     if (secretboxData.secretbox_type === 1) {
       useObjectFromAbove = true
-      justObject.cost = await this.connection.first(`SELECT * FROM secretbox_cost JOIN secretbox_button ON secretbox_cost.button_id = secretbox_button.button_id WHERE secretbox_id = :id AND step_id = :step`, {
+      justObject.cost = (await this.connection.first(`SELECT * FROM secretbox_cost JOIN secretbox_button ON secretbox_cost.button_id = secretbox_button.button_id WHERE secretbox_id = :id AND step_id = :step`, {
         id: secretboxData.secretbox_id,
         step: additionalInfo!.step
-      })
+      })).cost_id
     }
 
     let effectList: types.secretboxEffect[] = []
