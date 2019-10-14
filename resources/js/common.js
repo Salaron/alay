@@ -122,8 +122,8 @@ function replacePlaceholders(input, values) {
 }
 
 function updateBodySize() {
-  $("#body").height($(window).height() - $("#body").position().top - 19)
-  if (typeof scrollbar != "undefined") scrollbar.resize()
+  $("#body").height($(window).height() - $("#body").offset().top - 20)
+  if (typeof ps != "undefined") ps.update()
 }
 function isChrome() {
   var isChromium = window.chrome;
@@ -155,7 +155,7 @@ function isChrome() {
     return false
   }
   
-  if ($ && document.getElementById("body") !== null) {
+  if ($ && typeof enableResize != "undefined") {
     updateBodySize();
 
     $(function () {

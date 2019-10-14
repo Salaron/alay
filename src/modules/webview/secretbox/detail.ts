@@ -142,8 +142,7 @@ export default class extends WebViewAction {
         result: template({
           secretbox,
           costList,
-          headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-          external: this.requestData.requestFromBrowser
+          headers: JSON.stringify(this.requestData.getWebapiHeaders())
         })
       }
 

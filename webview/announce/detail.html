@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/nicescroll.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
 </head>
 
@@ -46,9 +46,9 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
 
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/nicescroll.js"></script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script>
-    var scrollbar = $("#body").niceScroll()
+    var ps = Scrollbar.init($("#body")[0])
     if (window.history.length != 1) {
       var url = window.location.protocol + "//" + window.location.host + "/webview.php/announce/index?id={{announce/id}}" 
       $("#2back").prepend('<a href="' + url + '" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
