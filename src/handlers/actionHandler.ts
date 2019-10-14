@@ -1,8 +1,8 @@
 import RequestData, { REQUEST_TYPE, PERMISSION, RESPONSE_TYPE, HANDLER_TYPE, AUTH_LEVEL } from "../core/requestData"
 import { Log } from "../core/log"
-import "./actions/webApi"
-import "./actions/webView"
-import "./actions/main"
+import "../models/webApiAction"
+import "../models/webViewAction"
+import "../models/mainAction"
 import { TYPE } from "../common/type"
 import { Utils } from "../common/utils"
 

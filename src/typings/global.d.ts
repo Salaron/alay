@@ -6,9 +6,9 @@ import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWeb
 import RequestData from "../core/requestData"
 import { Type as type} from "../common/type"
 
-import { WebApiAction as WebApiAction_ } from "../handlers/actions/webApi"
-import { WebViewAction as WebViewAction_ } from "../handlers/actions/webView"
-import { MainAction as MainAction_ } from "../handlers/actions/main"
+import { WebApiAction as WebApiAction_ } from "../models/webApiAction"
+import { WebViewAction as WebViewAction_ } from "../models/webViewAction"
+import { MainAction as MainAction_ } from "../models/mainAction"
 
 declare global {
   // make project root dir global (for easy access to files outside of 'compile' folder)

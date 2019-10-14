@@ -14,6 +14,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
     await requestData.getAuthLevel()
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
       requestData.resetCookieAuth()
+      // TODO: redirect to login page or access allow to page if required auth level is none
       return await writeJsonResponse(response, {
         httpStatusCode: 403,
         connection: requestData.connection,

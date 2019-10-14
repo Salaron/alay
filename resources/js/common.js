@@ -1,3 +1,15 @@
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+  sendRequest({
+    module: "report",
+    action: "error",
+    timestamp: Math.floor(Date.now() / 1000),
+    message: msg,
+    stacktrace: error == undefined ? null : error.stack,
+    url: url
+  })
+  return false
+}
+
 function parseQueryString(string) {
   return JSON.parse('{"' + string.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function (key, value) { return key === "" ? value : decodeURIComponent(value) })
 }
@@ -122,7 +134,11 @@ function replacePlaceholders(input, values) {
 }
 
 function updateBodySize() {
-  $("#body").height($(window).height() - $("#body").offset().top - 20)
+  var bottomOffset = 19
+  if (external === true) {
+    bottomOffset = 12
+  }
+  if (document.getElementById("body") !== null) $("#body").height($(window).height() - $("#body").position().top - bottomOffset)
   if (typeof ps != "undefined") ps.update()
 }
 function isChrome() {
@@ -143,26 +159,12 @@ function isChrome() {
 }
 
 (function() {
-  window.onerror = function (msg, url, lineNo, columnNo, error) {
-    sendRequest({
-      module: "report",
-      action: "error",
-      timestamp: Math.floor(Date.now() / 1000),
-      message: msg,
-      stacktrace: error == undefined ? null : error.stack,
-      url: url
-    })
-    return false
-  }
-  
-  if ($ && typeof enableResize != "undefined") {
-    updateBodySize();
-
+  if (typeof $ != "undefined") {
     $(function () {
-      updateBodySize();
+      updateBodySize()
     })
     $(window).resize(function () {
-      updateBodySize();
-    });
+      updateBodySize()
+    })
   }
 })()

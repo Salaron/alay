@@ -21,7 +21,7 @@ export class WebView {
   public static getTemplateSync(module: string, action: string): Handlebars.TemplateDelegate {
     let template = templates[`${module}-${action}`]
     if (!template || Config.server.debug_mode) {
-      template = Handlebars.compile(readFileSync(`${rootDir}/webview/${module}/${action}.html`, "utf-8"))
+      template = Handlebars.compile(readFileSync(`${rootDir}/webview/${module}/${action}.hbs`, "utf-8"))
       if (!Config.server.debug_mode) {
         templates[`${module}-${action}`] = template
       }
@@ -31,7 +31,7 @@ export class WebView {
   public static async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
     let template = templates[`${module}-${action}`]
     if (!template || Config.server.debug_mode) {
-      template = Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/${module}/${action}.html`, "utf-8"))
+      template = Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/${module}/${action}.hbs`, "utf-8"))
       if (!Config.server.debug_mode) {
         templates[`${module}-${action}`] = template
       }
@@ -67,8 +67,7 @@ export class WebView {
   }
 }
 
-// Helpers
-
+// Handlebars Helpers
 Handlebars.registerHelper("equal", function(this: any, a, b, options) {
   if (a == b) { return options.fn(this) }
   return options.inverse(this)

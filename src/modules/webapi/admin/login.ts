@@ -21,7 +21,7 @@ export default class extends WebApiAction {
     const i18n = new I18n(this.connection)
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
-      await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteIP(this.requestData.request))
+      await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
     }
 
     const strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup")

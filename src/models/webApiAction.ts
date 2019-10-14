@@ -1,6 +1,6 @@
-import RequestData, { AUTH_LEVEL } from "../../core/requestData"
-import { Connection } from "../../core/database_wrappers/mysql"
-import { ActionResult } from "../../typings/handlers"
+import RequestData, { AUTH_LEVEL } from "../core/requestData"
+import { Connection } from "../core/database_wrappers/mysql"
+import { ActionResult } from "../typings/handlers"
 
 export abstract class WebApiAction {
   public abstract requiredAuthLevel: AUTH_LEVEL;

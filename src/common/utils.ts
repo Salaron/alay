@@ -223,7 +223,7 @@ export class Utils {
     else return `${tz}`
   }
 
-  public static getRemoteIP(request: IncomingMessage): string {
+  public static getRemoteAddress(request: IncomingMessage): string {
     if (typeof request.headers["x-real-ip"] === "string") {
       return request.headers["x-real-ip"]
     }
