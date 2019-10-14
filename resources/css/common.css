@@ -19,13 +19,13 @@ body {
 
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
   color: rgba(255,255,255,0.8);
-  font-size: 19px;
+  font-size: 16px;
   min-height: 50px;
 }
 
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li.uk-active>a {
   color: #fff;
-  font-size: 19px;
+  font-size: 16px;
 }
 
 #outer {

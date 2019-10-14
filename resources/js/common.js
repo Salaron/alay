@@ -22,6 +22,9 @@ function escapeJSON(jsonString) {
 function nl2br(str) {
   return str.replace(/(?:\r\n|\r|\n)/g, "<br>")
 }
+function getExternalUrl() {
+  return "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=" + userId + "&token=" + authToken)
+}
 
 function setCookie(cname, cvalue, exhours) {
   var d = new Date();
