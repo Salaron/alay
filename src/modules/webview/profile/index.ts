@@ -2,7 +2,6 @@ import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
 import RequestData from "../../../core/requestData"
 import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
-import assert from "assert"
 import moment from "moment"
 
 const unitDB = sqlite3.getUnit()

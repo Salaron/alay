@@ -13,8 +13,6 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const webview = new WebView(this.connection)
-
     let template
     switch (this.requestData.auth_level) {
       case AUTH_LEVEL.ADMIN: {

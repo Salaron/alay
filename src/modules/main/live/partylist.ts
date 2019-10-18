@@ -5,7 +5,7 @@ import { Events } from "../../../common/event"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
 
-const marathonDB = sqlite3.getMarathon()
+// const marathonDB = sqlite3.getMarathon()
 
 export default class extends MainAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE

@@ -20,7 +20,7 @@ try {
 import ReadLine from "./core/readLine"
 import http from "http"
 import requestHandler from "./handlers/requestHandler"
-import * as modules from "./common";
+import * as modules from "./common"
 
 // Entry point
 (async () => {

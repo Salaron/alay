@@ -132,4 +132,4 @@ Handlebars.registerHelper("ifcond", function(this: any, v1, operator, v2, option
     default:
       return options.inverse(this)
   }
-});
+})

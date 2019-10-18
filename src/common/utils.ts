@@ -3,7 +3,6 @@ import crypto from "crypto"
 import moment from "moment"
 import { promisify } from "util"
 import request from "request"
-import { Connection } from "../core/database_wrappers/mysql"
 import { IncomingMessage } from "http"
 
 const log = new Log("Common: Utils")
@@ -37,11 +36,6 @@ export async function init() {
 }
 
 export class Utils {
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
-  }
-
   public static parseDate(value: Date | number, timestamp?: boolean) {
     if (typeof value === "number" || value instanceof Date) {
       if (typeof value === "number" && timestamp) value = Math.floor(value * 1000)

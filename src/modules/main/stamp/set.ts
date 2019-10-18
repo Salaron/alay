@@ -47,7 +47,7 @@ export default class extends MainAction {
     const stampDeckSlotInsert = []
     for (const stamp of this.params.stamp_list) {
       if (
-        !Type.isInt(stamp.stamp_id) || !Type.isInt(stamp.position)
+        !Type.isInt(stamp.stamp_id) || !Type.isInt(stamp.position) || !ids.includes(stamp.stamp_id)
       ) throw new Error(`Invalid stamp_list`)
       stampDeckSlotInsert.push(`(${this.user_id}, ${this.params.stamp_type}, ${this.params.stamp_setting_id}, ${stamp.position}, ${stamp.stamp_id})`)
     }

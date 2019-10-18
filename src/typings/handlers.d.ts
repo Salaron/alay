@@ -10,6 +10,5 @@ export interface ActionResult {
   headers?: any
 }
 export interface WebViewActionResult extends ActionResult {
-  
-}
 
+}
