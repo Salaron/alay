@@ -45,19 +45,17 @@ export class WebView {
     })).cnt
   }
 
-  public async getLanguageModalTemplate(userId: number): Promise<string>
-  public async getLanguageModalTemplate(token: string): Promise<string>
-  public async getLanguageModalTemplate(languageCode: string): Promise<string>
+  /**
+   * @param {number | string} input - User Id, token or Language code
+   */
   public async getLanguageModalTemplate(input?: number | string): Promise<string> {
     const template = await WebView.getTemplate("common", "changelanguage")
     const i18n = new I18n(this.connection)
 
     let languageCode = Config.i18n.defaultLanguage
     if (Type.isInt(input) || typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) {
-      // user id
-      languageCode = await i18n.getUserLocalizationCode(<number>input)
-      // token
-      languageCode = await i18n.getUserLocalizationCode(<string>input)
+      // token or user id
+      languageCode = await i18n.getUserLocalizationCode(input)
     } else if (typeof input === "string") languageCode = input
 
     return template({

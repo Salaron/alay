@@ -279,7 +279,7 @@ export class Unit {
   }
 
   /** Update information about unit in the album
-   * @returns true if unit not exists in the album
+   * @returns {true} if unit not exists in the album
    */
   public async updateAlbum(userId: number, unitId: number, options: updateAlbumOptions = {}): Promise<boolean> {
     options = extend(true, updateAlbumDefault, options)

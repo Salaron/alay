@@ -60,8 +60,10 @@ export class I18n {
     this.connection = connection
   }
 
-  public async setUserLocalizationCode(userId: number, code: string): Promise<void>
-  public async setUserLocalizationCode(token: string, code: string): Promise<void>
+  /**
+   * @param {number | string} input - User Id or token
+   * @param {string} code - language code
+   */
   public async setUserLocalizationCode(input: string | number, code: string): Promise<void> {
     if (Type.isInt(input)) {
       await this.connection.execute("UPDATE users SET language = :code WHERE user_id = :user", {
@@ -76,11 +78,12 @@ export class I18n {
     }
   }
 
-  public async getUserLocalizationCode(userId: number): Promise<string>
-  public async getUserLocalizationCode(token: string): Promise<string>
+  /**
+   * @param {number | string} input - User Id or token
+   * @returns {Promise<string>} user language code
+   */
   public async getUserLocalizationCode(input: number | string): Promise<string> {
     let code = ""
-
     if (typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) {
       code = (await this.connection.first("SELECT language FROM auth_tokens WHERE token = :token", { token: input })).language
     } else {
@@ -94,9 +97,9 @@ export class I18n {
     return code
   }
 
-  public async getStrings(languageCode: string, ...sections: string[]): Promise<any>
-  public async getStrings(userId: number, ...sections: string[]): Promise<any>
-  public async getStrings(token: string, ...sections: string[]): Promise<any>
+  /**
+   * @param {number | string} input - User Id, token or Language code
+   */
   public async getStrings(input: number | string, ...sections: string[]): Promise<any> {
     let languageCode = ""
     if (Type.isInt(input)) { // user id
@@ -115,9 +118,9 @@ export class I18n {
     return result
   }
 
-  public async getMarkdown(languageCode: string, type: I18nMarkdownType): Promise<string>
-  public async getMarkdown(userId: number, type: I18nMarkdownType): Promise<string>
-  public async getMarkdown(token: string, type: I18nMarkdownType): Promise<string>
+  /**
+   * @param {number | string} input - User Id, token or Language code
+   */
   public async getMarkdown(input: number | string, type: I18nMarkdownType): Promise<string> {
     let languageCode = ""
     if (Type.isInt(input)) { // user id
