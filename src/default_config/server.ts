@@ -1,6 +1,6 @@
 import { LEVEL } from "../core/log"
 
-export default <Server>{
+export default <IServerConfig>{
   port: 8080,
   host: "localhost",
   server_version: "39.1",

@@ -1,5 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL } from "../../../core/requestData"
+import { AUTH_LEVEL } from "../../../models/constant"
 import { promisify } from "util"
 import { readFile, exists } from "fs"
 

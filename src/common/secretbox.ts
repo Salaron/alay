@@ -1,21 +1,32 @@
+import { readFile } from "fs"
+import { promisify } from "util"
 import { Connection } from "../core/database_wrappers/mysql"
 import { Log } from "../core/log"
+import {
+  IRarityData,
+  ISecretbox,
+  ISecretboxButton,
+  ISecretboxCost,
+  ISecretboxData,
+  ISecretboxEffect,
+  ISecretboxEffectDetail,
+  ISecretboxSettings,
+  IStepInfo,
+  IStepUpSettings
+} from "../models/secretbox"
 import { Item } from "./item"
-import * as types from "../typings/secretbox"
-import { Utils } from "./utils"
-import { promisify } from "util"
-import { readFile } from "fs"
 import { User } from "./user"
+import { Utils } from "./utils"
 
 const log = new Log("Secretbox")
 const unitDB = sqlite3.getUnit()
 const secretboxDB = sqlite3.getSecretbox()
 
-let secretboxSettings: types.secretboxSettings = {}
+let secretboxSettings: ISecretboxSettings = {}
 async function updateSettings() {
   let costs = await MySQLconnectionPool.query(`SELECT * FROM secretbox_list JOIN secretbox_button ON secretbox_list.secretbox_id = secretbox_button.secretbox_id JOIN secretbox_cost ON secretbox_button.button_id = secretbox_cost.button_id`)
 
-  let processedFiles = <{ [file: string]: types.rarityData[] }>{}
+  let processedFiles = <{ [file: string]: IRarityData[] }>{}
   await Promise.all(costs.map(async cost => {
     if (!secretboxSettings[cost.secretbox_id]) secretboxSettings[cost.secretbox_id] = {}
 
@@ -26,7 +37,7 @@ async function updateSettings() {
 
     try {
       let data = await promisify(readFile)(`${rootDir}/data/secretbox/${cost.unit_data_file}`, "utf-8")
-      secretboxSettings[cost.secretbox_id][cost.cost_id] = processedFiles[cost.unit_data_file] = <types.rarityData[]>(await Promise.all(JSON.parse(data).map(async (rarityData: types.rarityData) => {
+      secretboxSettings[cost.secretbox_id][cost.cost_id] = processedFiles[cost.unit_data_file] = <IRarityData[]>(await Promise.all(JSON.parse(data).map(async (rarityData: IRarityData) => {
         if (
           !(Type.isNullDef(rarityData.unit_id) || Type.isArray(rarityData.unit_id)) ||
           !(Type.isNull(rarityData.unit_type_id) || Type.isArray(rarityData.unit_type_id)) ||
@@ -167,13 +178,13 @@ export class Secretbox {
     this.connection = connection
   }
 
-  public async getSecretboxList(userId: number): Promise<types.secretbox[]> {
+  public async getSecretboxList(userId: number): Promise<ISecretbox[]> {
     if (Config.server.debug_mode) await updateSettings()
 
     let list = await this.connection.query(`SELECT * FROM secretbox_list WHERE (start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2`, {
       date: Utils.toSpecificTimezone(9)
     })
-    return <types.secretbox[]>(await Promise.all(list.map(async secretbox => {
+    return <ISecretbox[]>(await Promise.all(list.map(async secretbox => {
       return await this.getTab(userId, secretbox)
     }))).filter(secretbox => {
       if (!secretbox) return false
@@ -212,11 +223,11 @@ export class Secretbox {
           cost: costId
         })
 
-        if (!stepCost && (<types.stepInfo>secretboxTab.secret_box_info.additional_info).reset_type != 2) throw new Error(`Cost id doesn't match with step id`)
+        if (!stepCost && (<IStepInfo>secretboxTab.secret_box_info.additional_info).reset_type != 2) throw new Error(`Cost id doesn't match with step id`)
         stepCost = await this.connection.first("SELECT * FROM secretbox_button WHERE secretbox_id = :id ORDER BY step_id DESC", {
           id: secretboxId
         })
-        if ((<types.stepInfo>secretboxTab.secret_box_info.additional_info).reset_type === 2 && secretboxTab.secret_box_info.additional_info!.step < stepCost.step_id) throw new Error(`Same`)
+        if ((<IStepInfo>secretboxTab.secret_box_info.additional_info).reset_type === 2 && secretboxTab.secret_box_info.additional_info!.step < stepCost.step_id) throw new Error(`Same`)
       }
     }
 
@@ -231,7 +242,7 @@ export class Secretbox {
     const unitRarities: number[] = [] // for guarantee
 
     for (let count = 0; gainedUnitIds.length < costData.unit_count; count++) {
-      let rarities: types.rarityData[] = []
+      let rarities: IRarityData[] = []
       for (const data of rarityData) {
         for (let i = 0; i < data.weight; i++) {
           rarities.push(data)
@@ -335,16 +346,16 @@ export class Secretbox {
     }
   }
 
-  private async getTab(userId: number, secretboxData: types.secretboxData): Promise<types.secretbox | undefined>
-  private async getTab(userId: number, secretboxId: number): Promise<types.secretbox>
-  private async getTab(userId: number, secretboxData: types.secretboxData | number): Promise<types.secretbox | undefined> {
+  private async getTab(userId: number, secretboxData: ISecretboxData): Promise<ISecretbox | undefined>
+  private async getTab(userId: number, secretboxId: number): Promise<ISecretbox>
+  private async getTab(userId: number, secretboxData: ISecretboxData | number): Promise<ISecretbox | undefined> {
     if (Type.isInt(secretboxData)) {
       let data = await this.connection.first(`SELECT * FROM secretbox_list WHERE ((start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2) AND secretbox_id = :id`, {
         date: Utils.toSpecificTimezone(9),
         id: secretboxData
       })
       if (!data) throw new ErrorCode(1508)
-      secretboxData = <types.secretboxData>data
+      secretboxData = <ISecretboxData>data
     }
 
     const [buttons, ponData, additionalInfo] = await Promise.all([
@@ -355,7 +366,7 @@ export class Secretbox {
     if (!buttons) return
     const effect = await this.getEffects(secretboxData, additionalInfo)
 
-    const tab: types.secretbox = {
+    const tab: ISecretbox = {
       page_title_asset: secretboxData.menu_title_asset,
       url: `/webview.php/secretbox/detail?id=${secretboxData.secretbox_id}`,
       animation_assets: {
@@ -387,16 +398,16 @@ export class Secretbox {
     return tab
   }
 
-  private async getButtons(userId: number, secretboxData: types.secretboxData): Promise<types.secretboxButton[] | false>
-  private async getButtons(userId: number, secretboxId: number): Promise<types.secretboxButton[]>
-  private async getButtons(userId: number, secretboxData: types.secretboxData | number): Promise<types.secretboxButton[] | false> {
+  private async getButtons(userId: number, secretboxData: ISecretboxData): Promise<ISecretboxButton[] | false>
+  private async getButtons(userId: number, secretboxId: number): Promise<ISecretboxButton[]>
+  private async getButtons(userId: number, secretboxData: ISecretboxData | number): Promise<ISecretboxButton[] | false> {
     if (Type.isInt(secretboxData)) {
       let data = await this.connection.first(`SELECT * FROM secretbox_list WHERE ((start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2) AND secretbox_id = :id`, {
         date: Utils.toSpecificTimezone(9),
         id: secretboxData
       })
       if (!data) throw new ErrorCode(1508)
-      secretboxData = <types.secretboxData>data
+      secretboxData = <ISecretboxData>data
     }
 
     switch (secretboxData.secretbox_type) {
@@ -411,7 +422,7 @@ export class Secretbox {
           return {
             secret_box_button_type: button.type,
             cost_list: await this.getCosts(userId, button.button_id),
-            secret_box_name: (<types.secretboxData>secretboxData).name,
+            secret_box_name: (<ISecretboxData>secretboxData).name,
             balloon_asset: button.balloon_asset === null ? undefined : button.balloon_asset
           }
         }))
@@ -430,7 +441,7 @@ export class Secretbox {
         }
         if (!stepButton && !secretboxData.always_visible) return false
 
-        const button: types.secretboxButton = {
+        const button: ISecretboxButton = {
           secret_box_button_type: 2, // default is 2
           cost_list: [],
           secret_box_name: secretboxData.name,
@@ -453,9 +464,9 @@ export class Secretbox {
       }
     }
   }
-  private async getCosts(userId: number, buttonId: number): Promise<types.secretboxCost[]>
-  private async getCosts(userId: number, costId: number, useCostId: true): Promise<types.secretboxCost>
-  private async getCosts(userId: number, id: number, useCostId: boolean = false): Promise<types.secretboxCost[] | types.secretboxCost> {
+  private async getCosts(userId: number, buttonId: number): Promise<ISecretboxCost[]>
+  private async getCosts(userId: number, costId: number, useCostId: true): Promise<ISecretboxCost>
+  private async getCosts(userId: number, id: number, useCostId: boolean = false): Promise<ISecretboxCost[] | ISecretboxCost> {
     const [costs, userItems] = await Promise.all([
       this.connection.query(`SELECT cost_id, unit_count, amount, item_name FROM secretbox_cost WHERE ${useCostId ? "cost_id" : "button_id"} = :id`, {
         id
@@ -488,7 +499,7 @@ export class Secretbox {
     return result
   }
 
-  private async getAdditionalInfo(userId: number, secretboxData: types.secretboxData) {
+  private async getAdditionalInfo(userId: number, secretboxData: ISecretboxData) {
     switch (secretboxData.secretbox_type) {
       case 1: { // step up
         const settings = await this.getStepUpSettings(secretboxData.secretbox_id)
@@ -498,7 +509,7 @@ export class Secretbox {
         if (settings.reset_type === 1) currentStep = currentStep % settings.end_step
         if (currentStep === 0) currentStep = settings.end_step
 
-        return <types.stepInfo>{
+        return <IStepInfo>{
           secret_box_type: 1,
           step: currentStep,
           end_step: settings.end_step,
@@ -511,7 +522,7 @@ export class Secretbox {
       default: return undefined
     }
   }
-  private async getEffects(secretboxData: types.secretboxData, additionalInfo?: types.stepInfo) {
+  private async getEffects(secretboxData: ISecretboxData, additionalInfo?: IStepInfo) {
     // oh god stupid crutch ...
     let justObject: any = {}
     let useObjectFromAbove = false
@@ -523,8 +534,8 @@ export class Secretbox {
       })).cost_id] = "lol"
     }
 
-    let effectList: types.secretboxEffect[] = []
-    let effectDetailList: types.secretboxEffectDetail[] = []
+    let effectList: ISecretboxEffect[] = []
+    let effectDetailList: ISecretboxEffectDetail[] = []
 
     let ids: number[] = []
     for (let cost of Object.keys(useObjectFromAbove ? justObject : this.secretboxSettings[secretboxData.secretbox_id])) {
@@ -560,7 +571,7 @@ export class Secretbox {
     }
   }
 
-  private async getStepUpSettings(secretboxId: number): Promise<types.stepUpSettings> {
+  private async getStepUpSettings(secretboxId: number): Promise<IStepUpSettings> {
     const settings = await this.connection.first(`SELECT * FROM secretbox_step_up_settings WHERE secretbox_id = :id`, {
       id: secretboxId
     })

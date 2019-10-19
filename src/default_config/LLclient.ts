@@ -1,4 +1,4 @@
-export default <LLclient>{
+export default <ILLclient>{
   host: "http://prod-jp.lovelive.ge.klabgames.net",
   application_key: "",
   base_key: "",

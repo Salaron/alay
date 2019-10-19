@@ -1,4 +1,4 @@
-export default <Modules>{
+export default <IModules>{
   award: {
     unlockAll: false
   },

@@ -1,12 +1,12 @@
 // tslint:disable:variable-name prefer-for-of
 import crypto from "crypto"
-import { Log } from "./log"
-import querystring from "querystring"
-import * as fs from "fs"
-import { promisify } from "util"
 import extend from "extend"
-import { request, IncomingHttpHeaders, RequestOptions } from "http"
+import * as fs from "fs"
+import { IncomingHttpHeaders, request, RequestOptions } from "http"
+import querystring from "querystring"
+import { promisify } from "util"
 import { gunzip } from "zlib"
+import { Log } from "./log"
 
 // Welcome to my hooorrible coding style...
 /*

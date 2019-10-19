@@ -1,4 +1,5 @@
 import { Log } from "./log"
+import { Utils } from "../common/utils"
 
 // import config files
 import Server from "../config/server"
@@ -10,8 +11,6 @@ import Modules from "../config/modules"
 import I18n from "../config/i18n"
 import Maintenance from "../config/maintenance"
 import Mailer from "../config/mailer"
-
-import { Utils } from "../common/utils"
 
 export class config {
   public lbonus: typeof LBonus

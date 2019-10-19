@@ -1,4 +1,4 @@
-import { WV_REQUEST_TYPE, AUTH_LEVEL } from "../../../core/requestData"
+import { WV_REQUEST_TYPE, AUTH_LEVEL } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
 import { Utils } from "../../../common/utils"
 import { WebView } from "../../../common/webview"

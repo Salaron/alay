@@ -19,7 +19,7 @@ export class ConnectionPool {
   public createdConnections: mysql.PoolConnection[]
   public acquiringConnections: mysql.PoolConnection[]
   private debugInterval: any
-  constructor(config: Database) {
+  constructor(config: IDatabaseConfig) {
     this.config = extend(
       {
         autoReconnect: true,
