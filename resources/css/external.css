@@ -22,17 +22,18 @@
   padding: 0 19px 0 13px;
   height: calc(100vh - 75px);
 }
-
 .sl-navbar-container:not(.uk-navbar-transparent) {
   border-radius: 1px;
 }
 
-.sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
-  min-height: 64px;
-}
+@media (min-width: 550px) {
+  .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
+    min-height: 64px;
+  }
 
-.sl-icon-button {
-  left: 10px;
-  top: 12px;
-  margin-right: 5px;
+  .sl-icon-button {
+    left: 10px;
+    top: 12px;
+    margin-right: 5px;
+  }
 }

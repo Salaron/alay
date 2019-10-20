@@ -48,7 +48,7 @@ export default class extends WebViewAction {
         this.requestData.auth_token = token
         return {
           status: 200,
-          result: template(values)
+          result: await webview.compileBodyTemplate(template, this.requestData, values)
         }
       }
       default: {

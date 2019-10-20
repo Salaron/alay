@@ -1,6 +1,8 @@
 @charset "utf-8";
 
-body {
+html, body {
+  width: 100vw;
+  height: 100vh;
   -webkit-text-size-adjust: 100%;
   background: transparent;
 }
@@ -13,13 +15,13 @@ body {
 
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
   color: rgba(255,255,255,0.8);
-  font-size: 16px;
-  min-height: 50px;
+  font-size: 14px;
+  min-height: 35px;
 }
 
 .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li.uk-active>a {
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 #outer {
@@ -46,7 +48,7 @@ body {
   position: relative;
 }
 #body {
-  margin: 5px 3px 5px;
+  margin: 3px 3px 5px;
   padding: 0 19px 0 13px;
   position: relative;
   height: calc(100vh - 80px);
@@ -65,24 +67,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 .sl-icon-button {
   background: white;
-  border: 4px solid #5bb7f0;
-  border-radius: 12px;
-  height: 40px;
-  width: 40px;
-  top: 5px;
+  border: 3px solid #5bb7f0;
+  border-radius: 8px;
+  height: 27px;
+  width: 27px;
+  top: 3.5px;
   left: 5px;
   position: relative;
 }
 
-ol, ul {
-  padding-left: 30px;
-  margin: 0;
-}
 
 /* SL Profile */
 .avatar-border {
-  width: 75px;
-  height: 75px;
+  width: 60px;
+  height: 60px;
   background-position: center;
   background-size: auto;
   background-size: 118%;
@@ -91,4 +89,43 @@ ol, ul {
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   border-radius: 100%;
+}
+
+h1 { font-size: 2em!important; }
+h2 { font-size: 1.5em!important; }
+h3 { font-size: 1.17em!important; }
+h4 { font-size: 1.12em!important; }
+h5 { font-size: .83em!important; }
+h6 { font-size: .75em!important; }
+p {
+  font-size: 14px;
+}
+
+/* Media selectors */
+@media (min-width: 550px) {
+  p {
+    font-size: 16px;
+  }
+
+  .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
+    font-size: 16px;
+    min-height: 50px;
+  }
+  
+  .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li.uk-active>a {
+    font-size: 16px;
+  }
+
+  .sl-icon-button {
+    border: 4px solid #5bb7f0;
+    border-radius: 12px;
+    height: 40px;
+    width: 40px;
+    top: 5px;
+    left: 5px;
+  }
+  .avatar-border {
+    width: 75px;
+    height: 75px;
+  }
 }
