@@ -7,8 +7,6 @@
 
       <div id="body">
         WIP
-        <a class="uk-button uk-button-primary uk-button-large uk-border-pill uk-width-1-1 uk-margin-top"
-          href="/webview.php/admin/markdown">Markdown Editor</a>
       </div>
     </div>
 
@@ -17,8 +15,8 @@
 
   <!-- Empty. use as reference for now -->
   <script type="text/javascript">
-    var userId = {{{ userId }}}
-    var token = {{{ token }}}
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
     var external = {{{ external }}}
     var headers = {{{ headers }}}
   </script>
@@ -29,7 +27,9 @@
   <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script type="text/javascript">
-    var ps = Scrollbar.init($("#body")[0])
-    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.protocol + "//" + window.location.host + "/webview.php/admin/index?user_id={{{user_id}}}&token={{{token}}}"))
+    $(function () {
+      var scrollbar = Scrollbar.init($("#body")[0])
+      $("#external").attr("href", getExternalUrl())
+    })
   </script>
 </body>

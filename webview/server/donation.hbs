@@ -1,18 +1,3 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>SunLight WebView</title>
-
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
-
-  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
-</head>
-
 <body>
   <div id="outer">
     <div id="inner">
@@ -31,8 +16,9 @@
         <div class="uk-container uk-container-small">
           <p>
             SunLight Project — полностью проект, который разрабатывается и модерируется всего одним человечком.<br>
-            Этот человечек старается поддерживать сервер на плаву и выкраивает денюжку на оплату хостинга из своих сбережений.<br>
-            Вы можете помочь развитию проекта... 
+            Этот человечек старается поддерживать сервер на плаву и выкраивает денюжку на оплату хостинга из своих
+            сбережений.<br>
+            Вы можете помочь развитию проекта...
           </p>
           <h3>Список меценатов</h3>
           Спасибо вам огромное (✿ ♡‿♡)
@@ -41,23 +27,22 @@
     </div>
   </div>
 
-  <script type="">
-    var enableResize = true
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
-
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
 
   <script>
-    var ps = Scrollbar.init($("#body")[0])
+    var scrollbar = Scrollbar.init($("#body")[0])
     if (window.history.length != 1) {
-      var url = window.location.protocol + "//" + window.location.host + "/webview.php/announce/index?id={{announce/id}}"
-      $("#2back").prepend('<a href="' + url + '" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+      $("#2back").prepend('<a href="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
     }
   </script>
 </body>
-
-</html>

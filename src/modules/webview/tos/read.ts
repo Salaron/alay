@@ -12,21 +12,22 @@ export default class extends WebViewAction {
   }
   public async execute() {
     const i18n = new I18n(this.connection)
+    const webview = new WebView(this.connection)
 
     let code = Config.i18n.defaultLanguage
     try {
-      // @ts-ignore
-      code = await i18n.getUserLocalizationCode(this.user_id || this.requestData.auth_token)
+      code = await i18n.getUserLocalizationCode(this.user_id ? this.user_id : <string>this.requestData.auth_token)
     } catch (_) { } // tslint:disable-line
-    const template = await WebView.getTemplate("tos", "read")
 
-    const values = {
-      tos: await i18n.getMarkdown(code, i18n.markdownType.TOS),
-      external: this.requestData.requestFromBrowser
-    }
     return {
       status: 200,
-      result: template(values)
+      result: await webview.compileBodyTemplate(
+        await webview.getTemplate("tos", "read"),
+        this.requestData,
+        {
+          tos: await i18n.getMarkdown(code, i18n.markdownType.TOS)
+        }
+      )
     }
   }
 }

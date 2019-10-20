@@ -139,13 +139,15 @@ export default class extends WebViewAction {
 
       return {
         status: 200,
-        result: template({
+        result: await new WebView(this.connection).compileBodyTemplate(template, this.requestData, {
           secretbox,
           costList,
-          headers: JSON.stringify(this.requestData.getWebapiHeaders())
+          pageTitle: secretbox.name,
+          stylesheets: [
+            "/resources/css/secretbox-detail.css"
+          ]
         })
       }
-
     } catch (err) {
       return {
         status: 500,

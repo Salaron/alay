@@ -17,11 +17,10 @@ export default class extends WebViewAction {
     const webview = new WebView(this.connection)
 
     const code = await i18n.getUserLocalizationCode(this.user_id)
-    let [strings, template, announceList, changeLanguageModal] = await Promise.all([ // tslint:disable-line
+    let [strings, template, announceList] = await Promise.all([
       i18n.getStrings(code, "common", "announce-index"),
       WebView.getTemplate("announce", "index"),
       this.connection.query(`SELECT * FROM webview_announce ORDER BY insert_date DESC LIMIT 5`),
-      webview.getLanguageModalTemplate(this.user_id)
     ])
 
     announceList = announceList.map((announce) => {
@@ -35,16 +34,13 @@ export default class extends WebViewAction {
     })
 
     const values = {
-      changeLanguageModal,
       announceList,
       code,
-      isAdmin: Config.server.admin_ids.includes(this.user_id),
-      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       i18n: strings
     }
     return {
       status: 200,
-      result: template(values)
+      result: await webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

@@ -139,10 +139,10 @@ function replacePlaceholders(input, values) {
 function updateBodySize() {
   var bottomOffset = 19
   if (external === true) {
-    bottomOffset = 12
+    bottomOffset = 16
   }
   if (document.getElementById("body") !== null) $("#body").height($(window).height() - $("#body").position().top - bottomOffset)
-  if (typeof ps != "undefined") ps.update()
+  if (typeof scrollbar != "undefined") scrollbar.update()
 }
 function isChrome() {
   var isChromium = window.chrome;

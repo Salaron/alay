@@ -14,7 +14,7 @@ export default class extends WebViewAction {
     const template = await WebView.getTemplate("server", "donation")
     return {
       status: 200,
-      result: template({})
+      result: await new WebView(this.connection).compileBodyTemplate(template, this.requestData)
     }
   }
 }

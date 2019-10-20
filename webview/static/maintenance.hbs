@@ -1,18 +1,3 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>SunLight WebView</title>
-
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
-
-  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
-</head>
-
 <body>
   <div id="outer">
     <div id="inner">
@@ -52,16 +37,19 @@
     </div>
   </div>
 
-  <script type="">
-    var enableResize = true
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
+    var publicKey = {{{ publicKey }}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript">
-    var ps = Scrollbar.init($("#body")[0])
+    var scrollbar = Scrollbar.init($("#body")[0])
   </script>
 </body>
-
-</html>

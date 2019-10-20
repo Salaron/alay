@@ -1,25 +1,9 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>SunLight WebView</title>
-
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
-
-  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
-</head>
-
-<style>
-  .uk-radio {
-    margin-left: 5px;
-  }
-</style>
-
-<body >
+<body>
+  <style>
+    .uk-radio {
+      margin-left: 5px;
+    }
+  </style>
   <div id="outer">
     <div id="inner">
       <div id="header">
@@ -145,7 +129,7 @@
             <h5 class="uk-text-muted uk-margin-remove">Выполнение запроса может занять до двух минут.</h5>
           </div>
           <div class="uk-modal-footer">
-            
+
             <div class="uk-text-right">
               <button type="button" class="uk-button uk-button-primary uk-border-pill"
                 onclick="bulkDelete()">Подтвердить</button>
@@ -156,24 +140,24 @@
     </div>
   </div>
 
-  <script type="">
-    var headers = {{{headers}}}
-    var publicKey = {{{publicKey}}}
-    var enableResize = true
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
+    var publicKey = {{{ publicKey }}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
-
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
   <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
-
   <script>
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(publicKey)
-    var ps = Scrollbar.init($("#body")[0])
+    var scrollbar = Scrollbar.init($("#body")[0])
 
     function changePassword() {
       var currentPass = $("#currentPassword").val()
@@ -275,5 +259,3 @@
     })
   </script>
 </body>
-
-</html>

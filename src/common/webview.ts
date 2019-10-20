@@ -4,6 +4,7 @@ import { promisify } from "util"
 import { readFile, readFileSync } from "fs"
 import { Connection } from "../core/database_wrappers/mysql"
 import { I18n } from "./i18n"
+import RequestData from "../core/requestData"
 
 interface WebViewTemplates {
   [templateName: string]: Handlebars.TemplateDelegate | undefined
@@ -27,6 +28,10 @@ export class WebView {
       }
     }
     return template
+  }
+
+  public async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
+    return WebView.getTemplate(module, action)
   }
   public static async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
     let template = templates[`${module}-${action}`]
@@ -56,11 +61,35 @@ export class WebView {
     if (Type.isInt(input) || typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) {
       // token or user id
       languageCode = await i18n.getUserLocalizationCode(input)
-    } else if (typeof input === "string") languageCode = input
+    } else if (typeof input === "string" && input.length > 0) languageCode = input
 
     return template({
       languageList: Config.i18n.languages,
       currentLanguage: languageCode
+    })
+  }
+
+  public async compileBodyTemplate(template: Handlebars.TemplateDelegate, requestData: RequestData, values: any = {}) {
+    let context = {
+      ...(values),
+      headers: JSON.stringify(requestData.getWebapiHeaders()),
+      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
+      external: requestData.requestFromBrowser,
+      isAdmin: Config.server.admin_ids.includes(requestData.user_id || 0),
+      userId: requestData.user_id,
+      authToken: requestData.auth_token
+    }
+    const htmlTemplate = await WebView.getTemplate("common", "htmlHead")
+    const headerTemplate = await WebView.getTemplate("common", "header")
+    const changeLanguageModal = await this.getLanguageModalTemplate(Type.isNullDef(requestData.user_id) ? <string>requestData.auth_token : requestData.user_id)
+
+    return htmlTemplate({
+      body: template({
+        header: headerTemplate(context),
+        changeLanguageModal,
+        ...(context)
+      }),
+      ...(context)
     })
   }
 }

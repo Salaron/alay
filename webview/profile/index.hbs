@@ -1,45 +1,29 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>SunLight WebView</title>
-
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.83, user-scalable=no">
-
-  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
-</head>
-
-<style>
-  .stats_entry {
-    display: flex;
-    margin: 0px;
-    justify-content: space-between;
-  }
-
-  .stats_test {
-    font-weight: 450;
-  }
-
-  .stats_value {
-    margin-left: 5px;
-    font-weight: 700;
-  }
-
-  .rank-icon {
-    width: 6em;
-    height: 2em;
-    background-size: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
-</style>
-
 <body>
+  <style>
+    .stats_entry {
+      display: flex;
+      margin: 0px;
+      justify-content: space-between;
+    }
+
+    .stats_test {
+      font-weight: 450;
+    }
+
+    .stats_value {
+      margin-left: 5px;
+      font-weight: 700;
+    }
+
+    .rank-icon {
+      width: 6em;
+      height: 2em;
+      background-size: 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+  </style>
   <div id="outer">
     <div id="inner">
       <div id="header">
@@ -60,7 +44,8 @@
 
               <h3 class="uk-text-bold">{{user/name}}</h3>
 
-              <div class="uk-text-muted uk-width-auto" style="word-wrap: break-word; overflow-wrap: break-word;">{{nl2br user/introduction}}</div>
+              <div class="uk-text-muted uk-width-auto" style="word-wrap: break-word; overflow-wrap: break-word;">
+                {{nl2br user/introduction}}</div>
             </div>
           </div>
           <div class="uk-text-right uk-text-mutedb uk-margin-small-top" {{#if user.lastLogin}}
@@ -202,22 +187,22 @@
     </div>
   </div>
 
-  <script type="">
-    var headers = {{{headers}}}
-    var enableResize = true
-    var userId = {{{userId}}}
-    var guest = {{{guest}}}
+  <script type="text/javascript">
+    var profile = parseInt("{{{ profileId }}}")
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
-
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript" src="/resources/js/change-language.js"></script>
 
   <script>
-    var ps = Scrollbar.init($("#body")[0])
+    var scrollbar = Scrollbar.init($("#body")[0])
 
     function loadRecentPlaysData() {
       $("#loadMoreRecentPlaysButton").attr("disabled", "disabled")
@@ -228,7 +213,7 @@
         action: "getRecentPlays",
         offset: offset,
         limit: 5,
-        userId: userId,
+        userId: profile,
         lang: "{{langCode}}",
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
@@ -250,7 +235,7 @@
         action: "getEventData",
         offset: offset,
         limit: 5,
-        userId: userId,
+        userId: profile,
         lang: "{{langCode}}",
         timestamp: Math.floor(Date.now() / 1000)
       })).done(function (response) {
@@ -264,5 +249,3 @@
     }
   </script>
 </body>
-
-</html>
