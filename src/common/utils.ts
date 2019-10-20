@@ -3,7 +3,6 @@ import crypto from "crypto"
 import moment from "moment"
 import { promisify } from "util"
 import request from "request"
-import { Connection } from "../core/database_wrappers/mysql"
 import { IncomingMessage } from "http"
 
 const log = new Log("Common: Utils")
@@ -37,11 +36,6 @@ export async function init() {
 }
 
 export class Utils {
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
-  }
-
   public static parseDate(value: Date | number, timestamp?: boolean) {
     if (typeof value === "number" || value instanceof Date) {
       if (typeof value === "number" && timestamp) value = Math.floor(value * 1000)
@@ -152,7 +146,7 @@ export class Utils {
   public static getRandomNumber(min: number, max: number) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
-  public static createObjCopy(object: any) {
+  public static createObjCopy<T>(object: T): T {
     return JSON.parse(JSON.stringify(object))
   }
 
@@ -223,7 +217,7 @@ export class Utils {
     else return `${tz}`
   }
 
-  public static getRemoteIP(request: IncomingMessage): string {
+  public static getRemoteAddress(request: IncomingMessage): string {
     if (typeof request.headers["x-real-ip"] === "string") {
       return request.headers["x-real-ip"]
     }

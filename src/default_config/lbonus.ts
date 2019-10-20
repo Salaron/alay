@@ -1,4 +1,4 @@
-export default <LBonus>{
+export default <ILBonusConfig>{
   calendar_generator: {
     cards_query: "SELECT unit_id FROM unit_m WHERE disable_rank_up=1 OR disable_rank_up=3", // support cards
     card_limit: 5, // max cards that can be in one month

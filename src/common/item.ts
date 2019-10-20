@@ -300,7 +300,6 @@ export class Item {
       result.amount = present.amount
       result.incentive_id = incentiveId
       result.reward_box_flag = false
-      result.new_unit_flag = true
       return result
     }
     return <IItemRewardInfo>{

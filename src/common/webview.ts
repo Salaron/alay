@@ -4,6 +4,7 @@ import { promisify } from "util"
 import { readFile, readFileSync } from "fs"
 import { Connection } from "../core/database_wrappers/mysql"
 import { I18n } from "./i18n"
+import RequestData from "../core/requestData"
 
 interface WebViewTemplates {
   [templateName: string]: Handlebars.TemplateDelegate | undefined
@@ -21,17 +22,21 @@ export class WebView {
   public static getTemplateSync(module: string, action: string): Handlebars.TemplateDelegate {
     let template = templates[`${module}-${action}`]
     if (!template || Config.server.debug_mode) {
-      template = Handlebars.compile(readFileSync(`${rootDir}/webview/${module}/${action}.html`, "utf-8"))
+      template = Handlebars.compile(readFileSync(`${rootDir}/webview/${module}/${action}.hbs`, "utf-8"))
       if (!Config.server.debug_mode) {
         templates[`${module}-${action}`] = template
       }
     }
     return template
   }
+
+  public async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
+    return WebView.getTemplate(module, action)
+  }
   public static async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
     let template = templates[`${module}-${action}`]
     if (!template || Config.server.debug_mode) {
-      template = Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/${module}/${action}.html`, "utf-8"))
+      template = Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/${module}/${action}.hbs`, "utf-8"))
       if (!Config.server.debug_mode) {
         templates[`${module}-${action}`] = template
       }
@@ -45,34 +50,53 @@ export class WebView {
     })).cnt
   }
 
-  public async getLanguageModalTemplate(userId: number): Promise<string>
-  public async getLanguageModalTemplate(token: string): Promise<string>
-  public async getLanguageModalTemplate(languageCode: string): Promise<string>
+  /**
+   * @param {number | string} input - User Id, token or Language code
+   */
   public async getLanguageModalTemplate(input?: number | string): Promise<string> {
     const template = await WebView.getTemplate("common", "changelanguage")
     const i18n = new I18n(this.connection)
 
     let languageCode = Config.i18n.defaultLanguage
     if (Type.isInt(input) || typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) {
-      // user id
-      languageCode = await i18n.getUserLocalizationCode(<number>input)
-      // token
-      languageCode = await i18n.getUserLocalizationCode(<string>input)
-    } else if (typeof input === "string") languageCode = input
+      // token or user id
+      languageCode = await i18n.getUserLocalizationCode(input)
+    } else if (typeof input === "string" && input.length > 0) languageCode = input
 
     return template({
       languageList: Config.i18n.languages,
       currentLanguage: languageCode
     })
   }
+
+  public async compileBodyTemplate(template: Handlebars.TemplateDelegate, requestData: RequestData, values: any = {}) {
+    let context = {
+      ...(values),
+      headers: JSON.stringify(requestData.getWebapiHeaders()),
+      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
+      external: requestData.requestFromBrowser,
+      isAdmin: Config.server.admin_ids.includes(requestData.user_id || 0),
+      userId: requestData.user_id,
+      authToken: requestData.auth_token
+    }
+    const htmlTemplate = await WebView.getTemplate("common", "htmlHead")
+    const headerTemplate = await WebView.getTemplate("common", "header")
+    const changeLanguageModal = await this.getLanguageModalTemplate(Type.isNullDef(requestData.user_id) ? <string>requestData.auth_token : requestData.user_id)
+
+    return htmlTemplate({
+      body: template({
+        header: headerTemplate(context),
+        changeLanguageModal,
+        ...(context)
+      }),
+      ...(context)
+    })
+  }
 }
 
-// Helpers
-
-Handlebars.registerHelper("equal", (a, b, options) => {
-  // @ts-ignore: Unreachable code error
+// Handlebars Helpers
+Handlebars.registerHelper("equal", function(this: any, a, b, options) {
   if (a == b) { return options.fn(this) }
-  // @ts-ignore: Unreachable code error
   return options.inverse(this)
 })
 
@@ -108,4 +132,31 @@ Handlebars.registerHelper("numberWithSpaces", (value) => {
   const parts = value.toString().split(".")
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ")
   return new Handlebars.SafeString(parts.join("."))
+})
+
+Handlebars.registerHelper("ifcond", function(this: any, v1, operator, v2, options) {
+  switch (operator) {
+    case "==":
+      return (v1 == v2) ? options.fn(this) : options.inverse(this)
+    case "===":
+      return (v1 === v2) ? options.fn(this) : options.inverse(this)
+    case "!=":
+      return (v1 != v2) ? options.fn(this) : options.inverse(this)
+    case "!==":
+      return (v1 !== v2) ? options.fn(this) : options.inverse(this)
+    case "<":
+      return (v1 < v2) ? options.fn(this) : options.inverse(this)
+    case "<=":
+      return (v1 <= v2) ? options.fn(this) : options.inverse(this)
+    case ">":
+      return (v1 > v2) ? options.fn(this) : options.inverse(this)
+    case ">=":
+      return (v1 >= v2) ? options.fn(this) : options.inverse(this)
+    case "&&":
+      return (v1 && v2) ? options.fn(this) : options.inverse(this)
+    case "||":
+      return (v1 || v2) ? options.fn(this) : options.inverse(this)
+    default:
+      return options.inverse(this)
+  }
 })

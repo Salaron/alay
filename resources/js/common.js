@@ -1,3 +1,15 @@
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+  sendRequest({
+    module: "report",
+    action: "error",
+    timestamp: Math.floor(Date.now() / 1000),
+    message: msg,
+    stacktrace: error == undefined ? null : error.stack,
+    url: url
+  })
+  return false
+}
+
 function parseQueryString(string) {
   return JSON.parse('{"' + string.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function (key, value) { return key === "" ? value : decodeURIComponent(value) })
 }
@@ -9,6 +21,9 @@ function escapeJSON(jsonString) {
 }
 function nl2br(str) {
   return str.replace(/(?:\r\n|\r|\n)/g, "<br>")
+}
+function getExternalUrl() {
+  return "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=" + userId + "&token=" + authToken)
 }
 
 function setCookie(cname, cvalue, exhours) {
@@ -122,8 +137,12 @@ function replacePlaceholders(input, values) {
 }
 
 function updateBodySize() {
-  $("#body").height($(window).height() - $("#body").offset().top - 20)
-  if (typeof ps != "undefined") ps.update()
+  var bottomOffset = 19
+  if (external === true) {
+    bottomOffset = 16
+  }
+  if (document.getElementById("body") !== null) $("#body").height($(window).height() - $("#body").position().top - bottomOffset)
+  if (typeof scrollbar != "undefined") scrollbar.update()
 }
 function isChrome() {
   var isChromium = window.chrome;
@@ -143,26 +162,12 @@ function isChrome() {
 }
 
 (function() {
-  window.onerror = function (msg, url, lineNo, columnNo, error) {
-    sendRequest({
-      module: "report",
-      action: "error",
-      timestamp: Math.floor(Date.now() / 1000),
-      message: msg,
-      stacktrace: error == undefined ? null : error.stack,
-      url: url
-    })
-    return false
-  }
-  
-  if ($ && typeof enableResize != "undefined") {
-    updateBodySize();
-
+  if (typeof $ != "undefined") {
     $(function () {
-      updateBodySize();
+      updateBodySize()
     })
     $(window).resize(function () {
-      updateBodySize();
-    });
+      updateBodySize()
+    })
   }
 })()

@@ -1,4 +1,4 @@
-(function() {
+(function () {
   $("#changeLanguage").on("click", function () {
     UIkit.modal("#languageSelect").toggle();
   });

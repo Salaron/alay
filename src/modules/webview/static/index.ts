@@ -1,4 +1,4 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
 import moment from "moment"
 import { Utils } from "../../../common/utils"
@@ -20,6 +20,7 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
+    const webview = new WebView(this.connection)
     // 10 -- maintenance (custom)
     // 11 -- iOS update
     // 12 -- android update
@@ -43,7 +44,8 @@ export default class extends WebViewAction {
           endTimeEn: moment(Config.maintenance.end_date).locale("en").format("HH:mm"),
           startDayEn: moment(Config.maintenance.start_date).locale("en").format("D MMMM"),
           endDayEn: moment(Config.maintenance.end_date).locale("en").format("D MMMM"),
-          timeZone: Utils.getTimeZoneWithPrefix(Config.maintenance.time_zone)
+          timeZone: Utils.getTimeZoneWithPrefix(Config.maintenance.time_zone),
+          pageTitle: "Maintenance"
         }
         break
       }
@@ -52,7 +54,9 @@ export default class extends WebViewAction {
         template = await WebView.getTemplate("static", "update")
         values = {
           latestVersion: Config.client.application_version,
-          clientVersion: this.requestData.request.headers["bundle-version"] || "N/A"
+          clientVersion: this.requestData.request.headers["bundle-version"] || "N/A",
+          pageTitle: "Update Required",
+          supportMail: Config.mailer.supportMail
         }
         break
       }
@@ -68,7 +72,8 @@ export default class extends WebViewAction {
         values = {
           expiration_date: data.expiration_date,
           expiration_date_human: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").humanize() : null,
-          message: data.message
+          message: data.message,
+          pageTitle: "Login Restricted"
         }
         break
       }
@@ -79,7 +84,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: template(values)
+      result: await webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

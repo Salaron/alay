@@ -1,0 +1,116 @@
+<body>
+  <div id="outer">
+    <div id="inner">
+      <div id="header">
+        {{{header i18n/announce this}}}
+      </div>
+
+      <div id="body">
+        {{#each announceList}}
+        <br>
+        <div id="announce-{{id}}" class="uk-card uk-card-default uk-width-1-1">
+          <div class="uk-card-header">
+            <div class="uk-grid-small uk-flex-middle" uk-grid>
+              <div class="uk-width-expand">
+                <h4 class="uk-card-title uk-margin-remove-bottom uk-margin-remove">{{title}}</h4>
+                <p class="uk-text-meta uk-margin-remove-top uk-margin-remove">{{date}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="uk-card-body">
+            <p class="uk-margin-remove" style="white-space: pre-line">{{description}}</p>
+          </div>
+          {{#if extendable}}
+          <div class="uk-card-footer">
+            <a href="/webview.php/announce/detail?id={{id}}"
+              class="uk-button uk-button-text uk-margin-remove">{{../i18n/more}}</a>
+          </div>
+          {{/if}}
+        </div>
+        {{/each}}
+      </div>
+
+      {{{changeLanguageModal}}}
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
+  </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
+  <script type="text/javascript" src="/resources/js/change-language.js"></script>
+  <script>
+    var announceTotal = null
+    var loadAttempt = 0 // Just in case, in order not to overload the server
+    var scrollbar = Scrollbar.init($("#body")[0])
+    $(document).ready(function () {
+      // check if current url contains query string
+      var queryString = window.location.href.split("?")[1]
+      if (!queryString) return
+
+      // if it is we check if it also contains 'id' element
+      var queryObject = parseQueryString(queryString)
+      if (!queryObject.id) return
+
+      // send request to server to make sure this record is in the database
+      checkIfExists(queryObject.id, function (result) {
+        if (result != true) return
+
+        function loadUntil() {
+          if ($("#announce-" + queryObject.id).length != 0) {
+            scrollbar.scrollTo(0, $("#announce-" + queryObject.id).position().top, 800)
+            return
+          }
+          loadNews(loadUntil)
+        }
+        loadUntil()
+      })
+    })
+
+    scrollbar.addListener(function (status) {
+      if (status.limit.y === status.offset.y) {
+        loadNews()
+      }
+    })
+
+    function loadNews(callback) {
+      if (loadAttempt > 3 || $(".uk-card-header").length === announceTotal) return
+      var before = $(".uk-card-header").length
+      $.when(sendRequest({
+        module: "announce",
+        action: "get",
+        offset: parseInt($(".uk-card-header").length),
+        limit: 20,
+        langCode: "{{code}}",
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        announceTotal = response.response_data.total
+        if (response.response_data.announceList.length > 0) {
+          $("#body").append(response.response_data.announceList)
+          scrollbar.update()
+        }
+        if (before === $(".uk-card-header").length) loadAttempt += 1
+        else loadAttempt = 0
+        if (callback) callback()
+      })
+    }
+
+    function checkIfExists(announceId, callback) {
+      $.when(sendRequest({
+        module: "announce",
+        action: "check",
+        id: parseInt(announceId),
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        callback(response.response_data)
+      })
+    }
+  </script>
+</body>

@@ -1,6 +1,6 @@
 import "./core/config"
-import "./handlers/errorHandler"
 import "./core/mailer"
+import "./models/error"
 import { Log } from "./core/log"
 import { resolve } from "path"
 import { Sqlite3 } from "./core/database_wrappers/sqlite3"
@@ -19,8 +19,8 @@ try {
 
 import ReadLine from "./core/readLine"
 import http from "http"
-import requestHandler from "./handlers/requestHandler"
-import * as modules from "./common";
+import requestHandler from "./handlers/request"
+import * as modules from "./common"
 
 // Entry point
 (async () => {

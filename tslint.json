@@ -8,7 +8,7 @@
         "indent": [true, "spaces", 2],
         "max-classes-per-file": [true, 5],
         "max-line-length": false,
-        "semicolon": false,
+        "semicolon": [true, "never"],
         "ordered-imports": false,
         "no-angle-bracket-type-assertion": false,
         "no-shadowed-variable": false,

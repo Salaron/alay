@@ -1,4 +1,4 @@
-export default <Maintenance>{
+export default <IMantenanceConfig>{
   force_enabled: false,
   notice: true,
   start_date: "2000-01-01 00:00:00",

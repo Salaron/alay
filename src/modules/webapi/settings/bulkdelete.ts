@@ -1,5 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL } from "../../../core/requestData"
+import { AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
 import { Unit } from "../../../common/unit"
 import { Utils } from "../../../common/utils"

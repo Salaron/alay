@@ -1,14 +1,10 @@
+import { Type as type } from "../common/type"
+import { config } from "../core/config"
 import { Connection, ConnectionPool } from "../core/database_wrappers/mysql"
 import { Sqlite3 } from "../core/database_wrappers/sqlite3"
-import { config } from "../core/config"
 import { Mailer as mailer } from "../core/mailer"
-import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../handlers/errorHandler"
-import RequestData from "../core/requestData"
-import { Type as type} from "../common/type"
-
-import { WebApiAction as WebApiAction_ } from "../handlers/actions/webApi"
-import { WebViewAction as WebViewAction_ } from "../handlers/actions/webView"
-import { MainAction as MainAction_ } from "../handlers/actions/main"
+import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../models/error"
+import { ApiAction as apiAction, WebApiAction as webApiAction, WebViewAction as webViewAction } from "../models/actions"
 
 declare global {
   // make project root dir global (for easy access to files outside of 'compile' folder)
@@ -26,9 +22,9 @@ declare global {
   const ErrorWebApi: typeof errorWebApi
   // just
   const Type: typeof type
-  const WebApiAction: typeof WebApiAction_
-  const WebViewAction: typeof WebViewAction_
-  const MainAction: typeof MainAction_
+  const WebApiAction: typeof webApiAction
+  const WebViewAction: typeof webViewAction
+  const ApiAction: typeof apiAction
 
   interface Array<T> {
     forEachAsync(callback: (element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void>

@@ -1,8 +1,7 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
 import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
-import assert from "assert"
 import moment from "moment"
 
 const unitDB = sqlite3.getUnit()
@@ -57,7 +56,7 @@ export default class extends WebViewAction {
       code = Config.i18n.defaultLanguage
     }
 
-    const [strings, template, user, userScore, eventData, liveDataStatus, liveDataLog, changeLanguageModal] = await Promise.all([
+    const [strings, template, user, userScore, eventData, liveDataStatus, liveDataLog] = await Promise.all([
       i18n.getStrings(code, "profile-index"),
       WebView.getTemplate("profile", "index"),
       this.connection.first(`
@@ -94,8 +93,7 @@ export default class extends WebViewAction {
         user: userId
       }),
       this.connection.query("SELECT * FROM user_live_status WHERE user_id = :user AND status = 2", { user: userId }),
-      this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC", { user: userId }),
-      webview.getLanguageModalTemplate(code)
+      this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC", { user: userId })
     ])
 
     if (!user) return {
@@ -169,15 +167,12 @@ export default class extends WebViewAction {
     if (haveMoreRecentPlays) recentPlays.pop()
     const values = {
       i18n: strings,
-      isAdmin: Config.server.admin_ids.includes(this.user_id),
-      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
       user,
       eventData,
       haveMoreEventData,
       haveMoreRecentPlays,
       recentPlays,
-      changeLanguageModal,
-      userId,
+      profileId: userId,
       guest,
       langCode: code,
       icon: user.display_rank === 1 ? icons.normal_icon_asset : icons.rank_max_icon_asset
@@ -185,7 +180,7 @@ export default class extends WebViewAction {
 
     return {
       status: 200,
-      result: template(values)
+      result: await webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

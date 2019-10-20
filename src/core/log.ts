@@ -1,10 +1,10 @@
 // based on Caraxian.log
-import circularJSON from "circular-json"
 import Chalk from "chalk"
+import circularJSON from "circular-json"
 import extend from "extend"
-import util from "util"
-import { EOL } from "os"
 import { appendFile } from "fs"
+import { EOL } from "os"
+import util from "util"
 
 const toTitleCase = (str: string) => str.replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
 const defLabelSize = 16
@@ -20,16 +20,16 @@ export enum LEVEL {
 }
 
 export class Log {
-  public options: CreatedOptions
+  public options: CreateOptions
 
-  constructor(defaultLabel?: string | CreateOptions, options?: CreateOptions) {
+  constructor(defaultLabel?: string | CreateOptions, options?: Partial<CreateOptions>) {
     if (typeof defaultLabel != "string" && typeof defaultLabel === "object") options = defaultLabel
     if (typeof options === "undefined") options = { labelSize: defLabelSize, defaultLabel: <string | undefined>defaultLabel }
     if (typeof options.labelSize != "number") options.labelSize = defLabelSize
     if (typeof options.showTime != "boolean") options.showTime = true
     if (typeof options.defaultLabel === "undefined" && typeof defaultLabel === "string") options.defaultLabel = defaultLabel
 
-    const defOptions: CreateOptions = {
+    const defOptions = {
       labelSize: defLabelSize,
       label: {
         fatal: new Label(options.defaultLabel || "[FATAL]", options.labelSize, "red", "white"),
@@ -45,7 +45,7 @@ export class Log {
       ]
     }
 
-    this.options = <CreatedOptions>extend(true, {}, defOptions, options)
+    this.options = <CreateOptions>extend(true, {}, defOptions, options)
   }
 
   public verbose(message: any, label: Label | string = this.options.label.verbose) {
@@ -257,22 +257,8 @@ export class Log {
 }
 
 interface CreateOptions {
-  labelSize?: number
-  defaultLabel?: string
-  inspectOptions?: util.InspectOptions
-  label?: {
-    fatal?: Label
-    error?: Label
-    warn?: Label
-    info?: Label
-    debug?: Label
-    verbose?: Label
-    always?: Label
-  }
-  showTime?: boolean
-  output?: Output[]
-}
-interface CreatedOptions extends CreateOptions {
+  labelSize: number
+  inspectOptions: util.InspectOptions
   defaultLabel: string
   label: {
     fatal: Label

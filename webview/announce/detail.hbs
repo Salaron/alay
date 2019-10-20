@@ -1,0 +1,49 @@
+<body>
+  <div id="outer">
+    <div id="inner">
+      <div id="header">
+        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
+          uk-sticky="bottom: #offset">
+          <div class="uk-navbar-left">
+            <ul id="2back" class="uk-navbar-nav">
+              <li class="uk-active"><a class="uk-text-bold">{{announce/title}}</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <div id="body">
+        {{{announce/body}}}
+        <div style="text-align: right; margin-bottom: 10px;">
+          {{{announce/date}}}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
+  </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
+  <script>
+    var scrollbar = Scrollbar.init($("#body")[0])
+    if (window.history.length != 1) {
+      var url = window.location.protocol + "//" + window.location.host + "/webview.php/announce/index?id={{announce/id}}"
+      $("#2back").prepend('<a href="' + url + '" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    }
+    if (!external) {
+      $('a[href^="http"]').each(function () {
+        if ($(this).attr("href").indexOf("webview.php/announce/index") >= 0) return
+        $(this).attr("href", "native://browser?url=" + encodeURIComponent($(this).attr("href")))
+      })
+    }
+  </script>
+</body>

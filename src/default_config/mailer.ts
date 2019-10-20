@@ -1,4 +1,4 @@
-export default <Mailer>{
+export default <IMailerConfig>{
   enabled: false,
   transportSettings: {
     service: "Yandex",

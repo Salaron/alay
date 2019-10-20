@@ -1,4 +1,4 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
 import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
@@ -19,10 +19,9 @@ export default class extends WebViewAction {
     const webview = new WebView(this.connection)
 
     const code = await i18n.getUserLocalizationCode(this.user_id)
-    const [strings, template, changeLanguageModal, currentOnline] = await Promise.all([
+    const [strings, template, currentOnline] = await Promise.all([
       i18n.getStrings(code, "server-info"),
       WebView.getTemplate("server", "info"),
-      webview.getLanguageModalTemplate(this.user_id),
       webview.getCurrentOnline()
     ])
 
@@ -46,17 +45,12 @@ export default class extends WebViewAction {
       serverInfo.commitDate = moment(parseInt(lastCommit[4]) * 1000).format("YYYY-MM-DD HH:mm") + " " + lastCommit[5]
     } catch (_) { } // tslint:disable-line
 
-    const values = {
-      i18n: strings,
-      changeLanguageModal,
-      isAdmin: Config.server.admin_ids.includes(this.user_id),
-      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      serverInfo
-    }
-
     return {
       status: 200,
-      result: template(values)
+      result: await webview.compileBodyTemplate(template, this.requestData, {
+        i18n: strings,
+        serverInfo
+      })
     }
   }
 }

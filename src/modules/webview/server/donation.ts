@@ -1,4 +1,4 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
 import { WebView } from "../../../common/webview"
 
@@ -14,7 +14,7 @@ export default class extends WebViewAction {
     const template = await WebView.getTemplate("server", "donation")
     return {
       status: 200,
-      result: template({})
+      result: await new WebView(this.connection).compileBodyTemplate(template, this.requestData)
     }
   }
 }

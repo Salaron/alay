@@ -1,4 +1,4 @@
-export default <I18n>{
+export default <II18nConfig>{
   languages: {
     "English (US)": "en",
     "Русский": "ru"

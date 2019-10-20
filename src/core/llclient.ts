@@ -1,12 +1,12 @@
 // tslint:disable:variable-name prefer-for-of
 import crypto from "crypto"
-import { Log, LEVEL } from "./log"
-import querystring from "querystring"
-import * as fs from "fs"
-import { promisify } from "util"
 import extend from "extend"
-import { request, IncomingHttpHeaders, RequestOptions } from "http"
+import * as fs from "fs"
+import { IncomingHttpHeaders, request, RequestOptions } from "http"
+import querystring from "querystring"
+import { promisify } from "util"
 import { gunzip } from "zlib"
+import { Log } from "./log"
 
 // Welcome to my hooorrible coding style...
 /*
@@ -698,9 +698,9 @@ export default class llclient {
       let result = ""
       let base = ""
       switch (type) {
-        case "af09": { base = "abcdef0123456789"; break; }
-        case "89ab": { base = "89ab"; break; }
-        case "az09": { base = "abcdefghijklmnopqrstuvwxyz0123456789"; break; }
+        case "af09": { base = "abcdef0123456789"; break }
+        case "89ab": { base = "89ab"; break }
+        case "az09": { base = "abcdefghijklmnopqrstuvwxyz0123456789"; break }
       }
       for (let i = 0; i < length; i++) {
         result += base.charAt(Math.floor(Math.random() * base.length))
@@ -709,6 +709,6 @@ export default class llclient {
     }
     let loginKey = `${randomChars(8, "af09")}-${randomChars(4, "af09")}-4${randomChars(3, "af09")}-${randomChars(1, "89ab")}${randomChars(3, "af09")}-${randomChars(12, "af09")}` // sif's like credentials
     let loginPasswd = randomChars(128, "az09")
-    return [loginKey, (crypto.createHash("SHA512").update([loginKey, Date.now()].toString())).digest("hex")]
+    return [loginKey, loginPasswd]
   }
 }

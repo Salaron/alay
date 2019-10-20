@@ -1,4 +1,4 @@
-export default <Client>{
+export default <IClientConfig>{
   application_version: "6.6.1",
   application_id: "",
   application_key: "",

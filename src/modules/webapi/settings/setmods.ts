@@ -1,6 +1,6 @@
 import RequestData from "../../../core/requestData"
 import assert from "assert"
-import { AUTH_LEVEL } from "../../../core/requestData"
+import { AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
 import { supportedModsValues, supportedMods } from "../../webview/settings/index"
 

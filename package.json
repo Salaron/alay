@@ -5,7 +5,8 @@
   "main": "alay.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'"
+    "tslint": "tslint -c tslint.json 'src/**/*.ts'",
+    "tslint:fix": "tslint -c tslint.json 'src/**/*.ts' --fix"
   },
   "author": "Salaron",
   "license": "ISC",
@@ -15,20 +16,20 @@
     "@types/formidable": "^1.0.31",
     "@types/mime": "^2.0.1",
     "@types/mysql": "^2.15.7",
-    "@types/node": "^12.7.5",
+    "@types/node": "^12.11.1",
     "@types/nodemailer": "^6.2.1",
     "@types/request": "^2.48.3",
     "@types/showdown": "^1.9.3",
     "@types/sqlite3": "^3.1.5",
     "tslint": "^5.20.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.4"
   },
   "dependencies": {
     "chalk": "^2.4.2",
     "circular-json": "^0.5.9",
     "extend": "^3.0.2",
     "formidable": "^1.2.1",
-    "handlebars": "^4.2.0",
+    "handlebars": "^4.4.3",
     "mem": "^5.1.1",
     "mime": "^2.4.4",
     "moment": "^2.24.0",

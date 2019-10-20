@@ -1,7 +1,7 @@
 [
   {
-    "rateup": [],
-    "rateup_hidden": [],
+    "rateup_unit_id": [],
+    "rateup_hidden_unit_id": [],
     "rateup_weight": 50,
     "unit_type_id": [101, 102, 103, 104, 105, 106, 107, 108, 109],
     "query": null,
@@ -10,8 +10,8 @@
     "guarantee": false
   },
   {
-    "rateup": [],
-    "rateup_hidden": [],
+    "rateup_unit_id": [],
+    "rateup_hidden_unit_id": [],
     "rateup_weight": 50,
     "unit_type_id": [101, 102, 103, 104, 105, 106, 107, 108, 109],
     "query": null,
@@ -20,8 +20,8 @@
     "guarantee": false
   },
   {
-    "rateup": [],
-    "rateup_hidden": [],
+    "rateup_unit_id": [],
+    "rateup_hidden_unit_id": [],
     "rateup_weight": 20,
     "unit_type_id": [101, 102, 103, 104, 105, 106, 107, 108, 109],
     "query": null,
@@ -30,8 +30,8 @@
     "guarantee": true
   },
   {
-    "rateup": [],
-    "rateup_hidden": [],
+    "rateup_unit_id": [],
+    "rateup_hidden_unit_id": [],
     "rateup_weight": 50,
     "unit_type_id": [101, 102, 103, 104, 105, 106, 107, 108, 109],
     "query": null,

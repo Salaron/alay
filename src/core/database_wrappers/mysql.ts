@@ -5,21 +5,21 @@ import { promisify } from "util"
 
 const log = new Log("MySQL")
 interface PoolConfig extends mysql.PoolConfig {
-  autoReconnect: boolean;
-  autoReconnectMaxAttempt: number;
-  autoReconnectDelay: number;
-  disconnected: any;
+  autoReconnect: boolean
+  autoReconnectMaxAttempt: number
+  autoReconnectDelay: number
+  disconnected: any
 }
 
 export class ConnectionPool {
-  public config: PoolConfig;
-  public pool: mysql.Pool;
-  public reconnectAttempts: number;
-  public freeConnections: mysql.PoolConnection[];
-  public createdConnections: mysql.PoolConnection[];
-  public acquiringConnections: mysql.PoolConnection[];
-  private debugInterval: any;
-  constructor(config: Database) {
+  public config: PoolConfig
+  public pool: mysql.Pool
+  public reconnectAttempts: number
+  public freeConnections: mysql.PoolConnection[]
+  public createdConnections: mysql.PoolConnection[]
+  public acquiringConnections: mysql.PoolConnection[]
+  private debugInterval: any
+  constructor(config: IDatabaseConfig) {
     this.config = extend(
       {
         autoReconnect: true,
@@ -256,9 +256,9 @@ export class ConnectionPool {
 }
 
 export class Connection {
-  public connection: mysql.PoolConnection;
-  public released = false;
-  private lastQuery: string | undefined;
+  public connection: mysql.PoolConnection
+  public released = false
+  private lastQuery: string | undefined
   constructor(connection?: mysql.PoolConnection) {
     if (typeof connection === "undefined") {
       throw new Error(`Cannot be called directly`)

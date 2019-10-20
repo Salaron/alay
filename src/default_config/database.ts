@@ -1,4 +1,4 @@
-export default <Database>{
+export default <IDatabaseConfig>{
   autoReconnect: true,
   autoReconnectDelay: 2000,
   autoReconnectMaxAttempt: 10,

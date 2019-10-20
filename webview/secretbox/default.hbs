@@ -1,0 +1,163 @@
+<body>
+  <div id="outer">
+    <div id="inner">
+      <div id="header">
+        <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
+          uk-sticky="bottom: #offset">
+          <div class="uk-navbar-left">
+            <ul id="2back" class="uk-navbar-nav">
+              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase"> </a></li>
+            </ul>
+          </div>
+          <div class="uk-navbar-center">
+            <ul class="uk-navbar-nav">
+              <li class="uk-active"><a class="uk-text-bold">{{secretbox/name}}</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      {{#ifcond secretbox.stubBox '||' secretbox.stepBox}}
+      <ul class="uk-flex-center uk-nav uk-nav-default" uk-scrollspy-nav="closest: li; scroll: true" uk-tab>
+        {{#each costList}}
+        {{#if default}}
+        <li class="uk-active"><a
+            onclick='scrollbar.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{label}}</a></li>
+        {{else}}
+        <li><a onclick='scrollbar.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{label}}</a></li>
+        {{/if}}
+        {{/each}}
+      </ul>
+      {{else if secretbox.honorBox}}
+      <ul class="uk-flex-center uk-nav uk-nav-default" uk-scrollspy-nav="closest: li; scroll: true" uk-tab>
+        {{#each costList.0.rarityList}}
+        {{#ifcond @index '===' 0}}
+        <li class="uk-active"><a
+            onclick='scrollbar.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a>
+        </li>
+        {{else}}
+        <li><a onclick='scrollbar.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a></li>
+        {{/ifcond}}
+        {{/each}}
+      </ul>
+      {{/ifcond}}
+
+      <div id="body" data-scrollbar>
+        {{#each costList}}
+        <div id="cost-{{@index}}" class="uk-container uk-container-large">
+          <!--
+            <h3 class="uk-text-bold">■ Costs</h3>
+          -->
+
+          <h3 class="uk-text-bold">■ Scouting rates by rarity</h3>
+          <ul>
+            {{#each rarityList}}
+            <li>{{rarity}}: {{rate}}%</li>
+            {{/each}}
+          </ul>
+
+          <h3 class="uk-text-bold">■ Note</h3>
+          <ul>
+            <li>Loading this page can take some time. Please wait a bit.</li>
+            <li>Rates are rounded to three decimal places, so there may by cases when the total does not add up to
+              exactly
+              100%</li>
+            <li>A player may Scout the same Member more than once.</li>
+            <li>When scouting, the rarity is decided first based on the "Scouting rates by rarity", then a club member
+              within that rarity is selected according to the rates as shown in the list of available members.</li>
+
+            {{#ifcond ../secretbox/enabled '==' 1}}
+            <li style="color: red;">Time limit: TODO</li>
+            {{/ifcond}}
+          </ul>
+
+          <h3 class="uk-text-bold">■ Members available in total ({{total}} members)</h3>
+
+          {{#each rarityList}}
+          <div id="rarity-{{@../index}}-{{@index}}">
+
+            <h4 class="uk-text-bold">&lt;{{rarity}}&gt; ({{total}} members)</h4>
+            {{#if rateup.length}}
+            <h4 style="color: red;">[{{rarity}} members with increased appearance rate]</h4>
+            <ul>
+              <li>Individual members will receive a flat rate increase in appearance.</li>
+              <li>Appearance rate per member within {{rarity}}: {{ratePerRateup}}%</li>
+            </ul>
+            <table class="uk-table uk-table-striped">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Name</th>
+                  <th>Skill Name</th>
+                  <th>Attribute</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {{#each rateup}}
+                <tr>
+                  <td class="card-number">{{cardNumber}}</td>
+                  <td>{{unitName}}</td>
+                  <td>{{skillName}}</td>
+                  <td>{{cardAttribute}}</td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+            {{/if}}
+
+            {{#if cards.length}}
+            <h4 style="color: blue;">[{{rarity}} members]</h4>
+            <ul>
+              <li>Individual appearance rates are equal among the same rarity.</li>
+              <li>Appearance rate per member within {{rarity}}: {{ratePerCard}}%</li>
+            </ul>
+            <table class="uk-table uk-table-striped">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Name</th>
+                  <th>Skill Name</th>
+                  <th>Attribute</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {{#each cards}}
+                <tr>
+                  <td class="card-number">{{cardNumber}}</td>
+                  <td>{{unitName}}</td>
+                  <td>{{skillName}}</td>
+                  <td>{{cardAttribute}}</td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+            {{/if}}
+          </div>
+          {{/each}}
+        </div>
+        <hr>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
+  </script>
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
+  <script>
+    var scrollbar = Scrollbar.init($("#body")[0]);
+    if (window.history.length != 1) {
+      $("#2back").prepend('<a onclick="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    }
+  </script>
+</body>

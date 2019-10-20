@@ -1,51 +1,18 @@
 // tslint:disable:variable-name
-import { IncomingMessage, ServerResponse } from "http"
-import { IncomingForm } from "formidable"
-import querystring from "querystring"
-import { Log } from "../core/log"
 import chalk from "chalk"
+import { IncomingForm } from "formidable"
+import { IncomingMessage, ServerResponse } from "http"
 import moment from "moment"
+import querystring from "querystring"
 import { Utils } from "../common/utils"
+import { Log } from "../core/log"
+import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
 import { Connection } from "./database_wrappers/mysql"
 
 const log = new Log("Request Data")
 
 interface authLevelOptions {
   force?: boolean
-}
-export enum AUTH_LEVEL {
-  NONE,
-  BANNED,
-  SESSION_EXPIRED,
-  REJECTED,
-  PRE_LOGIN,
-  UPDATE,
-  CONFIRMED_USER,
-  ADMIN
-}
-export enum REQUEST_TYPE {
-  BOTH,
-  SINGLE,
-  MULTI
-}
-export enum RESPONSE_TYPE {
-  SINGLE = 1,
-  MULTI
-}
-export enum HANDLER_TYPE {
-  MAIN,
-  WEBAPI,
-  WEBVIEW
-}
-export enum PERMISSION {
-  NOXMC,
-  XMC,
-  STATIC
-}
-export enum WV_REQUEST_TYPE {
-  BOTH,
-  APPLICATION,
-  BROWSER
 }
 export interface Authorize {
   consumerKey: string
@@ -91,7 +58,7 @@ export default class RequestData {
         if (Type.isString(this.params.user_id) && Type.isString(this.params.token)) { // queryString
           this.user_id = parseInt(this.params.user_id) || null
           this.auth_token = this.params.token
-          this.requestFromBrowser = true
+          if (!Config.server.debug_mode) this.requestFromBrowser = true
         } else if (
           getCookie(<string>this.headers.cookie || "", "token") != null
         ) { // cookie
@@ -99,7 +66,7 @@ export default class RequestData {
             this.user_id = parseInt(<string>getCookie(<string>this.headers.cookie || "", "user_id"))
           }
           this.auth_token = getCookie(<string>this.headers.cookie || "", "token")
-          this.requestFromBrowser = true
+          if (!Config.server.debug_mode) this.requestFromBrowser = true
         }
       }
       if (this.user_id != null && this.auth_token != null) {
@@ -111,7 +78,7 @@ export default class RequestData {
       if (!this.headers["x-requested-with"]) this.requestFromBrowser = true
     }
 
-    if (formData && formData.request_data && hType === HANDLER_TYPE.MAIN) {
+    if (formData && formData.request_data && hType === HANDLER_TYPE.API) {
       try {
         this.raw_request_data = formData.request_data
         this.params = JSON.parse(formData.request_data)

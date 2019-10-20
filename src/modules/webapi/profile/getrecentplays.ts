@@ -1,6 +1,6 @@
 import RequestData from "../../../core/requestData"
 import moment from "moment"
-import { AUTH_LEVEL } from "../../../core/requestData"
+import { AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
 import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"

@@ -1,4 +1,4 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
 
 const unitDB = sqlite3.getUnit()

@@ -9,7 +9,7 @@ const log = new Log("Common: Live")
 
 const liveDB = sqlite3.getLive()
 const liveNotesDB = sqlite3.getNotes()
-const festDB = sqlite3.getFestival()
+// const festDB = sqlite3.getFestival()
 const marathonDB = sqlite3.getMarathon()
 const unitDB = sqlite3.getUnit()
 
@@ -526,14 +526,14 @@ export class Live {
     let scoreReward = null
     let comboReward = null
     switch (scoreRank) {
-      case 1: scoreReward = ur.randomValue().unit_id; break;
-      case 2: scoreReward = sr.randomValue().unit_id; break;
+      case 1: scoreReward = ur.randomValue().unit_id; break
+      case 2: scoreReward = sr.randomValue().unit_id; break
       case 3:
       case 4: scoreReward = r.randomValue().unit_id; break
     }
     switch (comboRank) {
-      case 1: comboReward = ur.randomValue().unit_id; break;
-      case 2: comboReward = sr.randomValue().unit_id; break;
+      case 1: comboReward = ur.randomValue().unit_id; break
+      case 2: comboReward = sr.randomValue().unit_id; break
       case 3:
       case 4: comboReward = r.randomValue().unit_id; break
     }

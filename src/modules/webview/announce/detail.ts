@@ -1,4 +1,4 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
 import { WebView } from "../../../common/webview"
 import { TYPE } from "../../../common/type"
@@ -8,7 +8,7 @@ import moment from "moment"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
-  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
+  public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
 
   constructor(requestData: RequestData) {
     super(requestData)
@@ -23,8 +23,10 @@ export default class extends WebViewAction {
     assert(parseInt(this.params.id) === parseInt(this.params.id), "id should be int")
   }
   public async execute() {
+    const webview = new WebView(this.connection)
+
     const [template, announce] = await Promise.all([
-      WebView.getTemplate("announce", "detail"),
+      webview.getTemplate("announce", "detail"),
       this.connection.first("SELECT * FROM webview_announce WHERE id = :id AND body IS NOT NULL", {
         id: this.params.id
       })
@@ -33,13 +35,13 @@ export default class extends WebViewAction {
 
     announce.body = showdownConverter.makeHtml(announce.body.replace(/--/gi, "—"))
     announce.date = moment(announce.insert_date).format("DD.MM.YYYY H:mm")
-    const values = {
-      announce,
-      external: this.requestData.requestFromBrowser
-    }
+
     return {
       status: 200,
-      result: template(values)
+      result: await webview.compileBodyTemplate(template, this.requestData, {
+        announce,
+        pageTitle: announce.title
+      })
     }
   }
 }
