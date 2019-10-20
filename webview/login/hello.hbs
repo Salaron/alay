@@ -1,37 +1,20 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>{{i18n/hello}}</title>
-
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.8, user-scalable=no">
-  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-</head>
-
-<style>
-  body {
-    background-image: url("/resources/img/hello_bg.png");
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    min-height: 100vh;
-    overflow: hidden;
-  }
-</style>
-
 <body class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden">
+  <style>
+    body {
+      background-image: url("/resources/img/hello_bg.png");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+  </style>
   <div class="uk-overlay-primary uk-position-cover">
 
   </div>
   <div class="uk-light">
-    {{#unless external}}
-    <a id="external" style="margin: 10px;" class="uk-icon-button uk-position-left uk-position-z-index"
-      uk-icon="icon: expand; ratio: 1.25"></a>
-    {{/unless}}
-    <a id="changeLanguage" style="margin: 10px;" class="uk-icon-button uk-position-right uk-position-z-index lang-button"
-      uk-icon="icon: world; ratio: 1.25"></a>
+    <a id="changeLanguage" style="margin: 10px;"
+      class="uk-icon-button uk-position-right uk-position-z-index lang-button" uk-icon="icon: world; ratio: 1.25"></a>
   </div>
 
   <div class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium">
@@ -48,9 +31,11 @@
 
   {{{changeLanguageModal}}}
 
-  <script type="">
-    var headers = {{{headers}}}
-    var external = {{{external}}}
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
@@ -62,7 +47,7 @@
       if (external && isChrome()) {
         $("body").css("min-height", "calc(100vh - 56px)")
       }
-      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
+      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + authToken))
       setCookie("user_id", "", 1)
       var values = window.location.href.split("?")[1]
       if (values) {
@@ -72,5 +57,3 @@
     })
   </script>
 </body>
-
-</html>

@@ -1,38 +1,25 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta charset="UTF-8">
-  <title>SunLight Login</title>
-
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, user-scalable=no">
-  <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-</head>
-
-<style>
-  body {
-    background-image: url("/resources/img/login_bg.png");
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    min-height: 100vh;
-    overflow: hidden;
-  }
-
-  .sl-icon-back {
-    background: white;
-    border-radius: 12px;
-    left: 8px;
-    height: 40px;
-    position: absolute;
-    top: 11px;
-    width: 40px;
-  }
-</style>
-
 <body
   class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light">
+  <style>
+    body {
+      background-image: url("/resources/img/login_bg.png");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .sl-icon-back {
+      background: white;
+      border-radius: 12px;
+      left: 8px;
+      height: 40px;
+      position: absolute;
+      top: 11px;
+      width: 40px;
+    }
+  </style>
   <!-- overlay -->
   <div class="uk-position-cover uk-overlay-primary"></div>
   <!-- /overlay -->
@@ -128,17 +115,19 @@
     </p>
   </div>
 
-  <script type="">
-    // fix error? o.O
-    var headers = {{{headers}}}
-    var recaptchaEnabled = {{{enableRecaptcha}}}
-    var external = {{{external}}}
-    var publicKey = {{{publicKey}}}
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
+    var recaptchaEnabled = {{{ enableRecaptcha }}}
+    var publicKey = {{{ publicKey }}}
   </script>
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
   <script type="text/javascript" src="/resources/js/jsencrypt.min.js"></script>
   {{#if enableRecaptcha}}
   <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?render={{siteKey}}"></script>
@@ -286,5 +275,3 @@
     }
   </script>
 </body>
-
-</html>

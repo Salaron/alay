@@ -19,23 +19,22 @@ export default class extends WebViewAction {
       result: "Registration is disabled!"
     }
     const i18n = new I18n(this.connection)
+    const webview = new WebView(this.connection)
 
     const [strings, template] = await Promise.all([
       i18n.getStrings(<string>this.requestData.auth_token, "login-startup", "login-login"),
-      WebView.getTemplate("login", "startup")
+      webview.getTemplate("login", "startup")
     ])
 
     const values = {
-      headers: JSON.stringify(this.requestData.getWebapiHeaders()),
-      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
-      external: this.requestData.requestFromBrowser,
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,
-      i18n: strings
+      i18n: strings,
+      pageTitle: "SunLight Registration"
     }
     return {
       status: 200,
-      result: template(values)
+      result: await webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

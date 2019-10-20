@@ -37,12 +37,6 @@
 
             <li class="uk-nav-divider"></li>
             <li><a id="changeLanguage"><span uk-icon="world" class="uk-icon"></span> Change Language</a></li>
-            {{#if support/enabled}}
-            <li><a
-                href="native://mail?addr={{support/mail}}&subject=Bug%20Report&body=Describe%20in%20detail%20the%20actions%20before%20which%20the%20bug%20occurred.%20It%20is%20also%20recommended%20to%20indicate%20the%20version%20of%20Android."><span
-                  uk-icon="warning" class="uk-icon"></span> {{i18n/bugReport}}</a>
-            </li>
-            {{/if}}
 
             {{#if isAdmin}}
             <li class="uk-nav-divider"></li>
