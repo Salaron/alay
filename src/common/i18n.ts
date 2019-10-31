@@ -31,7 +31,8 @@ export const showdownConverter = new showdown.Converter({
   smartIndentationFix: true,
   openLinksInNewWindow: true,
   emoji: true,
-  omitExtraWLInCodeBlocks: true
+  omitExtraWLInCodeBlocks: true,
+  strikethrough: true
 })
 
 export async function init() {

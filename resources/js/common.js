@@ -160,14 +160,3 @@ function isChrome() {
     isMobile === true
   )
 }
-
-(function() {
-  if (typeof $ != "undefined") {
-    $(function () {
-      updateBodySize()
-    })
-    $(window).resize(function () {
-      updateBodySize()
-    })
-  }
-})()

@@ -292,9 +292,9 @@ export class Unit {
       love: (options.maxRank || data.rank_max_flag) && (options.maxLove || data.love_max_flag) ? 1 : 0,
       level: (options.maxRank || data.rank_max_flag) && (options.maxLevel || data.rank_level_max_flag) ? 1 : 0,
       all: ((options.maxRank && options.maxLove && options.maxLevel) || (data.rank_max_flag && data.love_max_flag && data.rank_level_max_flag)) ? 1 : 0,
-      lovemax: options.addLove,
-      lovetotal: options.addLove,
-      fav: options.addFavPt
+      lovemax: data.highest_love_per_unit ? Math.min(data.highest_love_per_unit + options.addLove, data.highest_love_per_unit) : options.addLove,
+      lovetotal: data.total_love ? data.total_love + options.addLove : options.addLove,
+      fav: data.favorite_point ? data.favorite_point + options.addFavPt : options.addFavPt
     }
 
     await this.connection.query(`

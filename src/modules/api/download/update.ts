@@ -27,7 +27,7 @@ export default class extends ApiAction {
     const serverVersion = Config.server.server_version
     const clientVersion = Utils.versionCompare(clientExternal, clientInstall) === -1 ? clientExternal : clientInstall
 
-    if (Utils.versionCompare(serverVersion, clientExternal) == -1) throw new Error(`Client version can't be upper than server version`)
+    if (Utils.versionCompare(serverVersion, clientExternal) == -1) throw new ErrorWebApi(`Client version can't be upper than server version`)
 
     const clientParts = clientVersion.split(".").map(Number)
     const serverParts = serverVersion.split(".").map(Number)

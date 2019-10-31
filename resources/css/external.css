@@ -20,13 +20,16 @@
 #body {
   margin: 5px 3px 5px;
   padding: 0 19px 0 13px;
-  height: calc(100vh - 75px);
+  height: calc(100vh - 45px);
 }
 .sl-navbar-container:not(.uk-navbar-transparent) {
   border-radius: 1px;
 }
 
 @media (min-width: 550px) {
+  #body {
+    height: calc(100vh - 75px);
+  }
   .sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
     min-height: 64px;
   }

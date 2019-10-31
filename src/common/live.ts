@@ -91,7 +91,9 @@ export class Live {
     return notes
   }
 
-  // only for special, normal lives or marathon lives not other
+  /**
+   * Only for special, normal or marathon lives for now.
+   */
   public async getLiveDataByDifficultyId(liveDifficultyId: number): Promise<liveData> {
     let data = await liveDB.get(`
     SELECT
@@ -165,7 +167,7 @@ export class Live {
       max_removable_skill_capacity, units.unit_owning_user_id,
       slot_id, unit_id, stat_smile, stat_pure, stat_cool, max_hp,
       attribute, love, level, unit_skill_level, max_love,
-      max_rank, max_level, max_skill_level, display_rank
+      max_rank, max_level, max_skill_level, display_rank, \`rank\`
     FROM user_unit_deck_slot
     JOIN units
       ON units.unit_owning_user_id = user_unit_deck_slot.unit_owning_user_id
@@ -424,34 +426,44 @@ export class Live {
 
   public async applyKizunaBonusToDeck(userId: number, deck: any[], kizuna: number) {
     const unitModule = new Unit(this.connection)
+    const itemModule = new Item(this.connection)
 
     for (const unit of deck) {
       unit.kizuna_add = 0
       unit.fpt_add = 0
+      unit.kizuna_max = false
     }
 
-    let centerKizuna = Math.ceil(kizuna * 5 / 10)
-    kizuna -= centerKizuna
-    deck[4].fpt_add = centerKizuna
-    while (deck[4].love + deck[4].kizuna_add < deck[4].max_love && centerKizuna > 0) {
-      deck[4].kizuna_add++
-      centerKizuna--
-    }
-    kizuna += centerKizuna // return back remain
+    let centerKizuna = Math.ceil(kizuna / 2)
+    deck[4].kizuna_add += Math.min(deck[4].max_love, deck[4].love + centerKizuna) - deck[4].love
+    kizuna -= deck[4].kizuna_add // take from all
 
-    while (kizuna > 0) {
+    let finishCalculation = false
+    while (kizuna > 0 && finishCalculation === false) {
+      finishCalculation = true
       for (let i = 0; i < deck.length; i++) {
         if (i === 4) continue // skip center unit
         if (deck[i].love + deck[i].kizuna_add < deck[i].max_love) {
           deck[i].kizuna_add++
           kizuna--
-        } else {
-          kizuna--
+          if (deck[i].love + deck[i].kizuna_add === deck[i].max_love) {
+            deck[i].kizuna_max = true
+            if (deck[i].is_rank_max) deck[i].love_max = true
+          }
+          finishCalculation = false
         }
       }
     }
 
-    deck = await Promise.all(deck.map(async unit => {
+    // add leftover to center
+    deck[4].kizuna_add += Math.min(deck[4].max_love, deck[4].love + kizuna) - deck[4].love
+    deck[4].fpt_add += deck[4].kizuna_add
+    if (deck[4].love + deck[4].kizuna_add >= deck[4].max_love) {
+      deck[4].kizuna_max = true
+      if (deck[4].is_rank_max) deck[4].love_max = true
+    }
+
+    return await Promise.all(deck.map(async unit => {
       await unitModule.updateAlbum(userId, unit.unit_id, {
         maxRank: unit.is_rank_max,
         maxLove: Math.min(unit.love + unit.kizuna_add, unit.max_love) === unit.max_love && unit.rank === unit.max_rank,
@@ -464,12 +476,17 @@ export class Live {
         user: userId,
         id: unit.unit_owning_user_id
       })
+      if (unit.kizuna_max && unit.is_rank_max) {
+        await itemModule.addPresent(userId, {
+          name: "lg"
+        }, "Unit bond max", 1, true)
+      }
+      unit.love = Math.min(unit.love + unit.kizuna_add, unit.max_love)
       unit.kizuna_add = undefined
       unit.fpt_add = undefined
+      unit.kizuna_max = undefined
       return unit
     }))
-
-    return deck
   }
 
   public async writeToLog(userId: number, result: writeToLogResult) {

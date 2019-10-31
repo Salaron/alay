@@ -188,7 +188,9 @@ export class Utils {
   }
 
   public static async reCAPTCHAverify(userToken: string, userIp?: string) {
-    const { body } = (await promisify(request.post)(<any>"https://www.google.com/recaptcha/api/siteverify", <any>{
+    // TODO: use axios for request
+    // @ts-ignore
+    const { body } = (await promisify(request.post)(<string>"https://www.google.com/recaptcha/api/siteverify", <any>{
       form: {
         secret: Config.modules.login.recaptcha_private_key,
         response: userToken,
