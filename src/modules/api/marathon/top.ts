@@ -1,6 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 import { TYPE } from "../../../common/type"
 
 export default class extends ApiAction {
@@ -19,7 +19,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const events = new Events(this.connection)
+    const events = new EventStub(this.connection)
     const currentEvent = await events.getEventById(this.params.event_id)
     if (!currentEvent.opened) throw new ErrorCode(1234, "Event is closed")
 

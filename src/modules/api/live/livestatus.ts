@@ -1,6 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { eventStatus, Events } from "../../../common/event"
+import { eventStatus, EventStub } from "../../../common/eventstub"
 import { Live } from "../../../common/live"
 
 const normalLiveUnlock = [
@@ -52,7 +52,7 @@ export default class extends ApiAction {
     }
     this.liveStatusList = liveStatusList
     this.liveGoalList = liveGoalList
-    this.marathonEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+    this.marathonEvent = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().TOKEN)
 
     return {
       status: 200,

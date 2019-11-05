@@ -1,3 +1,5 @@
+type liveAttibute = 1 | 2 | 3
+
 interface liveData {
   c_rank_score: number
   b_rank_score: number
@@ -55,4 +57,13 @@ interface writeToLogResult {
   combo: number
   combo_rank: number
   score_rank: number
+}
+
+interface liveDataCache {
+  [lsid: number]: {
+    difficulty: number
+    trackId: number
+    attribute: liveAttibute
+    memberCategory: memberCategory
+  }
 }

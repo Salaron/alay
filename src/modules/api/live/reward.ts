@@ -4,7 +4,7 @@ import assert from "assert"
 import { User } from "../../../common/user"
 import { Live } from "../../../common/live"
 import { Item } from "../../../common/item"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 import { TYPE } from "../../../common/type"
 
 export default class extends ApiAction {
@@ -41,7 +41,7 @@ export default class extends ApiAction {
     const user = new User(this.connection)
     const live = new Live(this.connection)
     const item = new Item(this.connection)
-    const event = new Events(this.connection)
+    const event = new EventStub(this.connection)
     const totalScore = this.params.score_smile + this.params.score_cute + this.params.score_cool
     let eventLive = false
 
@@ -52,7 +52,7 @@ export default class extends ApiAction {
 
     const [beforeUserInfo, currentEvent, liveData] = await Promise.all([
       user.getUserInfo(this.user_id),
-      event.getEventStatus(Events.getEventTypes().TOKEN),
+      event.getEventStatus(EventStub.getEventTypes().TOKEN),
       live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     ])
 
@@ -170,7 +170,7 @@ export default class extends ApiAction {
         event: currentEvent.id
       })
       if (eventLive) {
-        this.params.event_point = Events.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
+        this.params.event_point = EventStub.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
         if (!userStatus.score || userStatus.score < totalScore) {
           await event.writeHiScore(this.user_id, currentEvent.id, deck, [
             {

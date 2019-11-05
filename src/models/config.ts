@@ -104,7 +104,6 @@ interface IModules {
   }
   festival: {
     max_reset_setlist: number
-    setlist_type: number
     reset_cost_type: number
     reset_cost_value: number
   }

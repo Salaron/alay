@@ -9,18 +9,24 @@ const log = new Log("Common: Live")
 
 const liveDB = sqlite3.getLive()
 const liveNotesDB = sqlite3.getNotes()
-// const festDB = sqlite3.getFestival()
+const festDB = sqlite3.getFestival()
 const marathonDB = sqlite3.getMarathon()
 const unitDB = sqlite3.getUnit()
 
 const expTable = [0, 12, 26, 46, 65, 71, 84]
-const availableLiveList: number[] = []
-const normalLiveList: number[] = []
-const specialLiveList: number[] = []
+
+const availableLiveList: number[] = [] // Live setting ids that exists in live_note.db_
+const normalLiveList: number[] = [] // Available normal live setting ids
+const specialLiveList: number[] = [] // Available special live setting ids
 const marathonLiveList: { [eventId: number]: number[] } = {}
+const festivalLiveTrackList: {
+  // contains track ids, not live setting ids!
+  [attribute: number]: number[]
+} = {}
 export async function init() {
-  const liveSettings = await liveNotesDB.all("SELECT DISTINCT live_setting_id FROM live_note")
-  for (const liveSetting of liveSettings) {
+  const availableLiveSettingIds = await liveNotesDB.all("SELECT DISTINCT live_setting_id FROM live_note")
+
+  for (const liveSetting of availableLiveSettingIds) {
     availableLiveList.push(liveSetting.live_setting_id)
   }
   log.info(`Found note data for ${availableLiveList.length} lives`)

@@ -2,7 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import assert from "assert"
 import { Live } from "../../../common/live"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
 import { User } from "../../../common/user"
@@ -32,7 +32,7 @@ export default class extends ApiAction {
 
   public async execute() {
     const live = new Live(this.connection)
-    const eventStatus = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+    const eventStatus = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().TOKEN)
     // clear data about any previous live session
     await this.connection.query("DELETE FROM user_live_progress WHERE user_id=:user", { user: this.user_id })
     const guest = await this.connection.first(`

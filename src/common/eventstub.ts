@@ -25,45 +25,8 @@ export interface eventUserStatus {
   event_point: number
   event_rank: number
 }
-const tokenEventPoint = [ // format: [difficulty][comboRank][scoreRank]
-  [ // none
-  ],
-  [ // easy
-    // None, S, A, B, C, D rank score
-    [],                      // None
-    [0, 71, 70, 68, 64, 62], // S rank combo
-    [0, 70, 68, 66, 63, 61], // A rank combo
-    [0, 69, 66, 65, 62, 60], // B rank combo
-    [0, 67, 65, 64, 61, 59], // C rank combo
-    [0, 66, 64, 63, 60, 57]  // D rank combo
-  ],
-  [ // normal
-    [],
-    [0, 148, 143, 137, 131, 124],
-    [0, 145, 140, 135, 128, 122],
-    [0, 143, 137, 132, 126, 120],
-    [0, 140, 135, 129, 123, 117],
-    [0, 137, 133, 125, 121, 114]
-  ],
-  [ // hard
-    [],
-    [0, 261, 249, 237, 226, 214],
-    [0, 254, 242, 231, 219, 207],
-    [0, 246, 235, 224, 213, 202],
-    [0, 241, 230, 220, 209, 197],
-    [0, 237, 226, 215, 204, 194]
-  ],
-  [ // expert
-    [],
-    [0, 565, 540, 509, 484, 459],
-    [0, 549, 525, 495, 470, 446],
-    [0, 518, 495, 467, 444, 421],
-    [0, 508, 485, 458, 435, 413],
-    [0, 498, 475, 448, 426, 403]
-  ]
-]
 
-export class Events {
+export class EventStub {
   public TYPES = eventType
   public static TYPES = eventType
   private connection: Connection
@@ -131,7 +94,7 @@ export class Events {
 
   public async eventInfoWithRewards(userId: number, eventId: number, eventName: string, addedEventPoint: number, base?: number) {
     const item = new Item(this.connection)
-    const userStatus = await new Events(this.connection).getEventUserStatus(userId, eventId)
+    const userStatus = await new EventStub(this.connection).getEventUserStatus(userId, eventId)
     const eventRewardInfo: any[] = []
     const nextEventRewardInfo = {
       event_point: 0,
@@ -161,7 +124,7 @@ export class Events {
             add_type: reward.add_type,
             amount: reward.amount,
             item_category_id: reward.item_category_id,
-            reward_box_flag: reward.add_type == 1001, // cards should be added to reward box
+            reward_box_flag: reward.add_type === 1001, // cards should be added to reward box
             required_event_point: reward.point_count
           })
           // tslint:disable-next-line
@@ -250,7 +213,7 @@ export class Events {
         cute: unit.bonus_pure,
         cool: unit.bonus_cool
       }
-      // remove some shit
+      // remove temporary shit
       unit.unit_owning_user_id = undefined
       unit.stat_smile = undefined
       unit.stat_pure = undefined
@@ -335,6 +298,44 @@ export class Events {
     return eventType
   }
   public static getTokenEventPoint(liveDifficulty: number, comboRank: number, scoreRank: number) {
-    return tokenEventPoint[liveDifficulty][comboRank][scoreRank]
+    // Source: https://decaf.kouhi.me/lovelive/index.php/Gameplay#Token_Collecting_Event
+    const tokenEventPoint = [ // format: [difficulty][comboRank][scoreRank]
+      null,
+      [ // easy
+        // None, S, A, B, C, D rank score
+        [],                      // None
+        [0, 71, 70, 68, 64, 62], // S rank combo
+        [0, 70, 68, 66, 63, 61], // A rank combo
+        [0, 69, 66, 65, 62, 60], // B rank combo
+        [0, 67, 65, 64, 61, 59], // C rank combo
+        [0, 66, 64, 63, 60, 57]  // D rank combo
+      ],
+      [ // normal
+        [],
+        [0, 148, 143, 137, 131, 124],
+        [0, 145, 140, 135, 128, 122],
+        [0, 143, 137, 132, 126, 120],
+        [0, 140, 135, 129, 123, 117],
+        [0, 137, 133, 125, 121, 114]
+      ],
+      [ // hard
+        [],
+        [0, 261, 249, 237, 226, 214],
+        [0, 254, 242, 231, 219, 207],
+        [0, 246, 235, 224, 213, 202],
+        [0, 241, 230, 220, 209, 197],
+        [0, 237, 226, 215, 204, 194]
+      ],
+      [ // expert
+        [],
+        [0, 565, 540, 509, 484, 459],
+        [0, 549, 525, 495, 470, 446],
+        [0, 518, 495, 467, 444, 421],
+        [0, 508, 485, 458, 435, 413],
+        [0, 498, 475, 448, 426, 403]
+      ]
+    ]
+
+    return tokenEventPoint[liveDifficulty]![comboRank][scoreRank]
   }
 }

@@ -1,7 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Live } from "../../../common/live"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
 
@@ -32,7 +32,7 @@ export default class extends ApiAction {
   public async execute() {
     const liveData = await new Live(this.connection).getLiveDataByDifficultyId(this.params.live_difficulty_id)
     if (liveData.capital_type === 2) {
-      const eventStatus = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+      const eventStatus = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().TOKEN)
       if (!eventStatus.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
       const eventLives = Live.getMarathonLiveList(eventStatus.id)
       if (!eventLives.includes(liveData.live_difficulty_id)) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")

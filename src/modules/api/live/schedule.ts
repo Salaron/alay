@@ -2,7 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Live } from "../../../common/live"
 import { Utils } from "../../../common/utils"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 
 const marathonDB = sqlite3.getMarathon()
 
@@ -58,7 +58,7 @@ export default class extends ApiAction {
       })
     }
 
-    const marathonEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().TOKEN)
+    const marathonEvent = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().TOKEN)
     if (marathonEvent.active) {
       const marathonLives = (await marathonDB.all("SELECT live_difficulty_id FROM event_marathon_live_schedule_m WHERE event_id = :id", {
         id: marathonEvent.id

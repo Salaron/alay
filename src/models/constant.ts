@@ -32,3 +32,11 @@ export enum WV_REQUEST_TYPE {
   APPLICATION,
   BROWSER
 }
+
+// User
+export enum FESTIVAL_SETLIST {
+  ALL,
+  MUSE,
+  AQOURS,
+  MGD
+}

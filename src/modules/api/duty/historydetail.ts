@@ -1,7 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -18,8 +18,8 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const event = new Events(this.connection)
-    let currentEvent = await event.getEventStatus(Events.TYPES.DUTY)
+    const event = new EventStub(this.connection)
+    let currentEvent = await event.getEventStatus(EventStub.TYPES.DUTY)
     if (currentEvent.opened === false) throw new ErrorCode(720)
 
     let check = await this.connection.first(`SELECT * FROM event_duty_users WHERE user_id = :user AND room_id = :room AND status = 1`, {

@@ -1,11 +1,13 @@
 import { Connection } from "../core/database_wrappers/mysql"
 import { Unit } from "./unit"
+import { FESTIVAL_SETLIST } from "../models/constant"
 
 interface userParams {
   vanish?: number,
   mirror?: number,
   hp?: number,
   event?: number
+  festival_setList?: FESTIVAL_SETLIST
 }
 
 export class User {

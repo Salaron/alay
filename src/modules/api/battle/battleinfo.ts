@@ -1,6 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
@@ -12,7 +12,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().BATTLE)
+    const currentEvent = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().BATTLE)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []

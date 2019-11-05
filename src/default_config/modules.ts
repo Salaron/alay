@@ -34,7 +34,6 @@ export default <IModules>{
   },
   festival: {
     max_reset_setlist: 15,
-    setlist_type: 2,
     reset_cost_type: 3,
     reset_cost_value: 5000
   },

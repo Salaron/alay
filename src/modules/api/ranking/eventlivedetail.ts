@@ -1,7 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -19,7 +19,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    let event = await new Events(this.connection).getEventById(this.params.event_id)
+    let event = await new EventStub(this.connection).getEventById(this.params.event_id)
     if (event.opened === false) throw new ErrorCode(10004) // ERROR_CODE_EVENT_NO_EVENT_DATA
 
     // check if this user have ranking records

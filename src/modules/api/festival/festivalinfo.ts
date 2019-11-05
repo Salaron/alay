@@ -1,6 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Events } from "../../../common/event"
+import { EventStub } from "../../../common/eventstub"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
@@ -12,7 +12,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await new Events(this.connection).getEventStatus(Events.getEventTypes().FESTIVAL)
+    const currentEvent = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().FESTIVAL)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []
@@ -33,11 +33,6 @@ export default class extends ApiAction {
       }
     }
 
-    // reset setlist after app restart
-    await this.connection.query("UPDATE event_festival_users SET reset_setlist_number = 1010101 WHERE user_id=:user", {
-      user: this.user_id
-    })
-
     return {
       status: 200,
       result: {
@@ -47,7 +42,7 @@ export default class extends ApiAction {
           event_point: ranking.event_point,
           total_event_point: ranking.event_point,
           whole_event_point: ranking.event_point,
-          max_skill_activation_rate: 0
+          max_skill_activation_rate: 0 // ?
         }
       }
     }
