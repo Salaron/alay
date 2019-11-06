@@ -104,14 +104,8 @@ export default class extends WebViewAction {
     let total = 0
 
     // promise.all of promise.all?
-    let [, recentPlays] = await Promise.all([
-      Promise.all(liveDataStatus.map(async (live) => {
-        const time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
-          lsid: live.live_setting_id
-        })
-        if (live.hi_combo > 100) total += time.live_time * (live.clear_cnt || 1)
-      })),
-      Promise.all(liveDataLog.map(async (live, index) => {
+    let [recentPlays]: any[] = await Promise.all([
+      Promise.all(liveDataLog.map(async (live: any, index: number) => {
         if (!live.live_setting_id && !live.live_setting_ids) throw new Error("live setting id is missing")
 
         // mf support
@@ -143,6 +137,12 @@ export default class extends WebViewAction {
         live.combo_rank = convertRank[live.combo_rank]
 
         return live
+      })),
+      Promise.all(liveDataStatus.map(async (live: any) => {
+        const time = await liveDB.get("SELECT live_time FROM live_setting_m JOIN live_time_m ON live_setting_m.live_track_id = live_time_m.live_track_id WHERE live_setting_id = :lsid", {
+          lsid: live.live_setting_id
+        })
+        if (live.hi_combo > 100) total += time.live_time * (live.clear_cnt || 1)
       }))
     ])
 

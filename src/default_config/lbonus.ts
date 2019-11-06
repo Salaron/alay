@@ -117,3 +117,19 @@ export default <ILBonusConfig>{
     }
   }
 }
+
+interface ILBonusConfig {
+  calendar_generator: {
+    cards_query: string
+    card_limit: number
+    special_flag_types: number[]
+    items: item[]
+  }
+  total_login_bonus: {
+    [day: string]: {
+      name: string
+      amount: number
+      item_id?: number
+    }
+  }
+}

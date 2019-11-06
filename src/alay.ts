@@ -3,8 +3,8 @@ import "./core/mailer"
 import "./models/error"
 import { Log } from "./core/log"
 import { resolve } from "path"
-import { Sqlite3 } from "./core/database_wrappers/sqlite3"
-import { MySQLConnect } from "./core/database_wrappers/mysql"
+import { Sqlite3 } from "./core/database/sqlite3"
+import { Connect } from "./core/database/mariadb"
 
 const log = new Log("Setup");
 
@@ -29,8 +29,8 @@ import * as modules from "./common"
     await Config.prepareConfig()
     // Init readline interface
     ReadLine()
-    // Connect to MySQL database
-    await MySQLConnect()
+    // Connect to MySQL/MariaDB database
+    await Connect()
     // Prepare common modules
     // execute init function if exists
     for (const module in modules) {

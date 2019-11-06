@@ -7,7 +7,7 @@ import querystring from "querystring"
 import { Utils } from "../common/utils"
 import { Log } from "../core/log"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
-import { Connection } from "./database_wrappers/mysql"
+import { Connection } from "./database/mariadb"
 
 const log = new Log("Request Data")
 
@@ -100,7 +100,7 @@ export default class RequestData {
   public static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {
     const formData = await formidableParseAsync(request)
     const rd = new RequestData(request, response, formData, type)
-    rd.connection = await MySQLconnection.get()
+    rd.connection = await Connection.beginTransaction()
     return rd
   }
 

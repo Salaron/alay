@@ -4,6 +4,7 @@ import moment from "moment"
 import request from "request"
 import { promisify } from "util"
 import { Log } from "../core/log"
+import { Connection } from "../core/database/mariadb"
 
 const log = new Log("Common: Utils")
 
@@ -11,7 +12,7 @@ export async function init() {
   // Handle Clearing Temp Auth Tokens every 5 min
   setInterval(async () => {
     try {
-      const connection = await MySQLconnection.get()
+      const connection = await Connection.beginTransaction()
       try {
         const [tokens, codes] = await Promise.all([
           connection.query("SELECT * FROM auth_tokens WHERE expire <= CURRENT_TIMESTAMP"),

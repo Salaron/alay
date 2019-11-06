@@ -3,7 +3,7 @@ import querystring from "querystring"
 import { promisify } from "util"
 import { gzip } from "zlib"
 import { Utils } from "../common/utils"
-import { Connection } from "../core/database_wrappers/mysql"
+import { Connection } from "../core/database/mariadb"
 import { LEVEL } from "../core/log"
 import { Authorize } from "../core/requestData"
 

@@ -1,6 +1,6 @@
 // based on Caraxian.log
 import Chalk from "chalk"
-import circularJSON from "circular-json"
+import { stringify } from "flatted"
 import extend from "extend"
 import { appendFile } from "fs"
 import { EOL } from "os"
@@ -182,13 +182,13 @@ export class Log {
 
       if (!message || !message.constructor || message.constructor === Object ||
         Array.isArray(message) || (!message.constructor.name)) {
-        message = circularJSON.stringify(message, null, 2)
+        message = stringify(message, null, 2)
         const s = message.split(/\r\n|\r|\n/)
         for (let i = 0; i < s.length; i++) {
           this.writeOutput(label, s[i], i < s.length - 1)
         }
       } else {
-        message = "[" + message.constructor.name + "] " + circularJSON.stringify(message, null, 2)
+        message = "[" + message.constructor.name + "] " + stringify(message, null, 2)
         const s = message.split(/\r\n|\r|\n/)
         for (let i = 0; i < s.length; i++) {
           this.writeOutput(label, s[i], i < s.length - 1)

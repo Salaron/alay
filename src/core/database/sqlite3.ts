@@ -1,6 +1,6 @@
 import { existsSync } from "fs"
 import * as sqliteDB from "sqlite3"
-import { formatQuery } from "./mysql"
+import { formatQuery } from "./query"
 
 // used internally
 // make sqlite3 promise-like
@@ -28,8 +28,7 @@ class Sqlite3Wrapper {
   }
   public async exec(query: string, values?: any): Promise<void> {
     this.checkIfClosed()
-    const preparedQuery = formatQuery(query, values)
-    this.lastQuery = preparedQuery
+    const preparedQuery = this.lastQuery = formatQuery(query, values)
     return new Promise((res, rej) => {
       this.database.exec(preparedQuery, (err) => {
         if (err) return rej(err)

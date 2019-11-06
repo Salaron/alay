@@ -1,8 +1,7 @@
+import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { TYPE } from "../../../common/type"
-import { I18n } from "../../../common/i18n"
-import { Utils } from "../../../common/utils"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER

@@ -1,4 +1,5 @@
 import readline from "readline"
+import { Connection } from "./database/mariadb"
 import { Log } from "./log"
 
 const log = new Log("ReadLine")
@@ -46,7 +47,7 @@ const commands: CommandInterface = {
           useNumber = true
           arguments[1] = arguments[1].substr(1)
         }
-        const connection = await MySQLconnection.get()
+        const connection = await Connection.beginTransaction()
         // @ts-ignore
         const unit = new Unit({
           connection
@@ -59,9 +60,9 @@ const commands: CommandInterface = {
 
         const res = await unit.addUnit(args[0], args[1], {
           amount: args[2] || 1,
-          level: args[3]  || 1,
-          rank: args[4]   || 1,
-          love: args[5]   || 0,
+          level: args[3] || 1,
+          rank: args[4] || 1,
+          love: args[5] || 0,
           useNumber
         })
         await connection.commit()
@@ -76,20 +77,6 @@ const commands: CommandInterface = {
       log.always("addUnit user_id: int [n]unit_id: int [amount: int] [rank: 1 | 2] [level: int] [love: int]", "Command Usage")
       log.always("                      ^ prefix with 'n' to use unit_number", "Command Usage")
       log.always("  Adds a specific card to the user", "Command Usage")
-    }
-  },
-  connectiondebug: {
-    async execute() {
-      try {
-        MySQLconnectionPool.connectionDebug(arguments[0])
-      } catch (err) {
-        log.error(err)
-      }
-    },
-    help() {
-      log.always("connectionDebug [interval: ms]", "Command Usage")
-      log.always("  Print some debug info to the stdout", "Command Usage")
-      log.always("  Note: log level should be >= DEBUG", "Command Usage")
     }
   },
   reloadconfig: {

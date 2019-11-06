@@ -1,17 +1,14 @@
 import { Type as type } from "../common/type"
 import { config } from "../core/config"
-import { Connection, ConnectionPool } from "../core/database_wrappers/mysql"
-import { Sqlite3 } from "../core/database_wrappers/sqlite3"
+import { Sqlite3 } from "../core/database/sqlite3"
 import { Mailer as mailer } from "../core/mailer"
-import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../models/error"
 import { ApiAction as apiAction, WebApiAction as webApiAction, WebViewAction as webViewAction } from "../models/actions"
+import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../models/error"
 
 declare global {
   // make project root dir global (for easy access to files outside of 'compile' folder)
   const rootDir: string
-  // database stuff
-  const MySQLconnection: typeof Connection
-  const MySQLconnectionPool: ConnectionPool
+
   const sqlite3: Sqlite3
   // core modules should be global
   const Config: config

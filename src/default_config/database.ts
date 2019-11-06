@@ -1,11 +1,19 @@
+import { PoolConfig } from "mariadb"
+
 export default <IDatabaseConfig>{
-  autoReconnect: true,
-  autoReconnectDelay: 2000,
-  autoReconnectMaxAttempt: 10,
+  debug: false,
+  trace: false,
+  reconnectDelay: 5000,
+  reconnectMaxAttempt: 10,
   connectionLimit: 30,
-  dateStrings: true,
   host: "localhost",
-  user: "",
+  user: "root",
   password: "",
-  database: ""
+  database: "",
+  dateStrings: true
+}
+
+interface IDatabaseConfig extends PoolConfig {
+  reconnectMaxAttempt: number
+  reconnectDelay: number
 }

@@ -7,7 +7,6 @@ const log = new Log("Common: Live")
 
 const liveDB = sqlite3.getLive()
 const liveNotesDB = sqlite3.getNotes()
-const festDB = sqlite3.getFestival()
 const marathonDB = sqlite3.getMarathon()
 const unitDB = sqlite3.getUnit()
 
@@ -17,10 +16,6 @@ const availableLiveList: number[] = [] // Live setting ids that exists in live_n
 const normalLiveList: number[] = [] // Available normal live setting ids
 const specialLiveList: number[] = [] // Available special live setting ids
 const marathonLiveList: { [eventId: number]: number[] } = {}
-const festivalLiveTrackList: {
-  // contains track ids, not live setting ids!
-  [attribute: number]: number[]
-} = {}
 export async function init() {
   const availableLiveSettingIds = await liveNotesDB.all("SELECT DISTINCT live_setting_id FROM live_note")
 

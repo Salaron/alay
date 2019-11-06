@@ -1,4 +1,4 @@
-import { Connection } from "../core/database_wrappers/mysql"
+import { Connection } from "../core/database/mariadb"
 import RequestData from "../core/requestData"
 import { BaseAction } from "./actions"
 

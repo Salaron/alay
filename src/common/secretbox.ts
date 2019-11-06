@@ -5,6 +5,7 @@ import { BaseAction } from "../models/actions"
 import { IRarityData, ISecretbox, ISecretboxButton, ISecretboxCost, ISecretboxData, ISecretboxEffect, ISecretboxEffectDetail, ISecretboxSettings, IStepInfo, IStepUpSettings } from "../models/secretbox"
 import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
+import { Connection } from "../core/database/mariadb"
 
 const log = new Log("Secretbox")
 const unitDB = sqlite3.getUnit()
@@ -12,7 +13,9 @@ const secretboxDB = sqlite3.getSecretbox()
 
 let secretboxSettings: ISecretboxSettings = {}
 async function updateSettings() {
-  let costs = await MySQLconnectionPool.query(`SELECT * FROM secretbox_list JOIN secretbox_button ON secretbox_list.secretbox_id = secretbox_button.secretbox_id JOIN secretbox_cost ON secretbox_button.button_id = secretbox_cost.button_id`)
+  const connection = await Connection.beginTransaction()
+  let costs = await connection.query(`SELECT * FROM secretbox_list JOIN secretbox_button ON secretbox_list.secretbox_id = secretbox_button.secretbox_id JOIN secretbox_cost ON secretbox_button.button_id = secretbox_cost.button_id`)
+  await connection.commit()
 
   let processedFiles = <{ [file: string]: IRarityData[] }>{}
   await Promise.all(costs.map(async cost => {

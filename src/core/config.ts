@@ -1,5 +1,4 @@
 import { Log } from "./log"
-import { Utils } from "../common/utils"
 
 // import config files
 import Server from "../config/server"
@@ -38,6 +37,7 @@ export class config {
 
   public async prepareConfig(): Promise<void> {
     const log = new Log("Config Manager")
+    const Utils = (await import("../common/utils")).Utils
     if (this.server.debug_mode) this.server.XMC_check = false
 
     this.specialKey = Buffer.concat([Utils.xor(this.client.application_key.slice(0, 16), this.client.XMC_base.slice(16, 32)), Utils.xor(this.client.application_key.slice(16, 32), this.client.XMC_base.slice(0, 16))])

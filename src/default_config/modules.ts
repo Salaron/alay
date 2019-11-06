@@ -49,3 +49,55 @@ export default <IModules>{
     userSessionExpire: 82800 // 23 hours
   }
 }
+
+interface IModules {
+  award: {
+    unlockAll: boolean
+  }
+  background: {
+    unlockAll: boolean
+  }
+  download: {
+    microDLurl: string
+  }
+  live: {
+    unlockAll: boolean
+    continueAttemptsCount: number
+  }
+  liveSe: {
+    list: number[]
+  }
+  liveIcon: {
+    list: number[]
+  }
+  login: {
+    auth_logging: boolean
+    webview_login: boolean
+    enable_registration: boolean
+    enable_recaptcha: boolean
+    recaptcha_site_key: string
+    recaptcha_private_key: string
+  }
+  personalNotice: {
+    welcomeMessageEnabled: boolean
+    welcomeMessageType: number
+    welcomeMessageTitle: string
+    welcomeMessageContents: string
+  }
+  festival: {
+    max_reset_setlist: number
+    reset_cost_type: number
+    reset_cost_value: number
+  }
+  unit: {
+    removeFromDatabase: boolean
+  }
+  unitSelect: {
+    museCenterUnits: number[]
+    aqoursCenterUnits: number[]
+  }
+  user: {
+    setBirthOnlyOnce: boolean
+    userSessionExpire: number
+  }
+}

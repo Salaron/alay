@@ -1,7 +1,6 @@
+import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { TYPE } from "../../../common/type"
-import { I18n } from "../../../common/i18n"
 
 const langCodes = Object.values(Config.i18n.languages)
 

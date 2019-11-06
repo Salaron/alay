@@ -1,3 +1,5 @@
+import { TransportOptions } from "nodemailer"
+
 export default <IMailerConfig>{
   enabled: false,
   transportSettings: {
@@ -7,6 +9,13 @@ export default <IMailerConfig>{
       pass: ""
     }
   },
-  name: "SunLight Server",
+  name: "SunLight Project",
   supportMail: ""
+}
+
+interface IMailerConfig {
+  enabled: boolean
+  transportSettings: TransportOptions
+  name: string
+  supportMail: string
 }

@@ -5,3 +5,10 @@ export default <II18nConfig>{
   },
   defaultLanguage: "ru"
 }
+
+interface II18nConfig {
+  languages: {
+    [langName: string]: string
+  }
+  defaultLanguage: string
+}
