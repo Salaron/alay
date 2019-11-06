@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import moment from "moment"
-import { User } from "../../../common/user"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -13,8 +12,6 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const user = new User(this.connection)
-
     const mails = await this.connection.query(`SELECT * FROM user_greet WHERE affector_id = :user AND deleted_from_affector = 0 ORDER BY notice_id DESC`, {
       user: this.user_id
     })
@@ -40,7 +37,7 @@ export default class extends ApiAction {
             name: profileInfo.name,
             level: profileInfo.level
           },
-          center_unit_info: await user.getCenterUnitInfo(mail.receiver_id),
+          center_unit_info: await this.user.getCenterUnitInfo(mail.receiver_id),
           setting_award_id: profileInfo.setting_award_id
         },
         reply_flag: mail.reply === 1

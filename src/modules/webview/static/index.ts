@@ -1,9 +1,9 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import RequestData from "../../../core/requestData"
 import moment from "moment"
-import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
 import { WebView } from "../../../common/webview"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -20,7 +20,6 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const webview = new WebView(this.connection)
     // 10 -- maintenance (custom)
     // 11 -- iOS update
     // 12 -- android update
@@ -84,7 +83,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: await webview.compileBodyTemplate(template, this.requestData, values)
+      result: await this.webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

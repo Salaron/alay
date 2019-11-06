@@ -1,7 +1,6 @@
+import { BaseAction } from "../models/actions"
 import { Utils } from "./utils"
-import { Connection } from "../core/database_wrappers/mysql"
-import { Item } from "./item"
-import { Unit } from "./unit"
+import { CommonModule } from "../models/common"
 
 const eventDB = sqlite3.getEvent()
 
@@ -26,12 +25,10 @@ export interface eventUserStatus {
   event_rank: number
 }
 
-export class EventStub {
+export class EventStub extends CommonModule {
   public TYPES = eventType
-  public static TYPES = eventType
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
+  constructor(action: BaseAction) {
+    super(action)
   }
 
   public async getEventStatus(type: eventType): Promise<eventStatus> {
@@ -93,8 +90,7 @@ export class EventStub {
   }
 
   public async eventInfoWithRewards(userId: number, eventId: number, eventName: string, addedEventPoint: number, base?: number) {
-    const item = new Item(this.connection)
-    const userStatus = await new EventStub(this.connection).getEventUserStatus(userId, eventId)
+    const userStatus = await this.getEventUserStatus(userId, eventId)
     const eventRewardInfo: any[] = []
     const nextEventRewardInfo = {
       event_point: 0,
@@ -115,7 +111,7 @@ export class EventStub {
     for (const reward of eventPointReward) {
       if (reward.point_count < userStatus.event_point + addedEventPoint) {
         try {
-          await item.addPresent(userId, {
+          await this.action.item.addPresent(userId, {
             id: reward.item_id,
             type: reward.add_type
           }, `"${eventName}" reward`, reward.amount, reward.add_type != 1001)
@@ -198,7 +194,7 @@ export class EventStub {
       json.deck.si_bonus.cute += unit.bonus_pure
       json.deck.si_bonus.cool += unit.bonus_cool
       // sis data for unit
-      unit.removable_skill_ids = await new Unit(this.connection).getUnitSiS(unit.unit_owning_user_id)
+      unit.removable_skill_ids = await this.action.unit.getUnitSiS(unit.unit_owning_user_id)
       // total score for unit
       unit.total_status = {
         hp: unit.max_hp,
@@ -297,7 +293,7 @@ export class EventStub {
   public static getEventTypes() {
     return eventType
   }
-  public static getTokenEventPoint(liveDifficulty: number, comboRank: number, scoreRank: number) {
+  public getTokenEventPoint(liveDifficulty: number, comboRank: number, scoreRank: number) {
     // Source: https://decaf.kouhi.me/lovelive/index.php/Gameplay#Token_Collecting_Event
     const tokenEventPoint = [ // format: [difficulty][comboRank][scoreRank]
       null,

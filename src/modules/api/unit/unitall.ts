@@ -1,6 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Unit } from "../../../common/unit"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
@@ -17,7 +16,7 @@ export default class extends ApiAction {
     return {
       status: 200,
       result: {
-        active: active.map((unit: any) => Unit.parseUnitData(unit)),
+        active: active.map((unit: any) => this.unit.parseUnitData(unit)),
         waiting: []
       }
     }

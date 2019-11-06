@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
-import { EventStub } from "../../../common/eventstub"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -18,8 +17,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const event = new EventStub(this.connection)
-    let currentEvent = await event.getEventStatus(EventStub.TYPES.DUTY)
+    let currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.DUTY)
     if (currentEvent.opened === false) throw new ErrorCode(720)
 
     let check = await this.connection.first(`SELECT * FROM event_duty_users WHERE user_id = :user AND room_id = :room AND status = 1`, {
@@ -34,7 +32,7 @@ export default class extends ApiAction {
     (SELECT count(*) FROM event_duty_users WHERE room_id = event_duty_rooms.room_id AND status = 1) as playersNum
     FROM event_duty_rooms WHERE room_id = :room`, { room: this.params.room_id })
 
-    let users: any[] = await event.getDutyMatchingUsers(room.room_id, currentEvent.id)
+    let users: any[] = await this.eventStub.getDutyMatchingUsers(room.room_id, currentEvent.id)
 
     users = await Promise.all(users.map(async (user) => {
       let query = `

@@ -1,5 +1,4 @@
 import readline from "readline"
-import { Unit } from "../common/unit"
 import { Log } from "./log"
 
 const log = new Log("ReadLine")
@@ -48,7 +47,10 @@ const commands: CommandInterface = {
           arguments[1] = arguments[1].substr(1)
         }
         const connection = await MySQLconnection.get()
-        const unit = new Unit(connection)
+        // @ts-ignore
+        const unit = new Unit({
+          connection
+        })
 
         for (const arg of arguments) {
           if (isNaN(arg)) throw new Error("'" + arg + "' is not a number")

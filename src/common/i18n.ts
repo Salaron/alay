@@ -1,9 +1,10 @@
-import { Connection } from "../core/database_wrappers/mysql"
-import { Log } from "../core/log"
-import { promisify } from "util"
-import { readFile, exists } from "fs"
 import extend from "extend"
+import { exists, readFile } from "fs"
 import showdown from "showdown"
+import { promisify } from "util"
+import { Log } from "../core/log"
+import { BaseAction } from "../models/actions"
+import { CommonModule } from "../models/common"
 
 interface I18nCache {
   [localizationCode: string]: I18nSection
@@ -54,11 +55,10 @@ export async function init() {
   defaultStrings = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${Config.i18n.defaultLanguage}.json`, `utf-8`))
 }
 
-export class I18n {
-  private connection: Connection
+export class I18n extends CommonModule {
   public markdownType = I18nMarkdownType
-  constructor(connection: Connection) {
-    this.connection = connection
+  constructor(action: BaseAction) {
+    super(action)
   }
 
   /**
@@ -109,7 +109,7 @@ export class I18n {
       languageCode = await this.getUserLocalizationCode(input)
     } else if (typeof input === "string") languageCode = input
 
-    if (Config.server.debug_mode) await I18n.clearCache()
+    if (Config.server.debug_mode) await this.clearCache()
     const result: any = {}
     for (const section of sections) {
       extend(true, result, defaultStrings[section], cache[languageCode][section])
@@ -143,7 +143,7 @@ export class I18n {
     return mdCache[languageCode][I18nMarkdownType[type]] = showdownConverter.makeHtml(md.replace(/--/gi, "—"))
   }
 
-  public static async clearCache() {
+  public async clearCache() {
     cache = {}
     await init()
   }

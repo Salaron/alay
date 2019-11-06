@@ -1,8 +1,7 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import RequestData from "../../../core/requestData"
-import { I18n } from "../../../common/i18n"
-import { WebView } from "../../../common/webview"
 import moment from "moment"
+import { WebView } from "../../../common/webview"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
 const liveDB = sqlite3.getLive()
@@ -31,8 +30,6 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const i18n = new I18n(this.connection)
-    const webview = new WebView(this.connection)
     let userId = this.user_id
 
     const guest = this.requestData.auth_level < AUTH_LEVEL.CONFIRMED_USER
@@ -51,13 +48,13 @@ export default class extends WebViewAction {
 
     let code = this.params.lang
     if (!guest) {
-      if (!code) code = await i18n.getUserLocalizationCode(this.user_id)
+      if (!code) code = await this.i18n.getUserLocalizationCode(this.user_id)
     } else if (!code || !Config.i18n.languages.getKey(code)) {
       code = Config.i18n.defaultLanguage
     }
 
     const [strings, template, user, userScore, eventData, liveDataStatus, liveDataLog] = await Promise.all([
-      i18n.getStrings(code, "profile-index"),
+      this.i18n.getStrings(code, "profile-index"),
       WebView.getTemplate("profile", "index"),
       this.connection.first(`
       SELECT
@@ -180,7 +177,7 @@ export default class extends WebViewAction {
 
     return {
       status: 200,
-      result: await webview.compileBodyTemplate(template, this.requestData, values)
+      result: await this.webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

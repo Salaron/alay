@@ -1,8 +1,7 @@
+import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { TYPE } from "../../../common/type"
-import { I18n } from "../../../common/i18n"
-import { Utils } from "../../../common/utils"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
@@ -19,7 +18,7 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    const strings = await new I18n(this.connection).getStrings(this.user_id, "login-startup", "settings-index", "mailer")
+    const strings = await this.i18n.getStrings(this.user_id, "login-startup", "settings-index", "mailer")
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     if (!Utils.checkPass(password)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)

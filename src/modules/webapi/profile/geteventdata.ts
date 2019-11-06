@@ -1,8 +1,7 @@
+import { TYPE } from "../../../common/type"
+import { WebView } from "../../../common/webview"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { TYPE } from "../../../common/type"
-import { I18n } from "../../../common/i18n"
-import { WebView } from "../../../common/webview"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
@@ -21,10 +20,8 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    const i18n = new I18n(this.connection)
-
     const [strings, template, eventData, total] = await Promise.all([
-      i18n.getStrings(this.params.lang, "profile-index"),
+      this.i18n.getStrings(this.params.lang, "profile-index"),
       WebView.getTemplate("profile", "eventdata"),
       this.connection.query(`
       SELECT

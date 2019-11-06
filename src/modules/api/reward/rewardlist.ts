@@ -1,12 +1,8 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Item } from "../../../common/item"
-import { Unit } from "../../../common/unit"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
-const rarityUnits = Unit.rarityUnits
-const attributeUnits = Unit.attributeUnits
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH
@@ -32,6 +28,8 @@ export default class extends ApiAction {
   }
 
   public async execute() {
+    const rarityUnits = this.unit.rarityUnits
+    const attributeUnits = this.unit.attributeUnits
     const offset = this.params.offset || 0
     this.params.filter.map(Number)
 
@@ -81,7 +79,7 @@ export default class extends ApiAction {
     const list: any[] = await Promise.all(rewardList.map(async (reward: any) => {
       if (reward.item_type != 1001) return {
         incentive_id: reward.incentive_id,
-        incentive_item_id: Item.getIncentiveId(reward.item_type, reward.item_id),
+        incentive_item_id: this.item.getIncentiveId(reward.item_type, reward.item_id),
         add_type: reward.item_type,
         amount: reward.amount,
         item_category_id: 0,
@@ -105,7 +103,7 @@ export default class extends ApiAction {
         max_rank: (data.disable_rank_up >= 1 ? 1 : 2),
         max_love: data.before_love_max,
         unit_id: reward.item_id,
-        is_support_member: Unit.getSupportUnitList().includes(reward.item_id),
+        is_support_member: this.unit.getSupportUnitList().includes(reward.item_id),
         exp: 0,
         next_exp: 24,
         max_hp: data.hp_max,

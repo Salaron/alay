@@ -1,8 +1,7 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import moment from "moment"
-import { User } from "../../../common/user"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -23,7 +22,6 @@ export default class extends ApiAction {
     const numbers = this.params.invite_code.match(/\d+/g)
     if (numbers === null) throw new ErrorCode(2400, "Invite_code doesn't contain numbers")
     this.params.invite_code = numbers[0]
-    const user = new User(this.connection)
 
     const profile = await this.connection.first(`
     SELECT
@@ -53,7 +51,7 @@ export default class extends ApiAction {
           elapsed_time_from_login: lastLogin > 1440 ? ` ${Math.floor(lastLogin / 1440)} day(s)` : lastLogin > 60 ? ` ${Math.floor(lastLogin / 60)} hour(s)` : ` ${lastLogin} min(s)`,
           introduction: profile.introduction
         },
-        center_unit_info: await user.getCenterUnitInfo(this.params.invite_code),
+        center_unit_info: await this.user.getCenterUnitInfo(this.params.invite_code),
         setting_award_id: profile.setting_award_id
       }
 

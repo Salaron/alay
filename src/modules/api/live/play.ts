@@ -1,11 +1,9 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import assert from "assert"
-import { Live } from "../../../common/live"
 import { EventStub } from "../../../common/eventstub"
-import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
-import { User } from "../../../common/user"
+import { Utils } from "../../../common/utils"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -31,8 +29,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const live = new Live(this.connection)
-    const eventStatus = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().TOKEN)
+    const eventStatus = await this.eventStub.getEventStatus(EventStub.getEventTypes().TOKEN)
     // clear data about any previous live session
     await this.connection.query("DELETE FROM user_live_progress WHERE user_id=:user", { user: this.user_id })
     const guest = await this.connection.first(`
@@ -44,10 +41,10 @@ export default class extends ApiAction {
     WHERE user_unit_deck.user_id=:user`, { user: this.params.party_user_id })
 
     let eventLive = false
-    const liveInfo = await live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    const liveInfo = await this.live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     if (liveInfo.capital_type === 2) { // token live
       if (!eventStatus.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
-      const eventLives = Live.getMarathonLiveList(eventStatus.id)
+      const eventLives = this.live.getMarathonLiveList(eventStatus.id)
       if (!eventLives.includes(liveInfo.live_difficulty_id)) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
       const tokenCnt = await this.connection.first(`SELECT token_point FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
         user: this.user_id,
@@ -63,9 +60,9 @@ export default class extends ApiAction {
     }
 
     const [liveNotes, deckInfo, mods] = await Promise.all([
-      live.getLiveNotes(this.user_id, liveInfo.live_setting_id, eventLive),
-      live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id),
-      new User(this.connection).getParams(this.user_id, ["hp"]),
+      this.live.getLiveNotes(this.user_id, liveInfo.live_setting_id, eventLive),
+      this.live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id),
+      this.user.getParams(this.user_id, ["hp"]),
       this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id, lp_factor) VALUES (:user, :difficulty, :setting_id, :deck, :factor)", {
         user: this.user_id,
         difficulty: this.params.live_difficulty_id,

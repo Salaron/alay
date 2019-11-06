@@ -1,9 +1,7 @@
-import { Log } from "../core/log"
 import extend from "extend"
-import { Connection } from "../core/database_wrappers/mysql"
-import { User } from "./user"
-import { Item } from "./item"
-import { Unit } from "./unit"
+import { Log } from "../core/log"
+import { BaseAction } from "../models/actions"
+import { CommonModule } from "../models/common"
 
 const log = new Log("Common: Live")
 
@@ -68,14 +66,16 @@ export async function init() {
   }
 }
 
-export class Live {
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
+export class Live extends CommonModule {
+  public availableLiveList = availableLiveList
+  public specialLiveList = specialLiveList
+  public normalLiveList = normalLiveList
+  constructor(action: BaseAction) {
+    super(action)
   }
 
   public async getLiveNotes(userId: number, liveSettingId: number, isEvent = false) {
-    const params = await new User(this.connection).getParams(userId)
+    const params = await this.action.user.getParams(userId)
 
     // make mirror and vanish on-the-fly
     let mirror = 0
@@ -310,7 +310,7 @@ export class Live {
     })
     if (_unitTypeIds.length === 9) fullyComposed = true
 
-    const removableSkills = await new User(this.connection).getRemovableSkillInfo(userId)
+    const removableSkills = await this.action.user.getRemovableSkillInfo(userId)
     await deck.forEachAsync(async (unit) => {
       if (!removableSkills.equipment_info[unit.unit_owning_user_id]) return
 
@@ -387,8 +387,6 @@ export class Live {
   }
 
   public async liveGoalAccomp(userId: number, liveDifficultyId: number, scoreRank: number, comboRank: number, completeRank: number) {
-    const item = new Item(this.connection)
-
     const result = {
       achieved_ids: <number[]>[],
       rewards: <any>[]
@@ -412,7 +410,7 @@ export class Live {
           goal_id: goal.live_goal_reward_id,
           difficulty: liveDifficultyId
         })
-        await item.addPresent(userId, {
+        await this.action.item.addPresent(userId, {
           type: goal.add_type,
           id: goal.item_id
         }, "Live Show! Reward", goal.amount, true)
@@ -431,9 +429,6 @@ export class Live {
   }
 
   public async applyKizunaBonusToDeck(userId: number, deck: any[], kizuna: number) {
-    const unitModule = new Unit(this.connection)
-    const itemModule = new Item(this.connection)
-
     for (const unit of deck) {
       unit.kizuna_add = 0
       unit.fpt_add = 0
@@ -470,7 +465,7 @@ export class Live {
     }
 
     return await Promise.all(deck.map(async unit => {
-      await unitModule.updateAlbum(userId, unit.unit_id, {
+      await this.action.unit.updateAlbum(userId, unit.unit_id, {
         maxRank: unit.is_rank_max,
         maxLove: Math.min(unit.love + unit.kizuna_add, unit.max_love) === unit.max_love && unit.rank === unit.max_rank,
         maxLevel: unit.is_level_max && unit.rank === unit.max_rank,
@@ -483,7 +478,7 @@ export class Live {
         id: unit.unit_owning_user_id
       })
       if (unit.kizuna_max && unit.is_rank_max) {
-        await itemModule.addPresent(userId, {
+        await this.action.item.addPresent(userId, {
           name: "lg"
         }, "Unit bond max", 1, true)
       }
@@ -509,28 +504,26 @@ export class Live {
   }
 
   public async getDefaultRewards(userId: number, scoreRank: number, comboRank: number) {
-    let item = new Item(this.connection)
-
     let rndGT = Math.floor(Math.random() * (5)) + 1
     let rndBT = Math.floor(Math.random() * (3)) + 1
     let rndLG = Math.floor(Math.random() * (10 * (7 - comboRank) - 10 * (6 - comboRank) + 1)) + 10 * (6 - comboRank)
     let dailyReward = await Promise.all([
-      item.addPresent(userId, {
+      this.action.item.addPresent(userId, {
         name: "gt"
       }, "Live Show! Reward", rndGT),
-      item.addPresent(userId, {
+      this.action.item.addPresent(userId, {
         name: "bt"
       }, "Live Show! Reward", rndBT),
-      item.addPresent(userId, {
+      this.action.item.addPresent(userId, {
         name: "lg"
       }, "Live Show! Reward", rndLG)
     ])
 
     // Random SiS
     if (Math.random() < 0.2) {
-      dailyReward.push(await item.addPresent(userId, {
+      dailyReward.push(await this.action.item.addPresent(userId, {
         name: "sis",
-        id: Unit.getRemovableSkillIds().randomValue()
+        id: this.action.unit.getRemovableSkillIds().randomValue()
       }, "Live Show! Reward", 2))
     }
 
@@ -561,7 +554,7 @@ export class Live {
       case 4: comboReward = r.randomValue().unit_id; break
     }
     if (scoreReward != null) {
-      let res = await item.addPresent(userId, {
+      let res = await this.action.item.addPresent(userId, {
         name: "card",
         id: scoreReward
       }, "Live Show! Reward", 1, true)
@@ -569,16 +562,16 @@ export class Live {
       rewardUnitList.live_rank.push(res)
     }
     if (comboReward != null) {
-      let res = await item.addPresent(userId, {
+      let res = await this.action.item.addPresent(userId, {
         name: "card",
         id: comboReward
       }, "Live Show! Reward", 1, true)
       res.new_unit_flag = false
       rewardUnitList.live_combo.push(res)
     }
-    let res = await item.addPresent(userId, {
+    let res = await this.action.item.addPresent(userId, {
       name: "card",
-      id: Unit.getSupportUnitList().randomValue()
+      id: this.action.unit.getSupportUnitList().randomValue()
     }, "Live Show! Reward", 1, true)
     res.new_unit_flag = false
     rewardUnitList.live_clear.push(res)
@@ -598,19 +591,19 @@ export class Live {
   public static getSpecialLiveList() {
     return specialLiveList
   }
-  public static getMarathonLiveList(eventId: number) {
+  public getMarathonLiveList(eventId: number) {
     return marathonLiveList[eventId]
   }
-  public static getRank(rankInfo: rankInfo[], value: number): number {
+  public getRank(rankInfo: rankInfo[], value: number): number {
     for (const info of rankInfo) {
       if (info.rank_min <= value && (info.rank_max >= value || info.rank_max === 0)) return info.rank
     }
     return 5
   }
-  public static getExpAmount(difficulty: number) {
+  public getExpAmount(difficulty: number) {
     return expTable[difficulty]
   }
-  public static getEventPointMultipliers(comboRank: number, scoreRank: number) {
+  public getEventPointMultipliers(comboRank: number, scoreRank: number) {
     let comboBonus = 1
     let scoreBonus = 1
     // on the official server score bonus for S rank is 1.20 and 1.08 for S combo rank
@@ -632,7 +625,7 @@ export class Live {
       scoreBonus
     }
   }
-  public static calculateMaxKizuna(maxCombo: number) {
+  public calculateMaxKizuna(maxCombo: number) {
     // Source: https://decaf.kouhi.me/lovelive/index.php?title=Gameplay#Kizuna
     return Math.floor(maxCombo / 10) +
       Math.floor(Math.max(0, maxCombo - 200) / 10) +

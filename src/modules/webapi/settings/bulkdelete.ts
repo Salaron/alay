@@ -24,7 +24,7 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    const strings = await new I18n(this.connection).getStrings(this.user_id, "login-startup", "settings-index")
+    const strings = await this.i18n.getStrings(this.user_id, "login-startup", "settings-index")
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     if (!Utils.checkPass(password)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
@@ -55,13 +55,13 @@ export default class extends WebApiAction {
     WHERE
     units.favorite_flag = 0
     AND units.deleted = 0
-    AND units.unit_id IN (${Unit.rarityUnits[this.params.rarity].join(",")})
+    AND units.unit_id IN (${this.unit.rarityUnits[this.params.rarity].join(",")})
     AND units.unit_owning_user_id NOT IN (${deckData.join(",")}, ${patherUnit})
     AND user_id = :user`, {
       user: this.user_id
     })
     if (this.params.rarity != 1) {
-      await new Item(this.connection).addItemToUser(this.user_id, {
+      await this.item.addItemToUser(this.user_id, {
         name: "exchange_point",
         id: this.params.rarity
       }, res.affectedRows)

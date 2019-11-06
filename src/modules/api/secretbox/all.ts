@@ -12,12 +12,10 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const secretbox = new Secretbox(this.connection)
-
     const data = await this.connection.first("SELECT sns_coin, unit_max, box_gauge, bt_tickets, green_tickets, (SELECT count(*) FROM units WHERE user_id=:user AND deleted=0) as unit_count FROM users WHERE user_id=:user", {
       user: this.user_id
     })
-    const sbList = await secretbox.getSecretboxList(this.user_id)
+    const sbList = await this.secretbox.getSecretboxList(this.user_id)
 
     const response: any = {
       is_unit_max: data.unit_count >= data.unit_max,

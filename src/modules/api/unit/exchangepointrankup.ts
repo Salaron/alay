@@ -1,9 +1,7 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import assert from "assert"
-import { Unit } from "../../../common/unit"
-import { User } from "../../../common/user"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
 
@@ -35,10 +33,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const unit = new Unit(this.connection)
-    const user = new User(this.connection)
-
-    const baseUnit = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
+    const baseUnit = await this.unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
     if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorCode(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
 
     const baseUnitData = await unitDB.get("SELECT exchange_point_rank_up_cost, disable_rank_up, after_love_max, after_level_max, rarity FROM unit_m WHERE unit_id = :id", {
@@ -47,7 +42,7 @@ export default class extends ApiAction {
     assert(baseUnitData, `Failed to find unit data [${baseUnit.unit_id}]`)
     assert(baseUnitData.disable_rank_up === 0, "This unit can't be ranked up")
 
-    const beforeUserInfo = await user.getUserInfo(this.user_id)
+    const beforeUserInfo = await this.user.getUserInfo(this.user_id)
     const ePoints = await this.connection.first("SELECT exchange_point FROM user_exchange_point WHERE user_id=:user AND rarity=:rarity", {
       user: this.user_id,
       rarity: this.params.exchange_point_id
@@ -82,15 +77,15 @@ export default class extends ApiAction {
         cost: baseUnitData.exchange_point_rank_up_cost,
         user: this.user_id
       }),
-      unit.updateAlbum(this.user_id, baseUnit.unit_id, {
+      this.unit.updateAlbum(this.user_id, baseUnit.unit_id, {
         maxRank: true
       })
     ])
 
     const [afterUserInfo, afterUnitInfo, removableSkillInfo] = await Promise.all([
-      user.getUserInfo(this.user_id),
-      unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id),
-      user.getRemovableSkillInfo(this.user_id)
+      this.user.getUserInfo(this.user_id),
+      this.unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id),
+      this.user.getRemovableSkillInfo(this.user_id)
     ])
 
     return {

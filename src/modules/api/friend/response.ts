@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Notice } from "../../../common/notice"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -27,7 +26,7 @@ export default class extends ApiAction {
           init: this.params.user_id,
           rec: this.user_id
         })
-        await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().REJECTED_FRIEND_REQUEST, this.params.user_id)
+        await this.notice.addNotice(this.user_id, this.notice.FILTER.FRIENDS, this.notice.TYPE.REJECTED_FRIEND_REQUEST, this.params.user_id)
         break
       }
       case 2: {
@@ -36,7 +35,7 @@ export default class extends ApiAction {
           init: this.params.user_id,
           rec: this.user_id
         })
-        await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().ACCEPTED_FRIEND_REQUEST, this.params.user_id)
+        await this.notice.addNotice(this.user_id, this.notice.FILTER.FRIENDS, this.notice.TYPE.ACCEPTED_FRIEND_REQUEST, this.params.user_id)
         break
       }
       default: throw new ErrorUser(`Unknown status: ${this.params.status}`, this.user_id)

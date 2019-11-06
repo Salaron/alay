@@ -37,8 +37,6 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const user = new User(this.connection)
-
     const order = sort[this.params.sort]
     if (!order) throw new Error(`Unknown sort type: ${this.params.sort}`)
 
@@ -105,7 +103,7 @@ export default class extends ApiAction {
           elapsed_time_from_applied: appliedTime > 1440 ? ` ${Math.floor(appliedTime / 1440)} day(s)` : appliedTime > 60 ? ` ${Math.floor(appliedTime / 60)} hour(s)` : ` ${appliedTime} min(s)`,
           comment: friend.introduction
         },
-        center_unit_info: await user.getCenterUnitInfo(friend.user_id),
+        center_unit_info: await this.user.getCenterUnitInfo(friend.user_id),
         setting_award_id: friend.setting_award_id
       }
     }))

@@ -1,8 +1,7 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import RequestData from "../../../core/requestData"
-import { WebView } from "../../../common/webview"
 import { TYPE } from "../../../common/type"
-import { Secretbox } from "../../../common/secretbox"
+import { WebView } from "../../../common/webview"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 function getRarityString(rarity: number) {
   switch (rarity) {
@@ -40,9 +39,8 @@ export default class extends WebViewAction {
   public async execute() {
     try {
       if (isNaN(parseInt(this.params.id))) throw new Error("id should be int")
-      const secretboxModule = new Secretbox(this.connection)
 
-      if (Config.server.debug_mode) await secretboxModule.updateSecretboxSettings()
+      if (Config.server.debug_mode) await this.secretbox.updateSecretboxSettings()
       let secretbox = await this.connection.first("SELECT * FROM secretbox_list WHERE secretbox_id = :id", {
         id: this.params.id
       })
@@ -85,7 +83,7 @@ export default class extends WebViewAction {
 
       let costList = []
       for (let i = 0; i < costs.length; i++) {
-        let settings = secretboxModule.secretboxSettings[secretbox.secretbox_id][costs[i].cost_id]
+        let settings = this.secretbox.secretboxSettings[secretbox.secretbox_id][costs[i].cost_id]
         let cost = {
           total: 0,
           default: i === 0,
@@ -139,7 +137,7 @@ export default class extends WebViewAction {
 
       return {
         status: 200,
-        result: await new WebView(this.connection).compileBodyTemplate(template, this.requestData, {
+        result: await this.webview.compileBodyTemplate(template, this.requestData, {
           secretbox,
           costList,
           pageTitle: secretbox.name,

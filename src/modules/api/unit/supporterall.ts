@@ -1,6 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { User } from "../../../common/user"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
@@ -15,7 +14,7 @@ export default class extends ApiAction {
     return {
       status: 200,
       result: {
-        unit_support_list: await new User(this.connection).getSupportUnits(this.user_id)
+        unit_support_list: await this.user.getSupportUnits(this.user_id)
       }
     }
   }

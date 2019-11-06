@@ -1,5 +1,5 @@
-import { Connection } from "../core/database_wrappers/mysql"
-import { Unit } from "./unit"
+import { BaseAction } from "../models/actions"
+import { CommonModule } from "../models/common"
 
 interface ItemObject {
   name?: string
@@ -14,13 +14,12 @@ interface IItemRewardInfo {
   amount: number
 }
 
-export class Item {
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
+export class Item extends CommonModule {
+  constructor(action: BaseAction) {
+    super(action)
   }
 
-  public static nameToType(name: string, itemId?: number | null) {
+  public nameToType(name: string, itemId?: number | null) {
     if (!Type.isString(name)) throw new Error(`Argument should be string`)
 
     switch (name) {
@@ -136,7 +135,7 @@ export class Item {
     }
   }
 
-  public static typeToName(itemType: number, itemId?: number | null) {
+  public typeToName(itemType: number, itemId?: number | null) {
     switch (itemType) {
       case 1000: {
         if (itemId === 1) return "green_tickets"
@@ -160,11 +159,11 @@ export class Item {
     }
   }
 
-  public static correctName(name: string, itemId?: number | null) {
+  public correctName(name: string, itemId?: number | null) {
     const type = this.nameToType(name, itemId)
     return this.typeToName(type.itemType, itemId || type.itemId)
   }
-  public static getIncentiveId(itemType: number, itemId?: number | null) {
+  public getIncentiveId(itemType: number, itemId?: number | null) {
     switch (itemType) {
       case 1000:
       case 1001: return itemId
@@ -179,11 +178,11 @@ export class Item {
     if (!item.name && !item.type && !item.id) throw new Error(`Item object is empty`)
 
     if (typeof item.name === "string" && item.type == null) {
-      item.name = Item.correctName(item.name, item.id)
-      item.type = Item.nameToType(item.name, item.id).itemType
+      item.name = this.correctName(item.name, item.id)
+      item.type = this.nameToType(item.name, item.id).itemType
     }
     if (typeof item.type === "number" && item.name == null) {
-      item.name = Item.typeToName(item.type, item.id)
+      item.name = this.typeToName(item.type, item.id)
     }
 
     if (
@@ -201,8 +200,7 @@ export class Item {
     }
     switch (item.type) {
       case 1001: { // card
-        const unit = new Unit(this.connection)
-        return await unit.addUnit(userId, <number>item.id, { amount })
+        return await this.action.unit.addUnit(userId, <number>item.id, { amount })
       }
 
       case 1000:
@@ -251,14 +249,14 @@ export class Item {
   public async addPresent(userId: number, item: ItemObject, message: string, amount = 1, open = false) {
     if (!item.name && !item.type && !item.id) throw new Error(`Item object is empty`)
     if (typeof item.name === "string" && item.type == null) {
-      const ntt = Item.nameToType(item.name, item.id)
+      const ntt = this.nameToType(item.name, item.id)
       item.type = ntt.itemType
       item.id = ntt.itemId
-      item.name = Item.correctName(item.name, item.id)
+      item.name = this.correctName(item.name, item.id)
 
     }
     if (typeof item.type === "number" && item.name == null) {
-      item.name = Item.typeToName(item.type, item.id)
+      item.name = this.typeToName(item.type, item.id)
     }
 
     const res = await this.connection.execute(`

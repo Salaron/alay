@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Utils } from "../../../common/utils"
-import { Item } from "../../../common/item"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -29,14 +28,14 @@ export default class extends ApiAction {
             user: this.user_id
           })
           if (!gotCount) gotCount = { got_item_count: 0 }
-          const _i = Item.nameToType(item.item_name, item.item_id) // tslint:disable-line
+          const itemInfo = this.item.nameToType(item.item_name, item.item_id) // tslint:disable-line
           return {
             exchange_item_id: item.exchange_item_id,
             title: item.title,
             cost_list: cost,
             amount: item.amount,
-            add_type: _i.itemType,
-            item_id: _i.itemId,
+            add_type: itemInfo.itemType,
+            item_id: itemInfo.itemId,
             is_rank_max: false,
             got_item_count: gotCount.got_item_count,
             max_item_count: item.max_count == null ? undefined : item.max_count,

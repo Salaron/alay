@@ -1,6 +1,4 @@
-import { EventStub } from "../../../common/eventstub"
 import { TYPE } from "../../../common/type"
-import { User } from "../../../common/user"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, FESTIVAL_SETLIST, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
@@ -32,7 +30,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().FESTIVAL)
+    const currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.FESTIVAL)
     if (currentEvent.active === false) throw new ErrorCode(720)
 
     let response = {
@@ -59,7 +57,7 @@ export default class extends ApiAction {
     }
 
     let attribute = [1, 2, 3].randomValue() // select random attribute
-    let param = await new User(this.connection).getParams(this.user_id, ["festival_setList"])
+    let param = await this.user.getParams(this.user_id, ["festival_setList"])
 
     let setListMemberCategory = []
     switch (param.festival_setList) {

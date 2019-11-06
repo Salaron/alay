@@ -1,10 +1,9 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import RequestData from "../../../core/requestData"
-import { I18n } from "../../../common/i18n"
-import { WebView } from "../../../common/webview"
 import { readFile } from "fs"
-import { promisify } from "util"
 import moment from "moment"
+import { promisify } from "util"
+import { WebView } from "../../../common/webview"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -15,14 +14,11 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const i18n = new I18n(this.connection)
-    const webview = new WebView(this.connection)
-
-    const code = await i18n.getUserLocalizationCode(this.user_id)
+    const code = await this.i18n.getUserLocalizationCode(this.user_id)
     const [strings, template, currentOnline] = await Promise.all([
-      i18n.getStrings(code, "server-info"),
+      this.i18n.getStrings(code, "server-info"),
       WebView.getTemplate("server", "info"),
-      webview.getCurrentOnline()
+      this.webview.getCurrentOnline()
     ])
 
     const serverInfo = {
@@ -47,7 +43,7 @@ export default class extends WebViewAction {
 
     return {
       status: 200,
-      result: await webview.compileBodyTemplate(template, this.requestData, {
+      result: await this.webview.compileBodyTemplate(template, this.requestData, {
         i18n: strings,
         serverInfo
       })

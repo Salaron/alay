@@ -1,11 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Item } from "../../../common/item"
 import { TYPE } from "../../../common/type"
-import { Unit } from "../../../common/unit"
-
-const rarityUnits = Unit.rarityUnits
-const attributeUnits = Unit.attributeUnits
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH
@@ -30,6 +25,8 @@ export default class extends ApiAction {
   }
 
   public async execute() {
+    const rarityUnits = this.unit.rarityUnits
+    const attributeUnits = this.unit.attributeUnits
     this.params.filter.map(Number)
 
     let id = ``
@@ -79,7 +76,7 @@ export default class extends ApiAction {
       return {
         incentive_history_id: reward.incentive_id,
         incentive_id: reward.incentive_id,
-        incentive_item_id: Item.getIncentiveId(reward.item_type, reward.item_id),
+        incentive_item_id: this.item.getIncentiveId(reward.item_type, reward.item_id),
         add_type: reward.item_type,
         amount: reward.amount,
         item_category_id: 0,

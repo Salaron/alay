@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Unit } from "../../../common/unit"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -25,8 +24,6 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const unit = new Unit(this.connection)
-
     const ts = await this.connection.first("SELECT tutorial_state FROM users WHERE user_id=:user", { user: this.user_id })
     if (ts.tutorial_state != 1) throw new Error(`someting wronth with tutorial state`)
 
@@ -39,7 +36,7 @@ export default class extends ApiAction {
     const unitIds = [1391, 1529, 1527, 1487, leader, 1486, 1488, 1528, 1390, 1391, 1529]
     const uouid: any[] = []
     await unitIds.forEachAsync(async (u) => {
-      uouid.push(await unit.addUnit(this.user_id, u))
+      uouid.push((await this.unit.addUnit(this.user_id, u)).unit_owning_user_id)
     })
     await this.connection.query("UPDATE users SET tutorial_state=-1, partner_unit=:partner, setting_award_id=:award WHERE user_id=:user", {
       partner: uouid[4].unit_owning_user_id,

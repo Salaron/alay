@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Utils } from "../../../common/utils"
-import { Item } from "../../../common/item"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const achievementDB = sqlite3.getAchievement()
 
@@ -22,8 +21,8 @@ export default class extends ApiAction {
     for (const ac of loginAc) {
       if (loginCnt < ac.params1) break
       const reward: any = Utils.createObjCopy(Config.lbonus.total_login_bonus[ac.params1])
-      reward.add_type = Item.nameToType(reward.name).itemType
-      reward.item_id = Item.nameToType(reward.name, reward.item_id).itemId
+      reward.add_type = this.item.nameToType(reward.name).itemType
+      reward.item_id = this.item.nameToType(reward.name, reward.item_id).itemId
       list.push({
         achievement_id: ac.achievement_id,
         count: loginCnt,

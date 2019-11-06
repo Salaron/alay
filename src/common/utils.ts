@@ -1,9 +1,9 @@
-import { Log } from "../core/log"
 import crypto from "crypto"
-import moment from "moment"
-import { promisify } from "util"
-import request from "request"
 import { IncomingMessage } from "http"
+import moment from "moment"
+import request from "request"
+import { promisify } from "util"
+import { Log } from "../core/log"
 
 const log = new Log("Common: Utils")
 
@@ -18,7 +18,7 @@ export async function init() {
           connection.query("SELECT * FROM auth_recovery_codes WHERE expire <= CURRENT_TIMESTAMP")
         ])
         await tokens.forEachAsync(async (token) => {
-          await connection.query("DELETE FROM auth_tokens WHERE token=:token", { token: token.token })
+          await connection.query("DELETE FROM auth_tokens WHERE token = :token", { token: token.token })
         })
         await codes.forEachAsync(async (code) => {
           await connection.query("DELETE FROM auth_recovery_codes WHERE token = :token", { token: code.token })

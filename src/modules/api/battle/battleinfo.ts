@@ -12,7 +12,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().BATTLE)
+    const currentEvent = await this.eventStub.getEventStatus(EventStub.getEventTypes().BATTLE)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []

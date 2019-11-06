@@ -1,14 +1,10 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Log } from "../../../core/log"
-import { User } from "../../../common/user"
-import { Item } from "../../../common/item"
 import { TYPE } from "../../../common/type"
-import { Unit } from "../../../common/unit"
+import { User } from "../../../common/user"
+import { Log } from "../../../core/log"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const log = new Log("reward/openAll")
-const rarityUnits = Unit.rarityUnits
-const attributeUnits = Unit.attributeUnits
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -31,8 +27,8 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const user = new User(this.connection)
-    const item = new Item(this.connection)
+    const rarityUnits = this.unit.rarityUnits
+    const attributeUnits = this.unit.attributeUnits
     this.params.filter.map(Number)
 
     let rewardListQuery = ``
@@ -79,10 +75,10 @@ export default class extends ApiAction {
     const rewardCount = await this.connection.first(rewardCountQuery)
 
     const itemList = <any[]>[]
-    const beforeUserInfo = await user.getUserInfo(this.user_id)
+    const beforeUserInfo = await this.user.getUserInfo(this.user_id)
 
     // do async openning
-    const opened = await Promise.all(rewardList.map((reward: any) => item.openPresent(this.user_id, reward.incentive_id).catch((err: Error) => {
+    const opened = await Promise.all(rewardList.map((reward: any) => this.item.openPresent(this.user_id, reward.incentive_id).catch((err: Error) => {
       log.error(err) // log errors
       return undefined // return undefined if there an error
     })))
@@ -100,9 +96,9 @@ export default class extends ApiAction {
         upper_limit: itemList.length === 1000,
         reward_item_list: itemList,
         before_user_info: beforeUserInfo,
-        after_user_info: await user.getUserInfo(this.user_id),
+        after_user_info: await this.user.getUserInfo(this.user_id),
         class_system: User.getClassSystemStatus(this.user_id),
-        unit_support_list: await user.getSupportUnits(this.user_id)
+        unit_support_list: await this.user.getSupportUnits(this.user_id)
       }
     }
   }

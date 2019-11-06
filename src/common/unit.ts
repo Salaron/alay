@@ -1,6 +1,7 @@
 import extend from "extend"
-import { Connection } from "../core/database_wrappers/mysql"
+import { BaseAction } from "../models/actions"
 import { Utils } from "./utils"
+import { CommonModule } from "../models/common"
 
 const unitDB = sqlite3.getUnit()
 const exchangeDB = sqlite3.getExchange()
@@ -85,17 +86,14 @@ interface updateAlbumOptions {
   addFavPt?: number
 }
 
-export class Unit {
-  public static attributeUnits = attributeUnits
+export class Unit extends CommonModule {
   public attributeUnits = attributeUnits
-  public static rarityUnits = rarityUnits
   public rarityUnits = rarityUnits
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
+  constructor(action: BaseAction) {
+    super(action)
   }
 
-  public static parseUnitData(unitData: any) {
+  public parseUnitData(unitData: any) {
     return {
       unit_owning_user_id: unitData.unit_owning_user_id,
       unit_id: unitData.unit_id,
@@ -399,16 +397,16 @@ export class Unit {
     })
   }
 
-  public static getSupportUnitList() {
+  public getSupportUnitList() {
     return supportUnitList
   }
-  public static getSupportUnitData() {
+  public getSupportUnitData() {
     return supportUnitData
   }
-  public static getNoExchangePointList() {
+  public getNoExchangePointList() {
     return noExchangePointList
   }
-  public static getRemovableSkillIds() {
+  public getRemovableSkillIds() {
     return removableSkillList
   }
 }

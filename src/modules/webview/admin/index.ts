@@ -1,9 +1,7 @@
-import { WV_REQUEST_TYPE, AUTH_LEVEL } from "../../../models/constant"
-import RequestData from "../../../core/requestData"
 import { Utils } from "../../../common/utils"
 import { WebView } from "../../../common/webview"
-import { I18n } from "../../../common/i18n"
-import { webview } from "../../../common"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -14,9 +12,7 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const webview = new WebView(this.connection)
-
-    const strings = await new I18n(this.connection).getStrings(Config.i18n.defaultLanguage, "login-login", "login-startup")
+    const strings = await this.i18n.getStrings(Config.i18n.defaultLanguage, "login-login", "login-startup")
 
     const values = {
       redirect: "webview.php/admin/index",
@@ -31,7 +27,7 @@ export default class extends WebViewAction {
         let template = await WebView.getTemplate("admin", "index")
         return {
           status: 200,
-          result: await webview.compileBodyTemplate(template, this.requestData, values)
+          result: await this.webview.compileBodyTemplate(template, this.requestData, values)
         }
       }
       case AUTH_LEVEL.NONE: {
@@ -48,7 +44,7 @@ export default class extends WebViewAction {
         this.requestData.auth_token = token
         return {
           status: 200,
-          result: await webview.compileBodyTemplate(template, this.requestData, values)
+          result: await this.webview.compileBodyTemplate(template, this.requestData, values)
         }
       }
       default: {

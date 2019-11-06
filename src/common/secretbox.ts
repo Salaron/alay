@@ -1,22 +1,10 @@
 import { readFile } from "fs"
 import { promisify } from "util"
-import { Connection } from "../core/database_wrappers/mysql"
 import { Log } from "../core/log"
-import {
-  IRarityData,
-  ISecretbox,
-  ISecretboxButton,
-  ISecretboxCost,
-  ISecretboxData,
-  ISecretboxEffect,
-  ISecretboxEffectDetail,
-  ISecretboxSettings,
-  IStepInfo,
-  IStepUpSettings
-} from "../models/secretbox"
-import { Item } from "./item"
-import { User } from "./user"
+import { BaseAction } from "../models/actions"
+import { IRarityData, ISecretbox, ISecretboxButton, ISecretboxCost, ISecretboxData, ISecretboxEffect, ISecretboxEffectDetail, ISecretboxSettings, IStepInfo, IStepUpSettings } from "../models/secretbox"
 import { Utils } from "./utils"
+import { CommonModule } from "../models/common"
 
 const log = new Log("Secretbox")
 const unitDB = sqlite3.getUnit()
@@ -171,11 +159,10 @@ export async function init() {
   await updateSettings()
 }
 
-export class Secretbox {
+export class Secretbox extends CommonModule {
   public secretboxSettings = secretboxSettings
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
+  constructor(action: BaseAction) {
+    super(action)
   }
 
   public async getSecretboxList(userId: number): Promise<ISecretbox[]> {
@@ -196,12 +183,9 @@ export class Secretbox {
   }
 
   public async makePon(userId: number, secretboxId: number, costId: number) {
-    const user = new User(this.connection)
-    const item = new Item(this.connection)
-
     const rarityData = this.secretboxSettings[secretboxId][costId]
     const [beforeUserInfo, costData, secretboxTab] = await Promise.all([
-      user.getUserInfo(userId),
+      this.action.user.getUserInfo(userId),
       this.getCosts(userId, costId, true),
       this.getTab(userId, secretboxId),
       this.connection.query(`INSERT INTO secretbox_pon (user_id, secretbox_id, pon_count) VALUES (:user, :sbId, 0) ON DUPLICATE KEY UPDATE pon_count = pon_count + 0`, {
@@ -231,7 +215,7 @@ export class Secretbox {
       }
     }
 
-    await item.addItemToUser(userId, {
+    await this.action.item.addItemToUser(userId, {
       type: costData.type,
       id: costData.item_id
     }, parseInt(`-${costData.amount}`))
@@ -273,7 +257,7 @@ export class Secretbox {
 
     // result
     const gainedUnits = await Promise.all(gainedUnitIds.map(async id => {
-      let unitData = await item.addPresent(userId, {
+      let unitData = await this.action.item.addPresent(userId, {
         name: "card",
         id
       }, `Gained from Scouting Box "${secretboxTab.secret_box_info.name}"`, 1, true)
@@ -296,8 +280,8 @@ export class Secretbox {
     // get after info
     const [afterSecretboxButtons, afterUserInfo, afterSupportList, userItems] = await Promise.all([
       this.getButtons(userId, secretboxId),
-      user.getUserInfo(userId),
-      user.getSupportUnits(userId),
+      this.action.user.getUserInfo(userId),
+      this.action.user.getSupportUnits(userId),
       this.connection.first("SELECT sns_coin, bt_tickets, green_tickets FROM users WHERE user_id = :user", {
         user: userId
       }),
@@ -389,7 +373,7 @@ export class Secretbox {
         end_date: secretboxData.end_date,
         show_end_date: secretboxData.enabled === 1 ? secretboxData.end_date : undefined,
         add_gauge: secretboxData.add_gauge,
-        pon_count: ponData.pon_count,
+        pon_count: ponData!.pon_count,
         pon_upper_limit: secretboxData.upper_limit,
         additional_info: additionalInfo
       }
@@ -477,8 +461,8 @@ export class Secretbox {
     ])
     if (costs.length === 0) throw new Error(`Costs for ${useCostId ? "cost_id" : "button_id"} #${id} is missing`)
 
-    let result = costs.map(cost => {
-      const item = Item.nameToType(cost.item_name)
+    let result = costs.map((cost: { item_name: string; amount: number; cost_id: any; unit_count: any }) => {
+      const item = this.action.item.nameToType(cost.item_name)
       let payable = false
       if (item.itemType === 3001) payable = userItems.sns_coin >= cost.amount
       else if (item.itemType === 3000 && item.itemId === 2) payable = userItems.game_coin >= cost.amount

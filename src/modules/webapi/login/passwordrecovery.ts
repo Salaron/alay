@@ -1,8 +1,7 @@
+import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { Utils } from "../../../common/utils"
-import { TYPE } from "../../../common/type"
-import { I18n } from "../../../common/i18n"
 import moment = require("moment")
 
 export default class extends WebApiAction {
@@ -25,9 +24,8 @@ export default class extends WebApiAction {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
       await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
     }
-    const i18n = new I18n(this.connection)
 
-    const strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
+    const strings = await this.i18n.getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
     const userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })
     if (!userData) throw new ErrorWebApi(strings.mailNotExists, true)
 

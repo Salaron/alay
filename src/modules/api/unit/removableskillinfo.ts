@@ -14,7 +14,7 @@ export default class extends ApiAction {
   public async execute() {
     return {
       status: 200,
-      result: await new User(this.connection).getRemovableSkillInfo(this.user_id)
+      result: await this.user.getRemovableSkillInfo(this.user_id)
     }
   }
 }

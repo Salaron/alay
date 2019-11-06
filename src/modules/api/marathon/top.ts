@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { EventStub } from "../../../common/eventstub"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -19,11 +18,10 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const events = new EventStub(this.connection)
-    const currentEvent = await events.getEventById(this.params.event_id)
+    const currentEvent = await this.eventStub.getEventById(this.params.event_id)
     if (!currentEvent.opened) throw new ErrorCode(1234, "Event is closed")
 
-    const eventUser = await events.getEventUserStatus(this.user_id, currentEvent.id)
+    const eventUser = await this.eventStub.getEventUserStatus(this.user_id, currentEvent.id)
     return {
       status: 200,
       result: {

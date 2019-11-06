@@ -18,12 +18,10 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const events = new EventStub(this.connection)
-
-    const currentEvent = await events.getEventById(this.params.event_id)
+    const currentEvent = await this.eventStub.getEventById(this.params.event_id)
     if (currentEvent.opened === false) throw new ErrorCode(720)
 
-    const status = await events.getEventUserStatus(this.user_id, currentEvent.id)
+    const status = await this.eventStub.getEventUserStatus(this.user_id, currentEvent.id)
 
     return {
       status: 200,

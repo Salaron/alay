@@ -1,6 +1,5 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { User } from "../../../common/user"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
 
@@ -18,11 +17,9 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const user = new User(this.connection)
-
     const [beforeUserInfo, skillInfo] = await Promise.all([
-      user.getUserInfo(this.user_id),
-      user.getRemovableSkillInfo(this.user_id)
+      this.user.getUserInfo(this.user_id),
+      this.user.getRemovableSkillInfo(this.user_id)
     ])
     let gainCoins = 0
     let availableSkills: any = {}
@@ -59,7 +56,7 @@ export default class extends ApiAction {
         total: gainCoins,
         reward_box_flag: false,
         before_user_info: beforeUserInfo,
-        after_user_info: await user.getUserInfo(this.user_id)
+        after_user_info: await this.user.getUserInfo(this.user_id)
       }
     }
   }

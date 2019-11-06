@@ -115,16 +115,12 @@ export class ConnectionPool {
     release = true
   ): Promise<void> {
     return new Promise(async (res, rej) => {
-      connection.rollback(async (err) => {
+      connection.rollback((err) => {
         if (err) {
-          if (
-            this.freeConnections.indexOf(connection) === -1 &&
-            release == true
-          )
-            connection.release()
+          if (release === true) connection.release()
           return rej(err)
         }
-        if (release == true) connection.release()
+        if (release === true) connection.release()
         res()
       })
     })
@@ -301,7 +297,7 @@ export class Connection {
       ignoreErrors
     )
   }
-  public async query(query: string, values: any = {}, ignoreErrors?: boolean) {
+  public async query(query: string, values: any = {}, ignoreErrors?: boolean): Promise<any[]> {
     this.checkIfReleased()
     this.lastQuery = query
     return await MySQLconnectionPool.query(

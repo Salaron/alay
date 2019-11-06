@@ -1,8 +1,6 @@
-import RequestData from "../../../core/requestData"
 import assert from "assert"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { User } from "../../../common/user"
-import { Unit } from "../../../common/unit"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
 
@@ -20,10 +18,8 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const unit = new Unit(this.connection)
-    const user = new User(this.connection)
-    const noExchangePointList = Unit.getNoExchangePointList()
-    const beforeUserInfo = await user.getUserInfo(this.user_id)
+    const noExchangePointList = this.unit.getNoExchangePointList()
+    const beforeUserInfo = await this.user.getUserInfo(this.user_id)
 
     for (const id of this.params.unit_owning_user_id) {
       assert(Type.isInt(id) && id > 0, "uouid should be int")
@@ -32,7 +28,7 @@ export default class extends ApiAction {
       assert(typeof support === "object", "support is not an object")
       assert(Type.isInt(support.amount) && support.amount > 0, "amount should be int")
       assert(Type.isInt(support.unit_id), "unit_id should be int")
-      assert(Unit.getSupportUnitList().includes(support.unit_id), "This is not support unit")
+      assert(this.unit.getSupportUnitList().includes(support.unit_id), "This is not support unit")
     }
 
     let gainCoins = 0
@@ -44,7 +40,7 @@ export default class extends ApiAction {
       5: 0
     }
     if (this.params.unit_owning_user_id.length > 0) {
-      const units = await unit.getNotLockedUnits(this.user_id, this.params.unit_owning_user_id)
+      const units = await this.unit.getNotLockedUnits(this.user_id, this.params.unit_owning_user_id)
       if (units.length != this.params.unit_owning_user_id.length) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
 
       await Promise.all(units.map(async (unit: any) => {
@@ -74,7 +70,7 @@ export default class extends ApiAction {
     }
 
     if (this.params.unit_support_list.length > 0) {
-      const _owningSupportUnit = await user.getSupportUnits(this.user_id) // tslint:disable-line
+      const _owningSupportUnit = await this.user.getSupportUnits(this.user_id) // tslint:disable-line
       const owningSupportUnit = <{ [id: number]: number }>{}
       for (const support of _owningSupportUnit) owningSupportUnit[support.unit_id] = support.amount
 
@@ -103,8 +99,8 @@ export default class extends ApiAction {
       s5: seals[5]
     })
 
-    const afterUserInfo = await user.getUserInfo(this.user_id)
-    const skillInfo = await user.getRemovableSkillInfo(this.user_id)
+    const afterUserInfo = await this.user.getUserInfo(this.user_id)
+    const skillInfo = await this.user.getRemovableSkillInfo(this.user_id)
     const pointList = <any>[]
     for (const rarity of Object.keys(seals)) {
       if (seals[rarity] > 0) pointList.push({

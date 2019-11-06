@@ -1,8 +1,7 @@
+import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { Utils } from "../../../common/utils"
-import { TYPE } from "../../../common/type"
-import { I18n } from "../../../common/i18n"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -28,13 +27,12 @@ export default class extends WebApiAction {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
     if (!Config.modules.login.enable_registration) throw new ErrorWebApi("Registration is disabled!", true)
 
-    const i18n = new I18n(this.connection)
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
       await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
     }
 
-    const strings = await i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup", "mailer")
+    const strings = await this.i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup", "mailer")
 
     const pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     if (!checkPass(pass)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)

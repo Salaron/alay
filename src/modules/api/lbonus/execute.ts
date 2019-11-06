@@ -1,9 +1,8 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import moment from "moment"
-import { Item } from "../../../common/item"
 import { User } from "../../../common/user"
 import { Utils } from "../../../common/utils"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
 
@@ -17,8 +16,6 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const item = new Item(this.connection)
-
     const currentYear = moment(new Date()).utcOffset("+0900").format("YYYY")
     const currentMonth = moment(new Date()).utcOffset("+0900").format("M")
     const currentDay = moment(new Date()).utcOffset("+0900").format("D")
@@ -130,7 +127,7 @@ export default class extends ApiAction {
     }
     response.total_login_info.login_count += 1
 
-    await item.addPresent(this.user_id, {
+    await this.item.addPresent(this.user_id, {
       type: reward.item_type,
       id: reward.item_id
     }, `Login Bonus Reward! [${currentDay}.${currentMonth}.${currentMonth}]`, reward.amount)
@@ -145,12 +142,12 @@ export default class extends ApiAction {
         if (check) return
 
         await this.connection.query(`INSERT INTO login_bonus_total (user_id, days) VALUES (:user, :day)`, { user: this.user_id, day })
-        await item.addPresent(this.user_id, {
+        await this.item.addPresent(this.user_id, {
           name: Config.lbonus.total_login_bonus[day].name,
           id: Config.lbonus.total_login_bonus[day].item_id
         }, `Total Login Bonus Reward! [${day} day(s)]`, Config.lbonus.total_login_bonus[day].amount)
       } else if (response.total_login_info.remaining_count == 0) {
-        const itemInfo = Item.nameToType(Config.lbonus.total_login_bonus[day].name)
+        const itemInfo = this.item.nameToType(Config.lbonus.total_login_bonus[day].name)
         response.total_login_info.remaining_count = parseInt(day) - response.total_login_info.login_count
         response.total_login_info.reward.push({
           item_id: Config.lbonus.total_login_bonus[day].item_id || itemInfo.itemId,
@@ -172,7 +169,6 @@ export default class extends ApiAction {
     })
     if (sheets.length === 0) return []
     const result: any[] = []
-    const item = new Item(this.connection)
 
     await sheets.forEachAsync(async (sheet: any) => {
       const data = {
@@ -222,7 +218,7 @@ export default class extends ApiAction {
             user: this.user_id,
             id: seq.nlbonus_item_id
           })
-          await item.addPresent(this.user_id, {
+          await this.item.addPresent(this.user_id, {
             type: seq.item_type,
             id: seq.item_id || null
           }, `Special Login Bonus Reward [${data.stamp_num + 1} day(s)]`, seq.amount)
@@ -280,7 +276,7 @@ export default class extends ApiAction {
       else if (Type.isInt(_item.amount)) amount = _item.amount
       else throw new Error(`'Amount' field is missing`)
 
-      const itemInfo = Item.nameToType(_item.name)
+      const itemInfo = this.item.nameToType(_item.name)
       const specialFlag = Config.lbonus.calendar_generator.special_flag_types.includes(itemInfo.itemType) == true ? 1 : 0
       if (itemInfo.itemType === 1001) {
         cardLimit -= 1

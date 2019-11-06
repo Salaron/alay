@@ -1,6 +1,6 @@
-import { Connection } from "../core/database_wrappers/mysql"
-import { Unit } from "./unit"
+import { BaseAction } from "../models/actions"
 import { FESTIVAL_SETLIST } from "../models/constant"
+import { CommonModule } from "../models/common"
 
 interface userParams {
   vanish?: number,
@@ -10,10 +10,9 @@ interface userParams {
   festival_setList?: FESTIVAL_SETLIST
 }
 
-export class User {
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
+export class User extends CommonModule {
+  constructor(action: BaseAction) {
+    super(action)
   }
 
   public async getUserInfo(userId: number) {
@@ -81,14 +80,14 @@ export class User {
       user: userId
     })
     if (!data) throw new Error(`Center unit data is missing`)
-    return await new Unit(this.connection).getUnitDetail(data.unit_owning_user_id)
+    return await this.action.unit.getUnitDetail(data.unit_owning_user_id)
   }
   public async getNaviUnitInfo(userId: number) {
     const data = await this.connection.first(`SELECT partner_unit FROM users WHERE user_id = :user`, {
       user: userId
     })
     if (!data) throw new Error(`Navi unit data is missing`)
-    return await new Unit(this.connection).getUnitDetail(data.partner_unit)
+    return await this.action.unit.getUnitDetail(data.partner_unit)
   }
 
   public async getFriendStatus(currentUser: number, anotherUser: number) {

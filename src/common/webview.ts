@@ -1,23 +1,21 @@
+import { readFile, readFileSync } from "fs"
 import Handlebars from "handlebars"
 import moment from "moment"
 import { promisify } from "util"
-import { readFile, readFileSync } from "fs"
-import { Connection } from "../core/database_wrappers/mysql"
-import { I18n } from "./i18n"
 import RequestData from "../core/requestData"
+import { BaseAction } from "../models/actions"
+import { CommonModule } from "../models/common"
 
 interface WebViewTemplates {
   [templateName: string]: Handlebars.TemplateDelegate | undefined
 }
 const templates: WebViewTemplates = {}
 
-export class WebView {
-  public Handlebars = Handlebars
-  public connection: Connection
-
-  constructor(connection: Connection) {
-    this.connection = connection
+export class WebView extends CommonModule {
+  constructor(action: BaseAction) {
+    super(action)
   }
+  public Handlebars = Handlebars
 
   public static getTemplateSync(module: string, action: string): Handlebars.TemplateDelegate {
     let template = templates[`${module}-${action}`]
@@ -55,12 +53,11 @@ export class WebView {
    */
   public async getLanguageModalTemplate(input?: number | string): Promise<string> {
     const template = await WebView.getTemplate("common", "changelanguage")
-    const i18n = new I18n(this.connection)
 
     let languageCode = Config.i18n.defaultLanguage
     if (Type.isInt(input) || typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) {
       // token or user id
-      languageCode = await i18n.getUserLocalizationCode(input)
+      languageCode = await this.action.i18n.getUserLocalizationCode(input)
     } else if (typeof input === "string" && input.length > 0) languageCode = input
 
     return template({

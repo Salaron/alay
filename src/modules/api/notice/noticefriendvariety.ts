@@ -1,9 +1,7 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import moment from "moment"
-import { User } from "../../../common/user"
-import { Notice } from "../../../common/notice"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -23,7 +21,6 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    this.User = new User(this.connection)
     const list: any = []
     let count = 0
     let noticeList: any
@@ -89,7 +86,7 @@ export default class extends ApiAction {
       const affector = await this.getAffectorInfo(notice.affector_id)
 
       if (notice.message === null) {
-        notice.message = await new Notice(this.connection).getPreparedMessage(this.user_id, notice.type_id, {
+        notice.message = await this.notice.getPreparedMessage(this.user_id, notice.type_id, {
           affectorName: affector.user_data.name
         })
       }

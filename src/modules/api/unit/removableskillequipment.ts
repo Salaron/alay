@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import assert from "assert"
-import { User } from "../../../common/user"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
 
@@ -45,7 +44,7 @@ export default class extends ApiAction {
     })
 
     // Prepare SIS owning info
-    const _owningSkill = await new User(this.connection).getRemovableSkillInfo(this.user_id) // tslint:disable-line
+    const _owningSkill = await this.user.getRemovableSkillInfo(this.user_id) // tslint:disable-line
     const owningSkill = <any>{}
 
     for (const skill of _owningSkill.owning_info) {

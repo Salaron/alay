@@ -1,10 +1,9 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import RequestData from "../../../core/requestData"
-import { WebView } from "../../../common/webview"
-import { TYPE } from "../../../common/type"
-import { showdownConverter } from "../../../common/i18n"
 import assert from "assert"
 import moment from "moment"
+import { showdownConverter } from "../../../common/i18n"
+import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -23,10 +22,8 @@ export default class extends WebViewAction {
     assert(parseInt(this.params.id) === parseInt(this.params.id), "id should be int")
   }
   public async execute() {
-    const webview = new WebView(this.connection)
-
     const [template, announce] = await Promise.all([
-      webview.getTemplate("announce", "detail"),
+      this.webview.getTemplate("announce", "detail"),
       this.connection.first("SELECT * FROM webview_announce WHERE id = :id AND body IS NOT NULL", {
         id: this.params.id
       })
@@ -38,7 +35,7 @@ export default class extends WebViewAction {
 
     return {
       status: 200,
-      result: await webview.compileBodyTemplate(template, this.requestData, {
+      result: await this.webview.compileBodyTemplate(template, this.requestData, {
         announce,
         pageTitle: announce.title
       })

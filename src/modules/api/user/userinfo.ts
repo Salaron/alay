@@ -17,7 +17,7 @@ export default class extends ApiAction {
       user: this.user_id
     })
     const response: any = {
-      user: await new User(this.connection).getUserInfo(this.user_id),
+      user: await this.user.getUserInfo(this.user_id),
       server_timestamp: Utils.timeStamp()
     }
     if (birth.birth_month != null && birth.birth_day != null) response.birth = {

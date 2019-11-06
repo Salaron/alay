@@ -1,8 +1,7 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import RequestData from "../../../core/requestData"
 import moment from "moment"
-import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -13,17 +12,14 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const i18n = new I18n(this.connection)
-    const webview = new WebView(this.connection)
-
-    const code = await i18n.getUserLocalizationCode(this.user_id)
+    const code = await this.i18n.getUserLocalizationCode(this.user_id)
     let [strings, template, announceList] = await Promise.all([
-      i18n.getStrings(code, "common", "announce-index"),
+      this.i18n.getStrings(code, "common", "announce-index"),
       WebView.getTemplate("announce", "index"),
       this.connection.query(`SELECT * FROM webview_announce ORDER BY insert_date DESC LIMIT 5`),
     ])
 
-    announceList = announceList.map((announce) => {
+    announceList = announceList.map((announce: any) => {
       return {
         id: announce.id,
         title: announce.title,
@@ -40,7 +36,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: await webview.compileBodyTemplate(template, this.requestData, values)
+      result: await this.webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

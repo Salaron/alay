@@ -1,7 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Notice } from "../../../common/notice"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -33,13 +32,13 @@ export default class extends ApiAction {
         thisUser: this.user_id
       })
       isFriend = true
-      await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().ACCEPTED_FRIEND_REQUEST, this.params.user_id)
+      await this.notice.addNotice(this.user_id, this.notice.FILTER.FRIENDS, this.notice.TYPE.ACCEPTED_FRIEND_REQUEST, this.params.user_id)
     } else {
       await this.connection.query(`INSERT INTO user_friend (initiator_id, recipient_id, status) VALUES (:init, :rec, 0)`, {
         init: this.user_id,
         rec: this.params.user_id
       })
-      await new Notice(this.connection).addNotice(this.user_id, Notice.filter().FRIENDS, Notice.noticeType().SEND_FRIEND_REQUEST, this.params.user_id)
+      await this.notice.addNotice(this.user_id, this.notice.FILTER.FRIENDS, this.notice.TYPE.SEND_FRIEND_REQUEST, this.params.user_id)
     }
     return {
       status: 200,

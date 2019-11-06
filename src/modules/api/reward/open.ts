@@ -1,8 +1,7 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { User } from "../../../common/user"
-import { Item } from "../../../common/item"
 import { TYPE } from "../../../common/type"
+import { User } from "../../../common/user"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -20,27 +19,24 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const user = new User(this.connection)
-
-    const beforeUserInfo = await user.getUserInfo(this.user_id)
-    let result
     try {
-      result = await new Item(this.connection).openPresent(this.user_id, this.params.incentive_id)
+      const beforeUserInfo = await this.user.getUserInfo(this.user_id)
+      let result = await this.item.openPresent(this.user_id, this.params.incentive_id)
+
+      return {
+        status: 200,
+        result: {
+          opened_num: 1,
+          success: [result],
+          before_user_info: beforeUserInfo,
+          after_user_info: await this.user.getUserInfo(this.user_id),
+          class_system: User.getClassSystemStatus(this.user_id),
+          unit_support_list: await this.user.getSupportUnits(this.user_id)
+        }
+      }
     } catch (err) {
       if (err.message == "Present is already collected") throw new ErrorCode(1201) // ERROR_CODE_INCENTIVE_NONE
       else throw err
-    }
-
-    return {
-      status: 200,
-      result: {
-        opened_num: 1,
-        success: [result],
-        before_user_info: beforeUserInfo,
-        after_user_info: await user.getUserInfo(this.user_id),
-        class_system: User.getClassSystemStatus(this.user_id),
-        unit_support_list: await user.getSupportUnits(this.user_id)
-      }
     }
   }
 }

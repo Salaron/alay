@@ -1,11 +1,9 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import assert from "assert"
-import { User } from "../../../common/user"
-import { Live } from "../../../common/live"
-import { Item } from "../../../common/item"
 import { EventStub } from "../../../common/eventstub"
 import { TYPE } from "../../../common/type"
+import { User } from "../../../common/user"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -38,10 +36,6 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const user = new User(this.connection)
-    const live = new Live(this.connection)
-    const item = new Item(this.connection)
-    const event = new EventStub(this.connection)
     const totalScore = this.params.score_smile + this.params.score_cute + this.params.score_cool
     let eventLive = false
 
@@ -51,20 +45,20 @@ export default class extends ApiAction {
     if (session.live_difficulty_id != this.params.live_difficulty_id) throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
 
     const [beforeUserInfo, currentEvent, liveData] = await Promise.all([
-      user.getUserInfo(this.user_id),
-      event.getEventStatus(EventStub.getEventTypes().TOKEN),
-      live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+      this.user.getUserInfo(this.user_id),
+      this.eventStub.getEventStatus(EventStub.getEventTypes().TOKEN),
+      this.live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     ])
 
     if (liveData.capital_type === 2) { // token live
       if (!currentEvent.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
-      if (currentEvent.active && Live.getMarathonLiveList(currentEvent.id).includes(this.params.live_difficulty_id)) eventLive = true
+      if (currentEvent.active && this.live.getMarathonLiveList(currentEvent.id).includes(this.params.live_difficulty_id)) eventLive = true
     }
 
-    const maxKizuna = Live.calculateMaxKizuna(liveData.s_rank_combo)
+    const maxKizuna = this.live.calculateMaxKizuna(liveData.s_rank_combo)
     if (this.params.love_cnt > maxKizuna) throw new ErrorUser(`Too more kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`, this.user_id)
-    let deck = (await live.getUserDeck(this.user_id, session.deck_id, false, undefined, true)).deck
-    deck = await live.applyKizunaBonusToDeck(this.user_id, deck!, this.params.love_cnt)
+    let deck = (await this.live.getUserDeck(this.user_id, session.deck_id, false, undefined, true)).deck
+    deck = await this.live.applyKizunaBonusToDeck(this.user_id, deck!, this.params.love_cnt)
 
     await this.connection.execute(`INSERT INTO user_live_status VALUES (:user, :diff, :setting, 2, :score,:combo, clear_cnt + 1)
     ON DUPLICATE KEY UPDATE clear_cnt=clear_cnt + 1`, {
@@ -88,21 +82,21 @@ export default class extends ApiAction {
       ldid: this.params.live_difficulty_id
     })
 
-    const scoreRank = Live.getRank(liveData.score_rank_info, totalScore)
-    const comboRank = Live.getRank(liveData.combo_rank_info, this.params.max_combo)
-    const completeRank = Live.getRank(liveData.complete_rank_info, liveStatus.clear_cnt)
-    const goalAccomp = await live.liveGoalAccomp(this.user_id, this.params.live_difficulty_id, scoreRank, comboRank, completeRank)
+    const scoreRank = this.live.getRank(liveData.score_rank_info, totalScore)
+    const comboRank = this.live.getRank(liveData.combo_rank_info, this.params.max_combo)
+    const completeRank = this.live.getRank(liveData.complete_rank_info, liveStatus.clear_cnt)
+    const goalAccomp = await this.live.liveGoalAccomp(this.user_id, this.params.live_difficulty_id, scoreRank, comboRank, completeRank)
 
-    let exp = Live.getExpAmount(liveData.difficulty)
+    let exp = this.live.getExpAmount(liveData.difficulty)
     if (scoreRank === 5) exp = Math.floor(exp / 2)
     const [nextLevelInfo, defaultRewards] = await Promise.all([
-      user.addExp(this.user_id, exp),
-      live.getDefaultRewards(this.user_id, scoreRank, comboRank),
-      item.addPresent(this.user_id, {
+      this.user.addExp(this.user_id, exp),
+      this.live.getDefaultRewards(this.user_id, scoreRank, comboRank),
+      this.item.addPresent(this.user_id, {
         name: "coins",
       }, "Live Show! Reward", 100000, true)
     ])
-    let afterUserInfo = await user.getUserInfo(this.user_id)
+    let afterUserInfo = await this.user.getUserInfo(this.user_id)
 
     const response = {
       live_info: [
@@ -150,12 +144,12 @@ export default class extends ApiAction {
       event_info: <any>[],
       daily_reward_info: defaultRewards.daily_reward_info,
       can_send_friend_request: false,
-      unit_support_list: await user.getSupportUnits(this.user_id),
+      unit_support_list: await this.user.getSupportUnits(this.user_id),
       unite_info: [],
       class_system: User.getClassSystemStatus(this.user_id)
     }
 
-    await live.writeToLog(this.user_id, {
+    await this.live.writeToLog(this.user_id, {
       live_setting_id: liveData.live_setting_id,
       is_event: false,
       score: totalScore,
@@ -170,9 +164,9 @@ export default class extends ApiAction {
         event: currentEvent.id
       })
       if (eventLive) {
-        this.params.event_point = EventStub.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
+        this.params.event_point = this.eventStub.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
         if (!userStatus.score || userStatus.score < totalScore) {
-          await event.writeHiScore(this.user_id, currentEvent.id, deck, [
+          await this.eventStub.writeHiScore(this.user_id, currentEvent.id, deck, [
             {
               live_difficulty_id: liveData.live_difficulty_id,
               is_random: !!liveData.random_flag,
@@ -190,7 +184,7 @@ export default class extends ApiAction {
           })
         }
       }
-      response.event_info = await event.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, this.params.event_point)
+      response.event_info = await this.eventStub.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, this.params.event_point)
       response.event_info.event_point_info.before_event_point = userStatus.token_point
       response.event_info.event_point_info.after_event_point = userStatus.token_point
       if (!eventLive) {

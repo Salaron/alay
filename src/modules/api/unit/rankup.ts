@@ -1,9 +1,7 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import assert from "assert"
-import { Unit } from "../../../common/unit"
-import { User } from "../../../common/user"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
 
@@ -31,13 +29,10 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const unit = new Unit(this.connection)
-    const user = new User(this.connection)
-
-    const sacrificeUnit = await unit.getNotLockedUnits(this.user_id, [this.params.unit_owning_user_ids[0]])
+    const sacrificeUnit = await this.unit.getNotLockedUnits(this.user_id, [this.params.unit_owning_user_ids[0]])
     if (sacrificeUnit.length === 0) throw new ErrorCode(1311)
 
-    const baseUnit = await unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
+    const baseUnit = await this.unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
     if (sacrificeUnit[0].unit_id != baseUnit.unit_id) throw new Error("Not Same Unit")
     if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorCode(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
 
@@ -47,7 +42,7 @@ export default class extends ApiAction {
     assert(baseUnitData, `Failed to find unit data [${baseUnit.unit_id}]`)
     assert(baseUnitData.disable_rank_up === 0, "This unit can't be ranked up")
 
-    const beforeUserInfo = await user.getUserInfo(this.user_id)
+    const beforeUserInfo = await this.user.getUserInfo(this.user_id)
     if (beforeUserInfo.game_coin < baseUnitData.rank_up_cost) throw new ErrorCode(1104, "ERROR_CODE_NOT_ENOUGH_GAME_COIN")
 
     let gainSlots = 1
@@ -77,15 +72,15 @@ export default class extends ApiAction {
         cost: baseUnitData.rank_up_cost,
         user: this.user_id
       }),
-      unit.updateAlbum(this.user_id, baseUnit.unit_id, {
+      this.unit.updateAlbum(this.user_id, baseUnit.unit_id, {
         maxRank: true
       })
     ])
 
     const [afterUserInfo, afterUnitInfo, removableSkillInfo] = await Promise.all([
-      user.getUserInfo(this.user_id),
-      unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id),
-      user.getRemovableSkillInfo(this.user_id, true)
+      this.user.getUserInfo(this.user_id),
+      this.unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id),
+      this.user.getRemovableSkillInfo(this.user_id, true)
     ])
 
     return {

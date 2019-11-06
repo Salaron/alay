@@ -1,9 +1,7 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { User } from "../../../common/user"
-import { Item } from "../../../common/item"
-import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -23,9 +21,6 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const user = new User(this.connection)
-    const item = new Item(this.connection)
-
     const exchangeItem = await this.connection.first(`
     SELECT
       *
@@ -44,18 +39,18 @@ export default class extends ApiAction {
       user: this.user_id,
       rarity: this.params.rarity
     })
-    const beforeUserInfo = await user.getUserInfo(this.user_id)
+    const beforeUserInfo = await this.user.getUserInfo(this.user_id)
     if (!gotCount) gotCount = { got_item_count: 0 }
     if (exchangeItem.max_count && gotCount.got_item_count >= exchangeItem.max_count) throw new ErrorCode(4201, "ERROR_CODE_OVER_ADD_EXCHANGE_ITEM_COUNT_MAX_LIMIT")
     if (exchangeItem.end_date && Utils.toSpecificTimezone(9) > exchangeItem.end_date) throw new ErrorCode(4203, "ERROR_CODE_EXCHANGE_ITEM_OUT_OF_DATE")
     if (exchangeItem.cost_value * this.params.amount * exchangeItem.amount > ep.count) throw new ErrorCode(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
 
-    const itemInfo = Item.nameToType(exchangeItem.item_name, exchangeItem.item_id)
+    const itemInfo = this.item.nameToType(exchangeItem.item_name, exchangeItem.item_id)
     const reward = []
 
     if (itemInfo.itemType === 1001) {
       for (let i = 0; i < this.params.amount * exchangeItem.amount; i++) {
-        await item.addPresent(this.user_id, {
+        await this.item.addPresent(this.user_id, {
           name: exchangeItem.item_name,
           id: exchangeItem.item_id
         }, "Exchange Reward", 1)
@@ -68,7 +63,7 @@ export default class extends ApiAction {
         })
       }
     } else {
-      await new Item(this.connection).addPresent(this.user_id, {
+      await this.item.addPresent(this.user_id, {
         name: exchangeItem.item_name,
         id: exchangeItem.item_id
       }, "Exchange Reward", this.params.amount * exchangeItem.amount)
@@ -97,7 +92,7 @@ export default class extends ApiAction {
       result: {
         exchange_reward: reward,
         before_user_info: beforeUserInfo,
-        after_user_info: await user.getUserInfo(this.user_id),
+        after_user_info: await this.user.getUserInfo(this.user_id),
         exchange_point_list: await this.connection.query("SELECT rarity, exchange_point FROM user_exchange_point WHERE user_id = :user", {
           user: this.user_id
         })

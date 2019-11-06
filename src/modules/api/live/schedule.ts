@@ -1,8 +1,6 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Live } from "../../../common/live"
 import { Utils } from "../../../common/utils"
-import { EventStub } from "../../../common/eventstub"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const marathonDB = sqlite3.getMarathon()
 
@@ -26,7 +24,7 @@ export default class extends ApiAction {
     }
 
     if (Config.modules.live.unlockAll) {
-      const specialLiveList = Live.getSpecialLiveList()
+      const specialLiveList = this.live.specialLiveList
       for (const live of specialLiveList) {
         response.live_list.push({
           live_difficulty_id: live,
@@ -37,11 +35,11 @@ export default class extends ApiAction {
       }
     }
 
-    const events = await this.connection.query("SELECT * FROM events_list WHERE open_date <= :now AND close_date > :now", {
+    const eventList = await this.connection.query("SELECT * FROM events_list WHERE open_date <= :now AND close_date > :now", {
       now: Utils.toSpecificTimezone(9)
     })
 
-    for (const event of events) {
+    for (const event of eventList) {
       response.event_list.push({
         event_id: event.event_id,
         event_category_id: event.event_category_id,
@@ -58,7 +56,7 @@ export default class extends ApiAction {
       })
     }
 
-    const marathonEvent = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().TOKEN)
+    const marathonEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.TOKEN)
     if (marathonEvent.active) {
       const marathonLives = (await marathonDB.all("SELECT live_difficulty_id FROM event_marathon_live_schedule_m WHERE event_id = :id", {
         id: marathonEvent.id

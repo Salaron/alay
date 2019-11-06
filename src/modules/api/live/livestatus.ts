@@ -1,7 +1,6 @@
+import { eventStatus } from "../../../common/eventstub"
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { eventStatus, EventStub } from "../../../common/eventstub"
-import { Live } from "../../../common/live"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const normalLiveUnlock = [
   1, 2, 3, 350,
@@ -52,13 +51,13 @@ export default class extends ApiAction {
     }
     this.liveStatusList = liveStatusList
     this.liveGoalList = liveGoalList
-    this.marathonEvent = await new EventStub(this.connection).getEventStatus(EventStub.getEventTypes().TOKEN)
+    this.marathonEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.TOKEN)
 
     return {
       status: 200,
       result: {
-        normal_live_status_list: await this.getLiveStatusList(Live.getNormalLiveList(), liveType.NORMAL),
-        special_live_status_list: await this.getLiveStatusList(Live.getSpecialLiveList(), liveType.SPECIAL),
+        normal_live_status_list: await this.getLiveStatusList(this.live.normalLiveList, liveType.NORMAL),
+        special_live_status_list: await this.getLiveStatusList(this.live.specialLiveList, liveType.SPECIAL),
         marathon_live_status_list: await this.getLiveStatusList([], liveType.MARATHON),
         training_live_status_list: [], // possible will be not implemented on this server
         free_live_status_list: [], // quest event lives?

@@ -19,7 +19,7 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    const strings = await new I18n(this.connection).getStrings(this.user_id, "login-startup", "settings-index", "mailer")
+    const strings = await this.i18n.getStrings(this.user_id, "login-startup", "settings-index", "mailer")
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     const newPassword = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.newPassword), "base64").toString(), this.requestData.auth_token).toString()

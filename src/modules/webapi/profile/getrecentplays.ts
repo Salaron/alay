@@ -1,9 +1,8 @@
-import RequestData from "../../../core/requestData"
 import moment from "moment"
-import { AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
-import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL } from "../../../models/constant"
 
 const liveDB = sqlite3.getLive()
 const convertRank = <any>{
@@ -39,11 +38,9 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    const i18n = new I18n(this.connection)
-
     const code = this.params.lang
     const [strings, template, liveDataLog, total] = await Promise.all([
-      i18n.getStrings(code, "profile-index"),
+      this.i18n.getStrings(code, "profile-index"),
       WebView.getTemplate("profile", "recentplays"),
       this.connection.query(`SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC LIMIT ${this.params.offset}, ${this.params.limit}`, {
         user: this.params.userId
@@ -51,7 +48,7 @@ export default class extends WebApiAction {
       this.connection.first("SELECT COUNT(*) as count FROM user_live_log WHERE user_id = :user", { user: this.params.userId })
     ])
 
-    const recentPlays = await Promise.all(liveDataLog.map(async (live) => {
+    const recentPlays = await Promise.all(liveDataLog.map(async (live: any) => {
       if (!live.live_setting_id && !live.live_setting_ids) throw new Error("live setting id is missing")
 
       // mf support

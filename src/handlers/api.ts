@@ -118,7 +118,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
       }
     }
   } catch (err) {
-    await requestData.connection.rollback()
+    if (requestData.connection.released === false) await requestData.connection.rollback()
     throw err
   }
 }

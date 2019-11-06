@@ -1,7 +1,5 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
-import { I18n } from "../../../common/i18n"
-import { WebView } from "../../../common/webview"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends WebViewAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -14,12 +12,10 @@ export default class extends WebViewAction {
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
       throw new ErrorCode(1234, "Access only with a certain auth level")
-    const i18n = new I18n(this.connection)
-    const webview = new WebView(this.connection)
 
     const [strings, template] = await Promise.all([
-      i18n.getStrings(<string>this.requestData.auth_token, "login-hello"),
-      webview.getTemplate("login", "hello")
+      this.i18n.getStrings(<string>this.requestData.auth_token, "login-hello"),
+      this.webview.getTemplate("login", "hello")
     ])
 
     const values = {
@@ -29,7 +25,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: await webview.compileBodyTemplate(template, this.requestData, values)
+      result: await this.webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

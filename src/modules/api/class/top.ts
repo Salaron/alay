@@ -1,7 +1,7 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Live } from "../../../common/live"
 import { Utils } from "../../../common/utils"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const liveDB = sqlite3.getLive()
 
@@ -34,10 +34,8 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const live = new Live(this.connection)
-
     // let status = User.getClassSystemStatus(this.user_id)
-    let deck = await live.getUserDeck(this.user_id, (await this.connection.first("SELECT main_deck FROM users WHERE user_id = :user", {
+    let deck = await this.live.getUserDeck(this.user_id, (await this.connection.first("SELECT main_deck FROM users WHERE user_id = :user", {
       user: this.user_id
     })).main_deck, true, undefined, true)
 

@@ -1,8 +1,6 @@
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import RequestData from "../../../core/requestData"
-import { I18n } from "../../../common/i18n"
 import { WebView } from "../../../common/webview"
-import { User } from "../../../common/user"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
 export const supportedMods = ["event", "hp", "mirror", "vanish"]
 export const supportedModsValues = <any>{
@@ -21,13 +19,10 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const i18n = new I18n(this.connection)
-    const webview = new WebView(this.connection)
-
     const [strings, template, mods, userData] = await Promise.all([
-      i18n.getStrings(this.user_id, "common", "login-login", "login-startup", "settings-index"),
+      this.i18n.getStrings(this.user_id, "common", "login-login", "login-startup", "settings-index"),
       WebView.getTemplate("settings", "index"),
-      new User(this.connection).getParams(this.user_id, supportedMods),
+      this.user.getParams(this.user_id, supportedMods),
       this.connection.first("SELECT mail FROM users WHERE user_id = :user", { user: this.user_id })
     ])
 
@@ -39,7 +34,7 @@ export default class extends WebViewAction {
 
     return {
       status: 200,
-      result: await webview.compileBodyTemplate(template, this.requestData, values)
+      result: await this.webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

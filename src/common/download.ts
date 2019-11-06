@@ -1,9 +1,9 @@
-import { readdir, readFile, writeFile, stat, exists } from "fs"
-import { promisify } from "util"
-import { Utils } from "./utils"
-import { Log } from "../core/log"
-import llclient from "../core/llclient"
+import { exists, readdir, readFile, stat, writeFile } from "fs"
 import moment from "moment"
+import { promisify } from "util"
+import llclient from "../core/llclient"
+import { Log } from "../core/log"
+import { Utils } from "./utils"
 
 const log = new Log("Download")
 

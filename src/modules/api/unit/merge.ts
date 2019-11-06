@@ -1,10 +1,8 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import assert from "assert"
-import { User } from "../../../common/user"
-import { Unit } from "../../../common/unit"
-import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 const unitDB = sqlite3.getUnit()
 
@@ -35,12 +33,10 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const user = new User(this.connection)
-    const unit = new Unit(this.connection)
-    const supportUnitData = Unit.getSupportUnitData()
-    const noExchangePointList = Unit.getNoExchangePointList()
+    const supportUnitData = this.unit.getSupportUnitData()
+    const noExchangePointList = this.unit.getNoExchangePointList()
 
-    const _owningSupportUnit = await user.getSupportUnits(this.user_id) // tslint:disable-line
+    const _owningSupportUnit = await this.user.getSupportUnits(this.user_id) // tslint:disable-line
     const owningSupportUnit = <{ [id: number]: number }>{}
     for (const support of _owningSupportUnit) owningSupportUnit[support.unit_id] = support.amount
 
@@ -53,7 +49,7 @@ export default class extends ApiAction {
       assert(typeof support === "object", "support is not an object")
       assert(Type.isInt(support.amount) && support.amount > 0, "amount should be int")
       assert(Type.isInt(support.unit_id), "unit_id should be int")
-      assert(Unit.getSupportUnitList().includes(support.unit_id), "This is not support unit")
+      assert(this.unit.getSupportUnitList().includes(support.unit_id), "This is not support unit")
       assert(owningSupportUnit[support.unit_id] && owningSupportUnit[support.unit_id] >= support.amount, "Not enought supports")
 
       cardsCount += support.amount
@@ -75,8 +71,8 @@ export default class extends ApiAction {
     if (!baseUnitDataDef) throw new Error(`Failed to find info (unit_id ${baseUnitData.unit_id})`)
     baseUnitData.default_unit_skill_id = baseUnitDataDef.default_unit_skill_id
     baseUnitData.unit_level_up_pattern_id = baseUnitDataDef.unit_level_up_pattern_id
-    const beforeUserInfo = await user.getUserInfo(this.user_id)
-    const beforeUnitInfo = await unit.getUnitDetail(baseUnitData.unit_owning_user_id)
+    const beforeUserInfo = await this.user.getUserInfo(this.user_id)
+    const beforeUnitInfo = await this.unit.getUnitDetail(baseUnitData.unit_owning_user_id)
 
     let expMultiplier = 1
     let gainExp = 0
@@ -111,7 +107,7 @@ export default class extends ApiAction {
     }
 
     if (this.params.unit_owning_user_ids.length > 0) {
-      const unitData = await unit.getNotLockedUnits(this.user_id, this.params.unit_owning_user_ids)
+      const unitData = await this.unit.getNotLockedUnits(this.user_id, this.params.unit_owning_user_ids)
 
       if (unitData.length != this.params.unit_owning_user_ids.length) throw new ErrorCode(1311)
 
@@ -223,7 +219,7 @@ export default class extends ApiAction {
         user: this.user_id,
         cost: coinCost
       }),
-      unit.updateAlbum(this.user_id, baseUnitData.unit_id, {
+      this.unit.updateAlbum(this.user_id, baseUnitData.unit_id, {
         maxRank: isMaxRank,
         maxLove: (baseUnitData.love == baseUnitData.max_love && isMaxRank),
         maxLevel: (newData.level == baseUnitData.max_level && isMaxRank)
@@ -246,9 +242,9 @@ export default class extends ApiAction {
     }
 
     const [afterUserInfo, afterUnitInfo, removableSkillInfo] = await Promise.all([
-      user.getUserInfo(this.user_id),
-      unit.getUnitDetail(baseUnitData.unit_owning_user_id),
-      user.getRemovableSkillInfo(this.user_id, true)
+      this.user.getUserInfo(this.user_id),
+      this.unit.getUnitDetail(baseUnitData.unit_owning_user_id),
+      this.user.getRemovableSkillInfo(this.user_id, true)
     ])
     return {
       status: 200,

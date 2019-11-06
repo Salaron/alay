@@ -1,6 +1,6 @@
+import { BaseAction } from "../models/actions"
 import { Utils } from "./utils"
-import { Connection } from "../core/database_wrappers/mysql"
-import { I18n } from "./i18n"
+import { CommonModule } from "../models/common"
 
 enum noticeType {
   REMOVED_FROM_FRIENDS = 1,
@@ -19,16 +19,16 @@ enum filter {
   UNKNOWN = 99
 }
 
-export class Notice {
-  private connection: Connection
-  constructor(connection: Connection) {
-    this.connection = connection
+export class Notice extends CommonModule {
+  public FILTER = filter
+  public TYPE = noticeType
+  constructor(action: BaseAction) {
+    super(action)
   }
 
   public async getNoticeStrings(userId: number) {
     // based on current user language
-    const i18n = new I18n(this.connection)
-    return i18n.getStrings(userId, "notice")
+    return this.action.i18n.getStrings(userId, "notice")
   }
 
   public async getPreparedMessage(userId: number, noticeTypeId: noticeType | number, values: any) {
@@ -45,12 +45,5 @@ export class Notice {
       msg: typeof message === "string" ? message : null,
       type: typeof message === "number" ? message : null
     })
-  }
-
-  public static noticeType() {
-    return noticeType
-  }
-  public static filter() {
-    return filter
   }
 }
