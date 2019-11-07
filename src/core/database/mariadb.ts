@@ -68,15 +68,24 @@ export class Connection {
   }
 
   /**
-   * Commit changes and release connection.
+   * Commit changes.
+   *
+   * @param release release connection after commit (default is false)
    */
-  public async commit() {
+  public async commit(release = false) {
     await this.connection.commit()
-    this.connection.release()
-    this.released = true
+    if (release) {
+      this.connection.release()
+      this.released = true
+    }
   }
 
-  public async rollback(release = true) {
+  /**
+   * Rollback changes.
+   *
+   * @param release release connection after commit (default is false)
+   */
+  public async rollback(release = false) {
     await this.connection.rollback()
     if (release) {
       this.connection.release()

@@ -1,21 +1,27 @@
 import { IncomingMessage, ServerResponse } from "http"
+import * as path from "path"
+import { Utils } from "../common/utils"
 import { Log } from "../core/log"
 
 // Various handlers
 import mainHandler from "./api"
-import webviewHandler from "./webview"
-import webapiHandler from "./webapi"
 import resourcesHandler from "./resources"
 import { writeJsonResponse } from "./response"
-import { Utils } from "../common/utils"
+import webapiHandler from "./webapi"
+import webviewHandler from "./webview"
 
 const log = new Log("Request Handler")
 
 export default async function requestHandler(request: IncomingMessage, response: ServerResponse): Promise<void> {
   try {
     response.setHeader("X-Powered-By", "SunLight Project v3 (Alay)")
-    request.url = request.url!.split("../").join("")
-    if (request.url!.includes("favicon.ico")) return response.end() // ignore favicon.ico
+    request.url = path.posix.normalize(request.url || "")
+
+    // ignore favicon.ico for now
+    if (request.url!.includes("favicon.ico")) {
+      response.statusCode = 404
+      return response.end()
+    }
     log.verbose(request.method + " " + request.url)
     const urlSplit = request.url!.toLowerCase().split("/")
     if (urlSplit.length < 2) return response.end()
@@ -78,6 +84,7 @@ export default async function requestHandler(request: IncomingMessage, response:
         ) throw new Error("nope")
         return await webapiHandler(request, response)
       }
+
       // If you'll use reverse-proxy, then don't forget to add path maintenace/* to exceptions
       case "resources": {
         if (request.url!.includes("maintenace/update.php")) {

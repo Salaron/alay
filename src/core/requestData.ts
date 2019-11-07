@@ -71,8 +71,8 @@ export default class RequestData {
       }
       if (this.user_id != null && this.auth_token != null) {
         response.setHeader("Set-Cookie", [
-          `user_id=${this.user_id}; expires=${new Date(new Date().getTime() + Config.modules.user.userSessionExpire * 1000).toUTCString()}; path=/;`,
-          `token=${this.auth_token}; expires=${new Date(new Date().getTime() + Config.modules.user.userSessionExpire * 1000).toUTCString()}; path=/;`
+          `user_id=${this.user_id}; expires=${new Date(new Date().getTime() + Config.modules.user.userSessionExpire * 1000).toUTCString()}; path=/; SameSite=Strict;`,
+          `token=${this.auth_token}; expires=${new Date(new Date().getTime() + Config.modules.user.userSessionExpire * 1000).toUTCString()}; path=/; SameSite=Strict;`
         ])
       }
       if (!this.headers["x-requested-with"]) this.requestFromBrowser = true

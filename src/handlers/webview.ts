@@ -10,21 +10,22 @@ import { HANDLER_TYPE, AUTH_LEVEL } from "../models/constant"
 export default async function webviewHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBVIEW)
   try {
-    // get auth level
     await requestData.getAuthLevel()
+
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
       requestData.resetCookieAuth()
       // TODO: redirect to login page or access allow to page if required auth level is none
       return await writeJsonResponse(response, {
         httpStatusCode: 403,
-        connection: requestData.connection,
         responseData: "An error occurred while processing the request. Please close the current tab and try again",
         direct: true
       })
     }
-    if (requestData.auth_level === AUTH_LEVEL.BANNED &&
+    if (
+      requestData.auth_level === AUTH_LEVEL.BANNED &&
       !request.url!.includes("webview.php/static/index?id=") &&
-      !request.url!.includes("webview.php/tos/read")) {
+      !request.url!.includes("webview.php/tos/read")
+    ) {
       await requestData.connection.rollback()
       response.statusCode = 302
       response.setHeader("Location", "../../webview.php/static/index?id=13") // user banned page
@@ -38,6 +39,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
     const action = urlSplit[3].replace(/[^a-z]/g, "")
 
     const result: IApiResult = await executeAction(module, action, requestData)
+
     response.setHeader("Content-Type", "text/html; charset=utf-8")
     if (result.headers && Object.keys(result.headers).length > 0) {
       for (const key of Object.keys(result.headers)) {
@@ -53,12 +55,8 @@ export default async function webviewHandler(request: IncomingMessage, response:
     await requestData.connection.commit()
   } catch (err) {
     await requestData.connection.rollback()
-    if (err.message.startsWith("No permissions")) return await writeJsonResponse(response, {
-      httpStatusCode: 403,
-      connection: requestData.connection,
-      responseData: "An error occurred while processing the request. Please close the current tab and try again",
-      direct: true
-    })
     throw err
+  } finally {
+    requestData.connection.connection.release()
   }
 }

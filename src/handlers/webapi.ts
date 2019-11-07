@@ -7,25 +7,24 @@ import { HANDLER_TYPE, AUTH_LEVEL } from "../models/constant"
 export default async function webapiHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBAPI)
   try {
-    // get auth level
     await requestData.getAuthLevel()
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
-      return await writeJsonResponse(response, {
+      await writeJsonResponse(response, {
         httpStatusCode: 600,
-        connection: requestData.connection,
         responseData: {
           message: "An error occurred while processing the request. Please close the current tab and try again"
         }
       })
+      return await requestData.connection.commit()
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {
-      return await writeJsonResponse(response, {
+      await writeJsonResponse(response, {
         httpStatusCode: 600,
-        connection: requestData.connection,
         responseData: {
           message: "You have been banned on this server"
         }
       })
+      return await requestData.connection.commit()
     }
 
     // "extract" module & action
@@ -40,15 +39,15 @@ export default async function webapiHandler(request: IncomingMessage, response: 
         response.setHeader(key, result.headers[key])
       }
     }
-    return writeJsonResponse(response, {
+    await writeJsonResponse(response, {
       httpStatusCode: result.status,
       responseData: result.result,
       authToken: requestData.auth_token,
       userId: requestData.user_id,
       encoding: <string>request.headers["accept-encoding"],
-      nonce: requestData.auth_header.nonce,
-      connection: requestData.connection
+      nonce: requestData.auth_header.nonce
     })
+    await requestData.connection.commit()
   } catch (err) {
     await requestData.connection.rollback()
     if (err instanceof ErrorWebApi && err.sendToClient === true) {
@@ -60,5 +59,7 @@ export default async function webapiHandler(request: IncomingMessage, response: 
       return
     }
     throw err
+  } finally {
+    requestData.connection.connection.release()
   }
 }

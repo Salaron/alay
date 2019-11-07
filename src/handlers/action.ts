@@ -51,26 +51,31 @@ export default async function executeAction(module: string, action: string, requ
     }
 
     if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUser(`No permissions`, requestData.user_id)
-    if (body.paramTypes) checkParamTypes(requestData.params, body.paramTypes())
-    if (body.paramCheck) body.paramCheck()
+    try {
+      if (body.paramTypes) checkParamTypes(requestData.params, body.paramTypes())
+    } catch (err) {
+      throw new Error(`${module}/${action}: ${err.message}`)
+    }
+    if (body.paramCheck && body.paramCheck() === false) throw new Error(`${module}/${action}: params is not valid`)
+
     let hrTime = process.hrtime()
-    let result = await body.execute()
+    let response = await body.execute()
     hrTime = process.hrtime(hrTime)
-    log.debug(`[${module}/${action}] ${Math.floor(hrTime[0] * 1000 + hrTime[1] / 1000000)} ms`, `Perfomance`)
+    log.debug(`[${module}/${action}] ${Math.floor(hrTime[0] * 1000 + hrTime[1] / 1000000)} ms`)
 
     if (requestData.handlerType === HANDLER_TYPE.API) {
-      if (!Array.isArray(result.result) && result.status === 200) {
-        result.result.server_timestamp = Utils.timeStamp()
+      if (!Array.isArray(response.result) && response.status === 200) {
+        response.result.server_timestamp = Utils.timeStamp()
         if (requestData.auth_level >= AUTH_LEVEL.CONFIRMED_USER) {
           try {
-            result.result.present_cnt = (await requestData.connection.first("SELECT count(incentive_id) as count FROM reward_table WHERE user_id = :user AND opened_date IS NULL", {
+            response.result.present_cnt = (await requestData.connection.first("SELECT count(incentive_id) as count FROM reward_table WHERE user_id = :user AND opened_date IS NULL", {
               user: requestData.user_id
             })).count
           } catch { } // tslint:disable-line
         }
       }
     }
-    return result
+    return response
   } catch (err) {
     // handle module errors
     if (err instanceof ErrorCode) return err.response
