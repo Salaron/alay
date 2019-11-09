@@ -14,8 +14,16 @@ const secretboxDB = sqlite3.getSecretbox()
 let secretboxSettings: ISecretboxSettings = {}
 async function updateSettings() {
   const connection = await Connection.beginTransaction()
-  let costs = await connection.query(`SELECT * FROM secretbox_list JOIN secretbox_button ON secretbox_list.secretbox_id = secretbox_button.secretbox_id JOIN secretbox_cost ON secretbox_button.button_id = secretbox_cost.button_id`)
-  await connection.commit()
+  let costs
+  try {
+    costs = await connection.query(`SELECT * FROM secretbox_list JOIN secretbox_button ON secretbox_list.secretbox_id = secretbox_button.secretbox_id JOIN secretbox_cost ON secretbox_button.button_id = secretbox_cost.button_id`)
+    await connection.commit()
+  } catch (err) {
+    await connection.rollback()
+  } finally {
+    connection.release()
+  }
+  if (!costs) return
 
   let processedFiles = <{ [file: string]: IRarityData[] }>{}
   await Promise.all(costs.map(async cost => {

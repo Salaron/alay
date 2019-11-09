@@ -1,41 +1,23 @@
-<body>
-  <div id="outer">
-    <div id="inner">
-      <div id="header">
-        <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
-          <div class="uk-navbar-center">
-            <ul class="uk-navbar-nav">
-              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">Login Restricted</a></li>
-            </ul>
-          </div>
-        </nav>
-      </div>
+<div id="outer">
+  <div id="inner">
+    <div id="header">
+      <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
+        <div class="uk-navbar-center">
+          <ul class="uk-navbar-nav">
+            <li class="uk-active"><a class="uk-text-bold uk-text-uppercase no-hover">Login Restricted</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
 
-      <div id="body">
-        <p class="uk-text-secondary">По решению администратора сервера Ваш аккаунт был заблокирован за нарушение <a
-            href="../../webview.php/tos/read">правил сервера</a>.</p>
-        <p class="uk-margin-remove-bottom">Сообщение, оставленное администратором: {{message}}</p>
-        {{#if expiration_date}}
-        <span class="uk-text-primary">Данная блокировка является временной и доступ будет возобновлён через
-          {{expiration_date_human}} ({{expiration_date}})</span>
-        {{/if}}
-      </div>
+    <div id="body">
+      <p class="uk-text-secondary">По решению администратора сервера Ваш аккаунт был заблокирован за нарушение <a
+          href="../../webview.php/tos/read">правил сервера</a>.</p>
+      <p class="uk-margin-remove-bottom">Сообщение, оставленное администратором: {{message}}</p>
+      {{#if expiration_date}}
+      <span class="uk-text-primary">Данная блокировка является временной и доступ будет возобновлён через
+        {{expiration_date_human}} ({{expiration_date}})</span>
+      {{/if}}
     </div>
   </div>
-
-  <script type="text/javascript">
-    var userId = "{{{ userId }}}"
-    var authToken = "{{{ authToken }}}"
-    var external = {{{ external }}}
-    var headers = {{{ headers }}}
-    var publicKey = {{{ publicKey }}}
-  </script>
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
-  <script type="text/javascript">
-    var scrollbar = Scrollbar.init($("#body")[0])
-  </script>
-</body>
+</div>

@@ -1,52 +1,34 @@
-<body>
-  <div id="outer">
-    <div id="inner">
-      <div id="header">
-        <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
-          <div class="uk-navbar-center">
-            <ul class="uk-navbar-nav">
-              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">Update Required</a></li>
-            </ul>
-          </div>
-        </nav>
-      </div>
+<div id="outer">
+  <div id="inner">
+    <div id="header">
+      <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
+        <div class="uk-navbar-center">
+          <ul class="uk-navbar-nav">
+            <li class="uk-active"><a class="uk-text-bold uk-text-uppercase no-hover">Update Required</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
 
-      <div id="body">
-        <p>
-          Пожалуйста, обновите клиент до последней версии.
-          <br>
-          Крайняя версия: {{latestVersion}}
-          <br>
-          Ваша версия: {{clientVersion}}
-          <br>
-        </p>
-        <hr>
-        <p>
-          Please upgrade the client to the latest version.
-          <br>
-          Latest version: {{latestVersion}}
-          <br>
-          Your version: {{clientVersion}}
-        </p>
-        <hr>
-        {{#if supportMail.length}} <center>{{supportMail}}</center> {{/if}}
-      </div>
+    <div id="body">
+      <p>
+        Пожалуйста, обновите клиент до последней версии.
+        <br>
+        Крайняя версия: {{latestVersion}}
+        <br>
+        Ваша версия: {{clientVersion}}
+        <br>
+      </p>
+      <hr>
+      <p>
+        Please upgrade the client to the latest version.
+        <br>
+        Latest version: {{latestVersion}}
+        <br>
+        Your version: {{clientVersion}}
+      </p>
+      <hr>
+      {{#if supportMail.length}} <center>{{supportMail}}</center> {{/if}}
     </div>
   </div>
-
-  <script type="text/javascript">
-    var userId = "{{{ userId }}}"
-    var authToken = "{{{ authToken }}}"
-    var external = {{{ external }}}
-    var headers = {{{ headers }}}
-    var publicKey = {{{ publicKey }}}
-  </script>
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
-  <script type="text/javascript">
-    var scrollbar = Scrollbar.init($("#body")[0])
-  </script>
-</body>
+</div>

@@ -21,11 +21,14 @@ export default class extends WebViewAction {
     const values = {
       i18n: strings,
       regEnabled: Config.modules.login.enable_registration,
-      pageTitle: strings.hello
+      pageTitle: strings.hello,
+      scripts: [
+        "/resources/js/change-language.js"
+      ]
     }
     return {
       status: 200,
-      result: await this.webview.compileBodyTemplate(template, this.requestData, values)
+      result: await this.webview.compileBodyTemplate(template, this.requestData, values),
     }
   }
 }

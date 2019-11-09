@@ -1,6 +1,7 @@
 import readline from "readline"
 import { Connection } from "./database/mariadb"
 import { Log } from "./log"
+import { Unit } from "../common/unit"
 
 const log = new Log("ReadLine")
 const readLineInterface = readline.createInterface({
@@ -65,7 +66,7 @@ const commands: CommandInterface = {
           love: args[5] || 0,
           useNumber
         })
-        await connection.commit()
+        await connection.commit(true)
         log.always("Done! Unit owning user id: " + res.unit_owning_user_id, "addUnit")
       } catch (err) {
         log.error(err.message)

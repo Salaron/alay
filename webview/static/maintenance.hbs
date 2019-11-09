@@ -1,55 +1,48 @@
-<body>
-  <div id="outer">
-    <div id="inner">
-      <div id="header">
-        <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
-          <div class="uk-navbar-center">
-            <ul class="uk-navbar-nav">
-              <li class="uk-active"><a class="uk-text-bold uk-text-uppercase">Maintenance</a></li>
-            </ul>
-          </div>
-        </nav>
-      </div>
+<div id="outer">
+  <div id="inner">
+    <div id="header">
+      <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
+        <div class="uk-navbar-center">
+          <ul class="uk-navbar-nav">
+            <li class="uk-active"><a class="uk-text-bold uk-text-uppercase no-hover">Maintenance</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
 
-      <div id="body">
-        <p>
-          На данный момент сервер находится на техническом обслуживании для обновления. <br>
-          {{#if haveDate}}
-          <br>
-          Ожидаемый период обновления: <br>
-          {{startDay}} {{startTime}} ~ {{endDay}} {{endTime}} (UTC{{timeZone}})
-          <br><br>
-          {{/if}}
-          Приносим извинения за неудобства и благодарим за терпение.
-        </p>
-        <hr>
-        <p>
-          We are currently performing maintenance for an update. <br>
-          {{#if haveDate}}
-          <br>
-          Estimated maintenance period: <br>
-          {{startDayEn}} {{startTimeEn}} ~ {{endDayEn}} {{endTimeEn}} (UTC{{timeZone}})
-          <br><br>
-          {{/if}}
-          We apologize for the inconvenience, and thank you for your patience.
-        </p>
-      </div>
+    <div id="body">
+      <p>
+        На данный момент сервер находится на техническом обслуживании для обновления. <br>
+        {{#if haveDate}}
+        <br>
+        Ожидаемый период обновления: <br>
+        {{startDay}} {{startTime}} ~ {{endDay}} {{endTime}} (UTC{{timeZone}})
+        <br><br>
+        {{/if}}
+        Приносим извинения за неудобства и благодарим за терпение.
+      </p>
+      <hr>
+      <p>
+        We are currently performing maintenance for an update. <br>
+        {{#if haveDate}}
+        <br>
+        Estimated maintenance period: <br>
+        {{startDayEn}} {{startTimeEn}} ~ {{endDayEn}} {{endTimeEn}} (UTC{{timeZone}})
+        <br><br>
+        {{/if}}
+        We apologize for the inconvenience, and thank you for your patience.
+      </p>
     </div>
   </div>
+</div>
 
-  <script type="text/javascript">
-    var userId = "{{{ userId }}}"
-    var authToken = "{{{ authToken }}}"
-    var external = {{{ external }}}
-    var headers = {{{ headers }}}
-    var publicKey = {{{ publicKey }}}
-  </script>
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
-  <script type="text/javascript">
-    var scrollbar = Scrollbar.init($("#body")[0])
-  </script>
-</body>
+<script type="text/javascript">
+  var userId = "{{{ userId }}}"
+  var authToken = "{{{ authToken }}}"
+  var external = {{{ external }}}
+  var headers = {{{ headers }}}
+  var publicKey = {{{ publicKey }}}
+</script>
+<script type="text/javascript">
+ 
+</script>

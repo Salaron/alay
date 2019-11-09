@@ -76,16 +76,18 @@ export class WebView extends CommonModule {
       userId: requestData.user_id,
       authToken: requestData.auth_token
     }
-    const htmlTemplate = await WebView.getTemplate("common", "htmlHead")
-    const headerTemplate = await WebView.getTemplate("common", "header")
-    const changeLanguageModal = await this.getLanguageModalTemplate(Type.isNullDef(requestData.user_id) ? <string>requestData.auth_token : requestData.user_id)
+    const [htmlTemplate, headerTemplate, changeLanguageModal] = await Promise.all([
+      WebView.getTemplate("common", "htmlHead"),
+      WebView.getTemplate("common", "header"),
+      this.getLanguageModalTemplate(Type.isNullDef(requestData.user_id) ? <string>requestData.auth_token : requestData.user_id)
+    ])
 
     return htmlTemplate({
       body: template({
         header: headerTemplate(context),
-        changeLanguageModal,
         ...(context)
       }),
+      changeLanguageModal,
       ...(context)
     })
   }

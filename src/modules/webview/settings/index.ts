@@ -30,6 +30,10 @@ export default class extends WebViewAction {
       i18n: strings,
       mods,
       userData,
+      scripts: [
+        "/resources/js/change-language.js",
+        "/resources/js/jsencrypt.min.js"
+      ]
     }
 
     return {

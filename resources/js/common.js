@@ -136,27 +136,8 @@ function replacePlaceholders(input, values) {
   })
 }
 
-function updateBodySize() {
-  var bottomOffset = 19
-  if (external === true) {
-    bottomOffset = 16
+function onResize() {
+  if (typeof $ != "undefined") {
+    $("#body").getNiceScroll().resize()
   }
-  if (document.getElementById("body") !== null) $("#body").height($(window).height() - $("#body").position().top - bottomOffset)
-  if (typeof scrollbar != "undefined") scrollbar.update()
-}
-function isChrome() {
-  var isChromium = window.chrome;
-  var winNav = window.navigator;
-  var vendorName = winNav.vendor;
-  var isOpera = typeof window.opr !== "undefined";
-  var isIEedge = winNav.userAgent.indexOf("Edge") > -1;
-  var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  return (
-    isChromium !== null &&
-    typeof isChromium !== "undefined" &&
-    vendorName === "Google Inc." &&
-    isOpera === false &&
-    isIEedge === false &&
-    isMobile === true
-  )
 }

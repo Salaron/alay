@@ -45,7 +45,10 @@ export default class extends WebViewAction {
       status: 200,
       result: await this.webview.compileBodyTemplate(template, this.requestData, {
         i18n: strings,
-        serverInfo
+        serverInfo,
+        scripts: [
+          "/resources/js/change-language.js"
+        ]
       })
     }
   }

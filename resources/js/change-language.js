@@ -1,7 +1,7 @@
-(function () {
+$(function () {
   $("#changeLanguage").on("click", function () {
-    UIkit.modal("#languageSelect").toggle();
-  });
+    UIkit.modal("#languageSelect").toggle()
+  })
   $("input[type=radio][name='language_radio']").change(function () {
     var href = window.location.href
     if (!href.indexOf("lang") >= 0) {
@@ -13,17 +13,17 @@
         action: "changeLanguage",
         code: $(this).val(),
         timestamp: Math.floor(Date.now() / 1000)
-      };
+      }
       $.when(sendRequest(params)).done(function (response) {
-        if (response.error || response.maintenance) return;
+        if (response.error || response.maintenance) return
         sendNotification(
           "Success. This page will reload automatically.",
           "success"
-        );
-        setTimeout(window.location.reload.bind(window.location), 1000);
-      });
+        )
+        setTimeout(window.location.reload.bind(window.location), 1000)
+      })
     } else {
       window.location.replace(href.replace(/lang.+&/, "lang=" + $(this).val() + "&"))
     };
-  });
-})();
+  })
+})

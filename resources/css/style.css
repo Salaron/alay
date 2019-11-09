@@ -1,0 +1,132 @@
+@charset "utf-8";
+
+html, body {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  background: transparent;
+}
+
+body {
+  margin: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  tab-size: 4;
+  text-rendering: auto;
+  overflow: hidden;
+}
+
+/* SL Headers */
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 10px !important;
+  margin-top: 10px !important;
+}
+
+h1 { font-size: 2em!important; }
+h2 { font-size: 1.5em!important; }
+h3 { font-size: 1.17em!important; }
+h4 { font-size: 1.12em!important; }
+h5 { font-size: .83em!important; }
+h6 { font-size: .75em!important; }
+p {
+  font-size: 14px;
+}
+
+#outer {
+  bottom: auto;
+  right: auto;
+  height: 100%;
+}
+
+#inner {
+  height: 100%;
+  background-color: #fff;
+}
+
+#body {
+  height: calc(100% - 55px);
+  margin: 2px 3px 0px 0px;
+  overflow: auto;
+}
+
+.no-hover{
+  pointer-events: none;
+}
+
+/* Header */
+.sl-navbar-container:not(.uk-navbar-transparent) {
+  background: linear-gradient(to left, #28a5f5, #1e87f0);
+}
+
+.sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
+  color: rgba(255,255,255,0.8);
+  font-size: 14px;
+  min-height: 50px;
+}
+
+.sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li.uk-active>a {
+  color: #fff;
+  font-size: 14px;
+}
+
+/* SunLight Table 
+table {
+  border: 1px solid #1e87f0;
+  border-collapse: collapse;
+}
+thead tr {
+  background-color: #1e87f0;
+}
+th, td {
+  border: 1px solid #1e87f0;
+  padding: 2px 5px;
+}
+
+th {
+  font-weight: bold;
+  text-align: -internal-center;
+  color: white!important;
+}*/
+
+.uk-tab>*>a{
+  font-size: 11px;
+}
+
+.nicescroll-rails {
+  border-radius: 10px;
+  background: #c6dcff;
+}
+
+.nicescroll-cursors {
+  background: #4286f4 !important;
+    border-radius: 10px !important;
+}
+
+.avatar-border {
+  width: 60px;
+  height: 60px;
+  background-position: center;
+  background-size: auto;
+  background-size: 118%;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .7);
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
+  -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
+  border-radius: 100%;
+}
+
+
+@media (min-width: 550px) {
+  p {
+    font-size: 16px;
+  }
+  .uk-tab>*>a {
+    font-size: 1.12em;
+  }
+  .avatar-border {
+    width: 80px;
+    height: 80px;
+  }
+}

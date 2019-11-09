@@ -60,6 +60,6 @@ export default async function webapiHandler(request: IncomingMessage, response: 
     }
     throw err
   } finally {
-    requestData.connection.connection.release()
+    requestData.connection.release()
   }
 }

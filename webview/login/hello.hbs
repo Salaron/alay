@@ -1,17 +1,18 @@
-<body class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden">
-  <style>
-    body {
-      background-image: url("/resources/img/hello_bg.png");
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-  </style>
-  <div class="uk-overlay-primary uk-position-cover">
+<style>
+  #body {
+    background-image: url("/resources/img/hello_bg.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+  }
+</style>
 
-  </div>
+<div id="body"
+  class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden">
+  <div class="uk-overlay-primary uk-position-cover"></div>
   <div class="uk-light">
     <a id="changeLanguage" style="margin: 10px;"
       class="uk-icon-button uk-position-right uk-position-z-index lang-button" uk-icon="icon: world; ratio: 1.25"></a>
@@ -28,32 +29,16 @@
     {{/if}}
     <a class="uk-button uk-button-default uk-border-pill" href="/webview.php/tos/read">{{i18n/tos}}</a>
   </div>
+</div>
 
-  {{{changeLanguageModal}}}
-
-  <script type="text/javascript">
-    var userId = "{{{ userId }}}"
-    var authToken = "{{{ authToken }}}"
-    var external = {{{ external }}}
-    var headers = {{{ headers }}}
-  </script>
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/change-language.js"></script>
-  <script>
-    $(document).ready(function () {
-      if (external && isChrome()) {
-        $("body").css("min-height", "calc(100vh - 56px)")
-      }
-      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + authToken))
-      setCookie("user_id", "", 1)
-      var values = window.location.href.split("?")[1]
-      if (values) {
-        values = parseQueryString(values)
-        if (values.token) setCookie("token", values.token, 1)
-      }
-    })
-  </script>
-</body>
+<script type="text/javascript">
+  $(document).ready(function () {
+    $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + authToken))
+    setCookie("user_id", "", 1)
+    var values = window.location.href.split("?")[1]
+    if (values) {
+      values = parseQueryString(values)
+      if (values.token) setCookie("token", values.token, 1)
+    }
+  })
+</script>

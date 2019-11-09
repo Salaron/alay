@@ -9,19 +9,49 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
   <meta name="viewport"
-    content="width=device-width{{#unless external}}, initial-scale=1,minimum-scale=1, maximum-scale=1 {{/unless}}">
+    content="width=device-width{{#unless external}}, initial-scale=1,minimum-scale=1, maximum-scale=1{{/unless}}">
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/smooth-scrollbar.css">
-  <link rel="stylesheet" type="text/css" href="/resources/css/common.css">
-  {{#if external}}
-  <link rel="stylesheet" type="text/css" href="/resources/css/external.css">
-  {{/if}}
+  <link rel="stylesheet" type="text/css" href="/resources/css/style.css">
+  {{#unless external}}
+  <link rel="stylesheet" type="text/css" href="/resources/css/webview.css">
+  {{/unless}}
   {{#each stylesheets}}
   <link rel="stylesheet" type="text/css" href="{{this}}">
   {{/each}}
+
+  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.nicescroll.min.js"></script>
+  <script type="text/javascript" src="/resources/js/common.js"></script>
+  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  {{#each scripts}}
+  <script type="text/javascript" src="{{this}}"></script>
+  {{/each}}
+
+  <script type="text/javascript">
+    var userId = "{{{ userId }}}"
+    var authToken = "{{{ authToken }}}"
+    var external = {{{ external }}}
+    var headers = {{{ headers }}}
+
+    $(function () {
+      var scrollbar = $("#body").niceScroll({
+        bouncescroll: false,
+        smoothscroll: true,
+        cursoropacitymax: 0.7,
+        scrollspeed: 100,
+        preventmultitouchscrolling: false,
+        autohidemode: false,
+        enabletranslate3d: true
+      });
+    });
+  </script>
 </head>
 
-{{{body}}}
+<body onresize="onResize()">
+  {{{changeLanguageModal}}}
+  {{{body}}}
+</body>
 
 </html>

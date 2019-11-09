@@ -24,9 +24,9 @@ export async function init() {
         await codes.forEachAsync(async (code) => {
           await connection.query("DELETE FROM auth_recovery_codes WHERE token = :token", { token: code.token })
         })
-        await connection.commit()
+        await connection.commit(true)
       } catch (err) {
-        connection.rollback()
+        connection.rollback(true)
         log.error(err)
       }
     } catch (err) {

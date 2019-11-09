@@ -32,7 +32,10 @@ export default class extends WebViewAction {
     const values = {
       announceList,
       code,
-      i18n: strings
+      i18n: strings,
+      scripts: [
+        "/resources/js/change-language.js"
+      ]
     }
     return {
       status: 200,

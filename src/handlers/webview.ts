@@ -57,6 +57,6 @@ export default async function webviewHandler(request: IncomingMessage, response:
     await requestData.connection.rollback()
     throw err
   } finally {
-    requestData.connection.connection.release()
+    requestData.connection.release()
   }
 }

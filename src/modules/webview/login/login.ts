@@ -20,10 +20,17 @@ export default class extends WebViewAction {
 
     const values = {
       module: "login",
-      enableRecaptcha: Config.modules.login.enable_recaptcha,
+      scripts: [
+        "/resources/js/jsencrypt.min.js",
+      ],
       siteKey: Config.modules.login.recaptcha_site_key,
+      enableRecaptcha: Config.modules.login.enable_recaptcha,
       i18n: strings,
       pageTitle: "SunLight Login"
+    }
+
+    if (Config.modules.login.enable_recaptcha) {
+      values.scripts.push(`https://www.google.com/recaptcha/api.js?render=${Config.modules.login.recaptcha_site_key}`)
     }
     return {
       status: 200,

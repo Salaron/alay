@@ -92,6 +92,14 @@ export class Connection {
       this.released = true
     }
   }
+
+  /**
+   * Release this connection.
+   */
+  public release() {
+    this.connection.release()
+    this.released = true
+  }
 }
 
 let reconnectAttempts = 0

@@ -1,35 +1,18 @@
-<body>
-  <div id="outer">
-    <div id="inner">
-      <div id="header">
-        {{{header "APanel" this}}}
-      </div>
-
-      <div id="body">
-        WIP
-      </div>
+<div id="outer">
+  <div id="inner">
+    <div id="header">
+      {{{header "APanel" this}}}
     </div>
 
-    {{{changeLanguageModal}}}
+    <div id="body">
+      <center>WIP</center>
+    </div>
   </div>
+</div>
 
-  <!-- Empty. use as reference for now -->
-  <script type="text/javascript">
-    var userId = "{{{ userId }}}"
-    var authToken = "{{{ authToken }}}"
-    var external = {{{ external }}}
-    var headers = {{{ headers }}}
-  </script>
-  <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/common.js"></script>
-  <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
-  <script type="text/javascript" src="/resources/js/smooth-scrollbar.js"></script>
-  <script type="text/javascript" src="/resources/js/change-language.js"></script>
-  <script type="text/javascript">
-    $(function () {
-      var scrollbar = Scrollbar.init($("#body")[0])
-      $("#external").attr("href", getExternalUrl())
-    })
-  </script>
-</body>
+<script type="text/javascript">
+  $(function () {
+   
+    $("#external").attr("href", getExternalUrl())
+  })
+</script>

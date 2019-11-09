@@ -19,7 +19,11 @@ export default class extends WebViewAction {
       module: "admin",
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,
-      i18n: strings
+      i18n: strings,
+      scripts: [
+        "/resources/js/change-language.js",
+        "/resources/js/jsencrypt.min.js",
+      ]
     }
 
     switch (this.requestData.auth_level) {
@@ -42,6 +46,9 @@ export default class extends WebViewAction {
           lp: ""
         })
         this.requestData.auth_token = token
+        if (Config.modules.login.enable_recaptcha) {
+          values.scripts.push(`https://www.google.com/recaptcha/api.js?render=${Config.modules.login.recaptcha_site_key}`)
+        }
         return {
           status: 200,
           result: await this.webview.compileBodyTemplate(template, this.requestData, values)

@@ -172,7 +172,10 @@ export default class extends WebViewAction {
       profileId: userId,
       guest,
       langCode: code,
-      icon: user.display_rank === 1 ? icons.normal_icon_asset : icons.rank_max_icon_asset
+      icon: user.display_rank === 1 ? icons.normal_icon_asset : icons.rank_max_icon_asset,
+      scripts: [
+        "/resources/js/change-language.js"
+      ]
     }
 
     return {

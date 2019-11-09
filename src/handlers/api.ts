@@ -117,6 +117,6 @@ export default async function moduleHandler(request: IncomingMessage, response: 
     await requestData.connection.rollback()
     throw err
   } finally {
-    requestData.connection.connection.release()
+    requestData.connection.release()
   }
 }

@@ -140,10 +140,7 @@ export default class extends WebViewAction {
         result: await this.webview.compileBodyTemplate(template, this.requestData, {
           secretbox,
           costList,
-          pageTitle: secretbox.name,
-          stylesheets: [
-            "/resources/css/secretbox-detail.css"
-          ]
+          pageTitle: secretbox.name
         })
       }
     } catch (err) {
