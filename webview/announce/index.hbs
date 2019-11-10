@@ -5,28 +5,30 @@
     </div>
 
     <div id="body">
-      {{#each announceList}}
-      <br>
-      <div id="announce-{{id}}" class="uk-card uk-card-default uk-width-1-1">
-        <div class="uk-card-header">
-          <div class="uk-grid-small uk-flex-middle" uk-grid>
-            <div class="uk-width-expand">
-              <h4 class="uk-card-title uk-margin-remove-bottom uk-margin-remove">{{title}}</h4>
-              <p class="uk-text-meta uk-margin-remove-top uk-margin-remove">{{date}}</p>
+      <div id="bodywrapper">
+        {{#each announceList}}
+        <br>
+        <div id="announce-{{id}}" class="uk-card uk-card-default uk-width-1-1">
+          <div class="uk-card-header">
+            <div class="uk-grid-small uk-flex-middle" uk-grid>
+              <div class="uk-width-expand">
+                <h4 class="uk-card-title uk-margin-remove-bottom uk-margin-remove">{{title}}</h4>
+                <p class="uk-text-meta uk-margin-remove-top uk-margin-remove">{{date}}</p>
+              </div>
             </div>
           </div>
+          <div class="uk-card-body">
+            <p class="uk-margin-remove" style="white-space: pre-line">{{description}}</p>
+          </div>
+          {{#if extendable}}
+          <div class="uk-card-footer">
+            <a href="/webview.php/announce/detail?id={{id}}"
+              class="uk-button uk-button-text uk-margin-remove">{{../i18n/more}}</a>
+          </div>
+          {{/if}}
         </div>
-        <div class="uk-card-body">
-          <p class="uk-margin-remove" style="white-space: pre-line">{{description}}</p>
-        </div>
-        {{#if extendable}}
-        <div class="uk-card-footer">
-          <a href="/webview.php/announce/detail?id={{id}}"
-            class="uk-button uk-button-text uk-margin-remove">{{../i18n/more}}</a>
-        </div>
-        {{/if}}
+        {{/each}}
       </div>
-      {{/each}}
     </div>
   </div>
 </div>
@@ -34,7 +36,7 @@
 <script type="text/javascript">
   var announceTotal = null
   var loadAttempt = 0 // Just in case, in order not to overload the server
- 
+
   $(document).ready(function () {
     // check if current url contains query string
     var queryString = window.location.href.split("?")[1]

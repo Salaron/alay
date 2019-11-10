@@ -1,5 +1,5 @@
 <style>
-  #body {
+  #wrapper {
     background-image: url("/resources/img/startup_bg.png");
     background-position: center center;
     background-repeat: no-repeat;
@@ -20,7 +20,7 @@
   }
 </style>
 
-<div id="body"
+<div id="wrapper"
   class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light">
 
   <div class="uk-position-cover uk-overlay-primary"></div>
@@ -79,7 +79,7 @@
     var RSAEncrypt = new JSEncrypt()
     RSAEncrypt.setKey(publicKey)
     $(document).ready(function () {
-      if (window.history.length != 1) $("#body").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+      if (window.history.length != 1) $("#wrapper").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
       $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
     })
     function disableButtons() {

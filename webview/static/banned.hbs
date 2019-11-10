@@ -11,13 +11,15 @@
     </div>
 
     <div id="body">
-      <p class="uk-text-secondary">По решению администратора сервера Ваш аккаунт был заблокирован за нарушение <a
-          href="../../webview.php/tos/read">правил сервера</a>.</p>
-      <p class="uk-margin-remove-bottom">Сообщение, оставленное администратором: {{message}}</p>
-      {{#if expiration_date}}
-      <span class="uk-text-primary">Данная блокировка является временной и доступ будет возобновлён через
-        {{expiration_date_human}} ({{expiration_date}})</span>
-      {{/if}}
+      <div id="bodywrapper">
+        <p class="uk-text-secondary">По решению администратора сервера Ваш аккаунт был заблокирован за нарушение <a
+            href="../../webview.php/tos/read">правил сервера</a>.</p>
+        <p class="uk-margin-remove-bottom">Сообщение, оставленное администратором: {{message}}</p>
+        {{#if expiration_date}}
+        <span class="uk-text-primary">Данная блокировка является временной и доступ будет возобновлён через
+          {{expiration_date_human}} ({{expiration_date}})</span>
+        {{/if}}
+      </div>
     </div>
   </div>
 </div>

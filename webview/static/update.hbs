@@ -11,24 +11,26 @@
     </div>
 
     <div id="body">
-      <p>
-        Пожалуйста, обновите клиент до последней версии.
-        <br>
-        Крайняя версия: {{latestVersion}}
-        <br>
-        Ваша версия: {{clientVersion}}
-        <br>
-      </p>
-      <hr>
-      <p>
-        Please upgrade the client to the latest version.
-        <br>
-        Latest version: {{latestVersion}}
-        <br>
-        Your version: {{clientVersion}}
-      </p>
-      <hr>
-      {{#if supportMail.length}} <center>{{supportMail}}</center> {{/if}}
+      <div id="bodywrapper">
+        <p>
+          Пожалуйста, обновите клиент до последней версии.
+          <br>
+          Крайняя версия: {{latestVersion}}
+          <br>
+          Ваша версия: {{clientVersion}}
+          <br>
+        </p>
+        <hr>
+        <p>
+          Please upgrade the client to the latest version.
+          <br>
+          Latest version: {{latestVersion}}
+          <br>
+          Your version: {{clientVersion}}
+        </p>
+        <hr>
+        {{#if supportMail.length}} <center>{{supportMail}}</center> {{/if}}
+      </div>
     </div>
   </div>
 </div>
