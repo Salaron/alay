@@ -8,8 +8,11 @@
   <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
-  <meta name="viewport"
-    content="width=device-width{{#unless external}}, initial-scale=1,minimum-scale=1, maximum-scale=1{{/unless}}">
+  {{#if external}}
+  <meta name="viewport" content="width=device-width">
+  {{else}}
+  <meta name="viewport" content="width=device-width, initial-scale=1,minimum-scale=1, maximum-scale=1">
+  {{/if}}
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/style.css">

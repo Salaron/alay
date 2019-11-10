@@ -1,23 +1,7 @@
 <style>
-  table {
-    border: 1px solid #1e87f0;
-    border-collapse: collapse;
-  }
-
-  thead tr {
-    background-color: #1e87f0;
-  }
-
   th,
   td {
-    border: 1px solid #1e87f0;
     padding: 2px 5px;
-  }
-
-  th {
-    font-weight: bold;
-    text-align: -internal-center;
-    color: white !important;
   }
 
   td.card-number {
@@ -35,7 +19,8 @@
       <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
         <div class="uk-navbar-center">
           <ul class="uk-navbar-nav">
-            <li class="uk-active"><a class="uk-text-bold" style="text-transform: none;">{{secretbox/name}}</a></li>
+            <li class="uk-active"><a class="uk-text-bold no-hover" style="text-transform: none;">{{secretbox/name}}</a>
+            </li>
           </ul>
         </div>
       </nav>
@@ -171,8 +156,12 @@
 
 <script>
   if (window.history.length != 1) {
-    // $("#2back").prepend('<a onclick="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    $(".sl-navbar-container").prepend('<div class="uk-navbar-left"><a onclick="window.history.back()" class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+  } else {
+    $(".sl-navbar-container").prepend('<div class="uk-navbar-left"><a href="/webview.php/secretbox/list?id={{secretbox/secretbox_id}}" class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
   }
+  var extUrl = "native://browser?url=" + encodeURIComponent(window.location.href)
+  if (!external) $(".sl-navbar-container").append('<div class="uk-navbar-right"><ul class="uk-navbar-nav"><li class="uk-active"><a href="' + extUrl + '" style="font-size: 16px;">Open in browser</a></li></ul></div>')
   $(function () {
     $("#body").getNiceScroll().remove()
   });

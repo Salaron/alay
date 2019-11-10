@@ -1,11 +1,11 @@
 <div id="outer">
   <div id="inner">
     <div id="header">
-      <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
-        uk-sticky="bottom: #offset">
-        <div class="uk-navbar-left">
-          <ul id="2back" class="uk-navbar-nav">
-            <li class="uk-active"><a class="uk-text-bold">{{announce/title}}</a></li>
+      <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
+        <div class="uk-navbar-center">
+          <ul class="uk-navbar-nav">
+            <li class="uk-active"><a class="uk-text-bold no-hover" style="text-transform: none;">{{announce/title}}</a>
+            </li>
           </ul>
         </div>
       </nav>
@@ -14,7 +14,7 @@
     <div id="body">
       <div id="bodywrapper">
         {{{announce/body}}}
-        <div style="text-align: right; margin-bottom: 10px;">
+        <div style="text-align: right; margin-bottom: 5px;">
           {{{announce/date}}}
         </div>
       </div>
@@ -22,10 +22,8 @@
   </div>
 </div>
 <script>
-
   if (window.history.length != 1) {
-    var url = window.location.protocol + "//" + window.location.host + "/webview.php/announce/index?id={{announce/id}}"
-    $("#2back").prepend('<a href="' + url + '" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
+    $(".sl-navbar-container").prepend('<div class="uk-navbar-left"><a href="/webview.php/announce/index?id={{announce/id}}" class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
   }
   if (!external) {
     $('a[href^="http"]').each(function () {

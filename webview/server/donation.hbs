@@ -1,11 +1,10 @@
 <div id="outer">
   <div id="inner">
     <div id="header">
-      <nav class="uk-navbar-container sl-navbar-container uk-sticky uk-active uk-sticky-below uk-sticky-fixed"
-        uk-sticky="bottom: #offset">
-        <div class="uk-navbar-left">
-          <ul id="2back" class="uk-navbar-nav">
-            <li class="uk-active"><a class="uk-text-bold">Меценаты</a></li>
+      <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
+        <div class="uk-navbar-center">
+          <ul class="uk-navbar-nav">
+            <li class="uk-active"><a class="uk-text-bold no-hover">Мецентаты</a></li>
           </ul>
         </div>
       </nav>
@@ -29,8 +28,7 @@
 </div>
 
 <script>
-
-  if (window.history.length != 1) {
-    $("#2back").prepend('<a href="window.history.back()" class="uk-icon-button sl-icon-button" uk-icon="icon: arrow-left; ratio: 1.5"></a>')
-  }
+  $(function () {
+    if (window.history.length != 1) $(".sl-navbar-container").prepend('<div class="uk-navbar-left"><a onclick="window.history.back()" class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+  })
 </script>

@@ -48,6 +48,7 @@ p {
 #body {
   height: calc(100% - 55px);
   margin: 2px 2px 0px 6px;
+  padding: 0px 19px 0px 13px;
   overflow: auto;
 }
 #bodywrapper {
@@ -105,10 +106,6 @@ th {
   color: white!important;
 }*/
 
-.uk-tab>*>a{
-  font-size: 11px;
-}
-
 .nicescroll-rails {
   border-radius: 10px;
   background: #c6dcff;
@@ -117,6 +114,7 @@ th {
 .nicescroll-cursors {
   background: #4286f4 !important;
   border-radius: 10px !important;
+  width: 6px!important;
 }
 
 .avatar-border {
