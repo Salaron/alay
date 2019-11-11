@@ -86,7 +86,7 @@ export default class extends ApiAction {
       const affector = await this.getAffectorInfo(notice.affector_id)
 
       if (notice.message === null) {
-        notice.message = await this.notice.getPreparedMessage(this.user_id, notice.type_id, {
+        notice.message = await this.notice.getPreparedMessage(notice.type_id, {
           affectorName: affector.user_data.name
         })
       }
