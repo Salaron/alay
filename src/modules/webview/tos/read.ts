@@ -11,7 +11,7 @@ export default class extends WebViewAction {
   public async execute() {
     let code = Config.i18n.defaultLanguage
     try {
-      code = await this.i18n.getUserLocalizationCode(this.user_id ? this.user_id : <string>this.requestData.auth_token)
+      code = await this.i18n.getUserLocalizationCode(this.requestData)
     } catch (_) { } // tslint:disable-line
 
     return {

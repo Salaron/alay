@@ -20,7 +20,7 @@ export default class extends WebViewAction {
 
   public async execute() {
     const [strings, template, mods, userData] = await Promise.all([
-      this.i18n.getStrings(this.user_id, "common", "login-login", "login-startup", "settings-index"),
+      this.i18n.getStrings(this.requestData, "common", "login-login", "login-startup", "settings-index"),
       WebView.getTemplate("settings", "index"),
       this.user.getParams(this.user_id, supportedMods),
       this.connection.first("SELECT mail FROM users WHERE user_id = :user", { user: this.user_id })

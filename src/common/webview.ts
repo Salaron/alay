@@ -48,24 +48,6 @@ export class WebView extends CommonModule {
     })).cnt
   }
 
-  /**
-   * @param {number | string} input - User Id, token or Language code
-   */
-  public async getLanguageModalTemplate(input?: number | string): Promise<string> {
-    const template = await WebView.getTemplate("common", "changelanguage")
-
-    let languageCode = Config.i18n.defaultLanguage
-    if (Type.isInt(input) || typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) {
-      // token or user id
-      languageCode = await this.action.i18n.getUserLocalizationCode(input)
-    } else if (typeof input === "string" && input.length > 0) languageCode = input
-
-    return template({
-      languageList: Config.i18n.languages,
-      currentLanguage: languageCode
-    })
-  }
-
   public async compileBodyTemplate(template: Handlebars.TemplateDelegate, requestData: RequestData, values: any = {}) {
     let context = {
       ...(values),
@@ -76,10 +58,12 @@ export class WebView extends CommonModule {
       userId: requestData.user_id,
       authToken: requestData.auth_token
     }
-    const [htmlTemplate, headerTemplate, changeLanguageModal] = await Promise.all([
+
+    const [htmlTemplate, headerTemplate, clModalTemplate, userLangCode] = await Promise.all([
       WebView.getTemplate("common", "htmlHead"),
       WebView.getTemplate("common", "header"),
-      this.getLanguageModalTemplate(Type.isNullDef(requestData.user_id) ? <string>requestData.auth_token : requestData.user_id)
+      WebView.getTemplate("common", "changelanguage"),
+      this.action.i18n.getUserLocalizationCode(this.requestData)
     ])
 
     return htmlTemplate({
@@ -87,14 +71,17 @@ export class WebView extends CommonModule {
         header: headerTemplate(context),
         ...(context)
       }),
-      changeLanguageModal,
+      changeLanguageModal: clModalTemplate({
+        languageList: Config.i18n.languages,
+        currentLanguage: userLangCode
+      }),
       ...(context)
     })
   }
 }
 
 // Handlebars Helpers
-Handlebars.registerHelper("equal", function(this: any, a, b, options) {
+Handlebars.registerHelper("equal", function (this: any, a, b, options) {
   if (a == b) { return options.fn(this) }
   return options.inverse(this)
 })
@@ -133,7 +120,7 @@ Handlebars.registerHelper("numberWithSpaces", (value) => {
   return new Handlebars.SafeString(parts.join("."))
 })
 
-Handlebars.registerHelper("ifcond", function(this: any, v1, operator, v2, options) {
+Handlebars.registerHelper("ifcond", function (this: any, v1, operator, v2, options) {
   switch (operator) {
     case "==":
       return (v1 == v2) ? options.fn(this) : options.inverse(this)

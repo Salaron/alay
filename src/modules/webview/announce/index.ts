@@ -12,7 +12,7 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const code = await this.i18n.getUserLocalizationCode(this.user_id)
+    const code = await this.i18n.getUserLocalizationCode(this.requestData)
     let [strings, template, announceList] = await Promise.all([
       this.i18n.getStrings(code, "common", "announce-index"),
       WebView.getTemplate("announce", "index"),

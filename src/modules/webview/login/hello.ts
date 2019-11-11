@@ -14,7 +14,7 @@ export default class extends WebViewAction {
       throw new ErrorCode(1234, "Access only with a certain auth level")
 
     const [strings, template] = await Promise.all([
-      this.i18n.getStrings(<string>this.requestData.auth_token, "login-hello"),
+      this.i18n.getStrings(this.requestData, "login-hello"),
       this.webview.getTemplate("login", "hello")
     ])
 

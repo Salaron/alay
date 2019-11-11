@@ -26,13 +26,13 @@ export class Notice extends CommonModule {
     super(action)
   }
 
-  public async getNoticeStrings(userId: number) {
+  public async getNoticeStrings() {
     // based on current user language
-    return this.action.i18n.getStrings(userId, "notice")
+    return await this.action.i18n.getStrings(this.requestData, "notice")
   }
 
-  public async getPreparedMessage(userId: number, noticeTypeId: noticeType | number, values: any) {
-    const strings = await this.getNoticeStrings(userId)
+  public async getPreparedMessage(noticeTypeId: noticeType | number, values: any) {
+    const strings = await this.getNoticeStrings()
     const message = strings[noticeType[noticeTypeId]]
     if (!message) throw new Error(`Unknown noticeTypeId: ${noticeTypeId}`)
     return Utils.prepareTemplate(message, values)

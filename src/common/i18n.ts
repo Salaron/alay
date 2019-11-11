@@ -5,6 +5,7 @@ import { promisify } from "util"
 import { Log } from "../core/log"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
+import RequestData from "../core/requestData"
 
 interface I18nCache {
   [localizationCode: string]: I18nSection
@@ -62,52 +63,54 @@ export class I18n extends CommonModule {
   }
 
   /**
-   * @param {number | string} input - User Id or token
+   * @param {RequestData} requestData
    * @param {string} code - language code
    */
-  public async setUserLocalizationCode(input: string | number, code: string): Promise<void> {
-    if (Type.isInt(input)) {
+  public async setUserLocalizationCode(requestData: RequestData, code: string): Promise<void> {
+    if (Type.isInt(requestData.user_id)) {
       await this.connection.execute("UPDATE users SET language = :code WHERE user_id = :user", {
         code,
-        user: input
+        user: requestData.user_id
       })
-    } else if (Type.isString(input)) {
+    } else if (Type.isString(requestData.auth_token) && requestData.auth_token.match(/^[a-z0-9]{70,90}$/gi) && requestData.user_id === null) {
       await this.connection.execute("UPDATE auth_tokens SET language = :code WHERE token = :token", {
         code,
-        token: input
+        token: requestData.auth_token
       })
+    } else {
+      throw new Error(`Token or user_id is missing`)
     }
   }
 
   /**
-   * @param {number | string} input - User Id or token
    * @returns {Promise<string>} user language code
    */
-  public async getUserLocalizationCode(input: number | string): Promise<string> {
-    let code = ""
-    if (typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) {
-      code = (await this.connection.first("SELECT language FROM auth_tokens WHERE token = :token", { token: input })).language
-    } else {
-      code = (await this.connection.first("SELECT language FROM users WHERE user_id=:user", { user: input })).language
+  public async getUserLocalizationCode(requestData: RequestData): Promise<string> {
+    let languageCode = Config.i18n.defaultLanguage
+    if (Type.isString(requestData.auth_token) && requestData.auth_token.match(/^[a-z0-9]{70,90}$/gi) && requestData.user_id === null) {
+      languageCode = (await this.connection.first("SELECT language FROM auth_tokens WHERE token = :token", { token: requestData.auth_token })).language
+    } else if (Type.isInt(requestData.user_id)) {
+      languageCode = (await this.connection.first("SELECT language FROM users WHERE user_id = :user", { user: requestData.user_id })).language
     }
 
-    if (!Object.values(Config.i18n.languages).includes(code)) {
-      log.warn(`Language code ${code} is not exists in config. Using default language instead`)
+    if (!Object.values(Config.i18n.languages).includes(languageCode)) {
+      log.warn(`Language code ${languageCode} is not exists in config. Using default language instead`)
       return Config.i18n.defaultLanguage
     }
-    return code
+    return languageCode
   }
 
-  /**
-   * @param {number | string} input - User Id, token or Language code
-   */
-  public async getStrings(input: number | string, ...sections: string[]): Promise<any> {
-    let languageCode = ""
-    if (Type.isInt(input)) { // user id
-      languageCode = await this.getUserLocalizationCode(<number>input)
-    } else if (typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) { // token
+  public async getStrings(input: RequestData | string, ...sections: string[]): Promise<any>
+  public async getStrings(...sections: string[]): Promise<any>
+  public async getStrings(input: RequestData | string, ...sections: string[]): Promise<any> {
+    let languageCode = Config.i18n.defaultLanguage
+    if (input instanceof RequestData) {
       languageCode = await this.getUserLocalizationCode(input)
-    } else if (typeof input === "string") languageCode = input
+    } else if (Type.isString(input) && Object.values(Config.i18n.languages).includes(input)) {
+      languageCode = input
+    } else {
+      sections.push(input)
+    }
 
     if (Config.server.debug_mode) await this.clearCache()
     const result: any = {}
@@ -119,16 +122,14 @@ export class I18n extends CommonModule {
     return result
   }
 
-  /**
-   * @param {number | string} input - User Id, token or Language code
-   */
-  public async getMarkdown(input: number | string, type: I18nMarkdownType): Promise<string> {
-    let languageCode = ""
-    if (Type.isInt(input)) { // user id
-      languageCode = await this.getUserLocalizationCode(<number>input)
-    } else if (typeof input === "string" && input.match(/^[a-z0-9]{70,90}$/gi)) { // token
+  public async getMarkdown(input: RequestData | string, type: I18nMarkdownType): Promise<string> {
+    let languageCode = Config.i18n.defaultLanguage
+    if (input instanceof RequestData) {
       languageCode = await this.getUserLocalizationCode(input)
-    } else if (typeof input === "string") languageCode = input
+    } else if (Type.isString(input) && Object.values(Config.i18n.languages).includes(input)) {
+      languageCode = input
+    }
+
     if (mdCache[languageCode] && mdCache[languageCode][I18nMarkdownType[type]]) return mdCache[languageCode][I18nMarkdownType[type]]
 
     let md = ``

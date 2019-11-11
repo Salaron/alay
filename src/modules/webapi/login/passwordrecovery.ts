@@ -25,7 +25,7 @@ export default class extends WebApiAction {
       await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
     }
 
-    const strings = await this.i18n.getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
+    const strings = await this.i18n.getStrings(this.requestData, "login-login", "mailer")
     const userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })
     if (!userData) throw new ErrorWebApi(strings.mailNotExists, true)
 

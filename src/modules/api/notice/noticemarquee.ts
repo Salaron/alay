@@ -13,7 +13,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const langCode = await this.i18n.getUserLocalizationCode(this.user_id)
+    const langCode = await this.i18n.getUserLocalizationCode(this.requestData)
     const strings = await this.i18n.getStrings(langCode, "noticemarquee")
 
     const response = {

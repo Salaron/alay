@@ -23,7 +23,7 @@ export default class extends WebApiAction {
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorWebApi("Access only with a certain auth level")
 
-    const strings = await this.i18n.getStrings(<string>this.requestData.auth_token, "login-login", "mailer")
+    const strings = await this.i18n.getStrings(this.requestData, "login-login", "mailer")
 
     const recoveryData = await this.connection.first("SELECT * FROM auth_recovery_codes WHERE token = :token AND expire > CURRENT_TIMESTAMP", {
       token: this.requestData.auth_token

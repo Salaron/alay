@@ -10,9 +10,9 @@
       "name": "Start Server",
       "program": "${workspaceFolder}/src/alay.ts",
       "console": "externalTerminal",
-      "cwd":"${workspaceFolder}/compile/",
+      "cwd":"${workspaceFolder}/dist/",
       "outFiles": [
-          "${workspaceFolder}/compile/**/*.js"
+          "${workspaceFolder}/dist/**/*.js"
       ]
     }
   ]

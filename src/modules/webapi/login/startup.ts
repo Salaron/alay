@@ -32,7 +32,7 @@ export default class extends WebApiAction {
       await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
     }
 
-    const strings = await this.i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup", "mailer")
+    const strings = await this.i18n.getStrings(this.requestData, "login-login", "login-startup", "mailer")
 
     const pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     if (!checkPass(pass)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)

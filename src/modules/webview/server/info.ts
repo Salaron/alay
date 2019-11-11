@@ -14,7 +14,7 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const code = await this.i18n.getUserLocalizationCode(this.user_id)
+    const code = await this.i18n.getUserLocalizationCode(this.requestData)
     const [strings, template, currentOnline] = await Promise.all([
       this.i18n.getStrings(code, "server-info"),
       WebView.getTemplate("server", "info"),

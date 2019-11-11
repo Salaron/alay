@@ -24,7 +24,7 @@ export default class extends WebApiAction {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
       await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
     }
-    const strings = await this.i18n.getStrings(<string>this.requestData.auth_token, "login-login", "login-startup")
+    const strings = await this.i18n.getStrings(this.requestData, "login-login", "login-startup")
 
     this.user_id = parseInt(Buffer.from(Utils.RSADecrypt(this.params.user_id), "base64").toString())
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()

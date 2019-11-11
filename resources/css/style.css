@@ -106,6 +106,10 @@ th {
   color: white!important;
 }*/
 
+.uk-table td {
+  vertical-align: unset;
+}
+
 .nicescroll-rails {
   border-radius: 10px;
   background: #c6dcff;

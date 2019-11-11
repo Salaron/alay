@@ -48,7 +48,7 @@ export default class extends WebViewAction {
 
     let code = this.params.lang
     if (!guest) {
-      if (!code) code = await this.i18n.getUserLocalizationCode(this.user_id)
+      if (!code) code = await this.i18n.getUserLocalizationCode(this.requestData)
     } else if (!code || !Config.i18n.languages.getKey(code)) {
       code = Config.i18n.defaultLanguage
     }

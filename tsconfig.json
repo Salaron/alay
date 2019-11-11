@@ -6,7 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./compile/",
+    "outDir": "./dist/",
     "rootDir": "./src/",
     "preserveSymlinks": true,
     "removeComments": true,

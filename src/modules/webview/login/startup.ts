@@ -18,7 +18,7 @@ export default class extends WebViewAction {
     }
 
     const [strings, template] = await Promise.all([
-      this.i18n.getStrings(<string>this.requestData.auth_token, "login-startup", "login-login"),
+      this.i18n.getStrings(this.requestData, "login-startup", "login-login"),
       this.webview.getTemplate("login", "startup")
     ])
 
