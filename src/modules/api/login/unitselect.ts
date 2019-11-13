@@ -39,7 +39,7 @@ export default class extends ApiAction {
       uouid.push((await this.unit.addUnit(this.user_id, u)).unit_owning_user_id)
     })
     await this.connection.query("UPDATE users SET tutorial_state=-1, partner_unit=:partner, setting_award_id=:award WHERE user_id=:user", {
-      partner: uouid[4].unit_owning_user_id,
+      partner: uouid[4],
       user: this.user_id,
       award: titleId
     })
@@ -48,15 +48,15 @@ export default class extends ApiAction {
     await this.connection.query("INSERT INTO user_unit_deck VALUES (:user, 1, 'Team A')", { user: this.user_id })
     await this.connection.query("INSERT INTO user_unit_deck_slot VALUES (:user, 1, 1, :s1),(:user, 1, 2, :s2),(:user, 1, 3, :s3),(:user, 1, 4, :s4),(:user, 1, 5, :s5),(:user, 1, 6, :s6),(:user, 1, 7, :s7),(:user, 1, 8, :s8),(:user, 1, 9, :s9);",{
       user: this.user_id,
-      s1: uouid[0].unit_owning_user_id,
-      s2: uouid[1].unit_owning_user_id,
-      s3: uouid[2].unit_owning_user_id,
-      s4: uouid[3].unit_owning_user_id,
-      s5: uouid[4].unit_owning_user_id,
-      s6: uouid[5].unit_owning_user_id,
-      s7: uouid[6].unit_owning_user_id,
-      s8: uouid[7].unit_owning_user_id,
-      s9: uouid[8].unit_owning_user_id,
+      s1: uouid[0],
+      s2: uouid[1],
+      s3: uouid[2],
+      s4: uouid[3],
+      s5: uouid[4],
+      s6: uouid[5],
+      s7: uouid[6],
+      s8: uouid[7],
+      s9: uouid[8],
     })
 
     return {
