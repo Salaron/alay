@@ -60,9 +60,9 @@ export class WebView extends CommonModule {
     }
 
     const [htmlTemplate, headerTemplate, clModalTemplate, userLangCode] = await Promise.all([
-      WebView.getTemplate("common", "htmlHead"),
-      WebView.getTemplate("common", "header"),
-      WebView.getTemplate("common", "changelanguage"),
+      WebView.getTemplate("header", "htmlHead"),
+      WebView.getTemplate("header", "header"),
+      WebView.getTemplate("modal", "changelanguage"),
       this.action.i18n.getUserLocalizationCode(this.requestData)
     ])
 
@@ -81,7 +81,7 @@ export class WebView extends CommonModule {
 }
 
 // Handlebars Helpers
-Handlebars.registerHelper("equal", function (this: any, a, b, options) {
+Handlebars.registerHelper("equal", function(this: any, a, b, options) {
   if (a == b) { return options.fn(this) }
   return options.inverse(this)
 })
@@ -99,7 +99,7 @@ Handlebars.registerHelper("notAvailable", (value) => {
 })
 
 Handlebars.registerHelper("header", (pageName, context) => {
-  const template = WebView.getTemplateSync("common", "header")
+  const template = WebView.getTemplateSync("header", "header")
   context.i18n.pageName = pageName
   context.support = {
     mail: Config.mailer.supportMail,
@@ -120,7 +120,7 @@ Handlebars.registerHelper("numberWithSpaces", (value) => {
   return new Handlebars.SafeString(parts.join("."))
 })
 
-Handlebars.registerHelper("ifcond", function (this: any, v1, operator, v2, options) {
+Handlebars.registerHelper("ifcond", function(this: any, v1, operator, v2, options) {
   switch (operator) {
     case "==":
       return (v1 == v2) ? options.fn(this) : options.inverse(this)
