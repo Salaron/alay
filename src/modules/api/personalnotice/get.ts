@@ -17,8 +17,7 @@ export default class extends ApiAction {
       notice_id: 1,
       type: 1,
       title: "",
-      contents: "",
-      server_timestamp: Utils.timeStamp()
+      contents: ""
     }
 
     // if welcome message is enabled check if it is agreed

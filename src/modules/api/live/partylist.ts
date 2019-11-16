@@ -46,8 +46,7 @@ export default class extends ApiAction {
       has_slide_notes: liveData.swing_flag,
       party_list: [],
       training_energy: 5,
-      training_energy_max: 5,
-      server_timestamp: Utils.timeStamp()
+      training_energy_max: 5
     }
 
     const friendIds = (await this.connection.query("SELECT initiator_id, recipient_id FROM user_friend WHERE (initiator_id = :user OR recipient_id = :user) AND STATUS = 1", {

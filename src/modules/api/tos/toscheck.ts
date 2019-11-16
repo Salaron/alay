@@ -18,8 +18,7 @@ export default class extends ApiAction {
       result: {
         tos_id: -1,
         tos_type: 1,
-        is_agreed: typeof check != "undefined",
-        server_timestamp: Utils.timeStamp()
+        is_agreed: typeof check != "undefined"
       }
     }
   }

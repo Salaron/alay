@@ -62,8 +62,7 @@ export default class extends ApiAction {
 
     const response = {
       time_limit: moment(new Date()).utcOffset("+0900").add(1, "hour").format("YYYY-MM-DD HH:mm:ss"),
-      member_category_list: [museCategory, aqoursCategory],
-      server_timestamp: Utils.timeStamp()
+      member_category_list: [museCategory, aqoursCategory]
     }
 
     return {

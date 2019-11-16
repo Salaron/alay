@@ -8,7 +8,6 @@ export default class extends ApiAction {
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
-  private User: any
   constructor(requestData: RequestData) {
     super(requestData)
   }
@@ -120,7 +119,7 @@ export default class extends ApiAction {
         name: profileInfo.name,
         level: profileInfo.level
       },
-      center_unit_info: await this.User.getCenterUnitInfo(profileInfo.user_id),
+      center_unit_info: await this.user.getCenterUnitInfo(profileInfo.user_id),
       setting_award_id: profileInfo.setting_award_id
     }
   }

@@ -15,18 +15,18 @@ export default class extends ApiAction {
     const birth = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
       user: this.user_id
     })
-    const response: any = {
-      user: await this.user.getUserInfo(this.user_id),
-      server_timestamp: Utils.timeStamp()
-    }
-    if (birth.birth_month != null && birth.birth_day != null) response.birth = {
+
+    let user = await this.user.getUserInfo(this.user_id)
+    if (birth.birth_month != null && birth.birth_day != null) user.birth = {
       birth_month: birth.birth_month,
       birth_day: birth.birth_day
     }
 
     return {
       status: 200,
-      result: response
+      result: {
+        user
+      }
     }
   }
 }

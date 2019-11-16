@@ -73,7 +73,6 @@ export default class extends ApiAction {
         authorize_token: newToken,
         user_id: userData.user_id,
         review_version: "", // iOS feature?
-        server_timestamp: Utils.timeStamp()
       }
     }
   }

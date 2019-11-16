@@ -68,8 +68,7 @@ export default class extends ApiAction {
       result: {
         authorize_token: newToken,
         user_id: this.user_id,
-        review_version: "", // iOS feature?
-        server_timestamp: Utils.timeStamp()
+        review_version: "" // iOS feature?
       }
     }
   }

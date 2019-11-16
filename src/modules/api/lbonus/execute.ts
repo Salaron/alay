@@ -57,8 +57,7 @@ export default class extends ApiAction {
         reset_exchange_rate: false,
         unite_info: []
       },
-      class_system: User.getClassSystemStatus(this.user_id),
-      server_timestamp: Utils.timeStamp()
+      class_system: User.getClassSystemStatus(this.user_id)
     }
 
     for (const day of currentMonthCalendar) {
