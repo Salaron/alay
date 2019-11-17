@@ -75,7 +75,12 @@ export default class RequestData {
           `token=${this.auth_token}; expires=${new Date(new Date().getTime() + Config.modules.user.userSessionExpire * 1000).toUTCString()}; path=/; SameSite=Strict;`
         ])
       }
-      if (!this.headers["x-requested-with"]) this.requestFromBrowser = true
+      if (
+        !this.headers["x-requested-with"] ||
+        !this.headers["application-id"] ||
+        !this.headers["os"] ||
+        !this.headers["os-version"]
+      ) this.requestFromBrowser = true
     }
 
     if (formData && formData.request_data && hType === HANDLER_TYPE.API) {
