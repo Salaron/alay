@@ -16,10 +16,10 @@ export default class extends ApiAction {
     const birth = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
       user: this.user_id
     })
-    const isTodayBirthday = moment(birth.birth_day, "DD").isSame(Date.now(), "day") && moment(birth.birth_month, "MM").isSame(Date.now(), "month")
     const presents = await this.connection.first("SELECT count(incentive_id) as count FROM reward_table WHERE user_id = :user AND opened_date IS NULL", {
       user: this.user_id
     })
+    const isTodayBirthday = moment(birth.birth_day, "DD").isSame(Date.now(), "day") && moment(birth.birth_month, "MM").isSame(Date.now(), "month")
     const greets = await this.connection.first(`SELECT count(notice_id) as count FROM user_greet WHERE receiver_id = :user AND deleted_from_receiver = 0 AND readed = 0`, {
       user: this.user_id
     })
@@ -55,8 +55,10 @@ export default class extends ApiAction {
       friend_action_cnt: greets.count + variety.count,
       friend_greet_cnt: greets.count,
       friend_variety_cnt: variety.count,
-      present_cnt: presents.count,
+      friend_new_cnt: 0, // TODO
+      friends_request_cnt: 0,
       friends_approval_wait_cnt: approval.count,
+      present_cnt: presents.count,
       free_muse_gacha_flag: false,
       free_aqours_gacha_flag: false,
       server_datetime: Utils.parseDate(Date.now()),
@@ -70,8 +72,21 @@ export default class extends ApiAction {
       },
       using_buff_info: [],
       show_anniversary: false,
+      klab_id_task_can_sync: false,
       is_klab_id_task_flag: false,
-      klab_id_tasc_can_sync: false
+      has_unread_announce: false,
+      secret_box_id_list: [
+        [
+          2
+        ],
+        []
+      ],
+      exchange_badge_cnt: [
+        0,
+        0
+      ],
+      limit_bonus_ur_info: [],
+      free_ticket_list: []
     }
 
     return {

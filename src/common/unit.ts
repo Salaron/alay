@@ -291,15 +291,18 @@ export class Unit extends CommonModule {
       level: (options.maxRank || data.rank_max_flag) && (options.maxLevel || data.rank_level_max_flag) ? 1 : 0,
       all: ((options.maxRank && options.maxLove && options.maxLevel) || (data.rank_max_flag && data.love_max_flag && data.rank_level_max_flag)) ? 1 : 0,
       lovemax: data.highest_love_per_unit ? Math.min(data.highest_love_per_unit + options.addLove, data.highest_love_per_unit) : options.addLove,
-      lovetotal: data.total_love ? data.total_love + options.addLove : options.addLove,
-      fav: data.favorite_point ? data.favorite_point + options.addFavPt : options.addFavPt
+      lovetotal: options.addLove,
+      fav: options.addFavPt
     }
 
     await this.connection.query(`
     INSERT INTO
       user_unit_album VALUES (:user, :unit, :rank, :love, :level, :all, :lovemax, :lovetotal, :fav)
-    ON DUPLICATE KEY UPDATE rank_max_flag = :rank, love_max_flag = :love, rank_level_max_flag = :level, all_max_flag = :all, highest_love_per_unit = :lovemax,
-    total_love = :lovetotal,favorite_point = :fav`, values)
+    ON DUPLICATE KEY UPDATE
+      rank_max_flag = :rank, love_max_flag = :love, rank_level_max_flag = :level,
+      all_max_flag = :all, highest_love_per_unit = :lovemax, total_love = total_love + :lovetotal,
+      favorite_point = favorite_point + :fav
+    `, values)
 
     return Object.keys(data).length === 0
   }

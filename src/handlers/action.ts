@@ -63,8 +63,8 @@ export default async function executeAction(module: string, action: string, requ
     hrTime = process.hrtime(hrTime)
     log.debug(`[${module}/${action}] ${Math.floor(hrTime[0] * 1000 + hrTime[1] / 1000000)} ms`)
 
-    if (requestData.handlerType === HANDLER_TYPE.API) {
-      if (!Array.isArray(response.result) && response.status === 200) {
+    if (requestData.handlerType === HANDLER_TYPE.API && options.responseType === RESPONSE_TYPE.SINGLE) {
+      if (!Array.isArray(response.result) && response.status === 200 && HANDLER_TYPE) {
         response.result.server_timestamp = Utils.timeStamp()
         if (requestData.auth_level >= AUTH_LEVEL.CONFIRMED_USER) {
           try {

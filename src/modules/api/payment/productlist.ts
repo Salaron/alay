@@ -17,17 +17,28 @@ export default class extends ApiAction {
         restriction_info: {
           restricted: false
         },
-        under_age_info: {
-          birth_set: true,
-          has_limit: false,
-          limit_amount: null,
-          month_used: 0
-        },
         sns_product_list: [
-          { product_id: "Fake", name: "a", price: 1, can_buy: false, product_type: 1, item_list: [{ item_id: 4, add_type: 3001, amount: 5, is_freebie: false }] }
+          {
+            product_id: "Test",
+            name: "a",
+            price: 0,
+            can_buy: false,
+            product_type: 2,
+            item_list: [
+              {
+                item_id: 4,
+                add_type: 3001,
+                amount: 1,
+                is_freebie: false
+              }
+            ]
+          }
         ],
-        product_list: [],
-        subscription_list: []
+        product_list: [
+        ],
+        subscription_list: [
+        ],
+        show_point_shop: true
       }
     }
   }
