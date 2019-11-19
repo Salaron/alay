@@ -459,7 +459,7 @@ export class Live extends CommonModule {
       if (deck[4].is_rank_max) deck[4].love_max = true
     }
 
-    return await Promise.all(deck.map(async unit => {
+    await deck.forEachAsync(async unit => {
       await this.action.unit.updateAlbum(userId, unit.unit_id, {
         maxRank: unit.is_rank_max,
         maxLove: Math.min(unit.love + unit.kizuna_add, unit.max_love) === unit.max_love && unit.rank === unit.max_rank,
@@ -478,11 +478,11 @@ export class Live extends CommonModule {
         }, "Unit bond max", 1, true)
       }
       unit.love = Math.min(unit.love + unit.kizuna_add, unit.max_love)
-      unit.kizuna_add = undefined
-      unit.fpt_add = undefined
-      unit.kizuna_max = undefined
+      unit.fpt_add = unit.kizuna_add = unit.kizuna_max = undefined
       return unit
-    }))
+    })
+
+    return deck
   }
 
   public async writeToLog(userId: number, result: writeToLogResult) {
