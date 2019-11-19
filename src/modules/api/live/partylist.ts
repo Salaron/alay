@@ -43,6 +43,12 @@ export default class extends ApiAction {
     }
 
     const response: any = {
+      live_info: {
+        live_difficulty_id: this.params.live_difficulty_id,
+        is_random: liveData.difficulty === 5,
+        ac_flag: liveData.ac_flag,
+        swing_flag: liveData.swing_flag
+      },
       has_slide_notes: liveData.swing_flag,
       party_list: [],
       training_energy: 5,

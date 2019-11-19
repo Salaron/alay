@@ -286,7 +286,7 @@ export class Unit extends CommonModule {
     const values = {
       user: userId,
       unit: unitId,
-      rank: options.maxRank ? 1 : 0,
+      rank: options.maxRank || data.rank_max_flag ? 1 : 0,
       love: (options.maxRank || data.rank_max_flag) && (options.maxLove || data.love_max_flag) ? 1 : 0,
       level: (options.maxRank || data.rank_max_flag) && (options.maxLevel || data.rank_level_max_flag) ? 1 : 0,
       all: ((options.maxRank && options.maxLove && options.maxLevel) || (data.rank_max_flag && data.love_max_flag && data.rank_level_max_flag)) ? 1 : 0,

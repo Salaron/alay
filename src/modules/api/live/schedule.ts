@@ -1,6 +1,7 @@
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import moment = require("moment")
 
 const marathonDB = sqlite3.getMarathon()
 
@@ -14,11 +15,24 @@ export default class extends ApiAction {
   }
 
   public async execute() {
+    const currentDayOfWeek = moment().utcOffset("+0900").day()
+
     const response: any = {
       event_list: [],
       live_list: [],
       limited_bonus_list: [],
-      random_live_list: [], // TODO
+      random_live_list: [
+        {
+          attribute_id: currentDayOfWeek % 3 + 1,
+          start_date: moment().utcOffset("+0900").startOf("day").format("YYYY-MM-DD HH:mm:ss"),
+          end_date: moment().utcOffset("+0900").endOf("day").format("YYYY-MM-DD HH:mm:ss"),
+        },
+        {
+          attribute_id: (currentDayOfWeek + 1) % 3 + 1,
+          start_date: moment().utcOffset("+0900").add(1, "day").startOf("day").format("YYYY-MM-DD HH:mm:ss"),
+          end_date: moment().utcOffset("+0900").add(1, "day").endOf("day").format("YYYY-MM-DD HH:mm:ss"),
+        }
+      ],
       free_live_list: [],
       training_live_list: []
     }
@@ -70,6 +84,7 @@ export default class extends ApiAction {
         })
       }
     }
+
     return {
       status: 200,
       result: response

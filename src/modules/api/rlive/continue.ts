@@ -1,5 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
+import { TYPE } from "../../../common/type"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -8,6 +9,12 @@ export default class extends ApiAction {
 
   constructor(requestData: RequestData) {
     super(requestData)
+  }
+
+  public paramTypes() {
+    return {
+      token: TYPE.STRING
+    }
   }
 
   public async execute() {
@@ -22,8 +29,8 @@ export default class extends ApiAction {
 
     const before = await this.connection.first(`SELECT sns_coin FROM users WHERE user_id = :user`, { user: this.user_id })
     if (before.sns_coin - 1 < 0) throw new ErrorCode(720, "Not enough loveca")
-    await this.connection.query(`UPDATE users SET sns_coin=sns_coin - 1 WHERE user_id = :user`, { user: this.user_id })
-    await this.connection.query(`UPDATE user_live_progress SET continue_attempts=continue_attempts + 1 WHERE user_id = :user`, {
+    await this.connection.query(`UPDATE users SET sns_coin = sns_coin - 1 WHERE user_id = :user`, { user: this.user_id })
+    await this.connection.query(`UPDATE user_live_progress SET continue_attempts = continue_attempts + 1 WHERE user_id = :user`, {
       user: this.user_id
     })
 
