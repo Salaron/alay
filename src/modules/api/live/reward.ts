@@ -151,7 +151,7 @@ export default class extends ApiAction {
 
     await this.live.writeToLog(this.user_id, {
       live_setting_id: liveData.live_setting_id,
-      is_event: false,
+      is_event: eventLive,
       score: totalScore,
       combo: this.params.max_combo,
       combo_rank: comboRank,

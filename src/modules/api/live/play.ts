@@ -30,8 +30,9 @@ export default class extends ApiAction {
 
   public async execute() {
     const eventStatus = await this.eventStub.getEventStatus(EventStub.getEventTypes().TOKEN)
-    // clear data about any previous live session
-    await this.connection.query("DELETE FROM user_live_progress WHERE user_id=:user", { user: this.user_id })
+    const prevSession = await this.connection.query("SELECT * FROM user_live_progress WHERE user_id = :user", { user: this.user_id })
+    if (prevSession.length > 0) throw new ErrorCode(1234, "Another live session in progress!")
+
     const guest = await this.connection.first(`
     SELECT units.unit_id FROM users
     JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id

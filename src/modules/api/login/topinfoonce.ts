@@ -24,13 +24,13 @@ export default class extends ApiAction {
         update_info: false,
         campaign: false,
         live: false,
-        lbonus: true,
+        lbonus: false,
         muse_event: false,
         muse_secretbox: false,
-        muse_birthday: true,
+        muse_birthday: false,
         aqours_event: false,
         aqours_secretbox: false,
-        aqours_birthday: true
+        aqours_birthday: false
       }
     }
 
