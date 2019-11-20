@@ -88,6 +88,7 @@ export class Sqlite3 {
   private other: Sqlite3Wrapper
   private event: Sqlite3Wrapper
   private achievement: Sqlite3Wrapper
+  private download: Sqlite3Wrapper
   constructor() {
     // check if all databases exists
     if (!existsSync(rootDir + "data/db/unit.db_")) {
@@ -125,6 +126,9 @@ export class Sqlite3 {
     }
     if (!existsSync(rootDir + "data/db/achievement.db_")) {
       throw new Error("Required file 'data/db/achievement.db_' is missing")
+    }
+    if (!existsSync(rootDir + "data/db/download.db_")) {
+      throw new Error("Required file 'data/db/download.db_' is missing")
     }
   }
   public getUnit() {
@@ -174,5 +178,9 @@ export class Sqlite3 {
   public getAchievement() {
     if (!this.achievement || this.achievement.closed) return this.achievement = new Sqlite3Wrapper(rootDir + "data/db/achievement.db_", "ro")
     else return this.achievement
+  }
+  public getDownload() {
+    if (!this.download || this.download.closed) return this.download = new Sqlite3Wrapper(rootDir + "data/db/download.db_", "rw")
+    else return this.download
   }
 }

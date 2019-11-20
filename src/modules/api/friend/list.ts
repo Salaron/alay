@@ -111,7 +111,8 @@ export default class extends ApiAction {
       status: 200,
       result: {
         item_count: friends.length,
-        friend_list: friends
+        friend_list: friends,
+        new_friend_list: [] // should be Array<{user_id: number}> that contains uids, that appear in friend list recently
       }
     }
   }

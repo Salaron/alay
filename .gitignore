@@ -7,3 +7,4 @@ tsconfig.tsbuildinfo
 
 data/**/*.db_
 !data/db/live_notes.db_
+!data/db/download.db_

@@ -11,7 +11,15 @@ export default class extends ApiAction {
     super(requestData)
   }
 
+  public paramCheck() {
+    return (Array.isArray(this.params.excluded_package_ids))
+  }
+
   public async execute() {
+    this.params.excluded_package_ids.map((id: number) => {
+      if (isNaN(Number(id))) throw new ErrorUser(`Invalid type provided`, this.user_id)
+    })
+    if (this.params.os !== "Android" && this.params.os !== "iOS") throw new ErrorUser(`Invalid os`, this.user_id)
 
     if (this.requestData.params.package_type === 0) return {
       status: 200,
@@ -19,7 +27,7 @@ export default class extends ApiAction {
     }
     if (this.requestData.params.package_type === 1) return {
       status: 200,
-      result: Download.getSong()
+      result: await Download.getSongPackages(this.params.os, this.params.excluded_package_ids)
     }
 
     return {
