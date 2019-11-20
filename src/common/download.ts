@@ -89,7 +89,10 @@ export class Download {
       os
     })
     return packages = packages.filter(pkg => {
-      return Utils.versionCompare(pkg.version, Config.server.server_version) != 1 // exclude versions upper than server allows
+      return (
+        Utils.versionCompare(pkg.version, Config.server.server_version) !== 1 && // exclude versions upper than server allows
+        Utils.versionCompare(pkg.version, clientVersion) === 1                   // and versions lower than client have
+      )
     }).sort((a, b) => {
       return Utils.versionCompare(a.version, b.version) // asc sort
     })
