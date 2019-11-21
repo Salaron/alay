@@ -2,6 +2,13 @@
   .uk-radio {
     margin-left: 5px;
   }
+
+  .uk-form-label {
+    font-size: 1.12em;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
 </style>
 <div id="outer">
   <div id="inner">
@@ -13,36 +20,49 @@
       <div id="bodywrapper">
         <div class="uk-container uk-container-small">
           <h3 class="uk-text-bold" href="#">{{i18n/mods}}</h3>
-          <h4 class="uk-margin-remove">{{nl2br i18n/modsNotice}}</h4>
-          <h4 uk-tooltip="title: {{nl2br i18n/vanishTooltip}}; pos: bottom-left" style="width: 60px;">Vanish:</h4>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="0" {{setChecked 0 mods/vanish}}>
-            Disable</label>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="1" {{setChecked 1 mods/vanish}}>
-            Hidden</label>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="2" {{setChecked 2 mods/vanish}}>
-            Sudden</label>
+          <h4>{{nl2br i18n/modsNotice}}</h4>
 
-          <h4 uk-tooltip="title: {{nl2br i18n/mirrorTooltip}}; pos: bottom-left" style="width: 60px;">Mirror:</h4>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="mirror" value="0" {{setChecked 0 mods/mirror}}>
-            Disable</label>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="mirror" value="1" {{setChecked 1 mods/mirror}}>
-            Enable</label>
+          <label for="vanish" class="uk-form-label"
+            uk-tooltip="title: {{nl2br i18n/vanishTooltip}}; pos: bottom-left">Vanish:</label>
+          <input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="0" {{setChecked 0 mods/vanish}}>
+          Disable
+          <input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="1" {{setChecked 1 mods/vanish}}> Hidden
+          <input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="2" {{setChecked 2 mods/vanish}}> Sudden
+          <br>
 
-          <h4 uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left" style="width: 50px;">HP:</h4>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="hp" value="0" {{setChecked 0 mods/hp}}>
-            Default</label>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="hp" value="1" {{setChecked 1 mods/hp}}> 200
-            HP</label>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="hp" value="2" {{setChecked 2 mods/hp}}> 1 HP
-            (Sudden Death)</label>
+          <label for="mirror" class="uk-form-label"
+            uk-tooltip="title: {{nl2br i18n/mirrorTooltip}}; pos: bottom-left">Mirror:</label>
+          <input class="uk-radio sl-mod-radio" type="radio" name="mirror" value="0" {{setChecked 0 mods/mirror}}>
+          Disable
+          <input class="uk-radio sl-mod-radio" type="radio" name="mirror" value="1" {{setChecked 1 mods/mirror}}> Enable
+          <br>
 
-          <h4 uk-tooltip="title: {{nl2br i18n/applyForEventTooltip}}; pos: bottom-left" style="width: 350px;">
-            {{i18n/applyForEvent}}</h4>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="event" value="0" {{setChecked 0 mods/event}}>
-            {{i18n/no}}</label>
-          <label><input class="uk-radio sl-mod-radio" type="radio" name="event" value="1" {{setChecked 1 mods/event}}>
-            {{i18n/yes}}</label>
+          <label for="hp" class="uk-form-label"
+            uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left">HP:</label>
+          <input class="uk-radio sl-mod-radio" type="radio" name="hp" value="0" {{setChecked 0 mods/hp}}> Default
+          <input class="uk-radio sl-mod-radio" type="radio" name="hp" value="1" {{setChecked 1 mods/hp}}> 200 HP
+          <input class="uk-radio sl-mod-radio" type="radio" name="hp" value="2" {{setChecked 2 mods/hp}}> 1 HP (Sudden
+          Death)
+          <br>
 
+          <label for="event" class="uk-form-label"
+            uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left">{{i18n/applyForEvent}}</label>
+          <br>
+          <input class="uk-radio sl-mod-radio" type="radio" name="event" value="0" {{setChecked 0 mods/event}}>
+          {{i18n/no}}
+          <input class="uk-radio sl-mod-radio" type="radio" name="event" value="1" {{setChecked 1 mods/event}}>
+          {{i18n/yes}}
+          <br>
+
+          <label for="mf-song-pool" class="uk-form-label">MedFes song pool:</label>
+          <input class="uk-radio sl-mod-radio" type="radio" name="mf-song-pool" value="0" disabled>
+          Default
+          <input class="uk-radio sl-mod-radio" type="radio" name="mf-song-pool" value="1" disabled>
+          Game Mode
+          <input class="uk-radio sl-mod-radio" type="radio" name="mf-song-pool" value="2" disabled>
+          µ's
+          <input class="uk-radio sl-mod-radio" type="radio" name="mf-song-pool" value="3" disabled>
+          Aqours
           <hr>
 
           <h3 class="uk-text-bold" href="#">{{i18n/passwordAndEmail}}</h3>
@@ -92,13 +112,13 @@
           <h4 class="uk-margin-remove">Позволяет удалить карты, которые не состоят в командах, не выбраны в качестве
             партнёра и не помечены замочком.</h4>
           <div class="uk-margin-small">
-            <h4>Редкость:
-              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="4"> UR</label>
-              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="5"> SSR</label>
-              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="3"> SR</label>
-              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="2"> R</label>
-              <label><input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="1"> N</label>
-            </h4>
+            <label for="bulk-delete" class="uk-form-label">Редкость:</label>
+            <input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="4"> UR
+            <input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="5"> SSR
+            <input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="3"> SR
+            <input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="2"> R
+            <input class="uk-radio sl-bulk-delete" type="radio" name="bulk-delete" value="1"> N
+            <br>
             <button id="bulk-delete-button" type="button" class="uk-button uk-button-primary uk-border-pill"
               href="#bulk-delete-modal" uk-toggle disabled>Удалить!</button>
           </div>
