@@ -2,7 +2,6 @@ import nodemailer from "nodemailer"
 import { Log } from "./log"
 
 const log = new Log("Mailer")
-
 export class Mailer {
   public available = false
   private transporter: nodemailer.Transporter
@@ -10,6 +9,10 @@ export class Mailer {
     if (Config.mailer.enabled) {
       this.connect()
     }
+  }
+
+  public static getInstance() {
+    return mailer
   }
 
   public async sendMail(receivers: string, subject: string, text: string) {
@@ -43,4 +46,4 @@ export class Mailer {
     }
   }
 }
-(global as any).Mailer = new Mailer()
+const mailer = new Mailer()

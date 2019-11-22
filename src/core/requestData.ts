@@ -193,6 +193,7 @@ export default class RequestData {
       "bundle-version": this.headers["bundle-version"] || Config.client.application_version,
       "client-version": this.headers["client-version"] || Config.server.server_version,
       "application-id": this.headers["application-id"] || Config.client.application_id,
+      "os-version": this.request.headers["os-version"],
       "authorize": querystring.stringify(authorizeHeader)
     }
     return headers

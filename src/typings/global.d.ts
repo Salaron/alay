@@ -1,7 +1,6 @@
 import { Type as type } from "../common/type"
 import { config } from "../core/config"
 import { Sqlite3 } from "../core/database/sqlite3"
-import { Mailer as mailer } from "../core/mailer"
 import { ApiAction as apiAction, WebApiAction as webApiAction, WebViewAction as webViewAction } from "../models/actions"
 import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../models/error"
 
@@ -12,7 +11,6 @@ declare global {
   const sqlite3: Sqlite3
   // core modules should be global
   const Config: config
-  const Mailer: mailer
   // custom errors for handling
   const ErrorCode: typeof errorCode
   const ErrorUser: typeof errorUser

@@ -78,7 +78,15 @@ export async function init() {
 
 }
 (async () => {
-  setInterval(() => { init() }, 19800000) // 5 hours 30 mins
+  if (
+    Config.llsifclient.host.length &&
+    Config.llsifclient.application_key.length &&
+    Config.llsifclient.base_key.length &&
+    Config.llsifclient.login_key.length &&
+    Config.llsifclient.login_passwd.length
+  ) {
+    setInterval(() => { init() }, 19800000) // 5 hours 30 mins
+  }
 })()
 
 export class Download {
