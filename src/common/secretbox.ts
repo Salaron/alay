@@ -332,6 +332,8 @@ export class Secretbox extends CommonModule {
       },
       before_user_info: beforeUserInfo,
       after_user_info: afterUserInfo,
+      free_muse_gacha_flag: false,
+      free_aqours_gacha_flag: false,
       lowest_rarity: Utils.createObjCopy(rarityData).sort((a, b) => a.rarity - b.rarity)[0].rarity,
       promotion_performance_rate: 10, // idk...
       secret_box_parcel_type: 2, // idk...
