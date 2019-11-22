@@ -89,47 +89,24 @@ export class Sqlite3 {
   private event: Sqlite3Wrapper
   private achievement: Sqlite3Wrapper
   private download: Sqlite3Wrapper
+  private banner: Sqlite3Wrapper
   constructor() {
-    // check if all databases exists
-    if (!existsSync(rootDir + "data/db/unit.db_")) {
-      throw new Error("Required file 'data/db/unit.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/live.db_")) {
-      throw new Error("Required file 'data/db/live.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/team_duty.db_")) {
-      throw new Error("Required file 'data/db/team_duty.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/exchange.db_")) {
-      throw new Error("Required file 'data/db/exchange.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/festival.db_")) {
-      throw new Error("Required file 'data/db/festival.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/item.db_")) {
-      throw new Error("Required file 'data/db/item.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/live_notes.db_")) {
-      throw new Error("Required file 'data/db/live_notes.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/marathon.db_")) {
-      throw new Error("Required file 'data/db/marathon.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/secretbox.db_")) {
-      throw new Error("Required file 'data/db/secretbox.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/other.db_")) {
-      throw new Error("Required file 'data/db/other.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/event_common.db_")) {
-      throw new Error("Required file 'data/db/event_common.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/achievement.db_")) {
-      throw new Error("Required file 'data/db/achievement.db_' is missing")
-    }
-    if (!existsSync(rootDir + "data/db/download.db_")) {
-      throw new Error("Required file 'data/db/download.db_' is missing")
-    }
+    this.checkAllDatabases([
+      "unit.db_",
+      "live.db_",
+      "team_duty.db_",
+      "exchange.db_",
+      "festival.db_",
+      "item.db_",
+      "marathon.db_",
+      "secretbox.db_",
+      "other.db_",
+      "event_common.db_",
+      "achievement.db_",
+      "sv_live_notes.db_",
+      "sv_download.db_",
+      "sv_banner.db_"
+    ])
   }
   public getUnit() {
     if (!this.unit || this.unit.closed) return this.unit = new Sqlite3Wrapper(rootDir + "data/db/unit.db_", "ro")
@@ -152,7 +129,7 @@ export class Sqlite3 {
     else return this.marathon
   }
   public getNotes() {
-    if (!this.notes || this.notes.closed) return this.notes = new Sqlite3Wrapper(rootDir + "data/db/live_notes.db_", "ro")
+    if (!this.notes || this.notes.closed) return this.notes = new Sqlite3Wrapper(rootDir + "data/db/sv_live_notes.db_", "ro")
     else return this.notes
   }
   public getExchange() {
@@ -180,7 +157,19 @@ export class Sqlite3 {
     else return this.achievement
   }
   public getDownload() {
-    if (!this.download || this.download.closed) return this.download = new Sqlite3Wrapper(rootDir + "data/db/download.db_", "rw")
+    if (!this.download || this.download.closed) return this.download = new Sqlite3Wrapper(rootDir + "data/db/sv_download.db_", "rw")
     else return this.download
+  }
+  public getBanner() {
+    if (!this.banner || this.banner.closed) return this.banner = new Sqlite3Wrapper(rootDir + "data/db/sv_banner.db_", "rw")
+    else return this.banner
+  }
+
+  private checkAllDatabases(dbNames: string[]) {
+    dbNames.forEach(dbName => {
+      if (!existsSync(`${rootDir}/data/db/${dbName}`)) {
+        throw new Error(`Required file 'data/db/${dbName}' is missing`)
+      }
+    })
   }
 }

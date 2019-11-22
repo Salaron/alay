@@ -6,5 +6,6 @@ src/config/*
 tsconfig.tsbuildinfo
 
 data/**/*.db_
-!data/db/live_notes.db_
-!data/db/download.db_
+!data/db/sv_live_notes.db_
+!data/db/sv_download.db_
+!data/db/sv_banner.db_
