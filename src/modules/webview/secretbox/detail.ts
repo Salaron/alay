@@ -106,7 +106,7 @@ export default class extends WebViewAction {
             let data = rarity.unit_data_by_id[unitId]
             return {
               cardNumber: data.unit_number,
-              unitName: data.name,
+              icon: data.normal_icon_asset,
               skillName: data.skill,
               cardAttribute: getAttributeString(data.attribute)
             }
@@ -115,7 +115,7 @@ export default class extends WebViewAction {
             let data = rarity.unit_data_by_id[unitId]
             return {
               cardNumber: data.unit_number,
-              unitName: data.name,
+              icon: data.normal_icon_asset,
               skillName: data.skill,
               cardAttribute: getAttributeString(data.attribute)
             }
@@ -140,7 +140,11 @@ export default class extends WebViewAction {
         result: await this.webview.compileBodyTemplate(template, this.requestData, {
           secretbox,
           costList,
-          pageTitle: secretbox.name
+          pageTitle: secretbox.name,
+          scripts: [
+            "https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.js",
+            "https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"
+          ]
         })
       }
     } catch (err) {

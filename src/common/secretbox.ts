@@ -56,7 +56,7 @@ async function updateSettings() {
           rarityData.rateup_unit_ids = Utils.mergeArrayDedupe([rarityData.rateup_unit_id, rarityData.rateup_hidden_unit_id])
           const units = await unitDB.all(`
             SELECT
-              unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+              unit_id, normal_icon_asset, unit_number, attribute_id, unit_skill_m.name as skill_name
             FROM
               unit_m
             LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
@@ -67,7 +67,7 @@ async function updateSettings() {
             rarityData.unit_data_by_id[unit.unit_id] = {
               unit_id: unit.unit_id,
               unit_number: unit.unit_number,
-              name: unit.unit_name,
+              normal_icon_asset: unit.normal_icon_asset,
               attribute: unit.attribute_id,
               skill: unit.skill_name
             }
@@ -77,7 +77,7 @@ async function updateSettings() {
         if (Type.isArray(rarityData.unit_id)) {
           const units = await unitDB.all(`
             SELECT
-              unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+              unit_id, normal_icon_asset, unit_number, attribute_id, unit_skill_m.name as skill_name
             FROM
               unit_m
             LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
@@ -88,7 +88,7 @@ async function updateSettings() {
             rarityData.unit_data_by_id[unit.unit_id] = {
               unit_id: unit.unit_id,
               unit_number: unit.unit_number,
-              name: unit.unit_name,
+              normal_icon_asset: unit.normal_icon_asset,
               attribute: unit.attribute_id,
               skill: unit.skill_name
             }
@@ -99,7 +99,7 @@ async function updateSettings() {
         if (Array.isArray(rarityData.unit_type_id) && rarityData.unit_type_id.length > 0) {
           const units = await unitDB.all(`
             SELECT
-              unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+              unit_id, normal_icon_asset, unit_number, attribute_id, unit_skill_m.name as skill_name
             FROM
               unit_m
             LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
@@ -111,7 +111,7 @@ async function updateSettings() {
             rarityData.unit_data_by_id[unit.unit_id] = {
               unit_id: unit.unit_id,
               unit_number: unit.unit_number,
-              name: unit.unit_name,
+              normal_icon_asset: unit.normal_icon_asset,
               attribute: unit.attribute_id,
               skill: unit.skill_name
             }
@@ -130,7 +130,7 @@ async function updateSettings() {
 
               const data = await unitDB.get(`
                 SELECT
-                  unit_id, unit_m.name as unit_name, unit_number, attribute_id, unit_skill_m.name as skill_name
+                  unit_id, normal_icon_asset, unit_number, attribute_id, unit_skill_m.name as skill_name
                 FROM
                   unit_m
                 LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
@@ -141,7 +141,7 @@ async function updateSettings() {
               rarityData.unit_data_by_id[data.unit_id] = {
                 unit_id: data.unit_id,
                 unit_number: data.unit_number,
-                name: data.unit_name,
+                normal_icon_asset: unit.normal_icon_asset,
                 attribute: data.attribute_id,
                 skill: data.skill_name
               }

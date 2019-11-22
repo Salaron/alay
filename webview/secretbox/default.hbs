@@ -11,6 +11,15 @@
   .uk-tab>*>a {
     font-size: 1em;
   }
+
+  img.lazy {
+    width: 40px;
+    height: 40px;
+  }
+
+  .uk-table td {
+    padding: 2px 10px;
+  }
 </style>
 
 <div id="outer">
@@ -25,31 +34,6 @@
         </div>
       </nav>
     </div>
-
-    {{#ifcond secretbox.stubBox '||' secretbox.stepBox}}
-    <ul class="uk-flex-center uk-nav uk-nav-default" uk-scrollspy-nav="closest: li; scroll: true" uk-tab>
-      {{#each costList}}
-      {{#if default}}
-      <li class="uk-active"><a onclick='scrollbar.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{label}}</a>
-      </li>
-      {{else}}
-      <li><a onclick='scrollbar.scrollTo(0, $("#cost-{{@index}}").position().top, 1000)'>{{label}}</a></li>
-      {{/if}}
-      {{/each}}
-    </ul>
-    {{else if secretbox.honorBox}}
-    <ul class="uk-flex-center uk-nav uk-nav-default" uk-scrollspy-nav="closest: li; scroll: true" uk-tab>
-      {{#each costList.0.rarityList}}
-      {{#ifcond @index '===' 0}}
-      <li class="uk-active"><a
-          onclick='scrollbar.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a>
-      </li>
-      {{else}}
-      <li><a onclick='scrollbar.scrollTo(0, $("#rarity-0-{{@index}}").position().top, 1000)'>{{rarity}}</a></li>
-      {{/ifcond}}
-      {{/each}}
-    </ul>
-    {{/ifcond}}
 
     <div id="body">
       <div id="bodywrapper">
@@ -97,8 +81,7 @@
               <thead>
                 <tr>
                   <th>No.</th>
-                  <th>Name</th>
-                  <th>Skill Name</th>
+                  <th>Icon & Skill</th>
                   <th>Attribute</th>
                 </tr>
               </thead>
@@ -107,8 +90,8 @@
                 {{#each rateup}}
                 <tr>
                   <td class="card-number">{{cardNumber}}</td>
-                  <td>{{unitName}}</td>
-                  <td>{{skillName}}</td>
+                  <td>
+                    <img class="lazy" data-src="https://card.niconi.co.ni/asset/{{icon}}"> {{skillName}}</td>
                   <td>{{cardAttribute}}</td>
                 </tr>
                 {{/each}}
@@ -126,8 +109,7 @@
               <thead>
                 <tr>
                   <th>No.</th>
-                  <th>Name</th>
-                  <th>Skill Name</th>
+                  <th>Icon & Skill</th>
                   <th>Attribute</th>
                 </tr>
               </thead>
@@ -136,8 +118,8 @@
                 {{#each cards}}
                 <tr>
                   <td class="card-number">{{cardNumber}}</td>
-                  <td>{{unitName}}</td>
-                  <td>{{skillName}}</td>
+                  <td>
+                    <img class="lazy" data-src="https://card.niconi.co.ni/asset/{{icon}}">{{skillName}}</td>
                   <td>{{cardAttribute}}</td>
                 </tr>
                 {{/each}}
@@ -164,5 +146,6 @@
   if (!external) $(".sl-navbar-container").append('<div class="uk-navbar-right"><ul class="uk-navbar-nav"><li class="uk-active"><a href="' + extUrl + '" style="font-size: 16px;">Open in browser</a></li></ul></div>')
   $(function () {
     $("#body").getNiceScroll().remove()
+    $("img.lazy").lazyload();
   });
 </script>

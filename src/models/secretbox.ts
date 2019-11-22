@@ -19,7 +19,7 @@ export interface IRarityData {
     [unitId: number]: {
       unit_id: number
       unit_number: number
-      name: string
+      normal_icon_asset: string
       attribute: 1 | 2 | 3 | 5
       skill: string
     }
@@ -129,10 +129,10 @@ export enum buttonType {
 export enum secretboxType {
   DEFAULT = 0,
   STEP_UP = 1,
-  EXTRA = 2,
-  BOX = 3,
-  BOX_TYPE = 4,
-  STUB = 5,
+  EXTRA = 2,    // Select???
+  BOX = 3,      // Knapsack
+  BOX_TYPE = 4, // Not used?
+  STUB = 5,     // a.k.a. blue ticket box
   SELECT = 6
 }
 export enum animationType {
