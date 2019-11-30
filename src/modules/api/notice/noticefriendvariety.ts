@@ -51,16 +51,6 @@ export default class extends ApiAction {
     ) s WHERE ((receiver_id IS NULL AND friend_status = 1) OR (receiver_id = :user))`
 
     if (this.params.filter_id === 0) {
-      if (this.params.page === 0) list.push({
-        notice_id: -1,
-        filter_id: 99,
-        notice_template_id: 0,
-        message: `Your handover ID: ${(await this.connection.first("SELECT password FROM users WHERE user_id=:user", { user: this.user_id })).password}`,
-        readed: true,
-        insert_date: "Server",
-        affector: await this.getAffectorInfo(this.user_id)
-      })
-
       noticeList = await this.connection.query(`
       SELECT * FROM ${stubQuery} ORDER BY insert_date DESC LIMIT ${offset}, 40`, { user: this.user_id })
       count = (await this.connection.first(`SELECT count(*) as count FROM ${stubQuery}`, { user: this.user_id })).count + 1 // + handover/pass
