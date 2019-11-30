@@ -62,24 +62,24 @@ export default class extends ApiAction {
     let setListMemberCategory = []
     switch (param.festival_setList) {
       case FESTIVAL_SETLIST.MUSE: {
-        setListMemberCategory.push(1)
+        setListMemberCategory.push(1, 3)
         break
       }
       case FESTIVAL_SETLIST.AQOURS: {
-        setListMemberCategory.push(2)
+        setListMemberCategory.push(2, 3)
         break
       }
       case FESTIVAL_SETLIST.MGD: {
-        setListMemberCategory.push(this.params.mgd)
+        setListMemberCategory.push(this.params.mgd, 3)
         break
       }
       default: {
-        setListMemberCategory.push(1, 2)
+        setListMemberCategory.push(1, 2, 3)
       }
     }
 
-    const festivalLiveSettingIds = await festDB.all(`SELECT live_setting_id FROM event_festival_live_m`)
-    const trackIds = await liveDB.all(`
+    const festivalLiveSettingIds = await festDB.all(`SELECT live_setting_id FROM event_festival_live_m WHERE live_setting_id IN (${this.live.availableLiveList.join(",")})`)
+    let trackIds = await liveDB.all(`
     SELECT
       live_track_m.live_track_id
     FROM
@@ -89,6 +89,18 @@ export default class extends ApiAction {
       attribute_icon_id = :atb AND
       live_setting_id IN (${festivalLiveSettingIds.map(live => live.live_setting_id).join(",")}) AND
       member_category IN (${setListMemberCategory.join(",")})`, {
+      atb: attribute
+    })
+    // if none match, then select from all
+    if (trackIds.length === 0) trackIds = await liveDB.all(`
+    SELECT
+      live_track_m.live_track_id
+    FROM
+      live_setting_m
+    INNER JOIN live_track_m ON live_setting_m.live_track_id = live_track_m.live_track_id
+    WHERE
+      attribute_icon_id = :atb AND
+      live_setting_id IN (${festivalLiveSettingIds.map(live => live.live_setting_id).join(",")})`, {
       atb: attribute
     })
 

@@ -9,12 +9,12 @@
     "tslint:fix": "tslint -c tslint.json 'src/**/*.ts' --fix"
   },
   "author": "Salaron",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/extend": "^3.0.1",
     "@types/formidable": "^1.0.31",
     "@types/mime": "^2.0.1",
-    "@types/node": "^12.12.11",
+    "@types/node": "^12.12.14",
     "@types/nodemailer": "^6.2.2",
     "@types/request": "^2.48.3",
     "@types/showdown": "^1.9.3",
