@@ -1,13 +1,13 @@
 import { readFile } from "fs"
 import { promisify } from "util"
-import { Log } from "../core/log"
+import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { IRarityData, ISecretbox, ISecretboxButton, ISecretboxCost, ISecretboxData, ISecretboxEffect, ISecretboxEffectDetail, ISecretboxSettings, IStepInfo, IStepUpSettings } from "../models/secretbox"
 import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
 import { Connection } from "../core/database/mariadb"
 
-const log = new Log("Secretbox")
+const log = new Logger("Secretbox")
 const unitDB = sqlite3.getUnit()
 const secretboxDB = sqlite3.getSecretbox()
 

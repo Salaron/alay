@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http"
 import * as path from "path"
 import { Utils } from "../common/utils"
-import { Log } from "../core/log"
+import { Logger } from "../core/logger"
 
 // Various handlers
 import mainHandler from "./api"
@@ -10,7 +10,7 @@ import { writeJsonResponse } from "./response"
 import webapiHandler from "./webapi"
 import webviewHandler from "./webview"
 
-const log = new Log("Request Handler")
+const log = new Logger("Request Handler")
 
 export default async function requestHandler(request: IncomingMessage, response: ServerResponse): Promise<void> {
   try {

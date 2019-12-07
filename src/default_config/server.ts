@@ -1,5 +1,3 @@
-import { LEVEL } from "../core/log"
-
 export default <IServerConfig>{
   port: 8080,
   host: "localhost",
@@ -7,7 +5,7 @@ export default <IServerConfig>{
   XMC_check: false,
   debug_mode: false,
   API_request_limit: 32,
-  log_level: LEVEL.INFO,
+  log_level: "debug",
   admin_ids: [],
   PUBLIC_KEY: "",
   PRIVATE_KEY: "",
@@ -20,7 +18,7 @@ interface IServerConfig {
   server_version: string
   XMC_check: boolean
   API_request_limit: number
-  log_level: LEVEL
+  log_level: string
   debug_mode: boolean
   admin_ids: number[]
   PRIVATE_KEY: string

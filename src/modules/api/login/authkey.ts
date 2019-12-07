@@ -1,11 +1,11 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Log } from "../../../core/log"
+import { Logger } from "../../../core/logger"
 import crypto from "crypto"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
 
-const log = new Log("Authkey")
+const log = new Logger("Authkey")
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE

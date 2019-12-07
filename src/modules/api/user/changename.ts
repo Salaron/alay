@@ -1,9 +1,9 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Log } from "../../../core/log"
+import { Logger } from "../../../core/logger"
 import { TYPE } from "../../../common/type"
 
-const log = new Log("user/changeName")
+const log = new Logger("user/changeName")
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE

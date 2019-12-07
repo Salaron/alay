@@ -1,9 +1,8 @@
-import extend from "extend"
-import { Log } from "../core/log"
+import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
 
-const log = new Log("Common: Live")
+const log = new Logger("Live")
 
 const liveDB = sqlite3.getLive()
 const liveNotesDB = sqlite3.getNotes()
@@ -134,7 +133,10 @@ export class Live extends CommonModule {
         difficulty, ac_flag, swing_flag, live_setting_id
       FROM live_setting_m a WHERE live_setting_id = :lsid`, { lsid: tokenData.live_setting_id })
       if (!settingData) throw new Error(`Live data for live setting id #${tokenData.live_setting_id} is missing`)
-      extend(true, data, tokenData, settingData)
+      data = {
+        ...tokenData,
+        ...settingData
+      }
     }
     if (!data.random_flag) data.random_flag = 0
     if (!data.marathon_live) data.marathon_live = false

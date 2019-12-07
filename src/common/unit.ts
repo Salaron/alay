@@ -1,18 +1,17 @@
-import extend from "extend"
 import { BaseAction } from "../models/actions"
 import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
 
 const unitDB = sqlite3.getUnit()
 const exchangeDB = sqlite3.getExchange()
-const addUnitDefault: addUnitOptions = {
+const addUnitDefault = {
   level: 1,
   rank: 1,
   love: 0,
   useNumber: false,
   amount: 1
 }
-const updateAlbumDefault: updateAlbumOptions = {
+const updateAlbumDefault = {
   maxRank: false,
   maxLove: false,
   maxLevel: false,
@@ -71,21 +70,6 @@ export async function init() {
   }
 }
 
-interface addUnitOptions {
-  useNumber?: boolean
-  level?: number
-  rank?: number
-  love?: number
-  amount?: number
-}
-interface updateAlbumOptions {
-  maxRank?: boolean
-  maxLove?: boolean
-  maxLevel?: boolean
-  addLove?: number
-  addFavPt?: number
-}
-
 export class Unit extends CommonModule {
   public attributeUnits = attributeUnits
   public rarityUnits = rarityUnits
@@ -127,8 +111,11 @@ export class Unit extends CommonModule {
     }
   }
 
-  public async addUnit(userId: number, unitId: number, options: addUnitOptions = addUnitDefault): Promise<IAddUnitResult> {
-    options = extend(true, addUnitDefault, options)
+  public async addUnit(userId: number, unitId: number, options: Partial<typeof addUnitDefault> = {}): Promise<IAddUnitResult> {
+    options = {
+      ...addUnitDefault,
+      ...options
+    }
     if (options.useNumber) {
       const res = await unitDB.get(`SELECT unit_id FROM unit_m WHERE unit_number = :number`, { number: unitId })
       if (!res) throw new Error(`Unit Number "${unitId} does not exist`)
@@ -279,8 +266,11 @@ export class Unit extends CommonModule {
   /** Update information about unit in the album
    * @returns {true} if unit not exists in the album
    */
-  public async updateAlbum(userId: number, unitId: number, options: updateAlbumOptions = {}): Promise<boolean> {
-    options = extend(true, updateAlbumDefault, options)
+  public async updateAlbum(userId: number, unitId: number, options: Partial<typeof updateAlbumDefault> = {}): Promise<boolean> {
+    options = {
+      ...updateAlbumDefault,
+      ...options
+    }
     let data = await this.connection.first("SELECT * FROM user_unit_album WHERE user_id=:user AND unit_id=:unit", { user: userId, unit: unitId })
     if (!data) data = {}
     const values = {

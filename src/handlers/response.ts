@@ -3,7 +3,6 @@ import querystring from "querystring"
 import { promisify } from "util"
 import { gzip } from "zlib"
 import { Utils } from "../common/utils"
-import { LEVEL } from "../core/log"
 import { Authorize } from "../core/requestData"
 
 export async function writeJsonResponse(response: ServerResponse, options: Options = {}) {
@@ -37,7 +36,7 @@ export async function writeJsonResponse(response: ServerResponse, options: Optio
   response.statusCode = options.httpStatusCode || options.jsonStatusCode || 200
 
   if (Config.server.PRIVATE_KEY.length != 0) response.setHeader("X-Message-Sign", Utils.RSASign(JSON.stringify(result) + options.xmc))
-  if (Config.server.log_level >= LEVEL.VERBOSE) console.log(JSON.stringify(result))
+  JSON.stringify(result)
 
   if (options.encoding && options.encoding.indexOf("gzip") != -1) {
     response.setHeader("Content-Encoding", "gzip")

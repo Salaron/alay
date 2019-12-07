@@ -1,9 +1,9 @@
 import mariadb from "mariadb"
 import { promisify } from "util"
-import { Log } from "../log"
+import { Logger } from "../logger"
 import { formatQuery } from "./query"
 
-const log = new Log("MariaDB")
+const log = new Logger("MariaDB")
 export const pool = mariadb.createPool(Config.database)
 
 export class Connection {

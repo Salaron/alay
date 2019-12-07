@@ -1,12 +1,12 @@
 import "./core/config"
 import "./core/mailer"
 import "./models/error"
-import { Log } from "./core/log"
+import { Logger } from "./core/logger"
 import { resolve } from "path"
 import { Sqlite3 } from "./core/database/sqlite3"
 import { Connect } from "./core/database/mariadb"
 
-const log = new Log("Setup");
+const log = new Logger("Setup");
 
 (<any>global).rootDir = `${resolve(__dirname)}/../`
 try {

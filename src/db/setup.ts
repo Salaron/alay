@@ -4,11 +4,11 @@ import { readdirSync } from "fs"
 import { extname, resolve } from "path"
 import { Utils } from "../common/utils"
 import { Connect as ConnectToMariaDB, Connection } from "../core/database/mariadb"
-import { Log } from "../core/log"
+import { Logger } from "../core/logger"
 
 (<any>global).rootDir = `${resolve(__dirname)}/../../`
 let dbConnection: Connection
-const log = new Log("Migrate");
+const log = new Logger("Migrate");
 
 (async () => {
   await ConnectToMariaDB()

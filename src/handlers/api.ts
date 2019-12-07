@@ -1,14 +1,14 @@
 import chalk from "chalk"
 import { IncomingMessage, ServerResponse } from "http"
 import { Utils } from "../common/utils"
-import { Log } from "../core/log"
+import { Logger } from "../core/logger"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, HANDLER_TYPE, RESPONSE_TYPE } from "../models/constant"
 import { IApiMultiResponse, IApiResult } from "../models/handlers"
 import executeAction from "./action"
 import { writeJsonResponse } from "./response"
 
-const log = new Log("Api Handler")
+const log = new Logger("Api Handler")
 
 export default async function moduleHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.API)

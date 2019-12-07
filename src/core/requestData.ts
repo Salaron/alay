@@ -5,11 +5,11 @@ import { IncomingMessage, ServerResponse } from "http"
 import moment from "moment"
 import querystring from "querystring"
 import { Utils } from "../common/utils"
-import { Log } from "../core/log"
+import { Logger } from "./logger"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
 import { Connection } from "./database/mariadb"
 
-const log = new Log("Request Data")
+const log = new Logger("Request Data")
 
 interface authLevelOptions {
   force?: boolean

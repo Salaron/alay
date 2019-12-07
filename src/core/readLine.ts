@@ -1,9 +1,9 @@
 import readline from "readline"
 import { Connection } from "./database/mariadb"
-import { Log } from "./log"
+import { Logger } from "./logger"
 import { Unit } from "../common/unit"
 
-const log = new Log("ReadLine")
+const log = new Logger("ReadLine")
 const readLineInterface = readline.createInterface({
   input: process.stdin,
   output: process.stdout

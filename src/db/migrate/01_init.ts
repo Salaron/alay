@@ -1,7 +1,7 @@
-import { Log } from "../../core/log"
+import { Logger } from "../../core/logger"
 import { Connection } from "../../core/database/mariadb"
 
-const log = new Log(`Init`)
+const log = new Logger(`Init`)
 
 export async function migrate(connection: Connection) {
   log.info(`Create all tables!`)

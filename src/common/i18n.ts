@@ -1,8 +1,7 @@
-import extend from "extend"
 import { exists, readFile } from "fs"
 import showdown from "showdown"
 import { promisify } from "util"
-import { Log } from "../core/log"
+import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
 import RequestData from "../core/requestData"
@@ -26,7 +25,7 @@ let cache: I18nCache = {}
 const mdCache: I18nMdCache = {}
 let defaultStrings: I18nSection = {}
 
-const log = new Log("i18n")
+const log = new Logger("i18n")
 export const showdownConverter = new showdown.Converter({
   tables: true,
   simpleLineBreaks: true,
@@ -113,11 +112,19 @@ export class I18n extends CommonModule {
     }
 
     if (Config.server.debug_mode) await this.clearCache()
-    const result: any = {}
+    let result: any = {}
     for (const section of sections) {
-      extend(true, result, defaultStrings[section], cache[languageCode][section])
+      result = {
+        ...result,
+        ...defaultStrings[section],
+        ...cache[languageCode][section]
+      }
     }
-    extend(true, result, defaultStrings.common || {}, cache[languageCode].common || {})
+    result = {
+      ...result,
+      ...defaultStrings.common || {},
+      ...cache[languageCode].common || {}
+    }
 
     return result
   }

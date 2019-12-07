@@ -1,7 +1,7 @@
 import { Connection } from "../../core/database/mariadb"
-import { Log } from "../../core/log"
+import { Logger } from "../../core/logger"
 
-const log = new Log("rLive")
+const log = new Logger("rLive")
 
 export async function migrate(connection: Connection) {
   log.info("Random Live feature is available!")

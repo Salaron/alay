@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer"
-import { Log } from "./log"
+import { Logger } from "./logger"
 
-const log = new Log("Mailer")
+const log = new Logger("Mailer")
 export class Mailer {
   public available = false
   private transporter: nodemailer.Transporter

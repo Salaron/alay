@@ -58,7 +58,7 @@ export default class extends ApiAction {
         FROM normal_live_m
       ) as difficulty ON setting.live_setting_id = difficulty.live_setting_id
       INNER JOIN live_track_m ON live_track_m.live_track_id = setting.live_track_id
-      WHERE difficulty = :diff AND attribute_icon_id = :attr AND member_category = :category AND live_setting_id IN (${this.live.availableLiveList.join(",")})`, {
+      WHERE difficulty = :diff AND attribute_icon_id = :attr AND member_category = :category AND setting.live_setting_id IN (${this.live.availableLiveList.join(",")})`, {
         diff: this.params.difficulty,
         attr: this.params.attribute,
         category: this.params.member_category

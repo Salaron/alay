@@ -1,12 +1,11 @@
 import crypto from "crypto"
 import { IncomingMessage } from "http"
 import moment from "moment"
-import request from "request"
-import { promisify } from "util"
-import { Log } from "../core/log"
+import superagent from "superagent"
 import { Connection } from "../core/database/mariadb"
+import { Logger } from "../core/logger"
 
-const log = new Log("Common: Utils")
+const log = new Logger("Utils")
 
 export async function init() {
   // Handle Clearing Temp Auth Tokens every 5 min
@@ -189,24 +188,21 @@ export class Utils {
   }
 
   public static async reCAPTCHAverify(userToken: string, userIp?: string) {
-    // TODO: use axios for request
-    // @ts-ignore
-    const { body } = (await promisify(request.post)(<string>"https://www.google.com/recaptcha/api/siteverify", <any>{
-      form: {
-        secret: Config.modules.login.recaptcha_private_key,
-        response: userToken,
-        remoteip: userIp
-      }
-    })) as any
-    const response = JSON.parse(body)
-    if (response.success != true) {
-      log.error(`reCAPTCHA test Failed;\n Error-codes: ${response["error-codes"].join(", ")}`)
+    const response = await superagent.post("https://www.google.com/recaptcha/api/siteverify").type("form").send({
+      secret: Config.modules.login.recaptcha_private_key,
+      response: userToken,
+      remoteip: userIp
+    })
+    const jsonResponse = JSON.parse(response.text)
+    if (jsonResponse.success != true) {
+      log.error(`reCAPTCHA test Failed;\n Error-codes: ${jsonResponse["error-codes"].join(", ")}`)
       throw new ErrorWebApi(`reCAPTCHA test failed`)
     }
+    return true
   }
 
   public static prepareTemplate(template: string, values: any = {}) {
-    return template.replace(/{{\s?([^{}\s]*)\s?}}/g, (txt: any, key: any) =>  {
+    return template.replace(/{{\s?([^{}\s]*)\s?}}/g, (txt: any, key: any) => {
       if (values.hasOwnProperty(key)) {
         return values[key]
       }

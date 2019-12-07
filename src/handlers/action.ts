@@ -1,11 +1,11 @@
 import "../models/actions"
 import { TYPE } from "../common/type"
 import { Utils } from "../common/utils"
-import { Log } from "../core/log"
+import { Logger } from "../core/logger"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, HANDLER_TYPE, PERMISSION, REQUEST_TYPE, RESPONSE_TYPE } from "../models/constant"
 
-const log = new Log("Action Handler")
+const log = new Logger("Action Handler")
 const cache = <any>{}
 
 interface Options {
