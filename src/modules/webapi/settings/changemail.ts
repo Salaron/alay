@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { Mailer } from "../../../core/mailer"
+import { mailer } from "../../../core/mailer"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
@@ -42,7 +42,7 @@ export default class extends WebApiAction {
     })
 
     if (!Type.isNullDef(userData.mail) && userData.mail.length > 0) {
-      await Mailer.getInstance().sendMail(userData.mail, strings.subjectMailChange, Utils.prepareTemplate(strings.bodyMailChange, {
+      await mailer.sendMail(userData.mail, strings.subjectMailChange, Utils.prepareTemplate(strings.bodyMailChange, {
         userName: userData.name,
         supportMail: Config.mailer.supportMail.length > 0 ? Config.mailer.supportMail : ""
       }))

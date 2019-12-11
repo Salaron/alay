@@ -42,7 +42,7 @@ const customLevels = {
   }
 }
 
-function convertLevelToWinston(level: LEVEL): string {
+function levelToString(level: LEVEL): string {
   return LEVEL[level].toLowerCase()
 }
 
@@ -56,7 +56,7 @@ export class Logger {
   constructor(label: string) {
     this.label = this.labelWinston = label
     this.winston = <ILogger>createLogger({
-      level: convertLevelToWinston(Config.server.log_level),
+      level: levelToString(Config.server.log_level),
       levels: customLevels.levels,
       format: format.combine(
         format.timestamp({
@@ -98,7 +98,7 @@ export class Logger {
   }
 
   public setLevel(level: LEVEL) {
-    this.winston.level = convertLevelToWinston(level)
+    this.winston.level = levelToString(level)
   }
 
   public fatal(message: Message, label?: string) {
@@ -128,9 +128,5 @@ export class Logger {
   public always(message: Message, label?: string) {
     this.labelWinston = label || this.label
     this.winston.always(<string>message)
-  }
-
-  public profile(id: string, meta?: LogEntry) {
-    this.winston.profile(id, meta)
   }
 }

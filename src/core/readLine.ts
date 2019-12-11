@@ -5,8 +5,7 @@ import { Unit } from "../common/unit"
 
 const log = new Logger("ReadLine")
 const readLineInterface = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+  input: process.stdin
 })
 
 let _showInitMessage = true // tslint:disable-line
