@@ -1,14 +1,13 @@
+import { resolve } from "path"
+(<any>global).rootDir = `${resolve(__dirname)}/../`
 import "./core/config"
 import "./core/mailer"
 import "./models/error"
 import { Logger } from "./core/logger"
-import { resolve } from "path"
 import { Sqlite3 } from "./core/database/sqlite3"
 import { Connect } from "./core/database/mariadb"
 
-const log = new Logger("Setup");
-
-(<any>global).rootDir = `${resolve(__dirname)}/../`
+const log = new Logger("Setup")
 try {
   // Prepare sqlite3 databases
   (<any>global).sqlite3 = new Sqlite3()
@@ -21,6 +20,7 @@ import ReadLine from "./core/readLine"
 import http from "http"
 import requestHandler from "./handlers/request"
 import * as modules from "./common"
+import { AddressInfo } from "net"
 
 // Entry point
 (async () => {
@@ -39,8 +39,8 @@ import * as modules from "./common"
 
     const server = http.createServer(requestHandler)
     server.listen(Config.server.port, Config.server.host, () => {
-      const address = server.address() as any
-      log.info("Listening on " + address.address + ":" + address.port)
+      const address = server.address() as AddressInfo
+      log.info(`Listening on ${address.address}:${address.port}`)
     })
     server.on("error", async (err) => {
       log.fatal(err)
