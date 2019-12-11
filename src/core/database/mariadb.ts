@@ -47,9 +47,8 @@ export class Connection {
     if (this.released) throw new Error(`Connection was released before.\nLast query: ${this.lastQuery}`)
     this.lastQuery = `${query}\n${JSON.stringify(values)}`
 
-    if (query.slice(-1) === ";") query = query.slice(0, -1) // remove ";" -- the end of query
     // select only 1 element
-    const result = await this.connection.query(formatQuery(query, values) + " LIMIT 1;")
+    const result = await this.connection.query(formatQuery(query, values))
     if (typeof result === "object" && Array.isArray(result) && result.length > 0) {
       return result[0]
     } else {
