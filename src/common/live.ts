@@ -440,6 +440,7 @@ export class Live extends CommonModule {
     while (kizuna > 0 && finishCalculation === false) {
       finishCalculation = true
       for (let i = 0; i < deck.length; i++) {
+        if (kizuna === 0) break
         if (i === 4) continue // skip center unit
         if (deck[i].love + deck[i].kizuna_add < deck[i].max_love) {
           deck[i].kizuna_add++
