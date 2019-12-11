@@ -16,12 +16,12 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentYear = moment(new Date()).utcOffset("+0900").format("YYYY")
-    const currentMonth = moment(new Date()).utcOffset("+0900").format("M")
-    const currentDay = moment(new Date()).utcOffset("+0900").format("D")
-    const currentDate = moment(new Date()).utcOffset("+0900").format("YYYY-MM-DD")
-    const futureYear = moment(new Date()).utcOffset("+0900").add(1, "month").format("YYYY")
-    const futureMonth = moment(new Date()).utcOffset("+0900").add(1, "month").format("M")
+    const currentYear = moment().utcOffset("+0900").format("YYYY")
+    const currentMonth = moment().utcOffset("+0900").format("MM")
+    const currentDay = moment().utcOffset("+0900").format("DD")
+    const currentDate = moment().utcOffset("+0900").format("YYYY-MM-DD")
+    const futureYear = moment().utcOffset("+0900").add(1, "month").format("YYYY")
+    const futureMonth = moment().utcOffset("+0900").add(1, "month").format("MM")
 
     const currentMonthCalendar = await this.getCalendar(currentYear, currentMonth)
     const futureMonthCalendar = await this.getCalendar(futureYear, futureMonth)
@@ -129,7 +129,7 @@ export default class extends ApiAction {
     await this.item.addPresent(this.user_id, {
       type: reward.item_type,
       id: reward.item_id
-    }, `Login Bonus Reward! [${currentDay}.${currentMonth}.${currentMonth}]`, reward.amount)
+    }, `Login Bonus Reward! [${currentDay}.${currentMonth}.${currentYear}]`, reward.amount)
 
     // Total Login Bonus
     await Object.keys(Config.lbonus.total_login_bonus).forEachAsync(async (day: string) => {
