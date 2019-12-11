@@ -71,11 +71,11 @@ export class Logger {
       ),
       transports: [
         new transports.File({
-          filename: "logs/out.log",
+          filename: `${rootDir}/logs/out.log`,
           level: "info"
         }),
         new transports.File({
-          filename: "logs/error.log",
+          filename: `${rootDir}/logs/error.log`,
           level: "warn"
         }),
         new transports.Console({
