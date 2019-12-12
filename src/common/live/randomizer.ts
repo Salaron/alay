@@ -190,10 +190,10 @@ export class Randomizer {
     return note.effect % 10 === 3
   }
 
-  private moveSwingChain(note: Note, swingPos: number, center: boolean) {
-    if ((center ? swingPos + 1 === 5 : true) || swingPos + 1 > 9) {
+  private moveSwingChain(note: Note, swingPos: number, keepFromCenter: boolean) {
+    if ((keepFromCenter ? swingPos + 1 === 5 : false) || swingPos + 1 > 9) {
       note.position = swingPos - 1
-    } else if ((center ? swingPos + 1 === 5 : true) || swingPos - 1 < 1) {
+    } else if ((keepFromCenter ? swingPos + 1 === 5 : false) || swingPos - 1 < 1) {
       note.position = swingPos + 1
     } else {
       note.position = this.getRndPosition([swingPos - 1, swingPos + 1], true)
