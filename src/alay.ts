@@ -24,33 +24,31 @@ import { AddressInfo } from "net"
 
 // Entry point
 (async () => {
-  try {
-    // Load config
-    await Config.prepareConfig()
-    // Init readline interface
-    ReadLine()
-    // Connect to MySQL/MariaDB database
-    await Connect()
-    // Prepare common modules
-    // execute init function if exists
-    for (const module in modules) {
-      if ((<any>modules)[module].init) await (<any>modules)[module].init()
-    }
+  // Load config
+  await Config.prepareConfig()
+  // Init readline interface
+  ReadLine()
+  // Connect to MySQL/MariaDB database
+  await Connect()
+  // Prepare common modules
+  // execute init function if exists
+  for (const module in modules) {
+    if ((<any>modules)[module].init) await (<any>modules)[module].init()
+  }
 
-    const server = http.createServer(requestHandler)
-    server.listen(Config.server.port, Config.server.host, () => {
-      const address = server.address() as AddressInfo
-      log.info(`Listening on ${address.address}:${address.port}`)
-    })
-    server.on("error", async (err) => {
-      log.fatal(err)
-      process.exit(0)
-    })
-  } catch (err) {
+  const server = http.createServer(requestHandler)
+  server.listen(Config.server.port, Config.server.host, () => {
+    const address = server.address() as AddressInfo
+    log.info(`Listening on ${address.address}:${address.port}`)
+  })
+  server.on("error", async (err) => {
     log.fatal(err)
     process.exit(0)
-  }
-})()
+  })
+})().catch(err => {
+  log.error(err)
+  process.exit(0)
+})
 
 // like 'forEach' but async
 Array.prototype.forEachAsync = async function(callback: <T>(element: T, index: number, originalArray: T[]) => Promise<void>): Promise<void> {

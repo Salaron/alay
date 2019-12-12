@@ -77,22 +77,39 @@ export class Logger {
         new transports.File({
           filename: `${rootDir}/logs/error.log`,
           level: "warn"
-        }),
-        new transports.Console({
-          format: format.combine(
-            format.timestamp({
-              format: "HH:mm:ss"
-            }),
-            format.simple(),
-            format.printf(info => {
-              while (this.labelWinston.length < labelSize) this.labelWinston = " " + this.labelWinston
-              const message = info.stack ? info.stack : typeof info.message === "object" ? JSON.stringify(info.message) : info.message
-              return format.colorize().colorize(info.level, ` [${info.timestamp}] ${this.labelWinston} `) + " " + message
-            })
-          )
         })
       ]
     })
+    if (Config.server.debug_mode === true) {
+      this.winston.add(new transports.Console({
+        format: format.combine(
+          format.timestamp({
+            format: "HH:mm:ss"
+          }),
+          format.simple(),
+          format.printf(info => {
+            while (this.labelWinston.length < labelSize) this.labelWinston = " " + this.labelWinston
+            const message = info.stack ? info.stack : typeof info.message === "object" ? JSON.stringify(info.message) : info.message
+            return format.colorize().colorize(info.level, ` [${info.timestamp}] ${this.labelWinston} `) + " " + message
+          })
+        )
+      }))
+    } else {
+      this.winston.add(new transports.Console({
+        level: levelToString(LEVEL.WARN),
+        format: format.combine(
+          format.timestamp({
+            format: "HH:mm:ss"
+          }),
+          format.simple(),
+          format.printf(info => {
+            while (this.labelWinston.length < labelSize) this.labelWinston = " " + this.labelWinston
+            const message = info.stack ? info.stack : typeof info.message === "object" ? JSON.stringify(info.message) : info.message
+            return format.colorize().colorize(info.level, ` [${info.timestamp}] ${this.labelWinston} `) + " " + message
+          })
+        )
+      }))
+    }
     addColors(customLevels.colors)
     registedLoggers.push(this)
   }
