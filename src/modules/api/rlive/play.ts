@@ -29,8 +29,9 @@ export default class extends ApiAction {
       userId: this.user_id
     })
     if (!session) throw new ErrorCode(1234, "Session is missing [/shrug]")
-    const prevSession = await this.connection.query("SELECT * FROM user_live_progress WHERE user_id = :user", { user: this.user_id })
-    if (prevSession.length > 0) throw new ErrorCode(1234, "Another live session in progress!")
+    await this.connection.execute("DELETE FROM user_live_progress WHERE user_id = :user", {
+      user: this.user_id
+    })
 
     await this.connection.execute("UPDATE user_live_random SET in_progress = 1 WHERE user_id = :user AND token = :token", {
       user: this.user_id,

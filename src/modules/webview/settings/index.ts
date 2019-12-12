@@ -1,14 +1,6 @@
 import { WebView } from "../../../common/webview"
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-
-export const supportedMods = ["event", "hp", "mirror", "vanish"]
-export const supportedModsValues = <any>{
-  event: 1,
-  hp: 2,
-  mirror: 1,
-  vanish: 2
-}
+import { AUTH_LEVEL, WV_REQUEST_TYPE, settingNames } from "../../../models/constant"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -22,7 +14,7 @@ export default class extends WebViewAction {
     const [strings, template, mods, userData] = await Promise.all([
       this.i18n.getStrings(this.requestData, "common", "login-login", "login-startup", "settings-index"),
       WebView.getTemplate("settings", "index"),
-      this.user.getParams(this.user_id, supportedMods),
+      this.user.getParams(this.user_id, settingNames),
       this.connection.first("SELECT mail FROM users WHERE user_id = :user", { user: this.user_id })
     ])
 

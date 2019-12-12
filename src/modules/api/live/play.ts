@@ -30,8 +30,9 @@ export default class extends ApiAction {
 
   public async execute() {
     const eventStatus = await this.eventStub.getEventStatus(EventStub.getEventTypes().TOKEN)
-    const prevSession = await this.connection.query("SELECT * FROM user_live_progress WHERE user_id = :user", { user: this.user_id })
-    if (prevSession.length > 0) throw new ErrorCode(1234, "Another live session in progress!")
+    await this.connection.execute("DELETE FROM user_live_progress WHERE user_id = :user", {
+      user: this.user_id
+    })
 
     const guest = await this.connection.first(`
     SELECT units.unit_id FROM users
@@ -61,7 +62,7 @@ export default class extends ApiAction {
     }
 
     const [liveNotes, deckInfo, mods] = await Promise.all([
-      this.live.getLiveNotes(this.user_id, liveInfo.live_setting_id, eventLive),
+      this.live.getLiveNotes(this.user_id, liveInfo, eventLive),
       this.live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id),
       this.user.getParams(this.user_id, ["hp"]),
       this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id, lp_factor) VALUES (:user, :difficulty, :setting_id, :deck, :factor)", {
@@ -86,10 +87,10 @@ export default class extends ApiAction {
         {
           live_info: {
             live_difficulty_id: liveInfo.live_difficulty_id,
-            is_random: !!liveInfo.random_flag,
+            is_random: !!liveInfo.random_flag || liveNotes.random,
             ac_flag: liveInfo.ac_flag,
             swing_flag: liveInfo.swing_flag,
-            notes_list: liveNotes
+            notes_list: liveNotes.notes
           },
           deck_info: deckInfo
         }

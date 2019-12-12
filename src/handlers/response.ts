@@ -4,6 +4,9 @@ import { promisify } from "util"
 import { gzip } from "zlib"
 import { Utils } from "../common/utils"
 import { Authorize } from "../core/requestData"
+import { Logger } from "../core/logger"
+
+const logger = new Logger("Response")
 
 export async function writeJsonResponse(response: ServerResponse, options: Options = {}) {
   response.setHeader("Content-Type", "application/json")
@@ -36,7 +39,7 @@ export async function writeJsonResponse(response: ServerResponse, options: Optio
   response.statusCode = options.httpStatusCode || options.jsonStatusCode || 200
 
   if (Config.server.PRIVATE_KEY.length != 0) response.setHeader("X-Message-Sign", Utils.RSASign(JSON.stringify(result) + options.xmc))
-  JSON.stringify(result)
+  logger.verbose(JSON.stringify(result))
 
   if (options.encoding && options.encoding.indexOf("gzip") != -1) {
     response.setHeader("Content-Encoding", "gzip")

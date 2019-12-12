@@ -1,6 +1,7 @@
 import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
+import { Randomizer } from "./live/randomizer"
 
 const log = new Logger("Live")
 
@@ -68,15 +69,17 @@ export class Live extends CommonModule {
     super(action)
   }
 
-  public async getLiveNotes(userId: number, liveSettingId: number, isEvent = false) {
+  public async getLiveNotes(userId: number, liveData: liveData, isEvent = false) {
     const params = await this.action.user.getParams(userId)
 
     // make mirror and vanish on-the-fly
     let mirror = 0
     let vanish = 0
+    let random = false
     if ((isEvent === true && params.event === 1) || isEvent === false) {
       vanish = params.vanish ? params.vanish : 0
       mirror = params.mirror === 1 ? 10 : 0
+      random = !!params.random && liveData.ac_flag !== 1
     }
 
     const notes = await liveNotesDB.all(`
@@ -85,10 +88,20 @@ export class Live extends CommonModule {
       effect_value, (abs(${mirror} - position)) as position,
       ${vanish} as vanish
     FROM live_note
-    WHERE live_setting_id = :id`, { id: liveSettingId })
-    if (notes.length === 0) throw new Error(`Live notes data for LSID #${liveSettingId} is missing in database`)
+    WHERE live_setting_id = :id`, { id: liveData.live_setting_id })
+    if (notes.length === 0) throw new Error(`Live notes data for LSID #${liveData.live_setting_id} is missing in database`)
 
-    return notes
+    if (random === true) {
+      return {
+        notes: new Randomizer(notes).randomize(),
+        random
+      }
+    } else {
+      return {
+        notes,
+        random
+      }
+    }
   }
 
   /**

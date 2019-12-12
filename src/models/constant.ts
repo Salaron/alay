@@ -40,3 +40,12 @@ export enum FESTIVAL_SETLIST {
   AQOURS,
   MGD
 }
+
+export const settingNames = ["event", "hp", "mirror", "vanish", "random"]
+export const settingValues: { [name: string]: number } = {
+  event: 1,
+  hp: 2,
+  mirror: 1,
+  vanish: 2,
+  random: 1
+}

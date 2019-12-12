@@ -22,47 +22,69 @@
           <h3 class="uk-text-bold" href="#">{{i18n/mods}}</h3>
           <h4>{{nl2br i18n/modsNotice}}</h4>
 
-          <label for="vanish" class="uk-form-label"
-            uk-tooltip="title: {{nl2br i18n/vanishTooltip}}; pos: bottom-left">Vanish:</label>
-          <input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="0" {{setChecked 0 mods/vanish}}>
-          Disable
-          <input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="1" {{setChecked 1 mods/vanish}}> Hidden
-          <input class="uk-radio sl-mod-radio" type="radio" name="vanish" value="2" {{setChecked 2 mods/vanish}}> Sudden
+          <label class="uk-form-label"
+            uk-tooltip="title: {{nl2br i18n/randomTooltip}}; pos: bottom-left">Random:</label><br>
+          <label>
+            <input class="uk-radio settings-radio" type="radio" name="random" value="0" {{setChecked 0 mods/random}}>
+            Disable
+          </label>
+          <label>
+            <input class="uk-radio settings-radio" type="radio" name="random" value="1" {{setChecked 1 mods/random}}>
+            Enable
+          </label>
           <br>
 
-          <label for="mirror" class="uk-form-label"
-            uk-tooltip="title: {{nl2br i18n/mirrorTooltip}}; pos: bottom-left">Mirror:</label>
-          <input class="uk-radio sl-mod-radio" type="radio" name="mirror" value="0" {{setChecked 0 mods/mirror}}>
-          Disable
-          <input class="uk-radio sl-mod-radio" type="radio" name="mirror" value="1" {{setChecked 1 mods/mirror}}> Enable
+          <label class="uk-form-label"
+            uk-tooltip="title: {{nl2br i18n/vanishTooltip}}; pos: bottom-left">Vanish:</label><br>
+          <label><input class="uk-radio settings-radio" type="radio" name="vanish" value="0"
+              {{setChecked 0 mods/vanish}}>
+            Disable</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="vanish" value="1"
+              {{setChecked 1 mods/vanish}}>
+            Hidden</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="vanish" value="2"
+              {{setChecked 2 mods/vanish}}>
+            Sudden</label>
           <br>
 
-          <label for="hp" class="uk-form-label"
-            uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left">HP:</label>
-          <input class="uk-radio sl-mod-radio" type="radio" name="hp" value="0" {{setChecked 0 mods/hp}}> Default
-          <input class="uk-radio sl-mod-radio" type="radio" name="hp" value="1" {{setChecked 1 mods/hp}}> 200 HP
-          <input class="uk-radio sl-mod-radio" type="radio" name="hp" value="2" {{setChecked 2 mods/hp}}> 1 HP (Sudden
-          Death)
+          <label class="uk-form-label"
+            uk-tooltip="title: {{nl2br i18n/mirrorTooltip}}; pos: bottom-left">Mirror:</label><br>
+          <label><input class="uk-radio settings-radio" type="radio" name="mirror" value="0"
+              {{setChecked 0 mods/mirror}}>
+            Disable</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="mirror" value="1"
+              {{setChecked 1 mods/mirror}}>
+            Enable</label>
           <br>
 
-          <label for="event" class="uk-form-label"
-            uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left">{{i18n/applyForEvent}}</label>
-          <br>
-          <input class="uk-radio sl-mod-radio" type="radio" name="event" value="0" {{setChecked 0 mods/event}}>
-          {{i18n/no}}
-          <input class="uk-radio sl-mod-radio" type="radio" name="event" value="1" {{setChecked 1 mods/event}}>
-          {{i18n/yes}}
+          <label class="uk-form-label" uk-tooltip="title: {{nl2br i18n/hpTooltip}}; pos: bottom-left">HP:</label><br>
+          <label><input class="uk-radio settings-radio" type="radio" name="hp" value="0" {{setChecked 0 mods/hp}}>
+            Default</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="hp" value="1" {{setChecked 1 mods/hp}}> 200
+            HP</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="hp" value="2" {{setChecked 2 mods/hp}}> 1 HP
+            (Sudden
+            Death)</label>
           <br>
 
-          <label for="mf-song-pool" class="uk-form-label">MedFes song pool:</label>
-          <input class="uk-radio sl-mod-radio" type="radio" name="mf-song-pool" value="0" disabled>
-          Default
-          <input class="uk-radio sl-mod-radio" type="radio" name="mf-song-pool" value="1" disabled>
-          Game Mode
-          <input class="uk-radio sl-mod-radio" type="radio" name="mf-song-pool" value="2" disabled>
-          µ's
-          <input class="uk-radio sl-mod-radio" type="radio" name="mf-song-pool" value="3" disabled>
-          Aqours
+          <label class="uk-form-label"
+            uk-tooltip="title: {{nl2br i18n/applyForEventTooltip}}; pos: bottom-left">{{i18n/applyForEvent}}</label>
+          <br>
+          <label><input class="uk-radio settings-radio" type="radio" name="event" value="0" {{setChecked 0 mods/event}}>
+            {{i18n/no}}</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="event" value="1" {{setChecked 1 mods/event}}>
+            {{i18n/yes}}</label>
+          <br>
+
+          <label class="uk-form-label">MedFes song pool type:</label><br>
+          <label><input class="uk-radio settings-radio" type="radio" name="mf-song-pool" value="0" disabled>
+            Default</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="mf-song-pool" value="1" disabled>
+            Game Mode</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="mf-song-pool" value="2" disabled>
+            µ's</label>
+          <label><input class="uk-radio settings-radio" type="radio" name="mf-song-pool" value="3" disabled>
+            Aqours</label>
           <hr>
 
           <h3 class="uk-text-bold" href="#">{{i18n/passwordAndEmail}}</h3>
@@ -243,10 +265,10 @@
     })
   }
 
-  $(".sl-mod-radio").change(function () {
+  $(".settings-radio").change(function () {
     sendRequest({
       module: "settings",
-      action: "setMods",
+      action: "set",
       name: this.name,
       value: parseInt(this.value),
       timestamp: Math.floor(Date.now() / 1000)

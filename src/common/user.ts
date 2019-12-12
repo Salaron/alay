@@ -3,10 +3,11 @@ import { FESTIVAL_SETLIST } from "../models/constant"
 import { CommonModule } from "../models/common"
 
 interface userParams {
-  vanish?: number,
-  mirror?: number,
-  hp?: number,
+  vanish?: number
+  mirror?: number
+  hp?: number
   event?: number
+  random?: number
   festival_setList?: FESTIVAL_SETLIST
 }
 
