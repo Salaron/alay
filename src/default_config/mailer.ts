@@ -1,5 +1,3 @@
-import { TransportOptions } from "nodemailer"
-
 export default <IMailerConfig>{
   enabled: false,
   transportSettings: {
@@ -15,7 +13,7 @@ export default <IMailerConfig>{
 
 interface IMailerConfig {
   enabled: boolean
-  transportSettings: TransportOptions
+  transportSettings: any // refer to nodemailer docs
   name: string
   supportMail: string
 }

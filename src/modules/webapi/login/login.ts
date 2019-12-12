@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { mailer } from "../../../core/mailer"
+import { sendMail } from "../../../core/mailer"
 import moment from "moment"
 
 export default class extends WebApiAction {
@@ -65,7 +65,7 @@ export default class extends WebApiAction {
 
     if (Config.mailer.enabled) {
       const i18n = await this.i18n.getStrings(transferUserData.language, "mailer")
-      await mailer.sendMail(transferUserData.mail, i18n.subjectNewLogin, Utils.prepareTemplate(i18n.bodyNewLogin, {
+      await sendMail(transferUserData.mail, i18n.subjectNewLogin, Utils.prepareTemplate(i18n.bodyNewLogin, {
         userName: transferUserData.name,
         ip: Utils.getRemoteAddress(this.requestData.request),
         date: moment().format("YYYY.MM.DD HH:mm Z"),

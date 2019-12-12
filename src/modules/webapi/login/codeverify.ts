@@ -3,7 +3,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { mailer } from "../../../core/mailer"
+import { sendMail } from "../../../core/mailer"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -45,7 +45,7 @@ export default class extends WebApiAction {
       mail: recoveryData.mail
     })
 
-    const result = await mailer.sendMail(recoveryData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovered, {
+    const result = await sendMail(recoveryData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovered, {
       userId: userData.user_id,
       password: newPassword
     }))

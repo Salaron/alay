@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { mailer } from "../../../core/mailer"
+import { sendMail } from "../../../core/mailer"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -71,7 +71,7 @@ export default class extends WebApiAction {
     })
 
     // send mail
-    const status = await mailer.sendMail(this.params.mail, strings.subjectWelcome, Utils.prepareTemplate(strings.bodyWelcome, {
+    const status = await sendMail(this.params.mail, strings.subjectWelcome, Utils.prepareTemplate(strings.bodyWelcome, {
       userName: this.params.name
     }))
 

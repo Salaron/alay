@@ -2,7 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
-import { mailer } from "../../../core/mailer"
+import { sendMail } from "../../../core/mailer"
 import moment from "moment"
 
 export default class extends ApiAction {
@@ -47,7 +47,7 @@ export default class extends ApiAction {
       user: transferUserData.user_id
     })
 
-    await mailer.sendMail(transferUserData.mail, i18n.subjectNewLogin, Utils.prepareTemplate(i18n.bodyNewLogin, {
+    await sendMail(transferUserData.mail, i18n.subjectNewLogin, Utils.prepareTemplate(i18n.bodyNewLogin, {
       userName: transferUserData.name,
       ip: Utils.getRemoteAddress(this.requestData.request),
       date: moment().format("YYYY.MM.DD HH:mm Z"),
