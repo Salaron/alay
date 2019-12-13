@@ -7,12 +7,12 @@ import { Logger } from "./core/logger"
 import { Sqlite3 } from "./core/database/sqlite3"
 import { Connect } from "./core/database/mariadb"
 
-const log = new Logger("Setup")
+const logger = new Logger("Setup")
 try {
   // Prepare sqlite3 databases
   (<any>global).sqlite3 = new Sqlite3()
 } catch (err) {
-  log.fatal(err)
+  logger.fatal(err)
   process.exit(0)
 }
 
@@ -21,6 +21,7 @@ import http from "http"
 import requestHandler from "./handlers/request"
 import * as modules from "./common"
 import { AddressInfo } from "net"
+import { Gris } from "./core/gris"
 
 // Entry point
 (async () => {
@@ -37,16 +38,26 @@ import { AddressInfo } from "net"
   }
 
   const server = http.createServer(requestHandler)
-  server.listen(Config.server.port, Config.server.host, () => {
+  server.listen(Config.server.port, Config.server.host, async () => {
     const address = server.address() as AddressInfo
-    log.info(`Listening on ${address.address}:${address.port}`)
+    logger.info(`Listening on ${address.address}:${address.port}`)
+
+    if (Config.gris.enabled) {
+      // Connect to official server
+      try {
+        const gris = new Gris()
+        await gris.prepare()
+      } catch (err) {
+        logger.error(err.message, "Gris")
+      }
+    }
   })
   server.on("error", async (err) => {
-    log.fatal(err)
+    logger.fatal(err)
     process.exit(0)
   })
 })().catch(err => {
-  log.error(err)
+  logger.error(err)
   process.exit(0)
 })
 
