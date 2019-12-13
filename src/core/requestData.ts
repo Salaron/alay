@@ -116,7 +116,7 @@ export default class RequestData {
 
     if (this.user_id === null && this.auth_token === null) {
       // Auth key step
-      log.debug(this.headers, "Request Headers")
+      log.debug(JSON.stringify(this.headers, null, 2), "Request Headers")
       return this.auth_level = AUTH_LEVEL.NONE
     }
 
