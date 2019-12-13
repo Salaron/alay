@@ -38,7 +38,8 @@ export default class extends ApiAction {
         banner_id: banner.id,
         start_date: banner.start_date,
         end_date: banner.end_date,
-        webview_url: banner.webview_url
+        webview_url: banner.webview_url,
+        add_unit_start_date: banner.add_unit_start_date ? banner.add_unit_start_date : undefined
       }
     })
 
