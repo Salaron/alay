@@ -20,7 +20,7 @@ export class WebView extends CommonModule {
   public static getTemplateSync(module: string, action: string): Handlebars.TemplateDelegate {
     let template = templates[`${module}-${action}`]
     if (!template || Config.server.debug_mode) {
-      template = Handlebars.compile(readFileSync(`${rootDir}/webview/${module}/${action}.hbs`, "utf-8"))
+      template = Handlebars.compile(readFileSync(`./webview/${module}/${action}.hbs`, "utf-8"))
       if (!Config.server.debug_mode) {
         templates[`${module}-${action}`] = template
       }
@@ -34,7 +34,7 @@ export class WebView extends CommonModule {
   public static async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
     let template = templates[`${module}-${action}`]
     if (!template || Config.server.debug_mode) {
-      template = Handlebars.compile(await promisify(readFile)(`${rootDir}/webview/${module}/${action}.hbs`, "utf-8"))
+      template = Handlebars.compile(await promisify(readFile)(`./webview/${module}/${action}.hbs`, "utf-8"))
       if (!Config.server.debug_mode) {
         templates[`${module}-${action}`] = template
       }

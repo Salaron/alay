@@ -13,11 +13,11 @@ export default class extends WebApiAction {
   public async execute() {
     let warn = ""
     let error = ""
-    if (await promisify(exists)(`${rootDir}/logs/warn.log`)) {
-      warn = await promisify(readFile)(`${rootDir}/logs/warn.log`, "utf-8")
+    if (await promisify(exists)(`./logs/warn.log`)) {
+      warn = await promisify(readFile)(`./logs/warn.log`, "utf-8")
     }
-    if (await promisify(exists)(`${rootDir}/logs/error.log`)) {
-      error = await promisify(readFile)(`${rootDir}/logs/error.log`, "utf-8")
+    if (await promisify(exists)(`./logs/error.log`)) {
+      error = await promisify(readFile)(`./logs/error.log`, "utf-8")
     }
     return {
       status: 200,

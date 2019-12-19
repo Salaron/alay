@@ -35,7 +35,7 @@ async function updateSettings() {
     }
 
     try {
-      let data = await promisify(readFile)(`${rootDir}/data/secretbox/${cost.unit_data_file}`, "utf-8")
+      let data = await promisify(readFile)(`./data/secretbox/${cost.unit_data_file}`, "utf-8")
       secretboxSettings[cost.secretbox_id][cost.cost_id] = processedFiles[cost.unit_data_file] = <IRarityData[]>(await Promise.all(JSON.parse(data).map(async (rarityData: IRarityData) => {
         if (
           !(Type.isNullDef(rarityData.unit_id) || Type.isArray(rarityData.unit_id)) ||
@@ -44,7 +44,7 @@ async function updateSettings() {
           !Type.isInt(rarityData.rarity) ||
           !Type.isInt(rarityData.weight)
         ) {
-          log.warn(`File with unit_data: ${rootDir}/data/secretbox/${cost.unit_data_file} is invalid`)
+          log.warn(`File with unit_data: data/secretbox/${cost.unit_data_file} is invalid`)
           return
         }
         rarityData.unit_data_by_id = {}

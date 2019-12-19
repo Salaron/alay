@@ -1,5 +1,3 @@
-import { resolve } from "path"
-(<any>global).rootDir = `${resolve(__dirname)}/../`
 import "./core/config"
 import "./core/mailer"
 import "./models/error"

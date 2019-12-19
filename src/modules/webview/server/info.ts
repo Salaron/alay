@@ -33,8 +33,8 @@ export default class extends WebViewAction {
     }
     try {
       // get git info lol
-      const branchInfo = (await promisify(readFile)(`${rootDir}/.git/HEAD`, "utf-8")).substring(5).replace(/\n/g, "")
-      const log = (await promisify(readFile)(`${rootDir}/.git/logs/${branchInfo}`, "utf-8")).split(/\n/)
+      const branchInfo = (await promisify(readFile)(`.git/HEAD`, "utf-8")).substring(5).replace(/\n/g, "")
+      const log = (await promisify(readFile)(`.git/logs/${branchInfo}`, "utf-8")).split(/\n/)
       const lastCommit = log[log.length - 2].split(/\t|\s/g)
       serverInfo.branch = branchInfo.split("/")[2]
       serverInfo.commit = lastCommit[1].substring(0, 7)

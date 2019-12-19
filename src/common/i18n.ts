@@ -38,13 +38,13 @@ export const showdownConverter = new showdown.Converter({
 
 export async function init() {
   if (Object.keys(defaultStrings).length === 0) { // first-time load
-    if (!await promisify(exists)(`${rootDir}/i18n/${Config.i18n.defaultLanguage}.json`))
+    if (!await promisify(exists)(`./i18n/${Config.i18n.defaultLanguage}.json`))
       throw new Error(`File with default language is not exists`)
   }
   for (const localCode of Object.values(Config.i18n.languages)) {
     let sections
     try {
-      sections = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${localCode}.json`, `utf-8`))
+      sections = JSON.parse(await promisify(readFile)(`./i18n/${localCode}.json`, `utf-8`))
     } catch (err) {
       err.message = `Can't parse file with strings for '${localCode}' language`
       throw err
@@ -52,7 +52,7 @@ export async function init() {
     cache[localCode] = sections
     mdCache[localCode] = {}
   }
-  defaultStrings = JSON.parse(await promisify(readFile)(`${rootDir}/i18n/${Config.i18n.defaultLanguage}.json`, `utf-8`))
+  defaultStrings = JSON.parse(await promisify(readFile)(`./i18n/${Config.i18n.defaultLanguage}.json`, `utf-8`))
 }
 
 export class I18n extends CommonModule {
@@ -141,11 +141,11 @@ export class I18n extends CommonModule {
 
     let md = ``
     try {
-      md = await promisify(readFile)(`${rootDir}/i18n/TOS/${languageCode}.md`, "UTF-8")
+      md = await promisify(readFile)(`./i18n/TOS/${languageCode}.md`, "UTF-8")
     } catch (err) {
       const i18n = await this.getStrings(languageCode)
       md += `*${i18n.notTranslated}*\n\n`
-      md += await promisify(readFile)(`${rootDir}/i18n/TOS/${Config.i18n.defaultLanguage}.md`, "UTF-8")
+      md += await promisify(readFile)(`./i18n/TOS/${Config.i18n.defaultLanguage}.md`, "UTF-8")
     }
 
     return mdCache[languageCode][I18nMarkdownType[type]] = showdownConverter.makeHtml(md.replace(/--/gi, "—"))

@@ -1,11 +1,10 @@
-import { extname, resolve } from "path"
-(<any>global).rootDir = `${resolve(__dirname)}/../../`
 import "../core/config"
 Config.database.multipleStatements = true
 import { readdirSync } from "fs"
 import { Utils } from "../common/utils"
 import { Connect as ConnectToMariaDB, Connection } from "../core/database/mysql"
 import { Logger } from "../core/logger"
+import { extname } from "path"
 
 let dbConnection: Connection
 const log = new Logger("Migrate");

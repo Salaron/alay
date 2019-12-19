@@ -14,7 +14,7 @@ export default async function resourcesHandler(request: IncomingMessage, respons
   const [, , ...path] = pathName.split("/")
 
   try {
-    const stream = createReadStream(`${rootDir}/resources/${path.join("/")}`)
+    const stream = createReadStream(`./resources/${path.join("/")}`)
 
     stream.on("open", () => {
       response.setHeader("Content-Type", mimeType)

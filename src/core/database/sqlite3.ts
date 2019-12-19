@@ -109,65 +109,65 @@ export class Sqlite3 {
     ])
   }
   public getUnit() {
-    if (!this.unit || this.unit.closed) return this.unit = new Sqlite3Wrapper(rootDir + "data/db/unit.db_", "ro")
+    if (!this.unit || this.unit.closed) return this.unit = new Sqlite3Wrapper("data/db/unit.db_", "ro")
     else return this.unit
   }
   public getLive() {
-    if (!this.live || this.live.closed) return this.live = new Sqlite3Wrapper(rootDir + "data/db/live.db_", "ro")
+    if (!this.live || this.live.closed) return this.live = new Sqlite3Wrapper("data/db/live.db_", "ro")
     else return this.live
   }
   public getDuty() {
-    if (!this.duty || this.duty.closed) return this.duty = new Sqlite3Wrapper(rootDir + "data/db/team_duty.db_", "ro")
+    if (!this.duty || this.duty.closed) return this.duty = new Sqlite3Wrapper("data/db/team_duty.db_", "ro")
     else return this.duty
   }
   public getFestival() {
-    if (!this.festival || this.festival.closed) return this.festival = new Sqlite3Wrapper(rootDir + "data/db/festival.db_", "ro")
+    if (!this.festival || this.festival.closed) return this.festival = new Sqlite3Wrapper("data/db/festival.db_", "ro")
     else return this.festival
   }
   public getMarathon() {
-    if (!this.marathon || this.marathon.closed) return this.marathon = new Sqlite3Wrapper(rootDir + "data/db/marathon.db_", "ro")
+    if (!this.marathon || this.marathon.closed) return this.marathon = new Sqlite3Wrapper("data/db/marathon.db_", "ro")
     else return this.marathon
   }
   public getNotes() {
-    if (!this.notes || this.notes.closed) return this.notes = new Sqlite3Wrapper(rootDir + "data/db/sv_live_notes.db_", "ro")
+    if (!this.notes || this.notes.closed) return this.notes = new Sqlite3Wrapper("data/db/sv_live_notes.db_", "ro")
     else return this.notes
   }
   public getExchange() {
-    if (!this.exchange || this.exchange.closed) return this.exchange = new Sqlite3Wrapper(rootDir + "data/db/exchange.db_", "ro")
+    if (!this.exchange || this.exchange.closed) return this.exchange = new Sqlite3Wrapper("data/db/exchange.db_", "ro")
     else return this.exchange
   }
   public getItem() {
-    if (!this.item || this.item.closed) return this.item = new Sqlite3Wrapper(rootDir + "data/db/item.db_", "ro")
+    if (!this.item || this.item.closed) return this.item = new Sqlite3Wrapper("data/db/item.db_", "ro")
     else return this.item
   }
   public getSecretbox() {
-    if (!this.secretbox || this.secretbox.closed) return this.secretbox = new Sqlite3Wrapper(rootDir + "data/db/secretbox.db_", "ro")
+    if (!this.secretbox || this.secretbox.closed) return this.secretbox = new Sqlite3Wrapper("data/db/secretbox.db_", "ro")
     else return this.secretbox
   }
   public getOther() {
-    if (!this.other || this.other.closed) return this.other = new Sqlite3Wrapper(rootDir + "data/db/other.db_", "ro")
+    if (!this.other || this.other.closed) return this.other = new Sqlite3Wrapper("data/db/other.db_", "ro")
     else return this.other
   }
   public getEvent() {
-    if (!this.event || this.event.closed) return this.event = new Sqlite3Wrapper(rootDir + "data/db/event_common.db_", "ro")
+    if (!this.event || this.event.closed) return this.event = new Sqlite3Wrapper("data/db/event_common.db_", "ro")
     else return this.event
   }
   public getAchievement() {
-    if (!this.achievement || this.achievement.closed) return this.achievement = new Sqlite3Wrapper(rootDir + "data/db/achievement.db_", "ro")
+    if (!this.achievement || this.achievement.closed) return this.achievement = new Sqlite3Wrapper("data/db/achievement.db_", "ro")
     else return this.achievement
   }
   public getDownload() {
-    if (!this.download || this.download.closed) return this.download = new Sqlite3Wrapper(rootDir + "data/db/sv_download.db_", "rw")
+    if (!this.download || this.download.closed) return this.download = new Sqlite3Wrapper("data/db/sv_download.db_", "rw")
     else return this.download
   }
   public getBanner() {
-    if (!this.banner || this.banner.closed) return this.banner = new Sqlite3Wrapper(rootDir + "data/db/sv_banner.db_", "rw")
+    if (!this.banner || this.banner.closed) return this.banner = new Sqlite3Wrapper("data/db/sv_banner.db_", "rw")
     else return this.banner
   }
 
   private checkAllDatabases(dbNames: string[]) {
     dbNames.forEach(dbName => {
-      if (!existsSync(`${rootDir}/data/db/${dbName}`)) {
+      if (!existsSync(`./data/db/${dbName}`)) {
         throw new Error(`Required file 'data/db/${dbName}' is missing`)
       }
     })

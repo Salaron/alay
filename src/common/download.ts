@@ -18,8 +18,8 @@ let batchUrls: urlObject[] = []
 
 export async function init() {
   try {
-    additionalUrls = JSON.parse(await promisify(readFile)(`${rootDir}/data/download/additional.json`, "utf-8")).response_data
-    batchUrls = JSON.parse(await promisify(readFile)(`${rootDir}/data/download/batch.json`, "utf-8")).response_data
+    additionalUrls = JSON.parse(await promisify(readFile)(`./data/download/additional.json`, "utf-8")).response_data
+    batchUrls = JSON.parse(await promisify(readFile)(`./data/download/batch.json`, "utf-8")).response_data
   } catch (err) {
     log.warn(err)
   }

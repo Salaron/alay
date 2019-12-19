@@ -5,9 +5,6 @@ import { ApiAction as apiAction, WebApiAction as webApiAction, WebViewAction as 
 import { ErrorCode as errorCode, ErrorUser as errorUser, ErrorWebApi as errorWebApi } from "../models/error"
 
 declare global {
-  // make project root dir global (for easy access to files outside of 'compile' folder)
-  const rootDir: string
-
   const sqlite3: Sqlite3
   // core modules should be global
   const Config: config
