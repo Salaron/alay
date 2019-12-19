@@ -1,5 +1,5 @@
 import readline from "readline"
-import { Connection } from "./database/mariadb"
+import { Connection } from "./database/mysql"
 import { Logger } from "./logger"
 import { Unit } from "../common/unit"
 

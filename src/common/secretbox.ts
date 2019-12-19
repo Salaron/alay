@@ -5,7 +5,7 @@ import { BaseAction } from "../models/actions"
 import { IRarityData, ISecretbox, ISecretboxButton, ISecretboxCost, ISecretboxData, ISecretboxEffect, ISecretboxEffectDetail, ISecretboxSettings, IStepInfo, IStepUpSettings } from "../models/secretbox"
 import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
-import { Connection } from "../core/database/mariadb"
+import { Connection } from "../core/database/mysql"
 
 const log = new Logger("Secretbox")
 const unitDB = sqlite3.getUnit()

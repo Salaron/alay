@@ -1,19 +1,16 @@
-import { PoolConfig } from "mariadb"
+import { PoolOptions } from "mysql2"
 
 export default <IDatabaseConfig>{
-  debug: false,
-  trace: false,
-  reconnectDelay: 5000,
-  reconnectMaxAttempt: 10,
-  connectionLimit: 30,
   host: "localhost",
-  user: "root",
+  user: "",
   password: "",
   database: "",
-  dateStrings: true
+  connectionLimit: 10,
+  reconnectMaxAttempt: 10,
+  reconnectDelay: 5000,
 }
 
-interface IDatabaseConfig extends PoolConfig {
+interface IDatabaseConfig extends PoolOptions {
   reconnectMaxAttempt: number
   reconnectDelay: number
 }

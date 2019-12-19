@@ -4,7 +4,7 @@ import "../core/config"
 Config.database.multipleStatements = true
 import { readdirSync } from "fs"
 import { Utils } from "../common/utils"
-import { Connect as ConnectToMariaDB, Connection } from "../core/database/mariadb"
+import { Connect as ConnectToMariaDB, Connection } from "../core/database/mysql"
 import { Logger } from "../core/logger"
 
 let dbConnection: Connection

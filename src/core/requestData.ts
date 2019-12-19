@@ -7,7 +7,7 @@ import querystring from "querystring"
 import { Utils } from "../common/utils"
 import { Logger } from "./logger"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
-import { Connection } from "./database/mariadb"
+import { Connection } from "./database/mysql"
 
 const log = new Logger("Request Data")
 

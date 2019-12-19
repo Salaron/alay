@@ -5,7 +5,7 @@ import "./core/mailer"
 import "./models/error"
 import { Logger } from "./core/logger"
 import { Sqlite3 } from "./core/database/sqlite3"
-import { Connect } from "./core/database/mariadb"
+import { Connect } from "./core/database/mysql"
 
 const logger = new Logger("Setup")
 try {

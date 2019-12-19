@@ -1,4 +1,4 @@
-import { Connection } from "../../core/database/mariadb"
+import { Connection } from "../../core/database/mysql"
 import { Logger } from "../../core/logger"
 
 const log = new Logger("rLive")

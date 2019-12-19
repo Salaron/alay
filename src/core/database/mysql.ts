@@ -1,16 +1,19 @@
-import mariadb from "mariadb"
+import mysql from "mysql2/promise"
 import { promisify } from "util"
 import { Logger } from "../logger"
-import { formatQuery } from "./query"
 
-const log = new Logger("MariaDB")
-export const pool = mariadb.createPool(Config.database)
+const log = new Logger("MySQL/MariaDB")
+export const pool = mysql.createPool({
+  ...Config.database,
+  namedPlaceholders: true,
+  waitForConnections: true
+})
 
 export class Connection {
-  public connection: mariadb.PoolConnection
+  public connection: mysql.PoolConnection
   public released = false
   public lastQuery = ``
-  constructor(connection: mariadb.PoolConnection) {
+  constructor(connection: mysql.PoolConnection) {
     if (!connection) throw new Error(`You should provide a connection`)
     this.connection = connection
   }
@@ -30,14 +33,16 @@ export class Connection {
   }
 
   public async execute(query: string, values: any = {}): Promise<any> {
-    return await this.query(query, values)
+    const result = await this.query(query, values)
+    return result
   }
 
   public async query(query: string, values: any = {}): Promise<any[]> {
     if (this.released) throw new Error(`Connection was released before.\nLast query: ${this.lastQuery}`)
     this.lastQuery = `${query}\n${JSON.stringify(values)}`
 
-    return await this.connection.query(formatQuery(query, values))
+    const [rows] = await this.connection.query(query, values)
+    return <any[]>rows
   }
 
   /**
@@ -48,9 +53,9 @@ export class Connection {
     this.lastQuery = `${query}\n${JSON.stringify(values)}`
 
     // select only 1 element
-    const result = await this.connection.query(formatQuery(query, values))
-    if (typeof result === "object" && Array.isArray(result) && result.length > 0) {
-      return result[0]
+    const [rows] = await this.connection.query(query, values)
+    if (typeof rows === "object" && Array.isArray(rows) && rows.length > 0) {
+      return rows[0]
     } else {
       return undefined
     }
@@ -106,13 +111,13 @@ export async function Connect() {
   let connection
   try {
     connection = await pool.getConnection()
-    log.info("Connected to MariaDB Server")
+    log.info("Connected to MySQL/MariaDB Server")
     reconnectAttempts = 0
   } catch (e) {
     reconnectAttempts += 1
     if (e.code === "ECONNREFUSED")
       log.error(
-        `Unable to connect to MariaDB Server [ECONNREFUSED] ${reconnectAttempts}/${Config.database.reconnectMaxAttempt}`
+        `Unable to connect to MySQL/MariaDB Server [ECONNREFUSED] ${reconnectAttempts}/${Config.database.reconnectMaxAttempt}`
       )
     if (reconnectAttempts >= Config.database.reconnectMaxAttempt) {
       log.fatal(`Max reconnect attempts reached`)

@@ -1,5 +1,5 @@
 import { Logger } from "../../core/logger"
-import { Connection } from "../../core/database/mariadb"
+import { Connection } from "../../core/database/mysql"
 
 const log = new Logger(`Init`)
 

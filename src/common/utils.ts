@@ -2,7 +2,7 @@ import crypto from "crypto"
 import { IncomingMessage } from "http"
 import moment from "moment"
 import superagent from "superagent"
-import { Connection } from "../core/database/mariadb"
+import { Connection } from "../core/database/mysql"
 import { Logger } from "../core/logger"
 
 const log = new Logger("Utils")
