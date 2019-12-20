@@ -16,6 +16,7 @@
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
   <link rel="stylesheet" type="text/css" href="/resources/css/styles.css">
+  <link rel="stylesheet" type="text/css" href="/resources/css/overlayScrollbars.min.css">
   {{#unless external}}
   <link rel="stylesheet" type="text/css" href="/resources/css/webview.css">
   {{/unless}}
@@ -25,9 +26,9 @@
 
   <script type="text/javascript" src="/resources/js/uikit.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/resources/js/jquery.nicescroll.min.js"></script>
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
+  <script type="text/javascript" src="/resources/js/jquery.overlayScrollbars.min.js"></script>
   {{#each scripts}}
   <script type="text/javascript" src="{{this}}"></script>
   {{/each}}
@@ -38,21 +39,15 @@
     var external = {{{ external }}}
     var headers = {{{ headers }}}
 
-    $(function () {
-      var scrollbar = $("#body").niceScroll({
-        bouncescroll: false,
-        smoothscroll: true,
-        cursoropacitymax: 0.7,
-        scrollspeed: 100,
-        preventmultitouchscrolling: false,
-        autohidemode: false,
-        enabletranslate3d: true
-      });
-    });
+    $(function() {
+      var scrollbar = $("#body").overlayScrollbars({
+        className: "os-theme-dark os-theme-sunlight"
+      })
+    })
   </script>
 </head>
 
-<body onresize="onResize()">
+<body>
   {{{changeLanguageModal}}}
   {{{body}}}
 </body>

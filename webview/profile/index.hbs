@@ -1,23 +1,12 @@
 <style>
-  .stats_entry {
+  .profile-stats-entry {
     display: flex;
     margin: 0px;
     justify-content: space-between;
   }
 
-  .stats_test {
-    font-weight: 450;
-  }
-
-  .stats_value {
-    margin-left: 5px;
-    font-weight: 700;
-  }
-
   .rank-icon {
-    width: 6em;
-    height: 2em;
-    background-size: 100%;
+    height: 1.5em;
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -30,154 +19,176 @@
       {{{header i18n/profile this}}}
     </div>
     <div id="body">
-      <div id="bodywrapper">
-        <div class="uk-container uk-width-1-1">
-          <div class="uk-flex uk-margin-small-top">
-            <div>
-              <div class="avatar-border" style="background-image: url('//r.llsif.win/{{icon}}');"></div>
-            </div>
-            <div class="uk-margin-left uk-width-1-2" style="line-height: 1.2">
-
-              <h3 class="uk-text-bold">{{user/name}}</h3>
-
-              <div class="uk-text-muted uk-width-auto" style="word-wrap: break-word; overflow-wrap: break-word;">
-                {{nl2br user/introduction}}</div>
-            </div>
-          </div>
-          <div class="uk-text-right uk-text-mutedb uk-margin-small-top" {{#if user.lastLogin}}
-            uk-tooltip="title: {{user.lastLogin}}; pos: top-right" {{/if}}>{{user/lastLoginFormated}}</div>
-        </div>
-
-        <div class="uk-container uk-width-1-1">
-          <dl class="stats_entry">
-            <dt class="stats_test">User ID</dt>
-            <dd class="stats_value">{{numberWithSpaces user/user_id}}</dd>
-          </dl>
-          <dl class="stats_entry">
-            <dt class="stats_test">{{i18n/userLevel}}</dt>
-            <dd class="stats_value">{{numberWithSpaces user/level}}</dd>
-          </dl>
-          <dl class="stats_entry">
-            <dt class="stats_test">{{i18n/userRank}}</dt>
-            <dd class="stats_value">{{numberWithSpaces user/rank}}</dd>
-          </dl>
-          <dl class="stats_entry">
-            <dt class="stats_test">{{i18n/registrationDate}}</dt>
-            <dd class="stats_value" uk-tooltip="title: {{user/registrationDate}}">{{user/registrationDateFormated}}
-            </dd>
-          </dl>
-          <dl class="stats_entry">
-            <dt class="stats_test">{{i18n/daysInTheGame}}</dt>
-            <dd class="stats_value">{{numberWithSpaces user/daysInTheGame}}</dd>
-          </dl>
-          <dl class="stats_entry">
-            <dt class="stats_test">{{i18n/totalPlayTime}}</dt>
-            <dd class="stats_value">
-              {{user/playTime}}</dd>
-          </dl>
-          <dl class="stats_entry">
-            <dt class="stats_test">{{i18n/livesPlayed}}</dt>
-            <dd class="stats_value">{{numberWithSpaces user/livesPlayed}}</dd>
-          </dl>
-          <dl class="stats_entry">
-            <dt class="stats_test">{{i18n/totalScore}}</dt>
-            <dd class="stats_value">{{numberWithSpaces user/totalScore}}</dd>
-          </dl>
-          <dl class="stats_entry">
-            <dt class="stats_test">{{i18n/maxCombo}}</dt>
-            <dd class="stats_value">{{numberWithSpaces user/maxCombo}}</dd>
-          </dl>
-        </div>
-
-        <div class="uk-container uk-margin uk-width-1-1">
-          <hr>
-          <h3 class="uk-text-bold uk-align-center uk-margin-bottom">
-            <center>{{i18n/recentPlays}}</center>
-          </h3>
-          {{#if recentPlays.length}}
+      <div class="uk-container uk-width-1-1">
+        <div class="uk-flex uk-margin-small-top">
           <div>
-            <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
-              <thead>
-              </thead>
-              <tbody id="recentPlaysTable">
-                {{#each recentPlays}}
-                {{#if this}}
-                <tr class="recentPlays">
-                  <td class="rank-icon" style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
-                  </td>
-                  <td>{{nl2br this/name}} <br><span class="uk-text-small">{{this/timeAgo}}</span></td>
-                  <td uk-tooltip="{{../i18n/combo}}">{{this/combo}}/{{this/s_rank_combo}}</td>
-                </tr>
-                {{/if}}
-                {{/each}}
-              </tbody>
-            </table>
+            <div class="avatar-border" style="background-image: url('//r.llsif.win/{{icon}}');"></div>
           </div>
-          {{#if haveMoreRecentPlays}}
-          <button id="loadMoreRecentPlaysButton" type="button"
-            class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
-            onclick="loadRecentPlaysData()">
-            <span class="uk-icon" uk-icon="triangle-down"></span> {{i18n/showMore}} <span class="uk-icon"
-              uk-icon="triangle-down"></span>
-          </button>
-          {{/if}}
-          <hr class="uk-margin-remove-top">
-          {{else}}
-          <p>{{i18n/recentPlaysDataIsMissing}}</p>
-          <hr>
-          {{/if}}
-        </div>
+          <div class="uk-margin-left uk-width-1-2" style="line-height: 1.2">
 
-        <div class="uk-container uk-margin uk-width-1-1">
-          <h3 class="uk-text-bold uk-align-center uk-margin-bottom">
-            <center>{{i18n/events}}</center>
-          </h3>
-          {{#if eventData.length}}
-          <div>
-            <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
-              <thead>
-                <tr>
-                  <th class="uk-table-shrink">{{i18n/eventType}}</th>
-                  <th class="uk-table-shrink uk-text-nowrap" uk-tooltip="title: {{i18n/jpTimeZone}}; pos: top-left;">
-                    {{i18n/eventStart}}</th>
-                  <th class="uk-table-shrink uk-text-nowrap" uk-tooltip="title: {{i18n/jpTimeZone}}; pos: top-left;">
-                    {{i18n/eventEnd}}</th>
-                  <th class="uk-width-1-6">{{i18n/eventPtRank}}</th>
-                  <th class="uk-table-shrink">{{i18n/eventScoreRank}}</th>
-                  <th class="uk-table-shrink">{{i18n/livesPlayed}}</th>
-                </tr>
-              </thead>
-              <tbody id="eventDataTableBody">
-                {{#each eventData}}
-                <tr class="eventData">
-                  <td style="font-size: .9rem;">{{this/type}}</td>
-                  <td class="uk-text-nowrap" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
-                    {{momentFormat this/start_date "DD.MM.YY HH:mm"}}</td>
-                  <td class="uk-text-nowrap" style="font-size: .9rem;" uk-tooltip="{{../i18n/jpTimeZone}}">
-                    {{momentFormat this/end_date "DD.MM.YY HH:mm"}}</td>
-                  <td class="uk-text-break">{{notAvailable this/ptRank}}</td>
-                  <td>{{notAvailable this/scoreRank}}</td>
-                  <td>{{notAvailable this/lives_played}}</td>
-                </tr>
-                {{/each}}
-              </tbody>
-            </table>
+            <h3 class="uk-text-bold">{{user/name}}</h3>
+
+            <div class="uk-text-muted uk-width-auto" style="word-wrap: break-word; overflow-wrap: break-word;">
+              {{nl2br user/introduction}}</div>
           </div>
-          {{#if haveMoreEventData}}
-          <button id="loadMoreEventDataButton" type="button"
-            class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
-            onclick="loadEventData()">
-            <span class="uk-icon" uk-icon="triangle-down"></span> {{i18n/showMore}} <span class="uk-icon"
-              uk-icon="triangle-down"></span>
-          </button>
-          {{/if}}
-          <hr class="uk-margin-remove-top">
         </div>
+        <div class="uk-text-right uk-text-mutedb uk-margin-small-top" {{#if user.lastLogin}}
+          uk-tooltip="title: {{user.lastLogin}}; pos: top-right" {{/if}}>{{user/lastLoginFormated}}</div>
+      </div>
+
+      <div class="uk-container uk-width-1-1">
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">User ID</dt>
+          <dd class="uk-text-bold">{{numberWithSpaces user/user_id}}</dd>
+        </dl>
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">{{i18n/userLevel}}</dt>
+          <dd class="uk-text-bold">{{numberWithSpaces user/level}}</dd>
+        </dl>
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">{{i18n/userRank}}</dt>
+          <dd class="uk-text-bold">{{numberWithSpaces user/rank}}</dd>
+        </dl>
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">{{i18n/registrationDate}}</dt>
+          <dd class="uk-text-bold" uk-tooltip="title: {{user/registrationDate}}">{{user/registrationDateFormated}}
+          </dd>
+        </dl>
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">{{i18n/daysInTheGame}}</dt>
+          <dd class="uk-text-bold">{{numberWithSpaces user/daysInTheGame}}</dd>
+        </dl>
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">{{i18n/totalPlayTime}}</dt>
+          <dd class="uk-text-bold">
+            {{user/playTime}}</dd>
+        </dl>
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">{{i18n/livesPlayed}}</dt>
+          <dd class="uk-text-bold">{{numberWithSpaces user/livesPlayed}}</dd>
+        </dl>
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">{{i18n/totalScore}}</dt>
+          <dd class="uk-text-bold">{{numberWithSpaces user/totalScore}}</dd>
+        </dl>
+        <dl class="profile-stats-entry">
+          <dt class="uk-text-normal">{{i18n/maxCombo}}</dt>
+          <dd class="uk-text-bold">{{numberWithSpaces user/maxCombo}}</dd>
+        </dl>
+      </div>
+
+      <div class="uk-container uk-margin uk-width-1-1">
+        <hr>
+        <h3 class="uk-text-bold uk-align-center uk-margin-bottom">
+          <center>{{i18n/recentPlays}}</center>
+        </h3>
+        {{#if recentPlays.length}}
+        <div class="uk-overflow-auto">
+          <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
+            <thead>
+              <th>Название</th>
+              <th style="text-align: center;">Комбо</th>
+              <th style="text-align: center;">Очки</th>
+              <th>Моды</th>
+            </thead>
+            <tbody id="recentPlaysTable">
+              {{#each recentPlays}}
+              {{#if this}}
+              <tr class="recentPlays">
+                <td class="uk-text-nowrap uk-table-expand">
+                  {{#each this.songInfo}}
+                  {{this.name}} <br> <span style="font-size: .875rem;">{{this.difficulty}}</span> <br>
+                  {{/each}}
+                  <span style="font-size: .75rem;">{{this/timeAgo}}</span>
+                </td>
+                <td style="text-align: center; width: 110px;">
+                  {{this/combo}}/{{this/s_rank_combo}}
+
+                  {{#ifcond this.combo_rank "!=" "D"}}
+                  <div class="rank-icon" style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
+                  </div>
+                  {{/ifcond}}
+                </td>
+                <td style="text-align: center; width: 110px;">
+                  {{this/score}}
+
+                  {{#ifcond this.combo_rank "!=" "D"}}
+                  <div class="rank-icon" style="background-image: url('/resources/svg/{{this/score_rank}}Rank.svg');">
+                  </div>{{/ifcond}}
+                </td>
+                <td>
+                  {{nl2br this.mods}}
+                </td>
+              </tr>
+              {{/if}}
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{#if haveMoreRecentPlays}}
+        <button id="loadMoreRecentPlaysButton" type="button"
+          class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
+          onclick="loadRecentPlaysData()">
+          <span class="uk-icon" uk-icon="triangle-down"></span> {{i18n/showMore}} <span class="uk-icon"
+            uk-icon="triangle-down"></span>
+        </button>
+        {{/if}}
+        <hr class="uk-margin-remove-top">
         {{else}}
-        <p>{{i18n/eventDataIsMissing}}</p>
+        <p>{{i18n/recentPlaysDataIsMissing}}</p>
         <hr>
         {{/if}}
       </div>
+
+      <div class="uk-container uk-margin uk-width-1-1">
+        <h3 class="uk-text-bold uk-align-center uk-margin-bottom">
+          <center>{{i18n/events}}</center>
+        </h3>
+        {{#if eventData.length}}
+        <div class="uk-overflow-auto">
+          <table class="uk-table uk-table-middle uk-table-divider uk-table-justify">
+            <thead>
+              <tr>
+                <th class="uk-table-shrink">{{i18n/eventName}}</th>
+                <th class="uk-table-shrink uk-text-nowrap" uk-tooltip="title: {{i18n/jpTimeZone}}; pos: top-left;">
+                  {{i18n/eventStart}}</th>
+                <th class="uk-table-shrink uk-text-nowrap" uk-tooltip="title: {{i18n/jpTimeZone}}; pos: top-left;">
+                  {{i18n/eventEnd}}</th>
+                <th class="uk-width-1-6">{{i18n/eventPtRank}}</th>
+                <th class="uk-table-shrink">{{i18n/eventScoreRank}}</th>
+                <th class="uk-table-shrink">{{i18n/livesPlayed}}</th>
+              </tr>
+            </thead>
+            <tbody id="eventDataTableBody">
+              {{#each eventData}}
+              <tr class="eventData">
+                <td class="uk-text-nowrap">{{this/type}}</td>
+                <td class="uk-text-nowrap" uk-tooltip="{{../i18n/jpTimeZone}}">
+                  {{momentFormat this/start_date "DD.MM.YY HH:mm"}}</td>
+                <td class="uk-text-nowrap" uk-tooltip="{{../i18n/jpTimeZone}}">
+                  {{momentFormat this/end_date "DD.MM.YY HH:mm"}}</td>
+                <td class="uk-text-break">{{notAvailable this/ptRank}}</td>
+                <td>{{notAvailable this/scoreRank}}</td>
+                <td>{{notAvailable this/lives_played}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{#if haveMoreEventData}}
+        <button id="loadMoreEventDataButton" type="button"
+          class="uk-button uk-button-primary uk-button-small uk-align-center uk-border-pill uk-margin-small-top uk-text-uppercase"
+          onclick="loadEventData()">
+          <span class="uk-icon" uk-icon="triangle-down"></span> {{i18n/showMore}} <span class="uk-icon"
+            uk-icon="triangle-down"></span>
+        </button>
+        {{/if}}
+        <hr class="uk-margin-remove-top">
+      </div>
+      {{else}}
+      <p>{{i18n/eventDataIsMissing}}</p>
+      <hr>
+      {{/if}}
     </div>
   </div>
 </div>
@@ -187,8 +198,6 @@
 </script>
 
 <script>
-
-
   function loadRecentPlaysData() {
     $("#loadMoreRecentPlaysButton").attr("disabled", "disabled")
     var offset = $(".recentPlays").length

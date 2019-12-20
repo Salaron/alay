@@ -67,7 +67,7 @@
     "livesPlayed": "Lives played",
     "excludingEvents": "Excluding events",
     "events": "Event Activity",
-    "eventType": "Type",
+    "eventName": "Name",
     "eventStart": "Start date",
     "eventEnd": "End date",
     "eventPtRank": "pts rank",

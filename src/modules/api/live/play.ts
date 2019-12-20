@@ -61,24 +61,22 @@ export default class extends ApiAction {
       eventLive = true
     }
 
-    const [liveNotes, deckInfo, mods] = await Promise.all([
+    const modsInt = await this.user.getModsInt(this.user_id)
+    const [liveNotes, deckInfo] = await Promise.all([
       this.live.getLiveNotes(this.user_id, liveInfo, eventLive),
       this.live.getUserDeck(this.user_id, this.params.unit_deck_id, true, guest.unit_id),
-      this.user.getParams(this.user_id, ["hp"]),
-      this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id, lp_factor) VALUES (:user, :difficulty, :setting_id, :deck, :factor)", {
+      this.connection.query("INSERT INTO user_live_progress (user_id, live_difficulty_id, live_setting_id, deck_id, lp_factor, mods) VALUES (:user, :difficulty, :setting_id, :deck, :factor, :mods)", {
         user: this.user_id,
         difficulty: this.params.live_difficulty_id,
         setting_id: liveInfo.live_setting_id,
         deck: this.params.unit_deck_id,
-        factor: this.params.lp_factor
+        factor: this.params.lp_factor,
+        mods: modsInt
       })
     ])
 
-    if (!eventLive) {
-      if (mods.hp === 1) deckInfo.total_hp = 200
-      if (mods.hp === 2) deckInfo.total_hp = 1
-    }
-    const response = {
+    if (liveNotes.hp !== 0) deckInfo.total_hp = liveNotes.hp
+    const result = {
       rank_info: liveInfo.score_rank_info,
       energy_full_time: Utils.toSpecificTimezone(9),
       over_max_energy: 0,
@@ -102,7 +100,7 @@ export default class extends ApiAction {
     }
     return {
       status: 200,
-      result: response
+      result
     }
   }
 }

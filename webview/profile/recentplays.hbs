@@ -1,10 +1,30 @@
 {{#each recentPlays}}
 {{#if this}}
 <tr class="recentPlays">
-  <td class="rank-icon" style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
+  <td class="uk-text-nowrap uk-table-expand">
+    {{#each this.songInfo}}
+    {{this.name}} <br> <span style="font-size: .875rem;">{{this.difficulty}}</span> <br>
+    {{/each}}
+    <span style="font-size: .75rem;">{{this/timeAgo}}</span>
   </td>
-  <td>{{nl2br this/name}} <br><span class="uk-text-small">{{this/timeAgo}}</span></td>
-  <td>{{this/combo}}/{{this/s_rank_combo}}</td>
+  <td style="text-align: center; width: 110px;">
+    {{this/combo}}/{{this/s_rank_combo}}
+
+    {{#ifcond this.combo_rank "!=" "D"}}
+    <div class="rank-icon" style="background-image: url('/resources/svg/{{this/combo_rank}}Rank.svg');">
+    </div>
+    {{/ifcond}}
+  </td>
+  <td style="text-align: center; width: 110px;">
+    {{this/score}}
+
+    {{#ifcond this.combo_rank "!=" "D"}}
+    <div class="rank-icon" style="background-image: url('/resources/svg/{{this/score_rank}}Rank.svg');">
+    </div>{{/ifcond}}
+  </td>
+  <td>
+    {{nl2br this.mods}}
+  </td>
 </tr>
 {{/if}}
 {{/each}}

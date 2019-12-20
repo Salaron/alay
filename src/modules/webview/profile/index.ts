@@ -90,7 +90,10 @@ export default class extends WebViewAction {
         user: userId
       }),
       this.connection.query("SELECT * FROM user_live_status WHERE user_id = :user AND status = 2", { user: userId }),
-      this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user ORDER BY insert_date DESC", { user: userId })
+      this.connection.query("SELECT * FROM user_live_log WHERE user_id = :user AND insert_date >= :week ORDER BY insert_date DESC", {
+        user: userId,
+        week: moment().subtract(1, "week").format("YYYY-MM-DD HH:mm:ss")
+      })
     ])
 
     if (!user) return {
@@ -120,21 +123,25 @@ export default class extends WebViewAction {
           lsids: liveSettingId
         })
 
-        const songNames = []
+        const songInfo = []
         live.s_rank_combo = 0
         live.s_rank_score = 0
         for (const liveInfo of liveInfoList) {
           if (live.combo > 100 && live.is_event) total += liveInfo.live_time
-          songNames.push(`${liveInfo.name} (${convertDifficulty[liveInfo.difficulty]} ${liveInfo.stage_level}☆)`)
+          songInfo.push({
+            name: liveInfo.name,
+            difficulty: `${convertDifficulty[liveInfo.difficulty]} ${liveInfo.stage_level}☆`
+          })
           live.s_rank_combo += liveInfo.s_rank_combo
           live.s_rank_score += liveInfo.s_rank_score
         }
         if (index > 3) return
 
-        live.name = songNames.join("\n")
+        live.songInfo = songInfo
         live.timeAgo = moment.duration(moment(live.insert_date).diff(Date.now())).locale(code).humanize(true)
         live.score_rank = convertRank[live.score_rank]
         live.combo_rank = convertRank[live.combo_rank]
+        live.mods = await this.user.getModsString(1, live.mods)
 
         return live
       })),

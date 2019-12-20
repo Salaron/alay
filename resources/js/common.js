@@ -135,9 +135,3 @@ function replacePlaceholders(input, values) {
     return txt
   })
 }
-
-function onResize() {
-  if (typeof $ != "undefined") {
-    $("#body").getNiceScroll().resize()
-  }
-}

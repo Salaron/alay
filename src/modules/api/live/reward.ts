@@ -91,7 +91,7 @@ export default class extends ApiAction {
     if (scoreRank === 5) exp = Math.floor(exp / 2)
     const [nextLevelInfo, defaultRewards] = await Promise.all([
       this.user.addExp(this.user_id, exp),
-      this.live.getDefaultRewards(this.user_id, scoreRank, comboRank),
+      this.live.getDefaultRewards(this.user_id, scoreRank, comboRank, session.mods),
       this.item.addPresent(this.user_id, {
         name: "coins",
       }, "Live Show! Reward", 100000, true)
@@ -155,7 +155,8 @@ export default class extends ApiAction {
       score: totalScore,
       combo: this.params.max_combo,
       combo_rank: comboRank,
-      score_rank: scoreRank
+      score_rank: scoreRank,
+      mods: session.mods
     })
     await this.connection.query(`DELETE FROM user_live_progress WHERE user_id = :user`, { user: this.user_id })
     if (currentEvent.active) {

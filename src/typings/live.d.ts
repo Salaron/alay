@@ -51,7 +51,7 @@ interface scoreInfo {
 interface writeToLogResult {
   live_setting_id?: number
   live_setting_ids?: string
-  mods?: string
+  mods?: number
   is_event: boolean
   score: number
   combo: number

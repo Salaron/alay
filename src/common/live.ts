@@ -2,6 +2,7 @@ import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
 import { Randomizer } from "./live/randomizer"
+import { Mods } from "../models/constant"
 
 const log = new Logger("Live")
 
@@ -72,35 +73,43 @@ export class Live extends CommonModule {
   public async getLiveNotes(userId: number, liveData: liveData, isEvent = false) {
     const params = await this.action.user.getParams(userId)
 
-    // make mirror and vanish on-the-fly
-    let mirror = 0
-    let vanish = 0
+    let vanish = false
     let random = false
+    let mirror = false
+    let hp = 0
     if ((isEvent === true && params.event === 1) || isEvent === false) {
-      vanish = params.vanish ? params.vanish : 0
-      mirror = params.mirror === 1 ? 10 : 0
+      vanish = params.vanish !== 0
+      mirror = !!params.mirror
       random = !!params.random && liveData.ac_flag !== 1
     }
+    if (isEvent === false) {
+      if (params.hp === 1) hp = 999
+      if (params.hp === 2) hp = 1
+    }
 
-    const notes = await liveNotesDB.all(`
+    let notes = await liveNotesDB.all(`
     SELECT
-      timing_sec, notes_attribute, notes_level, effect,
-      effect_value, (abs(${mirror} - position)) as position,
-      ${vanish} as vanish
+      timing_sec, notes_attribute, notes_level, effect, position,
+      effect_value, ${vanish === true ? params.vanish : 0} as vanish
     FROM live_note
     WHERE live_setting_id = :id`, { id: liveData.live_setting_id })
     if (notes.length === 0) throw new Error(`Live notes data for LSID #${liveData.live_setting_id} is missing in database`)
 
     if (random === true) {
-      return {
-        notes: new Randomizer(notes).randomize(),
-        random
-      }
-    } else {
-      return {
-        notes,
-        random
-      }
+      notes = new Randomizer(notes).randomize()
+    }
+    if (mirror === true) {
+      notes.forEach(note => {
+        note.position = 10 - note.position
+      })
+    }
+
+    return {
+      vanish,
+      random,
+      mirror,
+      hp,
+      notes
     }
   }
 
@@ -502,7 +511,7 @@ export class Live extends CommonModule {
   }
 
   public async writeToLog(userId: number, result: writeToLogResult) {
-    await this.connection.execute("INSERT INTO user_live_log (user_id, live_setting_id, live_setting_ids, is_event, score, combo, combo_rank, score_rank) VALUES (:user, :lsid, :lsids, :event, :score, :combo, :combo_r, :score_r)", {
+    await this.connection.execute("INSERT INTO user_live_log (user_id, live_setting_id, live_setting_ids, is_event, score, combo, combo_rank, score_rank, mods) VALUES (:user, :lsid, :lsids, :event, :score, :combo, :combo_r, :score_r, :mods)", {
       user: userId,
       lsid: result.live_setting_id,
       lsids: result.live_setting_ids,
@@ -510,24 +519,26 @@ export class Live extends CommonModule {
       score: result.score,
       combo: result.combo,
       combo_r: result.combo_rank,
-      score_r: result.score_rank
+      score_r: result.score_rank,
+      mods: result.mods || 0
     })
   }
 
-  public async getDefaultRewards(userId: number, scoreRank: number, comboRank: number) {
+  public async getDefaultRewards(userId: number, scoreRank: number, comboRank: number, modsInt: number) {
+    let multiplier = modsInt & Mods.NO_FAIL ? 0.5 : 1
     let rndGT = Math.floor(Math.random() * (5)) + 1
     let rndBT = Math.floor(Math.random() * (3)) + 1
     let rndLG = Math.floor(Math.random() * (10 * (7 - comboRank) - 10 * (6 - comboRank) + 1)) + 10 * (6 - comboRank)
     let dailyReward = await Promise.all([
       this.action.item.addPresent(userId, {
         name: "gt"
-      }, "Live Show! Reward", rndGT),
+      }, "Live Show! Reward", Math.floor(rndGT * multiplier)),
       this.action.item.addPresent(userId, {
         name: "bt"
-      }, "Live Show! Reward", rndBT),
+      }, "Live Show! Reward", Math.floor(rndBT * multiplier)),
       this.action.item.addPresent(userId, {
         name: "lg"
-      }, "Live Show! Reward", rndLG)
+      }, "Live Show! Reward", Math.floor(rndLG * multiplier))
     ])
 
     // Random SiS
@@ -563,6 +574,10 @@ export class Live extends CommonModule {
       case 2: comboReward = sr.randomValue().unit_id; break
       case 3:
       case 4: comboReward = r.randomValue().unit_id; break
+    }
+    if (multiplier < 1) {
+      scoreReward = null
+      comboReward = null
     }
     if (scoreReward != null) {
       let res = await this.action.item.addPresent(userId, {

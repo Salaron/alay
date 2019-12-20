@@ -1,5 +1,5 @@
 import { BaseAction } from "../models/actions"
-import { FESTIVAL_SETLIST } from "../models/constant"
+import { FESTIVAL_SETLIST, modNames, Mods } from "../models/constant"
 import { CommonModule } from "../models/common"
 
 interface userParams {
@@ -100,6 +100,66 @@ export class User extends CommonModule {
     if (friend.status === 1) return 1 // friend
     if (friend.recipient_id === currentUser && friend.initiator_id === anotherUser) return 2 // approval wait
     return 3 // pending
+  }
+
+  public async getModsString(userId: number, value?: number) {
+    if (typeof value !== "number") value = await this.getModsInt(userId)
+
+    let result = ""
+    if (value & Mods.RANDOM) {
+      result += "RANDOM\n"
+    }
+    if (value & Mods.HIDDEN) {
+      result += "HIDDEN\n"
+    }
+    if (value & Mods.SUDDEN) {
+      result += "SUDDEN\n"
+    }
+    if (value & Mods.MIRROR) {
+      result += "MIRROR\n"
+    }
+    if (value & Mods.NO_FAIL) {
+      result += "NO FAIL\n"
+    }
+    if (value & Mods.SUDDEN_DEATH) {
+      result += "SUDDEN DEATH\n"
+    }
+
+    if (result.length > 0) {
+      return result.slice(0, -1) // remove new line symbol
+    } else {
+      return ""
+    }
+  }
+
+  public async getModsInt(userId: number) {
+    const params = await this.getParams(userId, modNames)
+
+    let result = 0
+    for (const param of Object.keys(params)) {
+      switch (param) {
+        case "random": {
+          if (params[param] === 1) result += Mods.RANDOM
+          break
+        }
+        case "vanish": {
+          if (params[param] === 1) result += Mods.HIDDEN
+          if (params[param] === 2) result += Mods.SUDDEN
+          break
+        }
+        case "mirror": {
+          if (params[param] === 1) result += Mods.MIRROR
+          break
+        }
+        case "hp": {
+          if (params[param] === 1) result += Mods.NO_FAIL
+          if (params[param] === 2) result += Mods.SUDDEN_DEATH
+          break
+        }
+      }
+    }
+
+    return result
   }
 
   public async getParams(userId: number, params: string[] = []): Promise<userParams> {

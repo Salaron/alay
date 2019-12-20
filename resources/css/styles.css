@@ -47,15 +47,10 @@ p {
 
 #body {
   height: calc(100% - 55px);
-  margin: 2px 2px 0px 6px;
-  padding: 0px 19px 0px 13px;
   overflow: auto;
 }
-#bodywrapper {
-  width: calc(100% - 10px);
-}
 
-.no-hover{
+.no-hover {
   pointer-events: none;
 }
 
@@ -110,17 +105,6 @@ th {
   vertical-align: unset;
 }
 
-.nicescroll-rails {
-  border-radius: 10px;
-  background: #c6dcff;
-}
-
-.nicescroll-cursors {
-  background: #4286f4 !important;
-  border-radius: 10px !important;
-  width: 6px!important;
-}
-
 .avatar-border {
   width: 60px;
   height: 60px;
@@ -132,6 +116,16 @@ th {
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, .7);
   border-radius: 100%;
+}
+
+.os-theme-dark.os-theme-sunlight > .os-scrollbar  > .os-scrollbar-track > .os-scrollbar-handle {
+  background: #84a8e2;
+}
+.os-theme-dark>.os-scrollbar:hover>.os-scrollbar-track:hover>.os-scrollbar-handle {
+  background: rgb(108, 162, 250);
+}
+.os-theme-dark.os-theme-sunlight > .os-scrollbar  > .os-scrollbar-track > .os-scrollbar-handle.active {
+  background: #4286f4;
 }
 
 

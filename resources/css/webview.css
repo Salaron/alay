@@ -29,4 +29,5 @@
 
 #body {
   height: calc(100% - 62px);
+  padding: 0px 10px 0px 10px;
 }

@@ -41,6 +41,16 @@ export enum FESTIVAL_SETLIST {
   MGD
 }
 
+export const modNames = ["random", "vanish", "mirror", "hp"]
+export enum Mods {
+  RANDOM = 2,
+  HIDDEN = 4,
+  SUDDEN = 8,
+  MIRROR = 16,
+  NO_FAIL = 32,
+  SUDDEN_DEATH = 64
+}
+
 export const settingNames = ["event", "hp", "mirror", "vanish", "random"]
 export const settingValues: { [name: string]: number } = {
   event: 1,
