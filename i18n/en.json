@@ -108,6 +108,11 @@
   "server-info": {
     "currentOnline": "Current Online"
   },
+  "static": {
+    "maintenance": "Maintenance",
+    "banner": "Login Restricted",
+    "update": "Update Required"
+  },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} removed you from their friend list",
     "SEND_FRIEND_REQUEST": "{{affectorName}} sent you a friend request",

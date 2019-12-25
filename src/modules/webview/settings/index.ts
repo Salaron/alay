@@ -23,7 +23,6 @@ export default class extends WebViewAction {
       mods,
       userData,
       scripts: [
-        "/resources/js/change-language.js",
         "/resources/js/jsencrypt.min.js"
       ]
     }

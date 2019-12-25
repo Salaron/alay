@@ -4,8 +4,10 @@ import moment from "moment"
 import superagent from "superagent"
 import { Connection } from "../core/database/mysql"
 import { Logger } from "../core/logger"
+import nodemailer from "nodemailer"
 
 const log = new Logger("Utils")
+const mailTransport = nodemailer.createTransport(Config.mailer.transportSettings)
 
 export async function init() {
   // Handle Clearing Temp Auth Tokens every 5 min
@@ -194,11 +196,26 @@ export class Utils {
       remoteip: userIp
     })
     const jsonResponse = JSON.parse(response.text)
-    if (jsonResponse.success != true) {
+    if (jsonResponse.success !== true) {
       log.error(`reCAPTCHA test Failed;\n Error-codes: ${jsonResponse["error-codes"].join(", ")}`)
       throw new ErrorWebApi(`reCAPTCHA test failed`)
     }
     return true
+  }
+
+  public static async sendMail(receivers: string, subject: string, text: string) {
+    if (Config.mailer.enabled === false) return false
+    try {
+      return await mailTransport.sendMail({
+        from: `${Config.mailer.name} ${Config.mailer.transportSettings.auth.user}`,
+        to: receivers,
+        subject,
+        text
+      })
+    } catch (err) {
+      log.error(err)
+      return false
+    }
   }
 
   public static prepareTemplate(template: string, values: any = {}) {

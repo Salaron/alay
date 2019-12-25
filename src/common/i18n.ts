@@ -66,12 +66,12 @@ export class I18n extends CommonModule {
    * @param {string} code - language code
    */
   public async setUserLocalizationCode(requestData: RequestData, code: string): Promise<void> {
-    if (Type.isInt(requestData.user_id)) {
+    if (Type.isInt(requestData.user_id) && requestData.user_id > 0) {
       await this.connection.execute("UPDATE users SET language = :code WHERE user_id = :user", {
         code,
         user: requestData.user_id
       })
-    } else if (Type.isString(requestData.auth_token) && requestData.auth_token.match(/^[a-z0-9]{70,90}$/gi) && requestData.user_id === null) {
+    } else if (Type.isString(requestData.auth_token) && requestData.auth_token.match(/^[a-z0-9]{70,90}$/gi) && requestData.user_id === 0) {
       await this.connection.execute("UPDATE auth_tokens SET language = :code WHERE token = :token", {
         code,
         token: requestData.auth_token
@@ -86,9 +86,13 @@ export class I18n extends CommonModule {
    */
   public async getUserLocalizationCode(requestData: RequestData): Promise<string> {
     let languageCode = Config.i18n.defaultLanguage
-    if (Type.isString(requestData.auth_token) && requestData.auth_token.match(/^[a-z0-9]{70,90}$/gi) && requestData.user_id === null) {
+
+    let cookieLanguageCode = this.requestData.getCookie("language")
+    if (cookieLanguageCode !== "" && Object.values(Config.i18n.languages).includes(cookieLanguageCode)) {
+      languageCode = this.requestData.getCookie("language")
+    } else if (Type.isString(requestData.auth_token) && requestData.auth_token.match(/^[a-z0-9]{70,90}$/gi) && requestData.user_id === 0) {
       languageCode = (await this.connection.first("SELECT language FROM auth_tokens WHERE token = :token", { token: requestData.auth_token })).language
-    } else if (Type.isInt(requestData.user_id)) {
+    } else if (Type.isInt(requestData.user_id) && requestData.user_id > 0) {
       languageCode = (await this.connection.first("SELECT language FROM users WHERE user_id = :user", { user: requestData.user_id })).language
     }
 

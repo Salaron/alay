@@ -45,7 +45,7 @@ export default async function executeAction(module: string, action: string, requ
       if (options.responseType != body.requestType && body.requestType != REQUEST_TYPE.BOTH) throw new Error(`Invalid request type (action: ${body.requestType}, param: ${options.responseType}) on ${module}/${action}`)
       // XMC check in api should be done in mainHandler
       if ((body.permission != PERMISSION.NOXMC) && options.responseType != RESPONSE_TYPE.MULTI) {
-        const xmcStatus = await requestData.checkXMC(body.permission === PERMISSION.STATIC)
+        const xmcStatus = await requestData.checkXMessageCode(body.permission === PERMISSION.STATIC)
         if (xmcStatus === false) throw new Error(`Invalid X-Message-Code (${module}/${action}); user #${requestData.user_id}`)
       }
     }

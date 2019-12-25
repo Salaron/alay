@@ -51,10 +51,10 @@ export default class extends WebApiAction {
     }
     this.requestData.user_id = this.user_id
     // update our auth level
-    await this.requestData.getAuthLevel({ force: true })
+    await this.requestData.updateAuthLevel()
     if (this.requestData.auth_level != AUTH_LEVEL.ADMIN) {
-      this.requestData.user_id = null
-      this.requestData.auth_token = null
+      this.requestData.user_id = 0
+      this.requestData.auth_token = ""
       throw new ErrorWebApi("You're not an admin .-.", true)
     }
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })

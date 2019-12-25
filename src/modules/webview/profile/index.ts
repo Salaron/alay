@@ -46,12 +46,7 @@ export default class extends WebViewAction {
       }
     }
 
-    let code = this.params.lang
-    if (!guest) {
-      if (!code) code = await this.i18n.getUserLocalizationCode(this.requestData)
-    } else if (!code || !Config.i18n.languages.getKey(code)) {
-      code = Config.i18n.defaultLanguage
-    }
+    let code = await this.i18n.getUserLocalizationCode(this.requestData)
 
     const [strings, template, user, userScore, eventData, liveDataStatus, liveDataLog] = await Promise.all([
       this.i18n.getStrings(code, "profile-index"),
@@ -179,10 +174,7 @@ export default class extends WebViewAction {
       profileId: userId,
       guest,
       langCode: code,
-      icon: user.display_rank === 1 ? icons.normal_icon_asset : icons.rank_max_icon_asset,
-      scripts: [
-        "/resources/js/change-language.js"
-      ]
+      icon: user.display_rank === 1 ? icons.normal_icon_asset : icons.rank_max_icon_asset
     }
 
     return {

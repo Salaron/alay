@@ -1,8 +1,16 @@
+<style>
+  .detail-container {
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: content-box;
+  }
+</style>
+
 <div id="outer">
   <div id="inner">
     <div id="header">
       <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
-        <div class="uk-navbar-center">
+        <div class="uk-navbar-left">
           <ul class="uk-navbar-nav">
             <li class="uk-active"><a class="uk-text-bold no-hover" style="text-transform: none;">{{announce/title}}</a>
             </li>
@@ -12,7 +20,7 @@
     </div>
 
     <div id="body">
-      <div id="bodywrapper">
+      <div class="detail-container">
         {{{announce/body}}}
         <div style="text-align: right; margin-bottom: 5px;">
           {{{announce/date}}}

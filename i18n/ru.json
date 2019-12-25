@@ -111,6 +111,11 @@
   "server-info": {
     "currentOnline": "Текущий онлайн"
   },
+  "static": {
+    "maintenance": "Технические работы",
+    "banner": "Вам бан",
+    "update": "Требуется обновление"
+  },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} удалил(-а) Вас из своего списка друзей",
     "SEND_FRIEND_REQUEST": "{{affectorName}} отправил(-а) Вам заявку в друзья",

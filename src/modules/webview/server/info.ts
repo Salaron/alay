@@ -18,7 +18,9 @@ export default class extends WebViewAction {
     const [strings, template, currentOnline] = await Promise.all([
       this.i18n.getStrings(code, "server-info"),
       WebView.getTemplate("server", "info"),
-      this.webview.getCurrentOnline()
+      this.connection.first("SELECT COUNT(*) as cnt FROM user_login WHERE last_activity > :now", {
+        now: moment().subtract(10, "minutes").format("YYYY-MM-DD HH:mm:ss")
+      })
     ])
 
     const serverInfo = {
@@ -29,7 +31,7 @@ export default class extends WebViewAction {
       bundleVersion: this.requestData.request.headers["bundle-version"] ? this.requestData.request.headers["bundle-version"] : "Unknown",
       uptime: moment.duration(0 - Math.ceil(process.uptime()), "seconds").locale(code).humanize(true),
       supportMail: Config.mailer.supportMail.length > 0 ? Config.mailer.supportMail : null,
-      currentOnline
+      currentOnline: currentOnline.cnt
     }
     try {
       // get git info lol
@@ -45,10 +47,7 @@ export default class extends WebViewAction {
       status: 200,
       result: await this.webview.compileBodyTemplate(template, this.requestData, {
         i18n: strings,
-        serverInfo,
-        scripts: [
-          "/resources/js/change-language.js"
-        ]
+        serverInfo
       })
     }
   }

@@ -5,7 +5,7 @@
     </div>
 
     <div id="body">
-      <div id="bodywrapper">
+      <div class="uk-container">
         {{#each announceList}}
         <br>
         <div id="announce-{{id}}" class="uk-card uk-card-default uk-width-1-1">
@@ -37,7 +37,7 @@
   var announceTotal = null
   var loadAttempt = 0 // Just in case, in order not to overload the server
 
-  $(document).ready(function () {
+  $(function () {
     // check if current url contains query string
     var queryString = window.location.href.split("?")[1]
     if (!queryString) return
@@ -52,7 +52,7 @@
 
       function loadUntil() {
         if ($("#announce-" + queryObject.id).length != 0) {
-          scrollbar.scrollTo(0, $("#announce-" + queryObject.id).position().top, 800)
+          $("#body").animate({scrollTop: $("#announce-" + queryObject.id).position().top }, 800)
           return
         }
         loadNews(loadUntil)
@@ -76,7 +76,6 @@
       announceTotal = response.response_data.total
       if (response.response_data.announceList.length > 0) {
         $("#body").append(response.response_data.announceList)
-        scrollbar.update()
       }
       if (before === $(".uk-card-header").length) loadAttempt += 1
       else loadAttempt = 0

@@ -42,10 +42,17 @@ export class WebView extends CommonModule {
     return template
   }
 
-  public async getCurrentOnline(): Promise<number> {
-    return (await this.connection.first("SELECT COUNT(*) as cnt FROM user_login WHERE last_activity > :now", {
-      now: moment().subtract(10, "minutes").format("YYYY-MM-DD HH:mm:ss")
-    })).cnt
+  public async getLanguageModal() {
+    const clTemplate = await this.getTemplate("modal", "changelanguage")
+
+    let userLangCode = Config.i18n.defaultLanguage
+    try {
+      userLangCode = await this.action.i18n.getUserLocalizationCode(this.requestData)
+    } catch { } // tslint:disable-line
+    return clTemplate({
+      languageList: Config.i18n.languages,
+      currentLanguage: userLangCode
+    })
   }
 
   public async compileBodyTemplate(template: Handlebars.TemplateDelegate, requestData: RequestData, values: any = {}) {
@@ -59,23 +66,14 @@ export class WebView extends CommonModule {
       authToken: requestData.auth_token
     }
 
-    const [htmlTemplate, headerTemplate, clModalTemplate, userLangCode] = await Promise.all([
-      WebView.getTemplate("header", "htmlHead"),
-      WebView.getTemplate("header", "header"),
-      WebView.getTemplate("modal", "changelanguage"),
-      this.action.i18n.getUserLocalizationCode(this.requestData)
-    ])
+    const htmlTemplate = await WebView.getTemplate("header", "htmlHead")
 
     return htmlTemplate({
       body: template({
-        header: headerTemplate(context),
-        ...(context)
+        ...context
       }),
-      changeLanguageModal: clModalTemplate({
-        languageList: Config.i18n.languages,
-        currentLanguage: userLangCode
-      }),
-      ...(context)
+      changeLanguageModal: await this.getLanguageModal(),
+      ...context
     })
   }
 }
@@ -105,6 +103,17 @@ Handlebars.registerHelper("header", (pageName, context) => {
     mail: Config.mailer.supportMail,
     enabled: Config.mailer.supportMail.length > 0
   }
+  return new Handlebars.SafeString(template(context))
+})
+
+Handlebars.registerHelper("headerWithLanguage", (pageName, context, upperCase) => {
+  const template = WebView.getTemplateSync("header", "headerWithLanguage")
+  context.i18n.pageName = pageName
+  context.support = {
+    mail: Config.mailer.supportMail,
+    enabled: Config.mailer.supportMail.length > 0
+  }
+  context.upperCase = upperCase
   return new Handlebars.SafeString(template(context))
 })
 

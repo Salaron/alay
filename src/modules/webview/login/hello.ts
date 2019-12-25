@@ -21,10 +21,7 @@ export default class extends WebViewAction {
     const values = {
       i18n: strings,
       regEnabled: Config.modules.login.enable_registration,
-      pageTitle: strings.hello,
-      scripts: [
-        "/resources/js/change-language.js"
-      ]
+      pageTitle: strings.hello
     }
     return {
       status: 200,

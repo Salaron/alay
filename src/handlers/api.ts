@@ -13,8 +13,6 @@ const log = new Logger("Api Handler")
 export default async function moduleHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.API)
   try {
-    await requestData.getAuthLevel()
-
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
       await writeJsonResponse(response, {
         httpStatusCode: 403,
@@ -43,7 +41,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
 
       const responseData: any[] = []
 
-      const xmcStatus = await requestData.checkXMC(false)
+      const xmcStatus = await requestData.checkXMessageCode(false)
       if (xmcStatus === false) throw new ErrorUser(`Invalid X-Message-Code; user #${requestData.user_id}`, requestData.user_id)
 
       await actionsList.forEachAsync(async (data: any, i: number) => {

@@ -21,7 +21,6 @@ export default class extends WebViewAction {
       siteKey: Config.modules.login.recaptcha_site_key,
       i18n: strings,
       scripts: [
-        "/resources/js/change-language.js",
         "/resources/js/jsencrypt.min.js",
       ]
     }

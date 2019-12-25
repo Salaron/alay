@@ -3,11 +3,8 @@ $(function () {
     UIkit.modal("#languageSelect").toggle()
   })
   $("input[type=radio][name='language_radio']").change(function () {
-    var href = window.location.href
-    if (!href.indexOf("lang") >= 0) {
-      href += "&lang=&"
-    }
-    if (typeof guest === "undefined") {
+    setCookie("language", $(this).val(), 10000)
+    if (userId !== "") {
       var params = {
         module: "settings",
         action: "changeLanguage",
@@ -20,10 +17,18 @@ $(function () {
           "Success. This page will reload automatically.",
           "success"
         )
-        setTimeout(window.location.reload.bind(window.location), 1000)
+        setTimeout(function() {
+          window.location.href = window.location.href
+        }, 1000)
       })
     } else {
-      window.location.replace(href.replace(/lang.+&/, "lang=" + $(this).val() + "&"))
-    };
+      sendNotification(
+        "Success. This page will reload automatically.",
+        "success"
+      )
+      setTimeout(function() {
+        window.location.href = window.location.href
+      }, 1000)
+    }
   })
 })

@@ -1,17 +1,11 @@
 <div id="outer">
   <div id="inner">
     <div id="header">
-      <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
-        <div class="uk-navbar-center">
-          <ul class="uk-navbar-nav">
-            <li class="uk-active"><a class="uk-text-bold uk-text-uppercase no-hover">Login Restricted</a></li>
-          </ul>
-        </div>
-      </nav>
+      {{{headerWithLanguage i18n/banned this}}}
     </div>
 
     <div id="body">
-      <div id="bodywrapper">
+      <div class="uk-container uk-container-expand">
         <p class="uk-text-secondary">По решению администратора сервера Ваш аккаунт был заблокирован за нарушение <a
             href="../../webview.php/tos/read">правил сервера</a>.</p>
         <p class="uk-margin-remove-bottom">Сообщение, оставленное администратором: {{message}}</p>

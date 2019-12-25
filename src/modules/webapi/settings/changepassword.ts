@@ -2,7 +2,6 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { sendMail } from "../../../core/mailer"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
@@ -36,7 +35,7 @@ export default class extends WebApiAction {
       user: this.user_id
     })
 
-    await sendMail(passwordCheck.mail, strings.subjectPasswordChange, Utils.prepareTemplate(strings.bodyPasswordChange, {
+    await Utils.sendMail(passwordCheck.mail, strings.subjectPasswordChange, Utils.prepareTemplate(strings.bodyPasswordChange, {
       userName: passwordCheck.name,
       supportMail: Config.mailer.supportMail.length > 0 ? Config.mailer.supportMail : ""
     }))

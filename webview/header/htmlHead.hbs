@@ -11,7 +11,7 @@
   {{#if external}}
   <meta name="viewport" content="width=device-width">
   {{else}}
-  <meta name="viewport" content="width=device-width, initial-scale=1,minimum-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
   {{/if}}
 
   <link rel="stylesheet" type="text/css" href="/resources/css/uikit.min.css">
@@ -29,6 +29,7 @@
   <script type="text/javascript" src="/resources/js/common.js"></script>
   <script type="text/javascript" src="/resources/js/uikit-icons.min.js"></script>
   <script type="text/javascript" src="/resources/js/jquery.overlayScrollbars.min.js"></script>
+  <script type="text/javascript" src="/resources/js/change-language.js"></script>
   {{#each scripts}}
   <script type="text/javascript" src="{{this}}"></script>
   {{/each}}
@@ -39,8 +40,8 @@
     var external = {{{ external }}}
     var headers = {{{ headers }}}
 
-    $(function() {
-      var scrollbar = $("#body").overlayScrollbars({
+    $(function () {
+      window.scrollbar = $("#body").overlayScrollbars({
         className: "os-theme-dark os-theme-sunlight"
       })
     })
@@ -48,8 +49,8 @@
 </head>
 
 <body>
-  {{{changeLanguageModal}}}
   {{{body}}}
+  {{{changeLanguageModal}}}
 </body>
 
 </html>

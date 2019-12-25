@@ -3,9 +3,6 @@
   <div class="uk-navbar-left">
     <ul class="uk-navbar-nav">
       <li>
-        {{#if guest}}
-        <a id="changeLanguage"><span uk-icon="world" class="uk-icon"></span></a>
-        {{else}}
         <a uk-icon="menu"></a>
         <div class="uk-width-auto uk-navbar-dropdown">
           <ul class="uk-nav uk-navbar-dropdown-nav">
@@ -48,14 +45,13 @@
             {{/if}}
           </ul>
         </div>
-        {{/if}}
       </li>
     </ul>
   </div>
 
   <div class="uk-navbar-center">
     <ul class="uk-navbar-nav">
-      <li class="uk-active"><a class="uk-text-bold no-hover">{{i18n/pageName}}</a></li>
+      <li class="uk-active"><a class="uk-text-bold uk-text-uppercase no-hover">{{i18n/pageName}}</a></li>
     </ul>
   </div>
 </nav>

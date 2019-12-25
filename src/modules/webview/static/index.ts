@@ -26,6 +26,8 @@ export default class extends WebViewAction {
     // 13 -- banned
     let template
     let values = {}
+    let i18n = await this.i18n.getStrings(this.requestData, "static")
+
     switch (this.params.id) {
       case "10": {
         if (Utils.isUnderMaintenance() === false) return {
@@ -44,7 +46,8 @@ export default class extends WebViewAction {
           startDayEn: moment(Config.maintenance.start_date).locale("en").format("D MMMM"),
           endDayEn: moment(Config.maintenance.end_date).locale("en").format("D MMMM"),
           timeZone: Utils.getTimeZoneWithPrefix(Config.maintenance.time_zone),
-          pageTitle: "Maintenance"
+          pageTitle: i18n.maintenance,
+          i18n
         }
         break
       }
@@ -54,8 +57,9 @@ export default class extends WebViewAction {
         values = {
           latestVersion: Config.client.application_version,
           clientVersion: this.requestData.request.headers["bundle-version"] || "N/A",
-          pageTitle: "Update Required",
-          supportMail: Config.mailer.supportMail
+          supportMail: Config.mailer.supportMail,
+          pageTitle: i18n.update,
+          i18n
         }
         break
       }
@@ -72,7 +76,8 @@ export default class extends WebViewAction {
           expiration_date: data.expiration_date,
           expiration_date_human: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").humanize() : null,
           message: data.message,
-          pageTitle: "Login Restricted"
+          pageTitle: i18n.banned,
+          i18n
         }
         break
       }

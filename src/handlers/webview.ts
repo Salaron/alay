@@ -10,8 +10,6 @@ import { HANDLER_TYPE, AUTH_LEVEL } from "../models/constant"
 export default async function webviewHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBVIEW)
   try {
-    await requestData.getAuthLevel()
-
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
       requestData.resetCookieAuth()
       // TODO: redirect to login page or access allow to page if required auth level is none

@@ -7,7 +7,6 @@ import { HANDLER_TYPE, AUTH_LEVEL } from "../models/constant"
 export default async function webapiHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBAPI)
   try {
-    await requestData.getAuthLevel()
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
       await writeJsonResponse(response, {
         httpStatusCode: 600,

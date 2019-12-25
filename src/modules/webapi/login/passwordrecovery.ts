@@ -3,7 +3,6 @@ import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
 import moment from "moment"
-import { sendMail } from "../../../core/mailer"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -39,7 +38,7 @@ export default class extends WebApiAction {
       mail: userData.mail
     })
 
-    const result = await sendMail(userData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovery, {
+    const result = await Utils.sendMail(userData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovery, {
       userName: userData.name,
       code: confirmationCode,
       ip: Utils.getRemoteAddress(this.requestData.request),

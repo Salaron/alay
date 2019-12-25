@@ -1,17 +1,11 @@
 <div id="outer">
   <div id="inner">
     <div id="header">
-      <nav class="uk-navbar-container sl-navbar-container" uk-navbar>
-        <div class="uk-navbar-center">
-          <ul class="uk-navbar-nav">
-            <li class="uk-active"><a class="uk-text-bold uk-text-uppercase no-hover">Maintenance</a></li>
-          </ul>
-        </div>
-      </nav>
+      {{{headerWithLanguage i18n/maintenance this}}}
     </div>
 
     <div id="body">
-      <div id="bodywrapper">
+      <div class="uk-container uk-container-medium uk-margin-top">
         <p>
           На данный момент сервер находится на техническом обслуживании для обновления. <br>
           {{#if haveDate}}
@@ -37,14 +31,3 @@
     </div>
   </div>
 </div>
-
-<script type="text/javascript">
-  var userId = "{{{ userId }}}"
-  var authToken = "{{{ authToken }}}"
-  var external = {{{ external }}}
-  var headers = {{{ headers }}}
-  var publicKey = {{{ publicKey }}}
-</script>
-<script type="text/javascript">
-
-</script>
