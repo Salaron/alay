@@ -3,6 +3,7 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Download } from "../../../common/download"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
+import { ErrorUserId, ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -23,7 +24,7 @@ export default class extends ApiAction {
 
   public async execute() {
     if (this.params.target_os !== "Android" && this.params.target_os !== "iOS")
-      throw new ErrorUser(`Invalid target_os`, this.user_id)
+      throw new ErrorUserId(`Invalid target_os`, this.user_id)
     const clientExternal = this.params.external_version
     const clientInstall = this.params.install_version
 
@@ -31,8 +32,8 @@ export default class extends ApiAction {
     const clientVersion = Utils.versionCompare(clientExternal, clientInstall) === -1 ? clientExternal : clientInstall
 
     if (Utils.versionCompare(serverVersion, clientExternal) === -1)
-      throw new ErrorCode(1234, `Not ready`)
-    if (clientVersion.split(".").length === 0) throw new ErrorCode(1234, "nope :p")
+      throw new ErrorAPI(`Not ready`)
+    if (clientVersion.split(".").length === 0) throw new ErrorAPI("nope :p")
 
     const packages = await Download.getUpdatePackages(this.params.target_os, clientVersion)
     return {

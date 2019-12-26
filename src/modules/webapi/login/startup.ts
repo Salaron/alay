@@ -2,6 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
+import { ErrorAPI, ErrorWebApi } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -19,12 +20,12 @@ export default class extends WebApiAction {
     }
   }
   public checkTypes() {
-    if (this.params.name.length === 0 || this.params.name.length > 20) throw new ErrorCode(1234, "Invalid name provided")
-    if (!checkMail(this.params.mail)) throw new ErrorCode(1234, "Invalid mail provided")
+    if (this.params.name.length === 0 || this.params.name.length > 20) throw new ErrorAPI("Invalid name provided")
+    if (!checkMail(this.params.mail)) throw new ErrorAPI("Invalid mail provided")
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorAPI("Access only with a certain auth level")
     if (!Config.modules.login.enable_registration) throw new ErrorWebApi("Registration is disabled!", true)
 
     if (Config.modules.login.enable_recaptcha) {

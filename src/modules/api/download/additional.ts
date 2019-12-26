@@ -2,6 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Download } from "../../../common/download"
 import { TYPE } from "../../../common/type"
+import { ErrorUserId } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -23,9 +24,9 @@ export default class extends ApiAction {
 
   public async execute() {
     this.params.excluded_package_ids.map((id: number) => {
-      if (isNaN(Number(id))) throw new ErrorUser(`Invalid type provided`, this.user_id)
+      if (isNaN(Number(id))) throw new ErrorUserId(`Invalid type provided`, this.user_id)
     })
-    if (this.params.target_os !== "Android" && this.params.target_os !== "iOS") throw new ErrorUser(`Invalid target_os`, this.user_id)
+    if (this.params.target_os !== "Android" && this.params.target_os !== "iOS") throw new ErrorUserId(`Invalid target_os`, this.user_id)
 
     if (this.requestData.params.package_type === 0) return {
       status: 200,

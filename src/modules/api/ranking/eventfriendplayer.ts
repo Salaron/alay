@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -49,7 +50,7 @@ export default class extends ApiAction {
         event: this.params.event_id
       })
       // this user is missing in event ranking
-      if (pos.rank === 0 || pos.length === 0) throw new ErrorCode(1601)
+      if (pos.rank === 0 || pos.length === 0) throw new ErrorAPI(1601)
       // calculate page that contains this user
       page = Math.floor(pos.rank / 20)
       // set offset
@@ -105,7 +106,7 @@ export default class extends ApiAction {
         setting_award_id: d.setting_award_id
       })
     }
-    if (list.length === 0) throw new ErrorCode(1601)
+    if (list.length === 0) throw new ErrorAPI(1601)
 
     let count = await this.connection.first(`
     SELECT

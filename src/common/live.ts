@@ -3,6 +3,7 @@ import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
 import { Randomizer } from "./live/randomizer"
 import { Mods } from "../models/constant"
+import { ErrorAPI } from "../models/error"
 
 const log = new Logger("Live")
 
@@ -197,7 +198,7 @@ export class Live extends CommonModule {
     JOIN units
       ON units.unit_owning_user_id = user_unit_deck_slot.unit_owning_user_id
     WHERE user_unit_deck_slot.user_id = :user AND deck_id = :deck`, { user: userId, deck: deckId })
-    if (deck.length != 9) throw new ErrorCode(1234, `Deck is invalid`)
+    if (deck.length != 9) throw new ErrorAPI(`Deck is invalid`)
     deck = deck.map((unit) => {
       return {
         unit_owning_user_id: unit.unit_owning_user_id,

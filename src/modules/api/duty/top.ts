@@ -1,6 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -18,7 +19,7 @@ export default class extends ApiAction {
 
   public async execute() {
     const currentEvent = await this.eventStub.getEventById(this.params.event_id)
-    if (currentEvent.opened === false) throw new ErrorCode(720)
+    if (currentEvent.opened === false) throw new ErrorAPI(720)
 
     // remove user from existing rooms
     await this.connection.query(`UPDATE event_duty_users SET status = 0 WHERE room_id IN (SELECT room_id FROM event_duty_rooms WHERE start_flag = 0 AND user_id = :user)`, {

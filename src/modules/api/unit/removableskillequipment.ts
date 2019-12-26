@@ -1,6 +1,7 @@
 import assert from "assert"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const unitDB = sqlite3.getUnit()
 
@@ -29,7 +30,7 @@ export default class extends ApiAction {
         user: this.user_id,
         id: sis.unit_owning_user_id
       })
-      if (!check) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
+      if (!check) throw new ErrorAPI(1311, "ERROR_CODE_UNIT_NOT_EXIST")
 
       await Promise.all([
         this.connection.execute(`DELETE FROM user_unit_removable_skill_equip WHERE unit_owning_user_id = :id AND unit_removable_skill_id = :skill`, {
@@ -79,7 +80,7 @@ export default class extends ApiAction {
         user: this.user_id,
         id: sis.unit_owning_user_id
       })
-      if (!unit) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
+      if (!unit) throw new ErrorAPI(1311, "ERROR_CODE_UNIT_NOT_EXIST")
 
       // Is there a free space for this SIS?
       let spaceAvailable = unit.removable_skill_capacity + 0

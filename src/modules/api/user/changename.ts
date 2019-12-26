@@ -2,6 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Logger } from "../../../core/logger"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI } from "../../../models/error"
 
 const log = new Logger("user/changeName")
 
@@ -21,7 +22,7 @@ export default class extends ApiAction {
   }
 
   public paramCheck() {
-    if (!this.params.name.match(/^.{1,20}$/)) throw new ErrorCode(1100)
+    if (!this.params.name.match(/^.{1,20}$/)) throw new ErrorAPI(1100)
     return true
   }
 
@@ -33,7 +34,7 @@ export default class extends ApiAction {
       })
     } catch (err) {
       log.error(err)
-      throw new ErrorCode(1100)
+      throw new ErrorAPI(1100)
     }
     return {
       status: 200,

@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI, ErrorUserId } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -19,7 +20,7 @@ export default class extends ApiAction {
   }
 
   public paramCheck() {
-    if (this.params.message.length > 200) throw new ErrorCode(1234, "Too long message")
+    if (this.params.message.length > 200) throw new ErrorAPI("Too long message")
   }
 
   public async execute() {
@@ -27,7 +28,7 @@ export default class extends ApiAction {
     const notice = await this.connection.first(`SELECT * FROM user_greet WHERE notice_id = :id`, {
       id: this.params.mail_notice_id
     })
-    if (notice.length === 0) throw new ErrorUser(`Notice ${this.params.mail_notice_id} doesn't exists`, this.user_id)
+    if (notice.length === 0) throw new ErrorUserId(`Notice ${this.params.mail_notice_id} doesn't exists`, this.user_id)
 
     if (this.params.is_send_mail === true && notice.affector_id === this.user_id) {
       await this.connection.query(`UPDATE user_greet SET deleted_from_affector = 1 WHERE notice_id = :id`, {
@@ -38,7 +39,7 @@ export default class extends ApiAction {
         id: this.params.mail_notice_id
       })
     } else {
-      throw new ErrorUser(`You're not receiver or owner of this notice`, this.user_id)
+      throw new ErrorUserId(`You're not receiver or owner of this notice`, this.user_id)
     }
 
     return {

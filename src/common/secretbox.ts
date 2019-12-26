@@ -6,6 +6,7 @@ import { IRarityData, ISecretbox, ISecretboxButton, ISecretboxCost, ISecretboxDa
 import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
 import { Connection } from "../core/database/mysql"
+import { ErrorAPI } from "../models/error"
 
 const log = new Logger("Secretbox")
 const unitDB = sqlite3.getUnit()
@@ -204,10 +205,10 @@ export class Secretbox extends CommonModule {
         sbId: secretboxId
       })
     ])
-    if (!secretboxTab) throw new ErrorCode(1500, "not exists") // ERROR_CODE_SECRET_BOX_NOT_EXIST
-    if (costData.payable === false) throw new ErrorCode(1507, "oops") // ERROR_CODE_SECRET_BOX_REMAINING_COST_IS_NOT_ENOUGH
+    if (!secretboxTab) throw new ErrorAPI(1500, "not exists") // ERROR_CODE_SECRET_BOX_NOT_EXIST
+    if (costData.payable === false) throw new ErrorAPI(1507, "oops") // ERROR_CODE_SECRET_BOX_REMAINING_COST_IS_NOT_ENOUGH
     if (secretboxTab.secret_box_info.pon_upper_limit != null && secretboxTab.secret_box_info.pon_upper_limit != 0) {
-      if (secretboxTab.secret_box_info.pon_count >= secretboxTab.secret_box_info.pon_upper_limit) throw new ErrorCode(1509, "nope") // ERROR_CODE_SECRET_BOX_UPPER_LIMIT
+      if (secretboxTab.secret_box_info.pon_count >= secretboxTab.secret_box_info.pon_upper_limit) throw new ErrorAPI(1509, "nope") // ERROR_CODE_SECRET_BOX_UPPER_LIMIT
     }
 
     switch (secretboxTab.secret_box_info.secret_box_type) {
@@ -351,7 +352,7 @@ export class Secretbox extends CommonModule {
         date: Utils.toSpecificTimezone(9),
         id: secretboxData
       })
-      if (!data) throw new ErrorCode(1508)
+      if (!data) throw new ErrorAPI(1508)
       secretboxData = <ISecretboxData>data
     }
 
@@ -403,7 +404,7 @@ export class Secretbox extends CommonModule {
         date: Utils.toSpecificTimezone(9),
         id: secretboxData
       })
-      if (!data) throw new ErrorCode(1508)
+      if (!data) throw new ErrorAPI(1508)
       secretboxData = <ISecretboxData>data
     }
 

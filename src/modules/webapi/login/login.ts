@@ -3,6 +3,7 @@ import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
 import moment from "moment"
+import { ErrorAPI, ErrorWebApi } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -19,7 +20,7 @@ export default class extends WebApiAction {
     }
   }
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorCode(1234, "Access only with a certain auth level")
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorAPI("Access only with a certain auth level")
 
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)

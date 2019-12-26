@@ -3,6 +3,7 @@ import { writeJsonResponse } from "./response"
 import executeAction from "./action"
 import RequestData from "../core/requestData"
 import { HANDLER_TYPE, AUTH_LEVEL } from "../models/constant"
+import { ErrorWebApi } from "../models/error"
 
 export default async function webapiHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBAPI)

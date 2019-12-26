@@ -1,6 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -19,7 +20,7 @@ export default class extends ApiAction {
 
   public async execute() {
     const currentEvent = await this.eventStub.getEventById(this.params.event_id)
-    if (!currentEvent.opened) throw new ErrorCode(1234, "Event is closed")
+    if (!currentEvent.opened) throw new ErrorAPI("Event is closed")
 
     const eventUser = await this.eventStub.getEventUserStatus(this.user_id, currentEvent.id)
     return {

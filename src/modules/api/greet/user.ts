@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -19,7 +20,7 @@ export default class extends ApiAction {
   }
 
   public paramCheck() {
-    if (this.params.message.length > 200) throw new ErrorCode(1234, "Too long message")
+    if (this.params.message.length > 200) throw new ErrorAPI("Too long message")
   }
 
   public async execute() {

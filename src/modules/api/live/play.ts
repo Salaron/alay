@@ -4,6 +4,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -45,14 +46,14 @@ export default class extends ApiAction {
     let eventLive = false
     const liveInfo = await this.live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     if (liveInfo.capital_type === 2) { // token live
-      if (!eventStatus.active) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
+      if (!eventStatus.active) throw new ErrorAPI(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
       const eventLives = this.live.getMarathonLiveList(eventStatus.id)
-      if (!eventLives.includes(liveInfo.live_difficulty_id)) throw new ErrorCode(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
+      if (!eventLives.includes(liveInfo.live_difficulty_id)) throw new ErrorAPI(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
       const tokenCnt = await this.connection.first(`SELECT token_point FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
         user: this.user_id,
         event: eventStatus.id
       })
-      if (!tokenCnt || !tokenCnt.token_point || tokenCnt.token_point - this.params.lp_factor * liveInfo.capital_value < 0) throw new ErrorCode(3412, "ERROR_CODE_LIVE_NOT_ENOUGH_EVENT_POINT")
+      if (!tokenCnt || !tokenCnt.token_point || tokenCnt.token_point - this.params.lp_factor * liveInfo.capital_value < 0) throw new ErrorAPI(3412, "ERROR_CODE_LIVE_NOT_ENOUGH_EVENT_POINT")
       await this.connection.execute("UPDATE event_ranking SET token_point = token_point - :val WHERE user_id = :user AND event_id = :id", {
         val: this.params.lp_factor * liveInfo.capital_value,
         user: this.user_id,

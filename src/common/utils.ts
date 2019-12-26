@@ -5,6 +5,7 @@ import superagent from "superagent"
 import { Connection } from "../core/database/mysql"
 import { Logger } from "../core/logger"
 import nodemailer from "nodemailer"
+import { ErrorWebApi } from "../models/error"
 
 const log = new Logger("Utils")
 const mailTransport = nodemailer.createTransport(Config.mailer.transportSettings)

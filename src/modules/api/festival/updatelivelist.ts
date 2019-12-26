@@ -1,6 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, FESTIVAL_SETLIST, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const liveDB = sqlite3.getLive()
 const festDB = sqlite3.getFestival()
@@ -34,19 +35,19 @@ export default class extends ApiAction {
     if (
       (this.params.mgd != 1 &&
         this.params.mgd != 2)
-    ) throw new ErrorCode(1234, "nope")
+    ) throw new ErrorAPI("nope")
   }
 
   public async execute() {
     const currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.FESTIVAL)
-    if (currentEvent.active === false) throw new ErrorCode(720)
+    if (currentEvent.active === false) throw new ErrorAPI(720)
 
     let data = await this.connection.first("SELECT * FROM event_festival_users WHERE user_id = :user AND event_id = :event AND reset_setlist_number != 1010101", {
       user: this.user_id,
       event: currentEvent.id
     })
-    if (!data) throw new ErrorCode(1234, "session is missing")
-    if (data.reset_setlist_number > data.reset_setlist_number + 1) throw new ErrorCode(1234, "you can't reset setlist")
+    if (!data) throw new ErrorAPI("session is missing")
+    if (data.reset_setlist_number > data.reset_setlist_number + 1) throw new ErrorAPI("you can't reset setlist")
 
     let response = {
       live_track_ids: <number[]>[],
@@ -61,7 +62,7 @@ export default class extends ApiAction {
     }
 
     if (response.before_user_info[convertCost(Config.modules.festival.reset_cost_type)] < Config.modules.festival.reset_cost_value)
-      throw new ErrorCode(1234, "not enough cost")
+      throw new ErrorAPI("not enough cost")
 
     await this.connection.query(`UPDATE users SET ${convertCost(Config.modules.festival.reset_cost_type)} = ${convertCost(Config.modules.festival.reset_cost_type)} - ${Config.modules.festival.reset_cost_value} WHERE user_id = :user`, {
       user: this.user_id

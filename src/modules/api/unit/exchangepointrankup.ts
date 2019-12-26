@@ -2,6 +2,7 @@ import assert from "assert"
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const unitDB = sqlite3.getUnit()
 
@@ -34,7 +35,7 @@ export default class extends ApiAction {
 
   public async execute() {
     const baseUnit = await this.unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
-    if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorCode(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
+    if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorAPI(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
 
     const baseUnitData = await unitDB.get("SELECT exchange_point_rank_up_cost, disable_rank_up, after_love_max, after_level_max, rarity FROM unit_m WHERE unit_id = :id", {
       id: baseUnit.unit_id
@@ -51,8 +52,8 @@ export default class extends ApiAction {
       !rankUpCost[baseUnitData.rarity] ||
       !rankUpCost[baseUnitData.rarity][this.params.exchange_point_id] ||
       ePoints.exchange_point < rankUpCost[baseUnitData.rarity][this.params.exchange_point_id]
-    ) throw new ErrorCode(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
-    if (beforeUserInfo.game_coin < baseUnitData.exchange_point_rank_up_cost) throw new ErrorCode(1104, "ERROR_CODE_NOT_ENOUGH_GAME_COIN")
+    ) throw new ErrorAPI(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
+    if (beforeUserInfo.game_coin < baseUnitData.exchange_point_rank_up_cost) throw new ErrorAPI(1104, "ERROR_CODE_NOT_ENOUGH_GAME_COIN")
 
     let gainSlots = 0 // slots will be gained only after idolize
     if (baseUnit.rank === baseUnit.max_rank) gainSlots += 1

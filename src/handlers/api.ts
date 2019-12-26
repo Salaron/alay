@@ -7,6 +7,7 @@ import { AUTH_LEVEL, HANDLER_TYPE, RESPONSE_TYPE } from "../models/constant"
 import { IApiMultiResponse, IApiResult } from "../models/handlers"
 import executeAction from "./action"
 import { writeJsonResponse } from "./response"
+import { ErrorUserId } from "../models/error"
 
 const log = new Logger("Api Handler")
 
@@ -37,12 +38,12 @@ export default async function moduleHandler(request: IncomingMessage, response: 
 
     if (module === "api") {
       const actionsList = requestData.params
-      if (actionsList.length > Config.server.API_request_limit) throw new ErrorUser(`API request limit reached ${actionsList.length}/${Config.server.API_request_limit}`, requestData.user_id)
+      if (actionsList.length > Config.server.API_request_limit) throw new ErrorUserId(`API request limit reached ${actionsList.length}/${Config.server.API_request_limit}`, requestData.user_id)
 
       const responseData: any[] = []
 
       const xmcStatus = await requestData.checkXMessageCode(false)
-      if (xmcStatus === false) throw new ErrorUser(`Invalid X-Message-Code; user #${requestData.user_id}`, requestData.user_id)
+      if (xmcStatus === false) throw new ErrorUserId(`Invalid X-Message-Code; user #${requestData.user_id}`, requestData.user_id)
 
       await actionsList.forEachAsync(async (data: any, i: number) => {
         data.module = data.module.toLowerCase().replace(/[^a-z]/g, "")

@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { TYPE } from "../../../common/type"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -24,6 +25,6 @@ export default class extends ApiAction {
       status: 200,
       result: []
     }
-    throw new ErrorCode(11102)
+    throw new ErrorAPI(11102)
   }
 }

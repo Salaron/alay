@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -22,7 +23,7 @@ export default class extends ApiAction {
       user: this.user_id,
       unit: this.params.unit_owning_user_id
     })
-    if (!check) throw new ErrorCode(1311)
+    if (!check) throw new ErrorAPI(1311)
 
     await this.connection.query("UPDATE users SET partner_unit = :unit WHERE user_id = :user", {
       user: this.user_id,

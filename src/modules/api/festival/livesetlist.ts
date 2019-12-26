@@ -1,6 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, FESTIVAL_SETLIST, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const liveDB = sqlite3.getLive()
 const festDB = sqlite3.getFestival()
@@ -26,12 +27,12 @@ export default class extends ApiAction {
       this.params.live_count > 3 ||
       (this.params.mgd != 1 &&
       this.params.mgd != 2)
-    ) throw new ErrorCode(1234, "nope")
+    ) throw new ErrorAPI("nope")
   }
 
   public async execute() {
     const currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.FESTIVAL)
-    if (currentEvent.active === false) throw new ErrorCode(720)
+    if (currentEvent.active === false) throw new ErrorAPI(720)
 
     let response = {
       live_track_ids: <number[]>[],

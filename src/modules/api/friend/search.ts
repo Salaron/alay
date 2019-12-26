@@ -2,6 +2,7 @@ import moment from "moment"
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -20,7 +21,7 @@ export default class extends ApiAction {
 
   public async execute() {
     const numbers = this.params.invite_code.match(/\d+/g)
-    if (numbers === null) throw new ErrorCode(2400, "Invite_code doesn't contain numbers")
+    if (numbers === null) throw new ErrorAPI(2400, "Invite_code doesn't contain numbers")
     this.params.invite_code = numbers[0]
 
     const profile = await this.connection.first(`
@@ -31,7 +32,7 @@ export default class extends ApiAction {
       setting_award_id, setting_background_id
     FROM users
     WHERE user_id = :user AND tutorial_state = -1`, { user: this.params.invite_code })
-    if (!profile) throw new ErrorCode(2400, "User not found")
+    if (!profile) throw new ErrorAPI(2400, "User not found")
 
     try {
       const dateNow = moment(new Date())
@@ -60,7 +61,7 @@ export default class extends ApiAction {
         result: response
       }
     } catch (err) {
-      throw new ErrorCode(2400, "Center unit is missing")
+      throw new ErrorAPI(2400, "Center unit is missing")
     }
   }
 }

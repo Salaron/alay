@@ -4,6 +4,7 @@ import { Utils } from "../common/utils"
 import { Logger } from "../core/logger"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, HANDLER_TYPE, PERMISSION, REQUEST_TYPE, RESPONSE_TYPE } from "../models/constant"
+import { ErrorUserId, ErrorAPI } from "../models/error"
 
 const log = new Logger("Action Handler")
 const cache = <any>{}
@@ -19,7 +20,7 @@ export default async function executeAction(module: string, action: string, requ
     !action ||
     module.length === 0 ||
     action.length === 0
-  ) throw new ErrorUser(`Module or Action is not provided (${module}/${action})`, requestData.user_id)
+  ) throw new ErrorUserId(`Module or Action is not provided (${module}/${action})`, requestData.user_id)
   module = module.replace(/\s/g, "X").toLowerCase()
   action = action.replace(/\s/g, "X").toLowerCase()
 
@@ -50,7 +51,7 @@ export default async function executeAction(module: string, action: string, requ
       }
     }
 
-    if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUser(`No permissions`, requestData.user_id)
+    if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUserId(`No permissions`, requestData.user_id)
     try {
       if (body.paramTypes) checkParamTypes(requestData.params, body.paramTypes())
     } catch (err) {
@@ -78,7 +79,7 @@ export default async function executeAction(module: string, action: string, requ
     return response
   } catch (err) {
     // handle module errors
-    if (err instanceof ErrorCode) return err.response
+    if (err instanceof ErrorAPI) return err.response
     throw err
   } finally {
     if (Config.server.debug_mode) {

@@ -1,5 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -11,6 +12,6 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    throw new ErrorCode(1102, "Unused feature")
+    throw new ErrorAPI(1102, "Unused feature")
   }
 }

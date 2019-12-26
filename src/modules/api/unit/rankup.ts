@@ -2,6 +2,7 @@ import assert from "assert"
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const unitDB = sqlite3.getUnit()
 
@@ -30,11 +31,11 @@ export default class extends ApiAction {
 
   public async execute() {
     const sacrificeUnit = await this.unit.getNotLockedUnits(this.user_id, [this.params.unit_owning_user_ids[0]])
-    if (sacrificeUnit.length === 0) throw new ErrorCode(1311)
+    if (sacrificeUnit.length === 0) throw new ErrorAPI(1311)
 
     const baseUnit = await this.unit.getUnitDetail(this.params.base_owning_unit_user_id, this.user_id)
     if (sacrificeUnit[0].unit_id != baseUnit.unit_id) throw new Error("Not Same Unit")
-    if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorCode(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
+    if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorAPI(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
 
     const baseUnitData = await unitDB.get("SELECT rank_up_cost, disable_rank_up, after_love_max, after_level_max FROM unit_m WHERE unit_id = :id", {
       id: baseUnit.unit_id
@@ -43,7 +44,7 @@ export default class extends ApiAction {
     assert(baseUnitData.disable_rank_up === 0, "This unit can't be ranked up")
 
     const beforeUserInfo = await this.user.getUserInfo(this.user_id)
-    if (beforeUserInfo.game_coin < baseUnitData.rank_up_cost) throw new ErrorCode(1104, "ERROR_CODE_NOT_ENOUGH_GAME_COIN")
+    if (beforeUserInfo.game_coin < baseUnitData.rank_up_cost) throw new ErrorAPI(1104, "ERROR_CODE_NOT_ENOUGH_GAME_COIN")
 
     let gainSlots = 1
     if (baseUnit.rank === baseUnit.max_rank) gainSlots += 1

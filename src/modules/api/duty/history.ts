@@ -1,6 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -19,7 +20,7 @@ export default class extends ApiAction {
   public async execute() {
     const event = this.eventStub
     let currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.DUTY)
-    if (currentEvent.opened === false) throw new ErrorCode(720)
+    if (currentEvent.opened === false) throw new ErrorAPI(720)
 
     let history = await this.connection.query(`
 		SELECT event_duty_rooms.room_id, live_difficulty_id, mission_id, event_duty_rooms.insert_date, start_flag, mission_goal, mission_result, mission_rank,

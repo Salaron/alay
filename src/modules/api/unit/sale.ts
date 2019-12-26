@@ -1,6 +1,7 @@
 import assert from "assert"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const unitDB = sqlite3.getUnit()
 
@@ -41,7 +42,7 @@ export default class extends ApiAction {
     }
     if (this.params.unit_owning_user_id.length > 0) {
       const units = await this.unit.getNotLockedUnits(this.user_id, this.params.unit_owning_user_id)
-      if (units.length != this.params.unit_owning_user_id.length) throw new ErrorCode(1311, "ERROR_CODE_UNIT_NOT_EXIST")
+      if (units.length != this.params.unit_owning_user_id.length) throw new ErrorAPI(1311, "ERROR_CODE_UNIT_NOT_EXIST")
 
       await Promise.all(units.map(async (unit: any) => {
         const data = await unitDB.get(`
@@ -75,7 +76,7 @@ export default class extends ApiAction {
       for (const support of _owningSupportUnit) owningSupportUnit[support.unit_id] = support.amount
 
       await Promise.all(this.params.unit_support_list.map(async (unit: any) => {
-        if (!(unit.unit_id && unit.unit_id in owningSupportUnit && owningSupportUnit[unit.unit_id] >= unit.amount)) throw new ErrorCode(1311)
+        if (!(unit.unit_id && unit.unit_id in owningSupportUnit && owningSupportUnit[unit.unit_id] >= unit.amount)) throw new ErrorAPI(1311)
 
         const data = await unitDB.get("SELECT U.rarity, L.sale_price FROM unit_m as U JOIN unit_level_up_pattern_m as L ON L.unit_level_up_pattern_id = U.unit_level_up_pattern_id WHERE U.unit_id=? AND L.unit_level=1;", [unit.unit_id])
         await this.connection.query("UPDATE user_support_unit SET amount=amount-:amount WHERE unit_id=:unit AND user_id=:user;", {

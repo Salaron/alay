@@ -1,24 +1,27 @@
 // tslint:disable:variable-name
-export class ErrorCode extends Error {
-  public code: number
+export class ErrorAPI extends Error {
+  public error_code: number
   public response: any
-  constructor(code: number, message?: string) {
+  constructor(ErrorAPI: number)
+  constructor(message: string)
+  constructor(ErrorAPI: number, message: string)
+  constructor(ErrorAPI: string | number, message?: string) {
     super()
-    this.code = code
+    this.error_code = Type.isInt(ErrorAPI) ? ErrorAPI : 0
     this.response = {
       status: 600,
       result: {
-        error_code: this.code,
+        error_code: this.error_code,
         message
       }
     }
   }
 }
-export class ErrorUser extends Error {
-  public user_id: number | null
-  constructor(message: string, user_id: number | null) {
+export class ErrorUserId extends Error {
+  public user_id: number
+  constructor(message: string, user_id: number) {
     super(message)
-    this.message += `;\nuser_id: ${user_id}`
+    this.message += `; user_id: ${user_id}`
     this.user_id = user_id
   }
 }
@@ -29,6 +32,3 @@ export class ErrorWebApi extends Error {
     this.sendToClient = sendToClient
   }
 }
-(global as any).ErrorCode = ErrorCode;
-(global as any).ErrorUser = ErrorUser;
-(global as any).ErrorWebApi = ErrorWebApi

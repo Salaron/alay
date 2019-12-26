@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -23,7 +24,7 @@ export default class extends ApiAction {
       user: this.user_id,
       unit: this.params.unit_owning_user_id
     })
-    if (!unitData) throw new ErrorCode(1311) // ERROR_CODE_UNIT_NOT_EXIST
+    if (!unitData) throw new ErrorAPI(1311) // ERROR_CODE_UNIT_NOT_EXIST
 
     await this.connection.query("UPDATE units SET favorite_flag=:fav WHERE unit_owning_user_id=:unit", {
       unit: this.params.unit_owning_user_id,

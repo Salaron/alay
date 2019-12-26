@@ -2,6 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -20,14 +21,14 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    if (this.requestData.auth_level > AUTH_LEVEL.UPDATE) throw new Error(`You're already logged in`)
+    if (this.requestData.auth_level > AUTH_LEVEL.UPDATE) throw new ErrorAPI(`You're already logged in`)
     if (Config.modules.login.webview_login) return {
       status: 200,
       result: {
         user_id: 0
       }
     }
-    if (Config.modules.login.enable_registration === false) throw new ErrorCode(1234, "Registration is disabled!")
+    if (Config.modules.login.enable_registration === false) throw new ErrorAPI("Registration is disabled!")
 
     const token = await this.connection.first("SELECT * FROM auth_tokens WHERE token = :token", {
       token: this.requestData.auth_token

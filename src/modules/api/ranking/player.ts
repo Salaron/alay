@@ -1,5 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -21,12 +22,12 @@ export default class extends ApiAction {
       page = this.params.page
     }
     if (typeof this.params.id != "undefined") {
-      if (typeof this.params.id != "number" || parseInt(this.params.id) != this.params.id) throw new ErrorCode(1601)
+      if (typeof this.params.id != "number" || parseInt(this.params.id) != this.params.id) throw new ErrorAPI(1601)
 
       const pos = await this.connection.first(`SELECT FIND_IN_SET(level, (SELECT GROUP_CONCAT(level ORDER BY level DESC) FROM users)) as rank FROM users WHERE user_id=:user`, {
         user: this.params.id
       })
-      if (pos.rank === 0) throw new ErrorCode(1601)
+      if (pos.rank === 0) throw new ErrorAPI(1601)
 
       page = Math.floor(pos.rank / 20)
       offset = page * 20
@@ -75,7 +76,7 @@ export default class extends ApiAction {
       })
     }
 
-    if (result.length === 0) throw new ErrorCode(1601)
+    if (result.length === 0) throw new ErrorAPI(1601)
     const count = await this.connection.first(`SELECT count(level) as cnt FROM users`)
 
     return {

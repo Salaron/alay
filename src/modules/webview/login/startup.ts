@@ -1,5 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends WebViewAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -11,7 +12,7 @@ export default class extends WebViewAction {
 
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
-      throw new ErrorCode(1234, "Access only with a certain auth level")
+      throw new ErrorAPI("Access only with a certain auth level")
     if (!Config.modules.login.enable_registration) return {
       status: 403,
       result: "Registration is disabled!"

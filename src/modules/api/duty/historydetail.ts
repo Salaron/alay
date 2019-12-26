@@ -1,6 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -18,13 +19,13 @@ export default class extends ApiAction {
 
   public async execute() {
     let currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.DUTY)
-    if (currentEvent.opened === false) throw new ErrorCode(720)
+    if (currentEvent.opened === false) throw new ErrorAPI(720)
 
     let check = await this.connection.first(`SELECT * FROM event_duty_users WHERE user_id = :user AND room_id = :room AND status = 1`, {
       user: this.user_id,
       room: this.params.room_id
     })
-    if (!check) throw new ErrorCode(1234, `User #${this.user_id} not in room #${this.params.room_id}`)
+    if (!check) throw new ErrorAPI(`User #${this.user_id} not in room #${this.params.room_id}`)
 
     let room = await this.connection.first(`
     SELECT event_duty_rooms.room_id, live_difficulty_id, mission_id, event_duty_rooms.insert_date, start_flag,

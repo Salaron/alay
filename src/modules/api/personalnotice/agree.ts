@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
+import { ErrorUserId } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -27,7 +28,7 @@ export default class extends ApiAction {
       user: this.user_id,
       id: this.params.notice_id
     })
-    if (!check) throw new ErrorUser(`Personalnotice ${this.params.notice_id} doesn't exist`, this.user_id)
+    if (!check) throw new ErrorUserId(`Personalnotice ${this.params.notice_id} doesn't exist`, this.user_id)
     await this.connection.query("UPDATE user_personal_notice SET agreed = 1 WHERE user_id = :user AND notice_id = :id", {
       user: this.user_id,
       id: this.params.notice_id

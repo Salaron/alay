@@ -2,6 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -29,7 +30,7 @@ export default class extends ApiAction {
     JOIN exchange_cost
       ON exchange_item.exchange_item_id = exchange_cost.exchange_item_id
     WHERE exchange_item.exchange_item_id = :id AND rarity = :rarity`, { id: this.params.exchange_item_id, rarity: this.params.rarity })
-    if (!exchangeItem) throw new ErrorCode(4204, "ERROR_CODE_EXCHANGE_INVALID")
+    if (!exchangeItem) throw new ErrorAPI(4204, "ERROR_CODE_EXCHANGE_INVALID")
 
     let gotCount = await this.connection.first(`SELECT got_item_count FROM exchange_log WHERE exchange_item_id = :id AND user_id = :user`, {
       id: exchangeItem.exchange_item_id,
@@ -41,9 +42,9 @@ export default class extends ApiAction {
     })
     const beforeUserInfo = await this.user.getUserInfo(this.user_id)
     if (!gotCount) gotCount = { got_item_count: 0 }
-    if (exchangeItem.max_count && gotCount.got_item_count >= exchangeItem.max_count) throw new ErrorCode(4201, "ERROR_CODE_OVER_ADD_EXCHANGE_ITEM_COUNT_MAX_LIMIT")
-    if (exchangeItem.end_date && Utils.toSpecificTimezone(9) > exchangeItem.end_date) throw new ErrorCode(4203, "ERROR_CODE_EXCHANGE_ITEM_OUT_OF_DATE")
-    if (exchangeItem.cost_value * this.params.amount * exchangeItem.amount > ep.count) throw new ErrorCode(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
+    if (exchangeItem.max_count && gotCount.got_item_count >= exchangeItem.max_count) throw new ErrorAPI(4201, "ERROR_CODE_OVER_ADD_EXCHANGE_ITEM_COUNT_MAX_LIMIT")
+    if (exchangeItem.end_date && Utils.toSpecificTimezone(9) > exchangeItem.end_date) throw new ErrorAPI(4203, "ERROR_CODE_EXCHANGE_ITEM_OUT_OF_DATE")
+    if (exchangeItem.cost_value * this.params.amount * exchangeItem.amount > ep.count) throw new ErrorAPI(4202, "ERROR_CODE_NOT_ENOUGH_EXCHANGE_POINT")
 
     const itemInfo = this.item.nameToType(exchangeItem.item_name, exchangeItem.item_id)
     const reward = []

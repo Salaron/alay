@@ -1,5 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const unitDB = sqlite3.getUnit()
 
@@ -30,7 +31,7 @@ export default class extends ApiAction {
     await Promise.all(this.params.selling_list.map(async (skill: any) => {
       if (!Type.isInt(skill.unit_removable_skill_id)) throw new Error(`ursi is not an int`)
       if (!Type.isInt(skill.amount)) throw new Error(`amount is not an int`)
-      if (availableSkills[skill.unit_removable_skill_id] && availableSkills[skill.unit_removable_skill_id] - skill.amount) throw new ErrorCode(1234, "Not enough sis")
+      if (availableSkills[skill.unit_removable_skill_id] && availableSkills[skill.unit_removable_skill_id] - skill.amount) throw new ErrorAPI("Not enough sis")
 
       let skillSellInfo = await unitDB.get("SELECT selling_price FROM unit_removable_skill_m WHERE unit_removable_skill_id = :id", {
         id: skill.unit_removable_skill_id

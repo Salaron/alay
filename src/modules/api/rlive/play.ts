@@ -3,6 +3,7 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, RESPONSE_TYPE } from "../../../mo
 import { TYPE } from "../../../common/type"
 import executeAction from "../../../handlers/action"
 import { Utils } from "../../../common/utils"
+import { ErrorAPI } from "../../../models/error"
 
 const liveDB = sqlite3.getLive()
 
@@ -28,7 +29,7 @@ export default class extends ApiAction {
       token: this.params.token,
       userId: this.user_id
     })
-    if (!session) throw new ErrorCode(1234, "Session is missing [/shrug]")
+    if (!session) throw new ErrorAPI("Session is missing [/shrug]")
     await this.connection.execute("DELETE FROM user_live_progress WHERE user_id = :user", {
       user: this.user_id
     })

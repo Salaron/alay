@@ -3,6 +3,7 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import moment from "moment"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -19,19 +20,19 @@ export default class extends ApiAction {
     }
   }
   public paramCheck() {
-    if (this.params.handover_code.length != 40) throw new ErrorCode(4407)
+    if (this.params.handover_code.length != 40) throw new ErrorAPI(4407)
   }
 
   public async execute() {
     let transferUserData = await this.connection.first(`SELECT name, user_id, password, mail, language FROM users WHERE user_id=:user`, {
       user: this.params.handover_id
     })
-    if (!transferUserData) throw new ErrorCode(4407) // Invalid id
-    if (this.user_id === transferUserData.user_id) throw new ErrorCode(4407) // trying to their id
+    if (!transferUserData) throw new ErrorAPI(4407) // Invalid id
+    if (this.user_id === transferUserData.user_id) throw new ErrorAPI(4407) // trying to their id
 
     let hashUser = Utils.hashSHA1(transferUserData.user_id).toUpperCase()
     let hash = Utils.hashSHA1(hashUser + transferUserData.password).toUpperCase()
-    if (hash != this.params.handover_code) throw new ErrorCode(4407) // invalid code
+    if (hash != this.params.handover_code) throw new ErrorAPI(4407) // invalid code
     const i18n = await this.i18n.getStrings(transferUserData.language, "mailer")
 
     let userCred = await this.connection.first(`SELECT login_key, login_passwd FROM user_login WHERE user_id = :user`, {

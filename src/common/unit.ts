@@ -1,6 +1,7 @@
 import { BaseAction } from "../models/actions"
 import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
+import { ErrorAPI } from "../models/error"
 
 const unitDB = sqlite3.getUnit()
 const exchangeDB = sqlite3.getExchange()
@@ -304,7 +305,7 @@ export class Unit extends CommonModule {
       uouid: unitOwningUserId,
       user: userId
     })
-    if (!data) throw new ErrorCode(1311, "You don't have this card")
+    if (!data) throw new ErrorAPI(1311, "You don't have this card")
 
     data.removable_skill_ids = await this.getUnitSiS(unitOwningUserId)
     return {

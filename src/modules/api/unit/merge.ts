@@ -3,6 +3,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const unitDB = sqlite3.getUnit()
 
@@ -61,10 +62,10 @@ export default class extends ApiAction {
       user: this.user_id,
       unit: this.params.base_owning_unit_user_id
     })
-    if (baseUnitData.length === 0) throw new ErrorCode(1311) // ERROR_CODE_UNIT_NOT_EXIST
+    if (baseUnitData.length === 0) throw new ErrorAPI(1311) // ERROR_CODE_UNIT_NOT_EXIST
     if (
       baseUnitData.level >= baseUnitData.max_level && baseUnitData.unit_skill_level >= baseUnitData.max_skill_level
-    ) throw new ErrorCode(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
+    ) throw new ErrorAPI(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
     const baseUnitDataDef = await unitDB.get("SELECT * FROM unit_m WHERE unit_id = :id", {
       id: baseUnitData.unit_id
     })
@@ -109,7 +110,7 @@ export default class extends ApiAction {
     if (this.params.unit_owning_user_ids.length > 0) {
       const unitData = await this.unit.getNotLockedUnits(this.user_id, this.params.unit_owning_user_ids)
 
-      if (unitData.length != this.params.unit_owning_user_ids.length) throw new ErrorCode(1311)
+      if (unitData.length != this.params.unit_owning_user_ids.length) throw new ErrorAPI(1311)
 
       await unitData.forEachAsync(async (unit: any) => {
         if (unit.unit_owning_user_id === this.params.base_owning_unit_user_id) throw new Error("Nice try :)")
@@ -152,7 +153,7 @@ export default class extends ApiAction {
         })
       }
     }
-    if (beforeUserInfo.game_coin < coinCost) throw new ErrorCode(1104, "ERROR_CODE_NOT_ENOUGH_GAME_COIN")
+    if (beforeUserInfo.game_coin < coinCost) throw new ErrorAPI(1104, "ERROR_CODE_NOT_ENOUGH_GAME_COIN")
 
     const newExp = baseUnitData.exp + (gainExp * expMultiplier)
     const newSkillExp = baseUnitData.default_unit_skill_id ? (baseUnitData.unit_skill_exp + gainSkillExp) : 0

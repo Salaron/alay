@@ -2,6 +2,7 @@ import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import executeAction from "../../../handlers/action"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE, RESPONSE_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 const liveDB = sqlite3.getLive()
 
@@ -39,7 +40,7 @@ export default class extends ApiAction {
       })
     ])
     if (!rSession || !liveSession || liveSession.live_difficulty_id != rSession.live_difficulty_id)
-      throw new ErrorCode(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
+      throw new ErrorAPI(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
 
     this.requestData.params.live_difficulty_id = liveSession.live_difficulty_id
 

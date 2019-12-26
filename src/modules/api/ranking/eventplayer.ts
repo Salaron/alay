@@ -1,6 +1,7 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -50,7 +51,7 @@ export default class extends ApiAction {
         event: this.params.event_id
       })
       // this user is missing in event ranking
-      if (pos.rank === 0 || pos.length === 0) throw new ErrorCode(1601)
+      if (pos.rank === 0 || pos.length === 0) throw new ErrorAPI(1601)
       // calculate page that contains this user
       page = Math.floor(pos.rank / 20)
       // set offset
@@ -70,7 +71,7 @@ export default class extends ApiAction {
         event: this.params.event_id
       })
       // this tier doesn't contains a players
-      if (pos.rank === 0 || pos.length === 0) throw new ErrorCode(1601)
+      if (pos.rank === 0 || pos.length === 0) throw new ErrorAPI(1601)
       // calculate tier start page
       page = Math.floor(pos.rank / 20)
       // set offset
@@ -124,7 +125,7 @@ export default class extends ApiAction {
       })
     }
 
-    if (result.length === 0) throw new ErrorCode(1601)
+    if (result.length === 0) throw new ErrorAPI(1601)
     const count = await this.connection.first(`SELECT count(event_point) as cnt FROM event_ranking WHERE event_id = :event AND event_point > 0`, {
       event: this.params.event_id
     })

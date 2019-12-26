@@ -2,6 +2,7 @@ import { TYPE } from "../../../common/type"
 import { User } from "../../../common/user"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -35,7 +36,7 @@ export default class extends ApiAction {
         }
       }
     } catch (err) {
-      if (err.message == "Present is already collected") throw new ErrorCode(1201) // ERROR_CODE_INCENTIVE_NONE
+      if (err.message == "Present is already collected") throw new ErrorAPI(1201) // ERROR_CODE_INCENTIVE_NONE
       else throw err
     }
   }

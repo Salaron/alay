@@ -1,6 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -19,14 +20,14 @@ export default class extends ApiAction {
 
   public async execute() {
     let event = await this.eventStub.getEventById(this.params.event_id)
-    if (event.opened === false) throw new ErrorCode(10004) // ERROR_CODE_EVENT_NO_EVENT_DATA
+    if (event.opened === false) throw new ErrorAPI(10004) // ERROR_CODE_EVENT_NO_EVENT_DATA
 
     // check if this user have ranking records
     let rankingData = await this.connection.first(`SELECT * FROM event_ranking WHERE user_id = :user AND event_id = :event`, {
       user: this.params.user_id,
       event: this.params.event_id
     })
-    if (rankingData.length === 0 || Type.isNullDef(rankingData.deck)) throw new ErrorCode(10003) // ERROR_CODE_EVENT_NO_EVENT_POINT_USER_DATA
+    if (rankingData.length === 0 || Type.isNullDef(rankingData.deck)) throw new ErrorAPI(10003) // ERROR_CODE_EVENT_NO_EVENT_POINT_USER_DATA
 
     let deck = JSON.parse(rankingData.deck)
     let liveList = []
