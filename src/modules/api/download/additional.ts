@@ -18,7 +18,7 @@ export default class extends ApiAction {
     }
   }
   public paramCheck() {
-    return (Array.isArray(this.params.excluded_package_ids))
+    return !Type.isUndefined(this.params.excluded_package_ids) ? Array.isArray(this.params.excluded_package_ids) : true
   }
 
   public async execute() {

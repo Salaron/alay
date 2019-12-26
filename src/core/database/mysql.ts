@@ -5,6 +5,7 @@ import { Logger } from "../logger"
 const log = new Logger("MySQL/MariaDB")
 export const pool = mysql.createPool({
   ...Config.database,
+  dateStrings: true,
   namedPlaceholders: true,
   waitForConnections: true
 })
