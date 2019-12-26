@@ -1,5 +1,4 @@
 import "./core/config"
-import "./core/mailer"
 import "./models/error"
 import { Logger } from "./core/logger"
 import { Sqlite3 } from "./core/database/sqlite3"
