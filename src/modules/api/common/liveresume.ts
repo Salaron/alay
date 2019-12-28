@@ -1,9 +1,6 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
-import executeAction from "../../../handlers/action"
-import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE, RESPONSE_TYPE } from "../../../models/constant"
-
-const liveDB = sqlite3.getLive()
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -25,10 +22,10 @@ export default class extends ApiAction {
       await this.connection.execute("DELETE FROM user_live_progress WHERE user_id = :user", {
         user: this.user_id
       })
-      await this.connection.execute("DELETE FROM event_festival_live_progress WHERE user_id = :user", {
+      await this.connection.execute("DELETE FROM user_class_live_progress WHERE user_id = :user", {
         user: this.user_id
       })
-      await this.connection.execute("DELETE FROM user_class_live_progress WHERE user_id = :user", {
+      await this.connection.execute("DELETE FROM event_festival_users WHERE user_id = :user", {
         user: this.user_id
       })
       await this.connection.execute("DELETE FROM user_live_random WHERE user_id = :user AND in_progress = 1", {

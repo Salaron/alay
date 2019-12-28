@@ -1,4 +1,4 @@
-import { eventStatus } from "../../../common/eventstub"
+import { eventStatus } from "../../../common/event"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
@@ -51,7 +51,7 @@ export default class extends ApiAction {
     }
     this.liveStatusList = liveStatusList
     this.liveGoalList = liveGoalList
-    this.marathonEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.TOKEN)
+    this.marathonEvent = await this.event.getEventStatus(this.event.TYPES.TOKEN)
 
     return {
       status: 200,

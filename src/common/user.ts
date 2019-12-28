@@ -12,6 +12,18 @@ interface userParams {
 }
 
 export class User extends CommonModule {
+
+  public static getClassSystemStatus(userId: number) {
+    return {
+      rank_info: {
+        before_class_rank_id: 1,
+        after_class_rank_id: 1
+      },
+      complete_flag: false,
+      is_open: false,
+      is_visible: false
+    }
+  }
   constructor(action: BaseAction) {
     super(action)
   }
@@ -56,18 +68,6 @@ export class User extends CommonModule {
     }
     if (equip.length === 0) result.equipment_info = []
     return result
-  }
-
-  public static getClassSystemStatus(userId: number) {
-    return {
-      rank_info: {
-        before_class_rank_id: 1,
-        after_class_rank_id: 1
-      },
-      complete_flag: false,
-      is_open: false,
-      is_visible: false
-    }
   }
 
   public async getCenterUnitInfo(userId: number) {

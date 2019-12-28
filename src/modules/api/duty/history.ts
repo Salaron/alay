@@ -18,8 +18,8 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const event = this.eventStub
-    let currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.DUTY)
+    const event = this.event
+    let currentEvent = await this.event.getEventStatus(this.event.TYPES.DUTY)
     if (currentEvent.opened === false) throw new ErrorAPI(720)
 
     let history = await this.connection.query(`

@@ -59,3 +59,17 @@ export const settingValues: { [name: string]: number } = {
   vanish: 2,
   random: 1
 }
+
+export enum FESTIVAL_BONUS {
+  GOLD_UP = 1,
+  EXP_UP = 2,
+  EVENT_POINT_UP = 3,
+  HEAL = 4,
+  SCORE_UP = 5,
+  SKILL_RATE_UP = 6,
+  DAMAGE_GUARD = 7,
+  NO_BAD = 8,
+  REWARD_GET = 9,
+  REWARD_RATE_UP = 10,
+  GUEST_BONUS = 11
+}

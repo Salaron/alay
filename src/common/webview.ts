@@ -12,10 +12,6 @@ interface WebViewTemplates {
 const templates: WebViewTemplates = {}
 
 export class WebView extends CommonModule {
-  constructor(action: BaseAction) {
-    super(action)
-  }
-  public Handlebars = Handlebars
 
   public static getTemplateSync(module: string, action: string): Handlebars.TemplateDelegate {
     let template = templates[`${module}-${action}`]
@@ -27,10 +23,6 @@ export class WebView extends CommonModule {
     }
     return template
   }
-
-  public async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
-    return WebView.getTemplate(module, action)
-  }
   public static async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
     let template = templates[`${module}-${action}`]
     if (!template || Config.server.debug_mode) {
@@ -40,6 +32,14 @@ export class WebView extends CommonModule {
       }
     }
     return template
+  }
+  public Handlebars = Handlebars
+  constructor(action: BaseAction) {
+    super(action)
+  }
+
+  public async getTemplate(module: string, action: string): Promise<Handlebars.TemplateDelegate> {
+    return WebView.getTemplate(module, action)
   }
 
   public async getLanguageModal() {

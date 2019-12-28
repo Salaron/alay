@@ -11,13 +11,6 @@ export const pool = mysql.createPool({
 })
 
 export class Connection {
-  public connection: mysql.PoolConnection
-  public released = false
-  public lastQuery = ``
-  constructor(connection: mysql.PoolConnection) {
-    if (!connection) throw new Error(`You should provide a connection`)
-    this.connection = connection
-  }
 
   /**
    * Begin transaction and return instanceof **Connection**
@@ -31,6 +24,13 @@ export class Connection {
       if (connection) connection.release()
       throw err
     }
+  }
+  public connection: mysql.PoolConnection
+  public released = false
+  public lastQuery = ``
+  constructor(connection: mysql.PoolConnection) {
+    if (!connection) throw new Error(`You should provide a connection`)
+    this.connection = connection
   }
 
   public async execute(query: string, values: any = {}): Promise<any> {

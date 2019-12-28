@@ -19,10 +19,10 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await this.eventStub.getEventById(this.params.event_id)
+    const currentEvent = await this.event.getEventById(this.params.event_id)
     if (!currentEvent.opened) throw new ErrorAPI("Event is closed")
 
-    const eventUser = await this.eventStub.getEventUserStatus(this.user_id, currentEvent.id)
+    const eventUser = await this.event.getEventUserStatus(this.user_id, currentEvent.id)
     return {
       status: 200,
       result: {

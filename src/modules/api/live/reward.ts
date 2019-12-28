@@ -1,5 +1,5 @@
 import assert from "assert"
-import { EventStub } from "../../../common/eventstub"
+import { Event } from "../../../common/event"
 import { TYPE } from "../../../common/type"
 import { User } from "../../../common/user"
 import RequestData from "../../../core/requestData"
@@ -47,7 +47,7 @@ export default class extends ApiAction {
 
     const [beforeUserInfo, currentEvent, liveData] = await Promise.all([
       this.user.getUserInfo(this.user_id),
-      this.eventStub.getEventStatus(EventStub.getEventTypes().TOKEN),
+      this.event.getEventStatus(Event.getEventTypes().TOKEN),
       this.live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     ])
 
@@ -166,9 +166,9 @@ export default class extends ApiAction {
         event: currentEvent.id
       })
       if (eventLive) {
-        this.params.event_point = this.eventStub.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
+        this.params.event_point = this.event.getTokenEventPoint(liveData.difficulty, comboRank, scoreRank) * session.lp_factor
         if (!userStatus.score || userStatus.score < totalScore) {
-          await this.eventStub.writeHiScore(this.user_id, currentEvent.id, deck, [
+          await this.event.writeHiScore(this.user_id, currentEvent.id, deck, [
             {
               live_difficulty_id: liveData.live_difficulty_id,
               is_random: !!liveData.random_flag,
@@ -186,7 +186,7 @@ export default class extends ApiAction {
           })
         }
       }
-      response.event_info = await this.eventStub.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, this.params.event_point)
+      response.event_info = await this.event.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, this.params.event_point)
       response.event_info.event_point_info.before_event_point = userStatus.token_point
       response.event_info.event_point_info.after_event_point = userStatus.token_point
       if (!eventLive) {

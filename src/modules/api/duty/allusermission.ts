@@ -18,7 +18,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await this.eventStub.getEventById(this.params.event_id)
+    const currentEvent = await this.event.getEventById(this.params.event_id)
     if (currentEvent.opened === false) throw new ErrorAPI(720)
 
     return {

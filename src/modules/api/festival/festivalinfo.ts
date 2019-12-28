@@ -11,7 +11,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.FESTIVAL)
+    const currentEvent = await this.event.getEventStatus(this.event.TYPES.FESTIVAL)
     if (currentEvent.opened === false) return {
       status: 200,
       result: []

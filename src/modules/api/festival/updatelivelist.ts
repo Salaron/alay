@@ -39,7 +39,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.FESTIVAL)
+    const currentEvent = await this.event.getEventStatus(this.event.TYPES.FESTIVAL)
     if (currentEvent.active === false) throw new ErrorAPI(720)
 
     let data = await this.connection.first("SELECT * FROM event_festival_users WHERE user_id = :user AND event_id = :event AND reset_setlist_number != 1010101", {

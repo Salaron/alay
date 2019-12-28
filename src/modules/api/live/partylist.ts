@@ -1,4 +1,4 @@
-import { EventStub } from "../../../common/eventstub"
+import { Event } from "../../../common/event"
 import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
@@ -32,7 +32,7 @@ export default class extends ApiAction {
   public async execute() {
     const liveData = await this.live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
     if (liveData.capital_type === 2) {
-      const eventStatus = await this.eventStub.getEventStatus(EventStub.getEventTypes().TOKEN)
+      const eventStatus = await this.event.getEventStatus(Event.getEventTypes().TOKEN)
       if (!eventStatus.active) throw new ErrorAPI(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")
       const eventLives = this.live.getMarathonLiveList(eventStatus.id)
       if (!eventLives.includes(liveData.live_difficulty_id)) throw new ErrorAPI(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")

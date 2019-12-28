@@ -70,7 +70,7 @@ export default class extends ApiAction {
       })
     }
 
-    const marathonEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.TOKEN)
+    const marathonEvent = await this.event.getEventStatus(this.event.TYPES.TOKEN)
     if (marathonEvent.active) {
       const marathonLives = (await marathonDB.all("SELECT live_difficulty_id FROM event_marathon_live_schedule_m WHERE event_id = :id", {
         id: marathonEvent.id

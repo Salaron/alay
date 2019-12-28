@@ -1,4 +1,4 @@
-import { EventStub } from "../common/eventstub"
+import { Event } from "../common/event"
 import { I18n } from "../common/i18n"
 import { Item } from "../common/item"
 import { Live } from "../common/live"
@@ -19,7 +19,7 @@ export abstract class BaseAction {
   public user: User
   public unit: Unit
   public live: Live
-  public eventStub: EventStub
+  public event: Event
   public secretbox: Secretbox
   public notice: Notice
   public i18n: I18n
@@ -41,7 +41,7 @@ export abstract class BaseAction {
     this.user = new User(this)
     this.unit = new Unit(this)
     this.live = new Live(this)
-    this.eventStub = new EventStub(this)
+    this.event = new Event(this)
     this.secretbox = new Secretbox(this)
     this.notice = new Notice(this)
     this.i18n = new I18n(this)

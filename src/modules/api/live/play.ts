@@ -1,5 +1,5 @@
 import assert from "assert"
-import { EventStub } from "../../../common/eventstub"
+import { Event } from "../../../common/event"
 import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
@@ -30,7 +30,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const eventStatus = await this.eventStub.getEventStatus(EventStub.getEventTypes().TOKEN)
+    const eventStatus = await this.event.getEventStatus(Event.getEventTypes().TOKEN)
     await this.connection.execute("DELETE FROM user_live_progress WHERE user_id = :user", {
       user: this.user_id
     })

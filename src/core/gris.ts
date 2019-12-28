@@ -6,13 +6,13 @@ const logger = new Logger("Gris")
 let gris: GrisClient
 
 export class Gris extends GrisClient {
+  public static getInstance() {
+    return gris
+  }
   private lastRequestTimestamp = Utils.timeStamp()
   constructor() {
     super(Config.gris)
     if (typeof gris === "undefined") gris = this
-  }
-  public static getInstance() {
-    return gris
   }
 
   public async prepare() {

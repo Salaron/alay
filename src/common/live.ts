@@ -1,9 +1,9 @@
 import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
-import { Randomizer } from "./live/randomizer"
 import { Mods } from "../models/constant"
 import { ErrorAPI } from "../models/error"
+import { Randomizer } from "./live/randomizer"
 
 const log = new Logger("Live")
 
@@ -64,6 +64,16 @@ export async function init() {
 }
 
 export class Live extends CommonModule {
+
+  public static getAvailableLiveList() {
+    return availableLiveList
+  }
+  public static getNormalLiveList() {
+    return normalLiveList
+  }
+  public static getSpecialLiveList() {
+    return specialLiveList
+  }
   public availableLiveList = availableLiveList
   public specialLiveList = specialLiveList
   public normalLiveList = normalLiveList
@@ -163,31 +173,13 @@ export class Live extends CommonModule {
     }
     if (!data.random_flag) data.random_flag = 0
     if (!data.marathon_live) data.marathon_live = false
-    data.score_rank_info = [
-      { rank: 5, rank_min: 0, rank_max: data.c_rank_score - 1 },
-      { rank: 4, rank_min: data.c_rank_score, rank_max: data.b_rank_score - 1 },
-      { rank: 3, rank_min: data.b_rank_score, rank_max: data.a_rank_score - 1 },
-      { rank: 2, rank_min: data.a_rank_score, rank_max: data.s_rank_score - 1 },
-      { rank: 1, rank_min: data.s_rank_score, rank_max: 0 }
-    ]
-    data.combo_rank_info = [
-      { rank: 5, rank_min: 0, rank_max: data.c_rank_combo - 1 },
-      { rank: 4, rank_min: data.c_rank_combo, rank_max: data.b_rank_combo - 1 },
-      { rank: 3, rank_min: data.b_rank_combo, rank_max: data.a_rank_combo - 1 },
-      { rank: 2, rank_min: data.a_rank_combo, rank_max: data.s_rank_combo - 1 },
-      { rank: 1, rank_min: data.s_rank_combo, rank_max: 0 }
-    ]
-    data.complete_rank_info = [
-      { rank: 5, rank_min: 0, rank_max: data.c_rank_complete - 1 },
-      { rank: 4, rank_min: data.c_rank_complete, rank_max: data.b_rank_complete - 1 },
-      { rank: 3, rank_min: data.b_rank_complete, rank_max: data.a_rank_complete - 1 },
-      { rank: 2, rank_min: data.a_rank_complete, rank_max: data.s_rank_complete - 1 },
-      { rank: 1, rank_min: data.s_rank_complete, rank_max: 0 }
-    ]
+    data.score_rank_info = this.generateRankInfo(data, "score")
+    data.combo_rank_info = this.generateRankInfo(data, "combo")
+    data.complete_rank_info = this.generateRankInfo(data, "complete")
     return data
   }
 
-  public async getUserDeck(userId: number, deckId: number, calculateScore = true, guestUnitId?: number, includeDeckData?: boolean, cleanup = true) {
+  public async getUserDeck(userId: number, deckId: number, calculateScore = true, guestUnitId?: number | null, includeDeckData?: boolean, cleanup = true) {
     let deck = await this.connection.query(`
     SELECT
       max_removable_skill_capacity, units.unit_owning_user_id,
@@ -257,7 +249,7 @@ export class Live extends CommonModule {
     }
   }
 
-  public async calculateScoreBonus(userId: number, deck: any[], guestUnitId?: number, cleanup = true) {
+  public async calculateScoreBonus(userId: number, deck: any[], guestUnitId?: number | null, cleanup = true) {
     // 1. Apply love (kizuna) bonus
     // 2. Apply SIS bonus
     // 3. Calculate Center and Extra bonus of center unit
@@ -299,110 +291,6 @@ export class Live extends CommonModule {
         unit.center_bonus_cool = undefined
       }
     }
-    return deck
-  }
-  private async applySISbonus(userId: number, deck: any[]) {
-    // Check if our team composed only
-    // of Aqours or Muse (or something else) members
-    let fullyComposed = false
-    let composedMemberTag = 0
-    const _unitTypeIds: number[] = [] // tslint:disable-line
-
-    // get member tags that will be trigger for SIS
-    const memberTagTrigger = (await unitDB.all("SELECT DISTINCT trigger_type FROM unit_removable_skill_m WHERE trigger_reference_type = 4")).map((type) => {
-      return type.trigger_type
-    })
-    await deck.forEachAsync(async (unit) => {
-      const unitTypeId = (await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", {
-        id: unit.unit_id
-      })).unit_type_id
-
-      const memberTags = (await unitDB.all("SELECT member_tag_id FROM unit_type_member_tag_m WHERE unit_type_id = :type", {
-        type: unitTypeId
-      })).map((tag) => tag.member_tag_id)
-
-      for (const tag of memberTags) {
-        if (memberTagTrigger.includes(tag)) {
-          if (composedMemberTag === 0) composedMemberTag = tag
-          if (!_unitTypeIds.includes(unitTypeId) && composedMemberTag === tag) _unitTypeIds.push(unitTypeId)
-        }
-      }
-    })
-    if (_unitTypeIds.length === 9) fullyComposed = true
-
-    const removableSkills = await this.action.user.getRemovableSkillInfo(userId)
-    await deck.forEachAsync(async (unit) => {
-      if (!removableSkills.equipment_info[unit.unit_owning_user_id]) return
-
-      await removableSkills.equipment_info[unit.unit_owning_user_id].detail.forEachAsync(async (skill: any) => {
-        const skillInfo = await unitDB.get("SELECT * FROM unit_removable_skill_m WHERE unit_removable_skill_id = :id", {
-          id: skill.unit_removable_skill_id
-        })
-        if (!skillInfo) throw new Error(`Data for removable skill #${skill.unit_removable_skill_id} is missing`)
-        if (skillInfo.effect_type > 3) return // client-side skill
-
-        if (skillInfo.effect_range == 1) { // SIS bonus for unit
-          if (skillInfo.fixed_value_flag === 1) { // This is fixed value
-            applyFixedBonusForUnit(unit, skillInfo.effect_type, skillInfo.effect_value)
-          } else { // Values based on unit stats
-            applyBonusForUnit(unit, skillInfo.effect_type, skillInfo.effect_value)
-          }
-        }
-
-        if (skillInfo.effect_range === 2) { // SIS bonus for deck
-          if (skillInfo.trigger_type === 0) { // Skill not tied to Muse or Aqours
-            if (skillInfo.fixed_value_flag === 1) {
-              applyFixedBonusForDeck(deck, skillInfo.effect_type, skillInfo.effect_value)
-            } else {
-              applyBonusForDeck(deck, skillInfo.effect_type, skillInfo.effect_value)
-            }
-          } else if (fullyComposed === true && skillInfo.trigger_type === composedMemberTag) {
-            applyBonusForDeck(deck, skillInfo.effect_type, skillInfo.effect_value)
-          }
-        }
-      })
-    })
-
-    for (const unit of deck) {
-      unit.stat_smile += unit.bonus_smile
-      unit.stat_pure += unit.bonus_pure
-      unit.stat_cool += unit.bonus_cool
-    }
-    return deck
-  }
-  private async calculateCenterUnitBonus(deck: any[], guestUnitId?: number) {
-    const skillId = await unitDB.get("SELECT default_leader_skill_id FROM unit_m WHERE unit_id = :id", {
-      id: Type.isInt(guestUnitId) ? guestUnitId : deck[4].unit_id
-    })
-    const leaderSkill = await unitDB.get("SELECT leader_skill_effect_type, effect_value FROM unit_leader_skill_m WHERE unit_leader_skill_id = :id", {
-      id: skillId.default_leader_skill_id
-    })
-    if (!leaderSkill) return deck // This card doesn't have leader skill (and leader extra) bonus
-
-    const attribute = String(leaderSkill.leader_skill_effect_type).split("") // Small hack
-    attribute.length > 1 ? attribute[0] = attribute[2] : attribute[1] = attribute[0]
-    for (const unit of deck) {
-      unit[centerBonus(attribute[0])] += Math.ceil(unit[stat(attribute[1])] * leaderSkill.effect_value / 100)
-    }
-
-    const extraSkill = await unitDB.get("SELECT member_tag_id, leader_skill_effect_type, effect_value FROM unit_leader_skill_extra_m WHERE unit_leader_skill_id = :id", {
-      id: skillId.default_leader_skill_id
-    })
-    if (!extraSkill) return deck
-
-    const typeIds = (await unitDB.all("SELECT unit_type_id FROM unit_type_member_tag_m WHERE member_tag_id = :tag", {
-      tag: extraSkill.member_tag_id
-    })).map((t) => t.unit_type_id)
-
-    await Promise.all(deck.map(async (unit) => {
-      const typeId = await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", {
-        id: unit.unit_id
-      })
-      if (typeIds.indexOf(typeId.unit_type_id) === -1) return
-
-      const atb = extraSkill.leader_skill_effect_type
-      unit[centerBonus(atb)] += Math.ceil(unit[stat(atb)] * extraSkill.effect_value / 100)
-    }))
     return deck
   }
 
@@ -526,7 +414,7 @@ export class Live extends CommonModule {
   }
 
   public async getDefaultRewards(userId: number, scoreRank: number, comboRank: number, modsInt: number) {
-    let multiplier = modsInt & Mods.NO_FAIL ? 0.5 : 1
+    let multiplier = modsInt & Mods.NO_FAIL ? 0.3 : 1
     let rndGT = Math.floor(Math.random() * (5)) + 1
     let rndBT = Math.floor(Math.random() * (3)) + 1
     let rndLG = Math.floor(Math.random() * (10 * (7 - comboRank) - 10 * (6 - comboRank) + 1)) + 10 * (6 - comboRank)
@@ -609,27 +497,45 @@ export class Live extends CommonModule {
     }
   }
 
-  public static getAvailableLiveList() {
-    return availableLiveList
+  public async getBaseRewardInfo(beforeUserInfo: any, afterUserInfo: any, addedExp: number, addedCoins: number) {
+    await this.action.item.addItemToUser(this.userId, {
+      name: "coins"
+    }, addedCoins)
+    return {
+      player_exp: addedExp,
+      player_exp_unit_max: {
+        before: beforeUserInfo.unit_max,
+        after: afterUserInfo.unit_max
+      },
+      player_exp_friend_max: {
+        before: beforeUserInfo.friend_max,
+        after: afterUserInfo.friend_max
+      },
+      player_exp_lp_max: {
+        before: beforeUserInfo.energy_max,
+        after: afterUserInfo.energy_max
+      },
+      game_coin: addedCoins,
+      game_coin_reward_box_flag: false,
+      social_point: 0
+    }
   }
-  public static getNormalLiveList() {
-    return normalLiveList
-  }
-  public static getSpecialLiveList() {
-    return specialLiveList
-  }
+
   public getMarathonLiveList(eventId: number) {
     return marathonLiveList[eventId]
   }
+
   public getRank(rankInfo: rankInfo[], value: number): number {
     for (const info of rankInfo) {
       if (info.rank_min <= value && (info.rank_max >= value || info.rank_max === 0)) return info.rank
     }
     return 5
   }
+
   public getExpAmount(difficulty: number) {
     return expTable[difficulty]
   }
+
   public getEventPointMultipliers(comboRank: number, scoreRank: number) {
     let comboBonus = 1
     let scoreBonus = 1
@@ -652,6 +558,7 @@ export class Live extends CommonModule {
       scoreBonus
     }
   }
+
   public calculateMaxKizuna(maxCombo: number) {
     // Source: https://decaf.kouhi.me/lovelive/index.php?title=Gameplay#Kizuna
     return Math.floor(maxCombo / 10) +
@@ -659,6 +566,128 @@ export class Live extends CommonModule {
       4 * Math.floor(maxCombo / 50) -
       Math.floor(Math.max(0, maxCombo - 200) / 50) +
       5 * Math.floor(maxCombo / 100)
+  }
+
+  public generateRankInfo(rankData: Partial<generateRankInfoInput>, type: "score" | "combo" | "complete"): rankInfo[] {
+    ["c", "b", "a", "s"].map(rank => {
+      if (
+        typeof rankData[`${rank}_rank_${type}`] !== "number" ||
+        isNaN(parseInt(<any>rankData[`${rank}_rank_${type}`]))
+      ) throw new Error(`property "${rank}_rank_${type}" should be integer`)
+    })
+    return [
+      { rank: 5, rank_min: 0, rank_max: rankData[`c_rank_${type}`]! - 1 },
+      { rank: 4, rank_min: rankData[`c_rank_${type}`]!, rank_max: rankData[`b_rank_${type}`]! - 1 },
+      { rank: 3, rank_min: rankData[`b_rank_${type}`]!, rank_max: rankData[`a_rank_${type}`]! - 1 },
+      { rank: 2, rank_min: rankData[`a_rank_${type}`]!, rank_max: rankData[`s_rank_${type}`]! - 1 },
+      { rank: 1, rank_min: rankData[`s_rank_${type}`]!, rank_max: 0 }
+    ]
+  }
+
+  private async applySISbonus(userId: number, deck: any[]) {
+    // Check if our team composed only
+    // of Aqours or Muse (or something else) members
+    let fullyComposed = false
+    let composedMemberTag = 0
+    const _unitTypeIds: number[] = [] // tslint:disable-line
+
+    // get member tags that will be trigger for SIS
+    const memberTagTrigger = (await unitDB.all("SELECT DISTINCT trigger_type FROM unit_removable_skill_m WHERE trigger_reference_type = 4")).map((type) => {
+      return type.trigger_type
+    })
+    await deck.forEachAsync(async (unit) => {
+      const unitTypeId = (await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", {
+        id: unit.unit_id
+      })).unit_type_id
+
+      const memberTags = (await unitDB.all("SELECT member_tag_id FROM unit_type_member_tag_m WHERE unit_type_id = :type", {
+        type: unitTypeId
+      })).map((tag) => tag.member_tag_id)
+
+      for (const tag of memberTags) {
+        if (memberTagTrigger.includes(tag)) {
+          if (composedMemberTag === 0) composedMemberTag = tag
+          if (!_unitTypeIds.includes(unitTypeId) && composedMemberTag === tag) _unitTypeIds.push(unitTypeId)
+        }
+      }
+    })
+    if (_unitTypeIds.length === 9) fullyComposed = true
+
+    const removableSkills = await this.action.user.getRemovableSkillInfo(userId)
+    await deck.forEachAsync(async (unit) => {
+      if (!removableSkills.equipment_info[unit.unit_owning_user_id]) return
+
+      await removableSkills.equipment_info[unit.unit_owning_user_id].detail.forEachAsync(async (skill: any) => {
+        const skillInfo = await unitDB.get("SELECT * FROM unit_removable_skill_m WHERE unit_removable_skill_id = :id", {
+          id: skill.unit_removable_skill_id
+        })
+        if (!skillInfo) throw new Error(`Data for removable skill #${skill.unit_removable_skill_id} is missing`)
+        if (skillInfo.effect_type > 3) return // client-side skill
+
+        if (skillInfo.effect_range == 1) { // SIS bonus for unit
+          if (skillInfo.fixed_value_flag === 1) { // This is fixed value
+            applyFixedBonusForUnit(unit, skillInfo.effect_type, skillInfo.effect_value)
+          } else { // Values based on unit stats
+            applyBonusForUnit(unit, skillInfo.effect_type, skillInfo.effect_value)
+          }
+        }
+
+        if (skillInfo.effect_range === 2) { // SIS bonus for deck
+          if (skillInfo.trigger_type === 0) { // Skill not tied to Muse or Aqours
+            if (skillInfo.fixed_value_flag === 1) {
+              applyFixedBonusForDeck(deck, skillInfo.effect_type, skillInfo.effect_value)
+            } else {
+              applyBonusForDeck(deck, skillInfo.effect_type, skillInfo.effect_value)
+            }
+          } else if (fullyComposed === true && skillInfo.trigger_type === composedMemberTag) {
+            applyBonusForDeck(deck, skillInfo.effect_type, skillInfo.effect_value)
+          }
+        }
+      })
+    })
+
+    for (const unit of deck) {
+      unit.stat_smile += unit.bonus_smile
+      unit.stat_pure += unit.bonus_pure
+      unit.stat_cool += unit.bonus_cool
+    }
+    return deck
+  }
+  private async calculateCenterUnitBonus(deck: any[], guestUnitId?: number) {
+    const skillId = await unitDB.get("SELECT default_leader_skill_id FROM unit_m WHERE unit_id = :id", {
+      id: Type.isInt(guestUnitId) ? guestUnitId : deck[4].unit_id
+    })
+    const leaderSkill = await unitDB.get("SELECT leader_skill_effect_type, effect_value FROM unit_leader_skill_m WHERE unit_leader_skill_id = :id", {
+      id: skillId.default_leader_skill_id
+    })
+    if (!leaderSkill) return deck // This card doesn't have leader skill (and leader extra) bonus
+
+    // Small hack
+    const attribute = String(leaderSkill.leader_skill_effect_type).split("")
+    attribute.length > 1 ? attribute[0] = attribute[2] : attribute[1] = attribute[0]
+    for (const unit of deck) {
+      unit[centerBonus(attribute[0])] += Math.ceil(unit[stat(attribute[1])] * leaderSkill.effect_value / 100)
+    }
+
+    const extraSkill = await unitDB.get("SELECT member_tag_id, leader_skill_effect_type, effect_value FROM unit_leader_skill_extra_m WHERE unit_leader_skill_id = :id", {
+      id: skillId.default_leader_skill_id
+    })
+    if (!extraSkill) return deck
+
+    const typeIds = (await unitDB.all("SELECT unit_type_id FROM unit_type_member_tag_m WHERE member_tag_id = :tag", {
+      tag: extraSkill.member_tag_id
+    })).map((t) => t.unit_type_id)
+
+    await Promise.all(deck.map(async (unit) => {
+      const typeId = await unitDB.get("SELECT unit_type_id FROM unit_m WHERE unit_id = :id", {
+        id: unit.unit_id
+      })
+      if (typeIds.indexOf(typeId.unit_type_id) === -1) return
+
+      const atb = extraSkill.leader_skill_effect_type
+      unit[centerBonus(atb)] += Math.ceil(unit[stat(atb)] * extraSkill.effect_value / 100)
+    }))
+    return deck
   }
 }
 

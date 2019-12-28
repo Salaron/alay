@@ -31,7 +31,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.FESTIVAL)
+    const currentEvent = await this.event.getEventStatus(this.event.TYPES.FESTIVAL)
     if (currentEvent.active === false) throw new ErrorAPI(720)
 
     let response = {

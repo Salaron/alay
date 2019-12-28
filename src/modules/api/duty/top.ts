@@ -18,7 +18,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const currentEvent = await this.eventStub.getEventById(this.params.event_id)
+    const currentEvent = await this.event.getEventById(this.params.event_id)
     if (currentEvent.opened === false) throw new ErrorAPI(720)
 
     // remove user from existing rooms
@@ -26,7 +26,7 @@ export default class extends ApiAction {
       user: this.user_id
     })
     await this.connection.query(`UPDATE event_duty_live_progress SET status = 0 WHERE status = 1 AND user_id = :user`, { user: this.user_id })
-    const status = await this.eventStub.getEventUserStatus(this.user_id, this.params.event_id)
+    const status = await this.event.getEventUserStatus(this.user_id, this.params.event_id)
     const history = await this.connection.query(`
 		SELECT mission_result FROM event_duty_rooms
 		JOIN event_duty_users ON event_duty_rooms.room_id = event_duty_users.room_id

@@ -23,6 +23,24 @@ export interface Authorize {
 }
 
 export default class RequestData {
+  public static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {
+    const formData = await this.parseFormData(request)
+    const rd = new RequestData(request, response, formData, type)
+    rd.connection = await Connection.beginTransaction()
+    await rd.updateAuthLevel()
+    return rd
+  }
+
+  private static async parseFormData(request: IncomingMessage): Promise<any> {
+    return new Promise((res, rej) => {
+      const form = new IncomingForm()
+      form.parse(request, (err, fields) => {
+        if (err) return rej(err)
+        res(fields)
+      })
+    })
+  }
+
   public user_id: number = 0
   public auth_token: string = ""
   public params: any = null
@@ -102,13 +120,6 @@ export default class RequestData {
     } else {
       log.info(chalk.bgWhite(chalk.black((url))), "User #" + this.user_id)
     }
-  }
-  public static async Create(request: IncomingMessage, response: ServerResponse, type: HANDLER_TYPE) {
-    const formData = await this.parseFormData(request)
-    const rd = new RequestData(request, response, formData, type)
-    rd.connection = await Connection.beginTransaction()
-    await rd.updateAuthLevel()
-    return rd
   }
 
   public async updateAuthLevel(options: authLevelOptions = {}) {
@@ -218,15 +229,5 @@ export default class RequestData {
       }
     }
     return ""
-  }
-
-  private static async parseFormData(request: IncomingMessage): Promise<any> {
-    return new Promise((res, rej) => {
-      const form = new IncomingForm()
-      form.parse(request, (err, fields) => {
-        if (err) return rej(err)
-        res(fields)
-      })
-    })
   }
 }

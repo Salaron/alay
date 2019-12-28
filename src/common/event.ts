@@ -25,7 +25,11 @@ export interface eventUserStatus {
   event_rank: number
 }
 
-export class EventStub extends CommonModule {
+export class Event extends CommonModule {
+
+  public static getEventTypes() {
+    return eventType
+  }
   public TYPES = eventType
   constructor(action: BaseAction) {
     super(action)
@@ -289,10 +293,6 @@ export class EventStub extends CommonModule {
     })
     return result
   }
-
-  public static getEventTypes() {
-    return eventType
-  }
   public getTokenEventPoint(liveDifficulty: number, comboRank: number, scoreRank: number) {
     // Source: https://decaf.kouhi.me/lovelive/index.php/Gameplay#Token_Collecting_Event
     const tokenEventPoint = [ // format: [difficulty][comboRank][scoreRank]
@@ -333,5 +333,23 @@ export class EventStub extends CommonModule {
     ]
 
     return tokenEventPoint[liveDifficulty]![comboRank][scoreRank]
+  }
+
+  public calcClearKeys(seed: number, liveDifficultyId: number, smile: number, pure: number, cool: number, maxCombo: number, loveCnt: number) {
+    let key = seed % 7927
+    let values = [
+      liveDifficultyId,
+      smile,
+      pure,
+      cool,
+      maxCombo,
+      loveCnt,
+      0
+    ].map((value) => {
+      value = Math.floor(value) + key
+      key = value % 7927
+      return value
+    })
+    return Utils.hashSHA1(`*${seed}*0*${values.join("*")}*`).toUpperCase()
   }
 }

@@ -18,7 +18,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    let currentEvent = await this.eventStub.getEventStatus(this.eventStub.TYPES.DUTY)
+    let currentEvent = await this.event.getEventStatus(this.event.TYPES.DUTY)
     if (currentEvent.opened === false) throw new ErrorAPI(720)
 
     let check = await this.connection.first(`SELECT * FROM event_duty_users WHERE user_id = :user AND room_id = :room AND status = 1`, {
@@ -33,7 +33,7 @@ export default class extends ApiAction {
     (SELECT count(*) FROM event_duty_users WHERE room_id = event_duty_rooms.room_id AND status = 1) as playersNum
     FROM event_duty_rooms WHERE room_id = :room`, { room: this.params.room_id })
 
-    let users: any[] = await this.eventStub.getDutyMatchingUsers(room.room_id, currentEvent.id)
+    let users: any[] = await this.event.getDutyMatchingUsers(room.room_id, currentEvent.id)
 
     users = await Promise.all(users.map(async (user) => {
       let query = `

@@ -1,5 +1,20 @@
 type liveAttibute = 1 | 2 | 3
 
+interface generateRankInfoInput {
+  c_rank_score: number
+  b_rank_score: number
+  a_rank_score: number
+  s_rank_score: number
+  c_rank_combo: number
+  b_rank_combo: number
+  a_rank_combo: number
+  s_rank_combo: number
+  c_rank_complete: number
+  b_rank_complete: number
+  a_rank_complete: number
+  s_rank_complete: number
+  [rank: string]: number
+}
 interface liveData {
   c_rank_score: number
   b_rank_score: number

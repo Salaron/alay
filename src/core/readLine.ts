@@ -120,7 +120,7 @@ const commands: CommandInterface = {
 
 interface CommandInterface {
   [command: string]: {
-    execute(): Promise<void>
     help?: () => void
+    execute(): Promise<void>
   }
 }
