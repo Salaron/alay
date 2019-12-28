@@ -1,4 +1,4 @@
-import { escape } from "mysql2"
+import { escape } from "mysql"
 
 // https://github.com/MariaDB/mariadb-connector-nodejs/issues/82
 export function formatQuery(query: string, values: any = {}) {

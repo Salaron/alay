@@ -16,7 +16,7 @@
   "devDependencies": {
     "@types/formidable": "^1.0.31",
     "@types/mime": "^2.0.1",
-    "@types/mysql2": "types/npm-mysql2",
+    "@types/mysql": "^2.15.8",
     "@types/node": "^13.1.0",
     "@types/nodemailer": "^6.4.0",
     "@types/showdown": "^1.9.3",
@@ -31,7 +31,7 @@
     "handlebars": "^4.5.3",
     "mime": "^2.4.4",
     "moment": "^2.24.0",
-    "mysql2": "^2.1.0",
+    "mysql": "^2.17.1",
     "nodemailer": "^4.7.0",
     "querystring": "^0.2.0",
     "showdown": "^1.9.1",
