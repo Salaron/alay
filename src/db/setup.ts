@@ -55,17 +55,18 @@ const log = new Logger("Migrate");
     const script = await import(`./migrate/${scriptName}`)
     const scriptVersion = scriptName.split("_")[0]
     if (version >= parseInt(scriptVersion)) continue
+    version = parseInt(scriptVersion)
     migrated = true
 
-    log.info(`Up to '${scriptName}'...`)
     await script.migrate(dbConnection)
     log.info(`Migration '${scriptName}' done`)
   }
   await dbConnection.query("UPDATE meta SET value = ? WHERE `key` = 'version'", [version])
   await dbConnection.commit()
 
-  if (migrated) log.info("End of migration")
-  else {
+  if (migrated) {
+    log.info("End of migration")
+  } else {
     log.info("Up to date!")
   }
   process.exit()

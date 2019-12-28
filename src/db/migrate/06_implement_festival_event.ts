@@ -1,7 +1,7 @@
 import { Connection } from "../../core/database/mysql"
 import { Logger } from "../../core/logger"
 
-const log = new Logger("rLive")
+const log = new Logger("MedFes")
 
 export async function migrate(connection: Connection) {
   log.info("MedFes event!")
