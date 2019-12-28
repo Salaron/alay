@@ -1,4 +1,4 @@
-import { PoolConfig } from "mysql"
+import { PoolOptions } from "mysql2"
 
 export default <IDatabaseConfig>{
   host: "localhost",
@@ -10,7 +10,7 @@ export default <IDatabaseConfig>{
   reconnectDelay: 5000,
 }
 
-interface IDatabaseConfig extends PoolConfig {
+interface IDatabaseConfig extends PoolOptions {
   reconnectMaxAttempt: number
   reconnectDelay: number
 }

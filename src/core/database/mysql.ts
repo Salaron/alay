@@ -1,64 +1,59 @@
-import mysql from "mysql"
+import mysql from "mysql2/promise"
 import { promisify } from "util"
 import { Logger } from "../logger"
-import { formatQuery } from "./query"
 
 const log = new Logger("MySQL/MariaDB")
 export const pool = mysql.createPool({
   ...Object.omit(Config.database, ["reconnectMaxAttempt", "reconnectDelay"]),
   dateStrings: true,
-  waitForConnections: true,
-  queryFormat: formatQuery
+  namedPlaceholders: true,
+  waitForConnections: true
 })
 export class Connection {
 
   /**
    * Begin transaction and return instanceof **Connection**
    */
-  public static beginTransaction(): Promise<Connection> {
-    return new Promise((res, rej) => {
-      pool.getConnection((err, connection) => {
-        if (err) return rej(err)
-        connection.beginTransaction(err => {
-          if (err) return rej(err)
-
-          res(new Connection(connection))
-        })
-      })
-    })
+  public static async beginTransaction() {
+    const connection = await pool.getConnection()
+    try {
+      await connection.beginTransaction()
+      return new Connection(connection)
+    } catch (err) {
+      if (connection) connection.release()
+      throw err
+    }
   }
   public connection: mysql.PoolConnection
   public released = false
   public lastQuery = ``
-
   constructor(connection: mysql.PoolConnection) {
     if (!connection) throw new Error(`You should provide a connection`)
     this.connection = connection
   }
 
   public async execute(query: string, values: any = {}): Promise<any> {
-    const okPacket = await this.query(query, values)
-    return okPacket
+    const result = await this.query(query, values)
+    return result
   }
 
-  public query(query: string, values: any = {}): Promise<any[]> {
-    return new Promise((res, rej) => {
-      this.connection.query(query, values, (err, rows) => {
-        if (err) return rej(err)
-
-        res(rows)
-      })
-    })
+  public async query(query: string, values: any = {}): Promise<any[]> {
     if (this.released) throw new Error(`Connection was released before.\nLast query: ${this.lastQuery}`)
     this.lastQuery = `${query}\n${JSON.stringify(values)}`
+
+    const [rows] = await this.connection.query(query, values)
+    return <any[]>rows
   }
 
   /**
    * Execute query with LIMIT 1 and return first element object.
    */
-  public async first(query: string, values: any = {}): Promise<any | undefined> {
+  public async first(query: string, values: any = {}): Promise<any> {
+    if (this.released) throw new Error(`Connection was released before.\nLast query: ${this.lastQuery}`)
+    this.lastQuery = `${query}\n${JSON.stringify(values)}`
+
     // select only 1 element
-    const rows = await this.query(query, values)
+    const [rows] = await this.connection.query(query, values)
     if (typeof rows === "object" && Array.isArray(rows) && rows.length > 0) {
       return rows[0]
     } else {
@@ -67,21 +62,26 @@ export class Connection {
   }
 
   /**
+   * Commit and begin transaction again.
+   *
+   * Note: to save changes you should call **save** or **commit** method again.
+   */
+  public async save() {
+    await this.connection.commit()
+    await this.connection.beginTransaction()
+  }
+
+  /**
    * Commit changes.
    *
    * @param release release connection after commit (default is false)
    */
-  public commit(release = false): Promise<void> {
-    return new Promise((res, rej) => {
-      this.connection.commit((err) => {
-        if (err) return rej(err)
-        if (release) {
-          this.connection.release()
-          this.released = true
-        }
-        res()
-      })
-    })
+  public async commit(release = false) {
+    await this.connection.commit()
+    if (release) {
+      this.connection.release()
+      this.released = true
+    }
   }
 
   /**
@@ -89,17 +89,12 @@ export class Connection {
    *
    * @param release release connection after commit (default is false)
    */
-  public async rollback(release = false): Promise<void> {
-    return new Promise((res, rej) => {
-      this.connection.rollback(err => {
-        if (err) return rej(err)
-        if (release) {
-          this.connection.release()
-          this.released = true
-        }
-        res()
-      })
-    })
+  public async rollback(release = false) {
+    await this.connection.rollback()
+    if (release) {
+      this.connection.release()
+      this.released = true
+    }
   }
 
   /**
@@ -112,19 +107,15 @@ export class Connection {
 }
 
 let reconnectAttempts = 0
-export function Connect() {
-  return new Promise((res, rej) => {
-    pool.getConnection((err, connection) => {
-      if (err) return rej(err)
-
-      log.info("Connected to MySQL/MariaDB Server")
-      reconnectAttempts = 0
-      connection.release()
-      res()
-    })
-  }).catch(async err => {
+export async function Connect() {
+  let connection
+  try {
+    connection = await pool.getConnection()
+    log.info("Connected to MySQL/MariaDB Server")
+    reconnectAttempts = 0
+  } catch (e) {
     reconnectAttempts += 1
-    if (err.code === "ECONNREFUSED")
+    if (e.code === "ECONNREFUSED")
       log.error(
         `Unable to connect to MySQL/MariaDB Server [ECONNREFUSED] ${reconnectAttempts}/${Config.database.reconnectMaxAttempt}`
       )
@@ -134,5 +125,7 @@ export function Connect() {
     }
     await promisify(setTimeout)(Config.database.reconnectDelay)
     await Connect()
-  })
+  } finally {
+    if (connection) connection.release()
+  }
 }
