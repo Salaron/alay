@@ -111,10 +111,10 @@ export class User extends CommonModule {
       result += "RANDOM\n"
     }
     if (value & Mods.HIDDEN) {
-      result += "HIDDEN\n"
+      result += "HIDDEN NOTE\n"
     }
     if (value & Mods.SUDDEN) {
-      result += "SUDDEN\n"
+      result += "SUDDEN NOTE\n"
     }
     if (value & Mods.MIRROR) {
       result += "MIRROR\n"

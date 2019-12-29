@@ -418,23 +418,17 @@ export class Live extends CommonModule {
     let rndGT = Math.floor(Math.random() * (5)) + 1
     let rndBT = Math.floor(Math.random() * (3)) + 1
     let rndLG = Math.floor(Math.random() * (10 * (7 - comboRank) - 10 * (6 - comboRank) + 1)) + 10 * (6 - comboRank)
-    let dailyReward = []
-    if (Math.floor(rndGT * multiplier) !== 0) {
-      dailyReward.push(this.action.item.addPresent(userId, {
+    let dailyReward = await Promise.all([
+      this.action.item.addPresent(userId, {
         name: "gt"
-      }, "Live Show! Reward", Math.floor(rndGT * multiplier)))
-    }
-    if (Math.floor(rndGT * multiplier) !== 0) {
-      dailyReward.push(this.action.item.addPresent(userId, {
+      }, "Live Show! Reward", Math.ceil(rndGT * multiplier)),
+      this.action.item.addPresent(userId, {
         name: "bt"
-      }, "Live Show! Reward", Math.floor(rndBT * multiplier)))
-    }
-    if (Math.floor(rndGT * multiplier) !== 0) {
-      dailyReward.push(this.action.item.addPresent(userId, {
+      }, "Live Show! Reward", Math.ceil(rndBT * multiplier)),
+      this.action.item.addPresent(userId, {
         name: "lg"
-      }, "Live Show! Reward", Math.floor(rndLG * multiplier)))
-    }
-    await Promise.all(dailyReward)
+      }, "Live Show! Reward", Math.ceil(rndLG * multiplier))
+    ])
 
     // Random SiS
     if (Math.random() < 0.2) {

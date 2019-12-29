@@ -4,10 +4,15 @@ import { Utils } from "../common/utils"
 
 const logger = new Logger("Gris")
 let gris: GrisClient
+let queue: Array<(gris: GrisClient) => Promise<void>> = []
 
 export class Gris extends GrisClient {
   public static getInstance() {
     return gris
+  }
+
+  public static executeOnReady(func: any) {
+    queue.push(func)
   }
   private lastRequestTimestamp = Utils.timeStamp()
   constructor() {
@@ -16,10 +21,16 @@ export class Gris extends GrisClient {
   }
 
   public async prepare() {
-    const response = await gris.startApp()
-    const userInfo = response[0].response_data.user
+    await gris.startApp()
     logger.info(`Successfully connected to official server`)
-    logger.info(`User ID: ${userInfo.user_id}, name: ${userInfo.name}, loveca count: ${userInfo.sns_coin}`)
+    logger.info(`User ID: ${gris.session.userId}`)
+  }
+
+  public async executeQueue() {
+    logger.info("Executing queue...")
+    for (const func of queue) {
+      await func(gris)
+    }
   }
 
   protected async postRequest(endPoint: string, signKey: Buffer, formData?: any) {

@@ -1,10 +1,10 @@
-import { exists, readFile, stat, writeFile } from "fs"
-import moment from "moment"
+import { readFile } from "fs"
 import { promisify } from "util"
 import { Logger } from "../core/logger"
 import { Utils } from "./utils"
+import { Gris } from "../core/gris"
 
-const log = new Logger("Download")
+const logger = new Logger("Download")
 const downloadDB = sqlite3.getDownload()
 
 type os = "Android" | "iOS"
@@ -17,12 +17,30 @@ let additionalUrls: urlObject[] = []
 let batchUrls: urlObject[] = []
 
 export async function init() {
-  try {
-    additionalUrls = JSON.parse(await promisify(readFile)(`./data/download/additional.json`, "utf-8")).response_data
-    batchUrls = JSON.parse(await promisify(readFile)(`./data/download/batch.json`, "utf-8")).response_data
-  } catch (err) {
-    log.warn(err)
-  }
+  Gris.executeOnReady(async (gris: Gris) => {
+    async function execute() {
+      const ad = await gris.APIRequest("download/additional", {
+        package_id: 0,
+        target_os: "Android",
+        package_type: 0,
+        region: "392"
+      })
+      const bth = await gris.APIRequest("download/batch", {
+        client_version: gris.session.clientVersion,
+        os: "Android",
+        package_type: 4,
+        excluded_package_ids: []
+      })
+      additionalUrls = ad.response_data
+      batchUrls = bth.response_data
+    }
+    await execute()
+    setInterval(() => {
+      execute().catch(err => {
+        logger.error(err)
+      })
+    }, 43200000) // every 12 hours
+  })
 }
 
 export class Download {

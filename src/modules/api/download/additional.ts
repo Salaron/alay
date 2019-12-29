@@ -23,7 +23,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    this.params.excluded_package_ids.map((id: number) => {
+    if (this.params.excluded_package_ids) this.params.excluded_package_ids.map((id: number) => {
       if (isNaN(Number(id))) throw new ErrorUserId(`Invalid type provided`, this.user_id)
     })
     if (this.params.target_os !== "Android" && this.params.target_os !== "iOS") throw new ErrorUserId(`Invalid target_os`, this.user_id)

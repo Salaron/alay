@@ -45,9 +45,12 @@ import { Gris } from "./core/gris"
       try {
         const gris = new Gris()
         await gris.prepare()
+        await gris.executeQueue()
       } catch (err) {
         logger.error(err.message, "Gris")
       }
+    } else {
+      logger.warn("Gris is disabled. 'download/*' actions may not work properly")
     }
   })
   server.on("error", async (err) => {
