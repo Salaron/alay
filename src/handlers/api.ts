@@ -15,20 +15,22 @@ export default async function moduleHandler(request: IncomingMessage, response: 
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.API)
   try {
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
+      await requestData.connection.commit()
       await writeJsonResponse(response, {
         httpStatusCode: 403,
         responseData: "No permissions",
         direct: true
       })
-      return await requestData.connection.commit()
+      return
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {
+      await requestData.connection.commit()
       await writeJsonResponse(response, {
         httpStatusCode: 423,
         responseData: {},
         direct: true
       })
-      return await requestData.connection.commit()
+      return
     }
 
     // "extract" module & action
@@ -77,6 +79,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
         responseData.push(res)
       })
 
+      await requestData.connection.commit()
       await writeJsonResponse(response, {
         httpStatusCode: 200,
         responseData,
@@ -99,6 +102,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
         }
       }
 
+      await requestData.connection.commit()
       await writeJsonResponse(response, {
         httpStatusCode: 200,
         jsonStatusCode: result.status,
@@ -110,8 +114,6 @@ export default async function moduleHandler(request: IncomingMessage, response: 
         nonce: requestData.auth_header.nonce
       })
     }
-
-    await requestData.connection.commit()
   } catch (err) {
     await requestData.connection.rollback()
     throw err

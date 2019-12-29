@@ -1,4 +1,4 @@
-import "./bootstrap"
+import "./global"
 import "./core/config"
 import "./models/error"
 import { Logger } from "./core/logger"

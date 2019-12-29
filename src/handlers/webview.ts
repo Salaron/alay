@@ -49,8 +49,8 @@ export default async function webviewHandler(request: IncomingMessage, response:
       response.setHeader("Content-Encoding", "gzip")
       result.result = await promisify(gzip)(result.result)
     }
-    response.end(result.result)
     await requestData.connection.commit()
+    response.end(result.result)
   } catch (err) {
     await requestData.connection.rollback()
     throw err

@@ -9,22 +9,24 @@ export default async function webapiHandler(request: IncomingMessage, response: 
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBAPI)
   try {
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
+      await requestData.connection.commit()
       await writeJsonResponse(response, {
         httpStatusCode: 600,
         responseData: {
           message: "An error occurred while processing the request. Please close the current tab and try again"
         }
       })
-      return await requestData.connection.commit()
+      return
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {
+      await requestData.connection.commit()
       await writeJsonResponse(response, {
         httpStatusCode: 600,
         responseData: {
           message: "You have been banned on this server"
         }
       })
-      return await requestData.connection.commit()
+      return
     }
 
     // "extract" module & action
@@ -39,6 +41,7 @@ export default async function webapiHandler(request: IncomingMessage, response: 
         response.setHeader(key, result.headers[key])
       }
     }
+    await requestData.connection.commit()
     await writeJsonResponse(response, {
       httpStatusCode: result.status,
       responseData: result.result,
@@ -47,7 +50,6 @@ export default async function webapiHandler(request: IncomingMessage, response: 
       encoding: <string>request.headers["accept-encoding"],
       nonce: requestData.auth_header.nonce
     })
-    await requestData.connection.commit()
   } catch (err) {
     await requestData.connection.rollback()
     if (err instanceof ErrorWebApi && err.sendToClient === true) {
