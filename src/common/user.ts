@@ -37,6 +37,7 @@ export class User extends CommonModule {
       user: userId
     })
 
+    data.invite_code = data.invite_code.toString()
     data.lp_recovery_item = []
     return data
   }

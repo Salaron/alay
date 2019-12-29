@@ -27,7 +27,7 @@
 
   <div class="uk-width-medium uk-padding-small uk-position-z-index toggle-base" uk-scrollspy="cls: uk-animation-fade"
     style>
-    <fieldset id="dialog" class="uk-fieldset">
+    <form id="dialog">
       <div class="uk-margin-small">
         <div class="uk-inline uk-width-1-1">
           <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
@@ -37,7 +37,7 @@
       <div class="uk-margin-small">
         <div class="uk-inline uk-width-1-1">
           <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
-          <input id="mail" class="uk-input uk-border-pill" placeholder="{{i18n/email}}" required type="text">
+          <input id="mail" class="uk-input uk-border-pill" placeholder="{{i18n/email}}" required type="email">
         </div>
       </div>
       <div class="uk-margin-small">
@@ -50,7 +50,7 @@
         <div class="uk-inline uk-width-1-1">
           <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
           <input id="password2" class="uk-input uk-border-pill" required placeholder="{{i18n/repeatPassword}}"
-            type="password">
+            type="password" onkeydown="if (event.keyCode == 13) { startUp(); blur(); }">
         </div>
       </div>
       <div id="buttons" class="uk-margin-small">
@@ -61,7 +61,7 @@
           href="">{{i18n/openInBrowser}}</a>
         {{/unless}}
       </div>
-    </fieldset>
+    </form>
   </div>
 
   <div id="notice" class="uk-overlay uk-position-bottom uk-light" hidden>

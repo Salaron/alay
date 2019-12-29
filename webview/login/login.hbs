@@ -28,35 +28,33 @@
   <div class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade">
     <!-- login -->
     <form id="loginForm" class="toggle-base">
-      <fieldset class="uk-fieldset">
-        <div class="uk-margin-small">
-          <div class="uk-inline uk-width-1-1">
-            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
-            <input id="user_id" class="uk-input uk-border-pill" required placeholder="User ID" type="text">
-          </div>
+      <div class="uk-margin-small">
+        <div class="uk-inline uk-width-1-1">
+          <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
+          <input id="user_id" class="uk-input uk-border-pill" required placeholder="User ID" type="number">
         </div>
-        <div class="uk-margin-small">
-          <div class="uk-inline uk-width-1-1">
-            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
-            <input id="password" class="uk-input uk-border-pill" required placeholder="{{i18n/password}}/Handover"
-              type="password">
-          </div>
+      </div>
+      <div class="uk-margin-small">
+        <div class="uk-inline uk-width-1-1">
+          <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+          <input id="password" class="uk-input uk-border-pill" required placeholder="{{i18n/password}}/Handover"
+            type="password" onkeydown="if (event.keyCode == 13) { login(); blur(); }">
         </div>
+      </div>
 
-        <div class="uk-margin-small">
-          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
-            onclick="login()">{{i18n/login}}</button>
-          {{#unless external}}
-          <a id="external"
-            class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small">{{i18n/openInBrowser}}</a>
-          {{/unless}}
-        </div>
+      <div class="uk-margin-small">
+        <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+          onclick="login()">{{i18n/login}}</button>
+        {{#unless external}}
+        <a id="external"
+          class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small">{{i18n/openInBrowser}}</a>
+        {{/unless}}
+      </div>
 
-        <div class="uk-text-center">
-          <a class="uk-link-reset uk-text-small uk-margin-top uk-button-text"
-            data-uk-toggle="target: .toggle-base; animation: uk-animation-fade">{{i18n/forgotPassword}}</a>
-        </div>
-      </fieldset>
+      <div class="uk-text-center">
+        <a class="uk-link-reset uk-text-small uk-margin-top uk-button-text"
+          data-uk-toggle="target: .toggle-base; animation: uk-animation-fade">{{i18n/forgotPassword}}</a>
+      </div>
     </form>
     <!-- /login -->
 
