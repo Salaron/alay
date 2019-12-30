@@ -1,3 +1,4 @@
+import "../global"
 import "../core/config"
 Config.database.multipleStatements = true
 import { readdirSync } from "fs"
