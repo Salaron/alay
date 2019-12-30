@@ -8,7 +8,7 @@ import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
-  public permission: PERMISSION = PERMISSION.XMC
+  public permission: PERMISSION = PERMISSION.STATIC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
   constructor(requestData: RequestData) {

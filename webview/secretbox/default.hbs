@@ -135,13 +135,6 @@
 </div>
 
 <script>
-  if (window.history.length != 1) {
-    $(".sl-navbar-container").prepend('<div class="uk-navbar-left"><a onclick="window.history.back()" class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
-  } else {
-    $(".sl-navbar-container").prepend('<div class="uk-navbar-left"><a href="/webview.php/secretbox/list?id={{secretbox/secretbox_id}}" class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
-  }
-  var extUrl = "native://browser?url=" + encodeURIComponent(window.location.href)
-  if (!external) $(".sl-navbar-container").append('<div class="uk-navbar-right"><ul class="uk-navbar-nav"><li class="uk-active"><a href="' + extUrl + '" style="font-size: 16px;">Open in browser</a></li></ul></div>')
   $(function () {
     $("img.lazy").lazyload();
   });

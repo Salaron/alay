@@ -68,7 +68,7 @@ export class Download {
     return batchUrls
   }
 
-  public static async getSongPackages(os: os, excludedIds: number[]) {
+  public static async getSongPackages(os: os, excludedIds: number[] = []) {
     if (excludedIds.length === 0) excludedIds.push(0)
     const packages = await downloadDB.all(`SELECT size, url FROM packages WHERE type = 1 AND id NOT IN (${excludedIds.join(",")}) AND os = :os`, {
       os

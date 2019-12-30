@@ -89,15 +89,15 @@ export class Live extends CommonModule {
     let mirror = false
     let hp = 0
     if ((isEvent === true && params.event === 1) || isEvent === false) {
-      vanish = params.vanish !== 0
+      vanish = params.vanish !== 0 && typeof params === "number"
       mirror = !!params.mirror
       random = !!params.random && liveData.ac_flag !== 1
     }
     if (isEvent === false) {
-      if (params.hp === 1) hp = 999
+      if (params.hp === 1) hp = 1999
       if (params.hp === 2) hp = 1
     }
-
+    
     let notes = await liveNotesDB.all(`
     SELECT
       timing_sec, notes_attribute, notes_level, effect, position,

@@ -1,15 +1,12 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL, RESPONSE_TYPE } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
+import RequestData from "../../../core/requestData"
 import executeAction from "../../../handlers/action"
-import { Utils } from "../../../common/utils"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE, RESPONSE_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
-
-const liveDB = sqlite3.getLive()
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
-  public permission: PERMISSION = PERMISSION.XMC
+  public permission: PERMISSION = PERMISSION.STATIC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 
   constructor(requestData: RequestData) {
