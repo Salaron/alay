@@ -16,7 +16,11 @@
 <div id="outer">
   <div id="inner">
     <div id="header">
+      {{#ifcond userId "==" "0"}}
+      {{{headerWithLanguage i18n/profile this}}}
+      {{else}}
       {{{header i18n/profile this}}}
+      {{/ifcond}}
     </div>
     <div id="body">
       <div class="uk-container uk-width-1-1">

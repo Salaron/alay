@@ -24,9 +24,8 @@ export default class extends WebViewAction {
     // 11 -- iOS update
     // 12 -- android update
     // 13 -- banned
-    let template
-    let values = {}
-    let i18n = await this.i18n.getStrings(this.requestData, "static")
+    const i18n = await this.i18n.getStrings(this.requestData, "static")
+    const language = await this.i18n.getUserLocalizationCode(this.requestData)
 
     switch (this.params.id) {
       case "10": {
@@ -34,8 +33,8 @@ export default class extends WebViewAction {
           status: 403,
           result: ""
         }
-        template = await WebView.getTemplate("static", "maintenance")
-        values = {
+        let template = await WebView.getTemplate("static", "maintenance")
+        let values = {
           haveDate: Config.maintenance.notice,
           startTime: moment(Config.maintenance.start_date).format("HH:mm"),
           endTime: moment(Config.maintenance.end_date).format("HH:mm"),
@@ -46,22 +45,33 @@ export default class extends WebViewAction {
           startDayEn: moment(Config.maintenance.start_date).locale("en").format("D MMMM"),
           endDayEn: moment(Config.maintenance.end_date).locale("en").format("D MMMM"),
           timeZone: Utils.getTimeZoneWithPrefix(Config.maintenance.time_zone),
+          supportMail: Config.mailer.supportMail,
           pageTitle: i18n.maintenance,
+          language,
           i18n
         }
-        break
+        return {
+          status: 200,
+          result: await this.webview.compileBodyTemplate(template, this.requestData, values)
+        }
       }
       case "11":
       case "12": {
-        template = await WebView.getTemplate("static", "update")
-        values = {
+        let template = await WebView.getTemplate("static", "update")
+        let values = {
           latestVersion: Config.client.application_version,
           clientVersion: this.requestData.request.headers["bundle-version"] || "N/A",
           supportMail: Config.mailer.supportMail,
           pageTitle: i18n.update,
+          loggedIn: this.requestData.auth_level > AUTH_LEVEL.PRE_LOGIN,
+          download: Config.modules.download,
+          language,
           i18n
         }
-        break
+        return {
+          status: 200,
+          result: await this.webview.compileBodyTemplate(template, this.requestData, values)
+        }
       }
       case "13": {
         const data = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
@@ -71,24 +81,23 @@ export default class extends WebViewAction {
           status: 403,
           result: ""
         }
-        template = await WebView.getTemplate("static", "banned")
-        values = {
+        let template = await WebView.getTemplate("static", "banned")
+        let values = {
           expiration_date: data.expiration_date,
           expiration_date_human: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").humanize() : null,
           message: data.message,
           pageTitle: i18n.banned,
-          i18n
+          language
         }
-        break
+        return {
+          status: 200,
+          result: await this.webview.compileBodyTemplate(template, this.requestData, values)
+        }
       }
       default: return {
         status: 501,
-        result: "Not implemented yet."
+        result: "Not implemented?"
       }
-    }
-    return {
-      status: 200,
-      result: await this.webview.compileBodyTemplate(template, this.requestData, values)
     }
   }
 }

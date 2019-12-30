@@ -20,10 +20,6 @@
 <script>
   $(function () {
     if (window.history.length != 1) $(".sl-navbar-container").prepend('<div class="uk-navbar-left"><a onclick="window.history.back()" class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5"></a><a id="changeLanguage"><span uk-icon="world" class="uk-icon"></span></a></div>')
-    if (!external) {
-      $('a[href^="http"]').each(function () {
-        $(this).attr("href", "native://browser?url=" + encodeURIComponent($(this).attr("href")))
-      })
-    }
+    updateHref()
   })
 </script>

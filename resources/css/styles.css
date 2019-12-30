@@ -129,6 +129,19 @@ th {
 }
 
 
+/* Remove arrows from input=[number] */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance:textfield;
+}
+
 @media (min-width: 550px) {
   p {
     font-size: 16px;

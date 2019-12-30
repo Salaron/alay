@@ -135,3 +135,11 @@ function replacePlaceholders(input, values) {
     return txt
   })
 }
+
+function updateHref() {
+  if (!external) {
+    $('a[href^="http"]').each(function () {
+      $(this).attr("href", "native://browser?url=" + encodeURIComponent($(this).attr("href")))
+    })
+  }
+}

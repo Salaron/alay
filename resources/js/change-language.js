@@ -4,7 +4,7 @@ $(function () {
   })
   $("input[type=radio][name='language_radio']").change(function () {
     setCookie("language", $(this).val(), 10000)
-    if (userId !== "") {
+    if (userId !== "0") {
       var params = {
         module: "settings",
         action: "changeLanguage",

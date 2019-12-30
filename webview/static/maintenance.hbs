@@ -1,32 +1,37 @@
 <div id="outer">
   <div id="inner">
     <div id="header">
-      {{{headerWithLanguage i18n/maintenance this}}}
+      {{{headerWithLanguage pageTitle this}}}
     </div>
 
     <div id="body">
       <div class="uk-container uk-container-medium uk-margin-top">
-        <p>
-          На данный момент сервер находится на техническом обслуживании для обновления. <br>
-          {{#if haveDate}}
-          <br>
-          Ожидаемый период обновления: <br>
-          {{startDay}} {{startTime}} ~ {{endDay}} {{endTime}} (UTC{{timeZone}})
-          <br><br>
-          {{/if}}
-          Приносим извинения за неудобства и благодарим за терпение.
-        </p>
+        {{#ifcond language "==" "ru"}}
+        <stub style="color: red">Доступ к игре ограничен из-за планового технического обслуживания.</stub><br>
+        {{#if haveDate}}
+        <br>
+        ■ Ожидаемый период проведения обновления <br>
+        {{startDay}} {{startTime}} ~ {{endDay}} {{endTime}} (UTC{{timeZone}})
+        <br>
+        <stub style="color: blue">Период обновления может быть изменён без предварительного предупреждения. </stub><br><br>
+        {{/if}}
+        Приносим извинения за неудобства и благодарим за терпение. <br>
+        {{else ifcond language "==" "en"}}
+        <stub style="color: red">Game access is restricted due to a scheduled maintenance.</stub> <br>
+        {{#if haveDate}}
+        <br>
+        ■ Maintenance Period <br>
+        {{startDayEn}} {{startTimeEn}} ~ {{endDayEn}} {{endTimeEn}} (UTC{{timeZone}})
+        <br>
+        <stub style="color: blue">Note: the maintenance period may be extended without prior notice. </stub><br><br>
+        {{/if}}
+
+        We apologize for the inconvenience and thank you for your patience.<br>
+        {{else}}
+        <h4 style="color:red"> {{i18n.notTranslated}}</h4>
+        {{/ifcond}}
         <hr>
-        <p>
-          We are currently performing maintenance for an update. <br>
-          {{#if haveDate}}
-          <br>
-          Estimated maintenance period: <br>
-          {{startDayEn}} {{startTimeEn}} ~ {{endDayEn}} {{endTimeEn}} (UTC{{timeZone}})
-          <br><br>
-          {{/if}}
-          We apologize for the inconvenience, and thank you for your patience.
-        </p>
+        {{#if supportMail.length}} <center>{{supportMail}}</center> {{/if}}
       </div>
     </div>
   </div>

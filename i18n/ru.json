@@ -112,8 +112,8 @@
     "currentOnline": "Текущий онлайн"
   },
   "static": {
-    "maintenance": "Технические работы",
-    "banner": "Вам бан",
+    "maintenance": "На техобслуживании",
+    "banner": "Вход",
     "update": "Требуется обновление"
   },
   "notice": {
@@ -123,7 +123,7 @@
     "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} принял(-а) Вашу заявку в друзья"
   },
   "noticemarquee": {
-    "maintenanceNotice": "В период с {{startDay}} {{startTime}} по {{endDay}} {{endTime}} UTC{{timeZone}} сервер будет отключён для проведения технических работ"
+    "maintenanceNotice": "В период с {{startDay}} {{startTime}} по {{endDay}} {{endTime}} UTC{{timeZone}} доступ к игре будет ограничен в связи с плановым техническим обслуживанием"
   },
   "mailer": {
     "subjectPasswordRecovery": "Восстановление пароля",

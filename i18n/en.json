@@ -120,7 +120,7 @@
     "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} accepted your friend request"
   },
   "noticemarquee": {
-    "maintenanceNotice": "In the period from {{startDay}} {{startTime}} to {{endDay}} {{endTime}} UTC{{timeZone}}, server will be unavailable due to maintenance"
+    "maintenanceNotice": "In the period from {{startDay}} {{startTime}} to {{endDay}} {{endTime}} UTC{{timeZone}}, game access will be restricted due to a scheduled maintenance"
   },
   "mailer": {}
 }

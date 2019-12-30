@@ -6,25 +6,49 @@
 
     <div id="body">
       <div class="uk-container uk-container-medium uk-margin-top">
-        <p>
-          Пожалуйста, обновите клиент до последней версии.
-          <br>
-          Крайняя версия: {{latestVersion}}
-          <br>
-          Ваша версия: {{clientVersion}}
-          <br>
-        </p>
-        <hr>
-        <p>
-          Please upgrade the client to the latest version.
-          <br>
-          Latest version: {{latestVersion}}
-          <br>
-          Your version: {{clientVersion}}
-        </p>
+        {{#ifcond language "==" "ru"}}
+        Пожалуйста, обновите клиент до последней версии.
+        <br>
+        Крайняя версия: {{latestVersion}}
+        <br>
+        Ваша версия: {{clientVersion}}
+        <br><br>
+        {{#if loggedIn}}
+
+        {{#if download.clientGDrive}} <a href="{{download.clientGDrive}}">Скачать с G.Drive</a> <br> {{/if}}
+
+        {{#if download.clientYaDisk}} <a href="{{download.clientYaDisk}}">Скачать с Ya.Disk</a> {{/if}}
+        {{else}}
+        Чтобы скачать обновление, <a href="./login">войдите в свой аккаунт</a>.
+        {{/if}}
+
+        {{else ifcond language "==" "en"}}
+        Please upgrade your client version to the latest.
+        <br>
+        Latest version: {{latestVersion}}
+        <br>
+        Your version: {{clientVersion}}
+        <br><br>
+        {{#if loggedIn}}
+        
+        {{#if download.clientGDrive}} <a href="{{download.clientGDrive}}">Download from G.Drive</a> <br> {{/if}}
+        {{#if download.clientYaDisk}} <a href="{{download.clientYaDisk}}">Download from Ya.Disk</a> {{/if}}
+        
+        {{else}}
+        <a href="./login">Log in to your account</a> to download this update.
+        {{/if}}
+
+        {{else}}
+        <h4 style="color:red"> {{i18n.notTranslated}}</h4>
+        {{/ifcond}}
         <hr>
         {{#if supportMail.length}} <center>{{supportMail}}</center> {{/if}}
       </div>
     </div>
   </div>
 </div>
+<script>
+  $(function () {
+    updateHref()
+  })
+</script>
