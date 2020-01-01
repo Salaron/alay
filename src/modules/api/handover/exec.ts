@@ -47,12 +47,15 @@ export default class extends ApiAction {
       user: transferUserData.user_id
     })
 
-    await Utils.sendMail(transferUserData.mail, i18n.subjectNewLogin, Utils.prepareTemplate(i18n.bodyNewLogin, {
-      userName: transferUserData.name,
-      ip: Utils.getRemoteAddress(this.requestData.request),
-      date: moment().format("YYYY.MM.DD HH:mm Z"),
-      device: this.requestData.headers["os-version"]
-    }))
+    if (!Type.isNullDef(transferUserData.mail)) {
+      await Utils.sendMail(transferUserData.mail, i18n.subjectNewLogin, Utils.prepareTemplate(i18n.bodyNewLogin, {
+        userName: transferUserData.name,
+        ip: Utils.getRemoteAddress(this.requestData.request),
+        date: moment().format("YYYY.MM.DD HH:mm Z"),
+        device: this.requestData.headers["os-version"]
+      }))
+    }
+
 
     return {
       status: 200,

@@ -63,15 +63,6 @@ export default class extends WebApiAction {
       user: this.user_id
     })
 
-    if (Config.mailer.enabled) {
-      const i18n = await this.i18n.getStrings(transferUserData.language, "mailer")
-      await Utils.sendMail(transferUserData.mail, i18n.subjectNewLogin, Utils.prepareTemplate(i18n.bodyNewLogin, {
-        userName: transferUserData.name,
-        ip: Utils.getRemoteAddress(this.requestData.request),
-        date: moment().format("YYYY.MM.DD HH:mm Z"),
-        device: this.requestData.headers["os-version"]
-      }))
-    }
     // Destroy current token
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })
     return {

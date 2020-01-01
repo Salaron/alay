@@ -22,9 +22,6 @@ export default class extends ApiAction {
       await this.connection.execute("DELETE FROM user_live_progress WHERE user_id = :user", {
         user: this.user_id
       })
-      await this.connection.execute("DELETE FROM user_class_live_progress WHERE user_id = :user", {
-        user: this.user_id
-      })
       await this.connection.execute("DELETE FROM event_festival_users WHERE user_id = :user", {
         user: this.user_id
       })
