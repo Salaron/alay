@@ -29,8 +29,9 @@ export default class extends WebApiAction {
     if (!Config.modules.login.enable_registration) throw new ErrorWebApi("Registration is disabled!", true)
 
     if (Config.modules.login.enable_recaptcha) {
-      if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error(`Missing recaptcha`)
-      await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
+      if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error("Missing recaptcha")
+      const reResult = await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
+      if (!reResult) throw new ErrorAPI("reCaptcha test failed")
     }
 
     const strings = await this.i18n.getStrings(this.requestData, "login-login", "login-startup", "mailer")

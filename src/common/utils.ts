@@ -190,7 +190,7 @@ export class Utils {
     )
   }
 
-  public static async reCAPTCHAverify(userToken: string, userIp?: string) {
+  public static async reCAPTCHAverify(userToken: string, userIp?: string): Promise<boolean> {
     const response = await superagent.post("https://www.google.com/recaptcha/api/siteverify").type("form").send({
       secret: Config.modules.login.recaptcha_private_key,
       response: userToken,
@@ -199,7 +199,7 @@ export class Utils {
     const jsonResponse = JSON.parse(response.text)
     if (jsonResponse.success !== true) {
       log.error(`reCAPTCHA test Failed;\n Error-codes: ${jsonResponse["error-codes"].join(", ")}`)
-      throw new ErrorWebApi(`reCAPTCHA test failed`)
+      return false
     }
     return true
   }
@@ -252,5 +252,14 @@ export class Utils {
     const regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,6})+$/
     return regex.test(input)
   }
-
+  public static checkUserId(input: any) {
+    return (
+      input.toString().match(/^[0-9]\w{0,10}$/) &&
+      parseInt(input) === parseInt(input) &&
+      parseInt(input) > 0
+    )
+  }
+  public static decryptSlAuth(input: string, token: string): string {
+    return Utils.xor(Buffer.from(Utils.RSADecrypt(input), "base64").toString(), token).toString()
+  }
 }

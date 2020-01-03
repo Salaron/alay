@@ -31,20 +31,20 @@
       <div class="uk-margin-small">
         <div class="uk-inline uk-width-1-1">
           <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
-          <input id="user_id" class="uk-input uk-border-pill" required placeholder="User ID" type="number">
+          <input id="login" class="uk-input uk-border-pill" required placeholder="Email / User ID" type="email">
         </div>
       </div>
       <div class="uk-margin-small">
         <div class="uk-inline uk-width-1-1">
           <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
-          <input id="password" class="uk-input uk-border-pill" required placeholder="{{i18n/password}}/Handover"
-            type="password" onkeydown="if (event.keyCode == 13) { login(); blur(); }">
+          <input id="password" class="uk-input uk-border-pill" required placeholder="{{i18n/password}} / Handover ID"
+            type="password" onkeydown="if (event.keyCode == 13) { doLogin (); blur(); }">
         </div>
       </div>
 
       <div class="uk-margin-small">
         <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
-          onclick="login()">{{i18n/login}}</button>
+          onclick="doLogin()">{{i18n/login}}</button>
         {{#unless external}}
         <a id="external"
           class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small">{{i18n/openInBrowser}}</a>
@@ -53,57 +53,52 @@
 
       <div class="uk-text-center">
         <a class="uk-link-reset uk-text-small uk-margin-top uk-button-text"
-          data-uk-toggle="target: .toggle-base; animation: uk-animation-fade">{{i18n/forgotPassword}}</a>
+          data-uk-toggle="target: .toggle-base; animation: uk-animation-fade">{{i18n/forgotPassword}}</a> <br>
       </div>
     </form>
     <!-- /login -->
 
     <!-- recover password -->
     <form id="recoverForm" class="toggle-base" onkeydown="return event.key != 'Enter';" hidden>
-      <fieldset class="uk-fieldset">
-        <div class="uk-margin-small">
-          <div class="uk-inline uk-width-1-1">
-            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
-            <input id="mail" class="uk-input uk-border-pill" required placeholder="{{i18n/email}}" type="text">
-          </div>
+      <div class="uk-margin-small">
+        <div class="uk-inline uk-width-1-1">
+          <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail"></span>
+          <input id="mail" class="uk-input uk-border-pill" required placeholder="{{i18n/email}}" type="text">
         </div>
+      </div>
 
-        <div class="uk-margin-small">
-          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
-            onclick="recoverPassword()">{{i18n/send}}</button>
-        </div>
+      <div class="uk-margin-small">
+        <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+          onclick="recoverPassword()">{{i18n/send}}</button>
+      </div>
 
-        <div class="uk-text-center">
-          <a class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
-            data-uk-toggle="target: .toggle-base; animation: uk-animation-fade"><span data-uk-icon="arrow-left"></span>
-            {{i18n/backToLogin}}</a>
-        </div>
-      </fieldset>
+      <div class="uk-text-center">
+        <a class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
+          data-uk-toggle="target: .toggle-base; animation: uk-animation-fade"><span data-uk-icon="arrow-left"></span>
+          {{i18n/backToLogin}}</a>
+      </div>
     </form>
     <!-- /recover password -->
 
     <!-- confirm code -->
     <form id="confirmForm" onkeydown="return event.key != 'Enter';" hidden>
-      <fieldset class="uk-fieldset" style="width: 304px">
-        <div class="uk-margin-small">
-          <div class="uk-inline uk-width-1-1">
-            <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
-            <input id="code" class="uk-input uk-border-pill" required placeholder="{{i18n/confirmationCode}}"
-              type="text">
-          </div>
+      <div class="uk-margin-small">
+        <div class="uk-inline uk-width-1-1">
+          <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock"></span>
+          <input id="code" class="uk-input uk-border-pill" required placeholder="{{i18n/confirmationCode}}" type="text">
         </div>
+      </div>
 
-        <div class="uk-margin-small">
-          <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
-            onclick="confirmCode()">{{i18n/send}}</button>
-        </div>
+      <div class="uk-margin-small">
+        <button type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+          onclick="confirmCode()">{{i18n/send}}</button>
+      </div>
 
-        <div class="uk-text-center">
-          <a class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
-            data-uk-toggle="target: #confirmForm, #loginForm; animation: uk-animation-fade"><span
-              data-uk-icon="arrow-left"></span> {{i18n/backToLogin}}</a>
-        </div>
-      </fieldset>
+      <div class="uk-text-center">
+        <a class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
+          data-uk-toggle="target: #confirmForm, #loginForm; animation: uk-animation-fade"><span
+            data-uk-icon="arrow-left"></span> {{i18n/backToLogin}}</a>
+      </div>
     </form>
     <!-- /confirm code-->
   </div>
@@ -148,11 +143,10 @@
     $("#back").fadeIn(200)
   }
 
-  function login() {
-    var userId = $("#user_id").val()
+  function doLogin() {
+    var login = $("#login").val()
     var pass = $("#password").val()
 
-    if (!checkUser(userId)) return sendNotification("{{i18n/userIdShouldBeInt}}", "warning")
     if (pass.length === 0) return sendNotification("{{i18n/passwordBlank}}", "warning")
     if (pass.length > 32) return sendNotification("{{i18n/passwordLimit}}", "warning")
     if (!checkPass(pass)) return sendNotification("{{i18n/passwordInvalidFormat}}", "warning")
@@ -162,7 +156,7 @@
       $.when(sendRequest({
         module: "{{{module}}}",
         action: "login",
-        user_id: RSAEncrypt.encrypt(userId),
+        login: RSAEncrypt.encrypt(xor(login, parseQueryString(headers.authorize).token)),
         password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
         recaptcha: token || "",
         timestamp: Math.floor(Date.now() / 1000)
