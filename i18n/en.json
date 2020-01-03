@@ -22,6 +22,10 @@
   "login-login": {
     "login": "LOG IN",
     "forgotPassword": "Forgot your password?",
+    "needHelpWithRecovery": "Need help with recovery?",
+    "ifYouLostLoginDataContactUs": "If you forgot/lost your login or password, you can contact us!",
+    "writeToVk": "Write to VK",
+    "writeToEmail": "Write to Email",
     "backToLogin": "Back to Login",
     "userIdShouldBeInt": "Field \"User ID\" should be int",
     "successDescriptionLogin": "You have successfully logged in!<br>Close this window to enter the game.",

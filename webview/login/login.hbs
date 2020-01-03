@@ -27,7 +27,7 @@
   <!-- /overlay -->
   <div class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade">
     <!-- login -->
-    <form id="loginForm" class="toggle-base">
+    <form id="loginForm" class="toggle-base toggle-recover-help">
       <div class="uk-margin-small">
         <div class="uk-inline uk-width-1-1">
           <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user"></span>
@@ -54,6 +54,8 @@
       <div class="uk-text-center">
         <a class="uk-link-reset uk-text-small uk-margin-top uk-button-text"
           data-uk-toggle="target: .toggle-base; animation: uk-animation-fade">{{i18n/forgotPassword}}</a> <br>
+        <a class="uk-link-reset uk-text-small uk-margin-top uk-button-text"
+          data-uk-toggle="target: .toggle-recover-help; animation: uk-animation-fade">{{i18n.needHelpWithRecovery}}</a>
       </div>
     </form>
     <!-- /login -->
@@ -80,6 +82,24 @@
     </form>
     <!-- /recover password -->
 
+    <form id="recoverHelpForm" class="uk-light uk-position-center toggle-recover-help" hidden>
+      <p>{{i18n.ifYouLostLoginDataContactUs}}</p>
+
+      <div style="width: 270px; margin: 0 auto" class="uk-margin-small">
+        <a class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+          href="native://mail?addr=admin@sunps.ru&subject=%D0%92%D0%BE%D1%81%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0&body=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D0%BC%D0%BD%D0%B5%20%D0%BD%D0%B5%D0%BE%D0%B1%D1%85%D0%BE%D0%B4%D0%B8%D0%BC%D0%B0%20%D0%BF%D0%BE%D0%BC%D0%BE%D1%89%D1%8C%20%D0%B2%20%D0%B2%D0%BE%D1%81%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B8%20%D1%83%D1%82%D0%B5%D1%80%D1%8F%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%B0%D0%BA%D0%BA%D0%B0%D1%83%D0%BD%D1%82%D0%B0.%0A%0AUser%20ID%3A%0A%D0%9D%D0%B8%D0%BA%3A%0A%D0%94%D0%B0%D1%82%D0%B0%20%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B5%D0%B3%D0%BE%20%D0%B2%D1%85%D0%BE%D0%B4%D0%B0%3A%0A%D0%94%D0%B0%D1%82%D0%B0%20%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B0%D1%86%D0%B8%D0%B8%3A%0A%D0%9C%D0%BE%D0%B4%D0%B5%D0%BB%D1%8C%20%D0%BC%D0%BE%D0%B5%D0%B3%D0%BE%20%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0%3A">
+          {{i18n.writeToEmail}}</a>
+        <a class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small"
+          href="native://browser?url=https://vk.me/sunlight_project">{{i18n.writeToVk}}</a>
+      </div>
+
+      <div class="uk-text-center">
+        <a class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
+          data-uk-toggle="target: .toggle-recover-help; animation: uk-animation-fade"><span
+            data-uk-icon="arrow-left"></span> {{i18n/backToLogin}}</a>
+      </div>
+    </form>
+
     <!-- confirm code -->
     <form id="confirmForm" onkeydown="return event.key != 'Enter';" hidden>
       <div class="uk-margin-small">
@@ -100,7 +120,7 @@
             data-uk-icon="arrow-left"></span> {{i18n/backToLogin}}</a>
       </div>
     </form>
-    <!-- /confirm code-->
+    <!-- /confirm code -->
   </div>
 
   <div id="notice" class="uk-overlay uk-position-bottom uk-light" hidden>

@@ -12,7 +12,7 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const strings = await this.i18n.getStrings(Config.i18n.defaultLanguage, "login-login", "login-startup")
+    const strings = await this.i18n.getStrings(this.requestData, "login-login", "login-startup")
 
     const values = {
       redirect: "webview.php/static/index?id=12",
