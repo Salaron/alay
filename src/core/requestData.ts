@@ -179,7 +179,7 @@ export default class RequestData {
       const key = await this.connection.first(`SELECT session_key FROM auth_tokens WHERE token = :token`, { token: this.auth_token })
       if (!key) return false
       xmc = Utils.hmacSHA1(this.raw_request_data, key.session_key)
-    } else if (this.auth_level >= AUTH_LEVEL.CONFIRMED_USER) {
+    } else if (this.auth_level >= AUTH_LEVEL.UPDATE) {
       const key = await this.connection.first(`SELECT session_key FROM user_login WHERE user_id = :user AND login_token = :token`, {
         user: this.user_id,
         token: this.auth_token
