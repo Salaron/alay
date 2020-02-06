@@ -1,7 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
-import { ErrorUserId } from "../../../models/error"
+import { ErrorUserId, ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -24,7 +24,7 @@ export default class extends ApiAction {
     const notice = await this.connection.first(`SELECT * FROM user_greet WHERE notice_id = :id`, {
       id: this.params.mail_notice_id
     })
-    if (notice.length === 0) throw new ErrorUserId(`Notice ${this.params.mail_notice_id} doesn't exists`, this.user_id)
+    if (!notice) throw new ErrorAPI(403)
 
     if (this.params.is_send_mail === true && notice.affector_id === this.user_id) {
       await this.connection.query(`UPDATE user_greet SET deleted_from_affector = 1 WHERE notice_id = :id`, {
