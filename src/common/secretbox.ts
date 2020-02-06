@@ -267,6 +267,18 @@ export class Secretbox extends CommonModule {
       unitRarities.push(selectedRarity.rarity)
     }
 
+    if (costData.unit_count > 1) {
+      for (const data of rarityData) {
+        if (data.guarantee && !unitRarities.includes(data.rarity)) {
+          let randomIndex = Math.floor(Math.random() * gainedUnitIds.length)
+          if (unitRarities[randomIndex] >= data.rarity) continue // don't kill this card
+          unitRarities[randomIndex] = data.rarity
+          gainedUnitIds[randomIndex] = data.unit_id!.randomValue()
+        }
+      }
+    }
+
+
     // result
     const gainedUnits = await Promise.all(gainedUnitIds.map(async id => {
       let unitData = await this.action.item.addPresent(userId, {
