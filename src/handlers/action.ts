@@ -51,7 +51,7 @@ export default async function executeAction(module: string, action: string, requ
       }
     }
 
-    if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUserId(`No permissions`, requestData.user_id)
+    if (requestData.auth_level < body.requiredAuthLevel) throw new ErrorUserId(`No permissions (${module}/${action})`, requestData.user_id)
     try {
       if (body.paramTypes) checkParamTypes(requestData.params, body.paramTypes())
     } catch (err) {

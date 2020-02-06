@@ -5,7 +5,6 @@ import superagent from "superagent"
 import { Connection } from "../core/database/mysql"
 import { Logger } from "../core/logger"
 import nodemailer from "nodemailer"
-import { ErrorWebApi } from "../models/error"
 
 const log = new Logger("Utils")
 const mailTransport = nodemailer.createTransport(Config.mailer.transportSettings)
@@ -205,7 +204,7 @@ export class Utils {
   }
 
   public static async sendMail(receivers: string, subject: string, text: string) {
-    if (Config.mailer.enabled === false) return false
+    if (Config.mailer.enabled === false || !receivers || receivers === "") return false
     try {
       return await mailTransport.sendMail({
         from: `${Config.mailer.name} ${Config.mailer.transportSettings.auth.user}`,

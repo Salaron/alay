@@ -89,6 +89,9 @@ export default class extends ApiAction {
         remaining_time: "No Expiration"
       }
       const data = await unitDB.get("SELECT * FROM unit_m WHERE unit_id = ?", [reward.item_id])
+      if (!data) {
+        throw new Error("Can't find data for unit_id #" + reward.item_id)
+      }
       return {
         incentive_id: reward.incentive_id,
         incentive_item_id: reward.item_id,

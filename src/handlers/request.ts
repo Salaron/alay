@@ -9,6 +9,7 @@ import resourcesHandler from "./resources"
 import { writeJsonResponse } from "./response"
 import webapiHandler from "./webapi"
 import webviewHandler from "./webview"
+import { AssertionError } from "assert"
 
 const log = new Logger("Request Handler")
 
@@ -111,11 +112,26 @@ export default async function requestHandler(request: IncomingMessage, response:
       }
     }
   } catch (err) {
-    if (err.message != "nope") log.error(err)
-    await writeJsonResponse(response, {
-      responseData: Config.server.debug_mode ? { message: err.message } : { message: "Internal Server Error" },
-      direct: true,
-      httpStatusCode: 500
-    })
+    if (err.message != "nope") {
+      let msg = ""
+      if (!isNaN(parseInt(<string>request.headers["user-id"]))) msg += `UserId: ${request.headers["user-id"]}; `
+      msg += err.message
+      log.error(msg)
+    }
+    if (err instanceof AssertionError) {
+      await writeJsonResponse(response, {
+        responseData: {
+          error_code: 1234
+        },
+        httpStatusCode: 600
+      })
+    } else {
+      await writeJsonResponse(response, {
+        responseData: Config.server.debug_mode ? { message: err.message } : { message: "Internal Server Error" },
+        direct: true,
+        httpStatusCode: 500
+      })
+    }
+
   }
 }

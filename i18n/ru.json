@@ -38,7 +38,8 @@
     "mailSuccess": "Письмо с кодом подтверждения было отправлено на указанный E-mail",
     "confirmationCode": "Код подтверждения",
     "confirmationCodeNotExists": "Код подтверждения устарел, получите новый в предыдущей форме",
-    "confirmationCodeNotMatch": "Неверный код подтверждения"
+    "confirmationCodeNotMatch": "Неверный код подтверждения",
+    "invalidUserIdOrMail": "User ID или E-Mail имеет неправильный формат"
   },
   "login-startup": {
     "nickname": "Никнейм",
