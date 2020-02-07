@@ -20,7 +20,7 @@ export class User extends CommonModule {
         after_class_rank_id: 1
       },
       complete_flag: false,
-      is_open: false,
+      is_opened: false,
       is_visible: false
     }
   }

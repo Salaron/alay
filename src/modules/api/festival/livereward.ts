@@ -196,10 +196,11 @@ export default class extends ApiAction {
       })
     }
 
-    const [afterUserInfo, rewards, eventInfo] = await Promise.all([
+    const [afterUserInfo, defaultRewards, eventInfo, unitSupportList] = await Promise.all([
       this.user.getUserInfo(this.user_id),
       this.live.getDefaultRewards(this.user_id, scoreRank, comboRank, liveSession.mods),
       this.event.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, liveResult.added_event_point, liveResult.base_event_point),
+      this.user.getSupportUnits(this.user_id),
       this.connection.query("DELETE FROM user_live_progress WHERE user_id = :user", {
         user: this.user_id
       }),
@@ -226,20 +227,29 @@ export default class extends ApiAction {
         mods: liveSession.mods
       })
     ])
+
     const result = {
       rank: scoreRank,
       combo_rank: comboRank,
       total_love: this.params.love_cnt,
       base_reward_info: await this.live.getBaseRewardInfo(beforeUserInfo, afterUserInfo, liveResult.exp, liveResult.coins),
       reward_item_list: {
-        live_clear: [],
-        live_rank: [],
-        live_combo: [],
+        ...defaultRewards.reward_unit_list,
         guest_bonus: []
       },
       unlocked_subscenario_ids: [],
-      effort_point: [],
-      is_effort_point_visible: false,
+      unlocked_multi_unit_scenario_ids: [],
+      effort_point: [
+        // TODO
+        {
+          live_effort_point_box_spec_id: 2,
+          capacity: 1,
+          before: 0,
+          after: 0,
+          rewards: []
+        }
+      ],
+      is_effort_point_visible: true,
       limited_effort_box: [],
       unit_list: units.deck,
       before_user_info: beforeUserInfo,
@@ -263,40 +273,16 @@ export default class extends ApiAction {
         event_reward_info: eventInfo!.event_reward_info,
         event_mission_reward_info: [],
         event_mission_bonus_reward_info: [],
-        next_event_reward_info: [],
-        event_notice: [],
-        mission_status: {
-          level: 1,
-          chance_count: 1,
-          achievement_type: 1,
-          achievement_condition_id_list: [
-            98
-          ],
-          is_special: false,
-          play_count: 0,
-          achieved_count: 0,
-          achievement_count: 1,
-          description: "",
-          time_limit: 0,
-          result: 0,
-          first_clear_bonus: {
-            reward_list: [],
-            bonus_list: []
-          },
-          clear_bonus: {
-            reward_list: [],
-            bonus_list: []
-          }
-        }
+        next_event_reward_info: eventInfo.next_event_reward_info,
+        event_notice: []
       },
-      daily_reward_info: rewards.daily_reward_info,
+      daily_reward_info: defaultRewards.daily_reward_info,
       unite_info: [],
       using_buff_info: [],
       class_system: User.getClassSystemStatus(this.user_id),
-      unit_support_list: await this.user.getSupportUnits(this.user_id)
+      unit_support_list: unitSupportList
     }
 
-    const fakeResult = { rank: 1, combo_rank: 3, total_love: 361, base_reward_info: { player_exp: 548, player_exp_unit_max: { before: 340, after: 340 }, player_exp_friend_max: { before: 29, after: 29 }, player_exp_lp_max: { before: 95, after: 95 }, game_coin: 40500, game_coin_reward_box_flag: false, social_point: 0 }, reward_item_list: { live_clear: [{ add_type: 1001, amount: 1, item_category_id: 0, unit_id: 1024, unit_owning_user_id: 0, is_support_member: true, exp: 0, next_exp: 0, max_hp: 0, level: 1, skill_level: 0, rank: 1, love: 0, is_rank_max: false, is_level_max: false, is_love_max: false, new_unit_flag: false, reward_box_flag: false, unit_skill_exp: 0, display_rank: 1, unit_removable_skill_capacity: 0, rarity: 2 }], live_rank: [{ add_type: 1001, amount: 1, item_category_id: 0, unit_id: 1024, unit_owning_user_id: 0, is_support_member: true, exp: 0, next_exp: 0, max_hp: 0, level: 1, skill_level: 0, rank: 1, love: 0, is_rank_max: false, is_level_max: false, is_love_max: false, new_unit_flag: false, reward_box_flag: false, unit_skill_exp: 0, display_rank: 1, unit_removable_skill_capacity: 0, rarity: 2 }], live_combo: [{ add_type: 1001, amount: 1, item_category_id: 0, unit_id: 353, unit_owning_user_id: null, is_support_member: false, exp: 1229, next_exp: 1394, max_hp: 2, level: 16, skill_level: 0, rank: 1, love: 0, is_rank_max: false, is_level_max: false, is_love_max: false, new_unit_flag: false, reward_box_flag: true, unit_skill_exp: 0, display_rank: 1, unit_removable_skill_capacity: 0, rarity: 1 }], guest_bonus: [{ add_type: 1001, amount: 1, item_category_id: 0, unit_id: 1480, unit_owning_user_id: null, is_support_member: false, exp: 1394, next_exp: 1570, max_hp: 1, level: 17, skill_level: 0, rank: 1, love: 0, is_rank_max: false, is_level_max: false, is_love_max: false, new_unit_flag: false, reward_box_flag: true, unit_skill_exp: 0, display_rank: 1, unit_removable_skill_capacity: 0, rarity: 1 }] }, unlocked_subscenario_ids: [], effort_point: [{ live_effort_point_box_spec_id: 4, capacity: 2000000, before: 915402, after: 2000000, rewards: [{ rarity: 3, item_id: 33, add_type: 5500, amount: 1, item_category_id: 0, reward_box_flag: false, insert_date: "2019-02-20 18:48:30" }, { rarity: 6, item_id: 2, add_type: 3002, amount: 300, item_category_id: 0, reward_box_flag: false }, { rarity: 6, item_id: 2, add_type: 3002, amount: 100, item_category_id: 0, reward_box_flag: false }, { item_id: 4, add_type: 8000, amount: 5, item_category_id: 0, reward_box_flag: false }] }, { live_effort_point_box_spec_id: 4, capacity: 2000000, before: 0, after: 2000000, rewards: [{ rarity: 1, item_id: 10, add_type: 5500, amount: 1, item_category_id: 0, reward_box_flag: false, insert_date: "2017-04-26 17:51:22" }, { rarity: 1, item_id: 2, add_type: 5500, amount: 1, item_category_id: 0, reward_box_flag: false, insert_date: "2017-02-28 02:58:30" }, { rarity: 1, item_id: 3, add_type: 5500, amount: 1, item_category_id: 0, reward_box_flag: false, insert_date: "2017-02-28 02:58:30" }, { item_id: 4, add_type: 8000, amount: 5, item_category_id: 0, reward_box_flag: false }] }, { live_effort_point_box_spec_id: 5, capacity: 4000000, before: 0, after: 685606, rewards: [] }], is_effort_point_visible: true, limited_effort_box: [], unit_list: [{ unit_owning_user_id: 467919915, unit_id: 357, position: 1, level: 80, unit_skill_level: 1, before_love: 500, love: 500, max_love: 500, is_rank_max: true, is_love_max: true, is_level_max: true }, { unit_owning_user_id: 690711253, unit_id: 1270, position: 2, level: 70, unit_skill_level: 1, before_love: 375, love: 375, max_love: 375, is_rank_max: false, is_love_max: false, is_level_max: false }, { unit_owning_user_id: 741956517, unit_id: 982, position: 3, level: 80, unit_skill_level: 1, before_love: 500, love: 500, max_love: 500, is_rank_max: false, is_love_max: false, is_level_max: false }, { unit_owning_user_id: 656130163, unit_id: 1372, position: 4, level: 80, unit_skill_level: 1, before_love: 500, love: 500, max_love: 500, is_rank_max: false, is_love_max: false, is_level_max: false }, { unit_owning_user_id: 741956516, unit_id: 1153, position: 5, level: 80, unit_skill_level: 1, before_love: 500, love: 500, max_love: 500, is_rank_max: false, is_love_max: false, is_level_max: false }, { unit_owning_user_id: 690711224, unit_id: 1287, position: 6, level: 80, unit_skill_level: 1, before_love: 500, love: 500, max_love: 500, is_rank_max: false, is_love_max: false, is_level_max: false }, { unit_owning_user_id: 353078937, unit_id: 611, position: 7, level: 80, unit_skill_level: 1, before_love: 500, love: 500, max_love: 500, is_rank_max: false, is_love_max: false, is_level_max: false }, { unit_owning_user_id: 467919170, unit_id: 947, position: 8, level: 90, unit_skill_level: 1, before_love: 750, love: 750, max_love: 750, is_rank_max: true, is_love_max: true, is_level_max: true }, { unit_owning_user_id: 467919911, unit_id: 863, position: 9, level: 60, unit_skill_level: 1, before_love: 250, love: 250, max_love: 250, is_rank_max: false, is_love_max: false, is_level_max: false }], before_user_info: { level: 140, exp: 203632, previous_exp: 203629, next_exp: 207901, game_coin: 18975009, sns_coin: 6, free_sns_coin: 6, paid_sns_coin: 0, social_point: 795610, unit_max: 340, waiting_unit_max: 300, current_energy: 1, energy_max: 95, training_energy: 5, training_energy_max: 5, energy_full_time: "2019-02-21 04:11:13", friend_max: 29, tutorial_state: -1, over_max_energy: 0, unlock_random_live_muse: 1, unlock_random_live_aqours: 1 }, after_user_info: { level: 140, exp: 204180, previous_exp: 203629, next_exp: 207901, game_coin: 19026509, sns_coin: 7, free_sns_coin: 7, paid_sns_coin: 0, social_point: 796560, unit_max: 340, waiting_unit_max: 300, current_energy: 1, energy_max: 95, training_energy: 5, training_energy_max: 5, energy_full_time: "2019-02-21 04:11:13", friend_max: 29, tutorial_state: -1, over_max_energy: 0, unlock_random_live_muse: 1, unlock_random_live_aqours: 1 }, next_level_info: [{ level: 140, from_exp: 203632 }], event_info: { event_id: 140, event_point_info: { before_event_point: 1696, before_total_event_point: 1696, after_event_point: 3730, after_total_event_point: 3730, base_event_point: 741, added_event_point: 2034, score_bonus: 1.2, combo_bonus: 1.04, item_bonus: 1.1, guest_bonus: 1, mission_bonus: 1 }, event_reward_info: [{ item_id: 4, add_type: 3001, amount: 1, item_category_id: 0, reward_box_flag: false, required_event_point: 2000 }, { item_id: 2, add_type: 3002, amount: 250, item_category_id: 0, reward_box_flag: false, required_event_point: 2400 }, { item_id: 1, add_type: 8000, amount: 1, item_category_id: 0, reward_box_flag: false, required_event_point: 2800 }, { item_id: 173, add_type: 5330, amount: 1, item_category_id: 0, reward_box_flag: false, required_event_point: 3190 }, { item_id: 2, add_type: 3002, amount: 300, item_category_id: 0, reward_box_flag: false, required_event_point: 3200 }, { item_id: 3, add_type: 3000, amount: 11000, item_category_id: 0, reward_box_flag: false, required_event_point: 3600 }], event_mission_reward_info: [{ item_id: 2, add_type: 3002, amount: 100, item_category_id: 0, reward_box_flag: true }], event_mission_bonus_reward_info: [], next_event_reward_info: { event_point: 4000, rewards: [{ item_id: 2, add_type: 3002, amount: 350, item_category_id: 2 }] }, event_notice: [], mission_status: { level: 2, chance_count: 5, achievement_type: 1, achievement_condition_id_list: [98], is_special: false, play_count: 1, achieved_count: 1, achievement_count: 1, description: "\u6b8b\u308a\u4f53\u529b3\u4ee5\u4e0a\u3067\u30d5\u30a7\u30b9\u3092\u6210\u529f", time_limit: 0, result: 1, first_clear_bonus: { reward_list: [{ add_type: 3002, item_id: 2, amount: 100 }], bonus_list: [] }, clear_bonus: { reward_list: [], bonus_list: [] } }, new_mission_status: { level: 3, chance_count: 5, achievement_type: 1, achievement_condition_id_list: [100, 104], is_special: false, play_count: 0, achieved_count: 0, achievement_count: 1, description: "1\u66f2\u4ee5\u4e0aNORMAL\u4ee5\u4e0a\u3067\u3001<br>\u6b8b\u308a\u4f53\u529b8\u4ee5\u4e0a\u3067\u30d5\u30a7\u30b9\u3092\u6210\u529f", time_limit: 0, result: 0, first_clear_bonus: { reward_list: [{ add_type: 3000, item_id: 3, amount: 10000 }], bonus_list: [] }, clear_bonus: { reward_list: [], bonus_list: [] } } }, daily_reward_info: [], unite_info: [], using_buff_info: [], class_system: { rank_info: { before_class_rank_id: 5, after_class_rank_id: 5, rank_up_date: "2019-01-07 20:13:14" }, complete_flag: false, is_opened: true, is_visible: true }, unit_support_list: [{ unit_id: 28, amount: 5 }, { unit_id: 29, amount: 11 }, { unit_id: 30, amount: 14 }, { unit_id: 89, amount: 29 }, { unit_id: 379, amount: 15 }, { unit_id: 380, amount: 8 }, { unit_id: 381, amount: 23 }, { unit_id: 382, amount: 133 }, { unit_id: 383, amount: 3 }, { unit_id: 384, amount: 2 }, { unit_id: 385, amount: 1 }, { unit_id: 386, amount: 7 }, { unit_id: 632, amount: 14 }, { unit_id: 1024, amount: 20 }, { unit_id: 1050, amount: 5 }, { unit_id: 1072, amount: 15 }, { unit_id: 1142, amount: 6 }, { unit_id: 1355, amount: 2 }, { unit_id: 1356, amount: 3 }, { unit_id: 1410, amount: 2 }, { unit_id: 1411, amount: 7 }, { unit_id: 1498, amount: 2 }], server_timestamp: 1550656110 }
     return {
       status: 200,
       result

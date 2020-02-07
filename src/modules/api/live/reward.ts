@@ -86,18 +86,16 @@ export default class extends ApiAction {
     const scoreRank = this.live.getRank(liveData.score_rank_info, totalScore)
     const comboRank = this.live.getRank(liveData.combo_rank_info, this.params.max_combo)
     const completeRank = this.live.getRank(liveData.complete_rank_info, liveStatus.clear_cnt)
-    const goalAccomp = await this.live.liveGoalAccomp(this.user_id, this.params.live_difficulty_id, scoreRank, comboRank, completeRank)
 
     let exp = this.live.getExpAmount(liveData.difficulty)
     if (scoreRank === 5) exp = Math.floor(exp / 2)
-    const [nextLevelInfo, defaultRewards] = await Promise.all([
+    const [nextLevelInfo, defaultRewards, afterUserInfo, unitSupportList, goalAccomp] = await Promise.all([
       this.user.addExp(this.user_id, exp),
       this.live.getDefaultRewards(this.user_id, scoreRank, comboRank, session.mods),
-      this.item.addPresent(this.user_id, {
-        name: "coins",
-      }, "Live Show! Reward", 100000, true)
+      this.user.getUserInfo(this.user_id),
+      this.user.getSupportUnits(this.user_id),
+      this.live.liveGoalAccomp(this.user_id, this.params.live_difficulty_id, scoreRank, comboRank, completeRank)
     ])
-    let afterUserInfo = await this.user.getUserInfo(this.user_id)
 
     const response = {
       live_info: [
@@ -113,24 +111,7 @@ export default class extends ApiAction {
       total_love: this.params.love_cnt,
       is_high_score: totalScore >= liveStatus.hi_score,
       hi_score: Math.max(totalScore, liveStatus.hi_score),
-      base_reward_info: {
-        player_exp: exp,
-        player_exp_unit_max: {
-          before: beforeUserInfo.unit_max,
-          after: afterUserInfo.unit_max
-        },
-        player_exp_friend_max: {
-          before: beforeUserInfo.friend_max,
-          after: afterUserInfo.friend_max
-        },
-        player_exp_lp_max: {
-          before: beforeUserInfo.energy_max,
-          after: afterUserInfo.energy_max
-        },
-        game_coin: 100000,
-        game_coin_reward_box_flag: false,
-        social_point: 0
-      },
+      base_reward_info: await this.live.getBaseRewardInfo(beforeUserInfo, afterUserInfo, exp, 100000),
       reward_unit_list: defaultRewards.reward_unit_list,
       unlocked_subscenario_ids: [],
       effort_point: [],
@@ -145,7 +126,7 @@ export default class extends ApiAction {
       event_info: <any>[],
       daily_reward_info: defaultRewards.daily_reward_info,
       can_send_friend_request: false,
-      unit_support_list: await this.user.getSupportUnits(this.user_id),
+      unit_support_list: unitSupportList,
       unite_info: [],
       class_system: User.getClassSystemStatus(this.user_id)
     }

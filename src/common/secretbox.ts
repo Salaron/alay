@@ -278,7 +278,6 @@ export class Secretbox extends CommonModule {
       }
     }
 
-
     // result
     const gainedUnits = await Promise.all(gainedUnitIds.map(async id => {
       let unitData = await this.action.item.addPresent(userId, {
