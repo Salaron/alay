@@ -37,7 +37,7 @@ export default class extends WebApiAction {
     } else if (Utils.checkMail(login)) {
       // select by mail
       transferUserDataQuery = "SELECT * FROM users WHERE mail = :login AND password = :password"
-    } else throw new ErrorWebApi(i18n.invalidUserIdOrMail)
+    } else throw new ErrorWebApi(i18n.invalidUserIdOrMail, true)
     if (!Utils.checkPass(password)) throw new ErrorWebApi(i18n.passwordInvalidFormat, true)
 
     const transferUserData = await this.connection.first(transferUserDataQuery, {
@@ -49,7 +49,7 @@ export default class extends WebApiAction {
     const cred = await this.connection.first("SELECT * FROM auth_tokens WHERE token = :token", {
       token: this.requestData.auth_token
     })
-    if (!cred) throw new ErrorWebApi("Token expired")
+    if (!cred) throw new ErrorWebApi("Token expired; Try again", true)
     if (
       (cred.login_key.length !== 36) ||
       (cred.login_passwd.length !== 128) ||

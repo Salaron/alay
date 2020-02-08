@@ -35,7 +35,7 @@ export default class extends WebApiAction {
     } else if (Utils.checkMail(login)) {
       // select by mail
       dataQuery = "SELECT * FROM users WHERE mail = :login AND password = :password"
-    } else throw new ErrorWebApi(i18n.invalidUserIdOrMail)
+    } else throw new ErrorWebApi(i18n.invalidUserIdOrMail, true)
     if (!Utils.checkPass(password)) throw new ErrorWebApi(i18n.passwordInvalidFormat, true)
 
     const data = await this.connection.first(dataQuery, {
