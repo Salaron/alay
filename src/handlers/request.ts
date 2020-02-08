@@ -113,10 +113,12 @@ export default async function requestHandler(request: IncomingMessage, response:
     }
   } catch (err) {
     if (err.message != "nope") {
-      let msg = ""
-      if (!isNaN(parseInt(<string>request.headers["user-id"]))) msg += `UserId: ${request.headers["user-id"]}; `
-      msg += err.message
-      log.error(msg)
+      if (!isNaN(parseInt(<string>request.headers["user-id"]))) {
+        let msg = ""
+        msg += `${err.message}; UserId: ${request.headers["user-id"]}`
+        err.stack = err.stack.replace(err.message, msg)
+      }
+      log.error(err.stack)
     }
     if (err instanceof AssertionError) {
       await writeJsonResponse(response, {
