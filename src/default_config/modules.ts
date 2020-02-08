@@ -7,8 +7,7 @@ export default <IModules>{
   },
   download: {
     microDLurl: "http://",
-    clientYaDisk: "",
-    clientGDrive: ""
+    urls: []
   },
   live: {
     unlockAll: false,
@@ -61,8 +60,10 @@ interface IModules {
   }
   download: {
     microDLurl: string
-    clientYaDisk: string
-    clientGDrive: string
+    urls: {
+      name: string
+      url: string
+    }[]
   }
   live: {
     unlockAll: boolean

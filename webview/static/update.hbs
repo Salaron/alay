@@ -15,9 +15,10 @@
         <br><br>
         {{#if loggedIn}}
 
-        {{#if download.clientGDrive}} <a href="{{download.clientGDrive}}">Скачать с G.Drive</a> <br> {{/if}}
+        {{#each download.urls}}
+        <a href="{{url}}">Скачать с {{name}}</a> <br>
+        {{/each}}
 
-        {{#if download.clientYaDisk}} <a href="{{download.clientYaDisk}}">Скачать с Ya.Disk</a> {{/if}}
         {{else}}
         Чтобы скачать обновление, <a href="./login">войдите в свой аккаунт</a>.
         {{/if}}
@@ -31,8 +32,9 @@
         <br><br>
         {{#if loggedIn}}
         
-        {{#if download.clientGDrive}} <a href="{{download.clientGDrive}}">Download from G.Drive</a> <br> {{/if}}
-        {{#if download.clientYaDisk}} <a href="{{download.clientYaDisk}}">Download from Ya.Disk</a> {{/if}}
+        {{#each download.urls}}
+        <a href="{{url}}">Download from {{name}}</a> <br>
+        {{/each}}
         
         {{else}}
         <a href="./login">Log in to your account</a> to download this update.
