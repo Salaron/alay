@@ -1,11 +1,8 @@
-import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
-
-const achievementDB = sqlite3.getAchievement()
+import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 
 export default class extends ApiAction {
-  public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI
+  public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
 

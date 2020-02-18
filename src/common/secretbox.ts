@@ -285,6 +285,7 @@ export class Secretbox extends CommonModule {
         id
       }, `Gained from Scouting Box "${secretboxTab.secret_box_info.name}"`, 1, true)
       unitData.is_hit = false
+      unitData.is_signed = false
       return unitData
     }))
     const gainedItems: any[] = []

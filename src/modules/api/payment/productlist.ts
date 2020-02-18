@@ -15,30 +15,12 @@ export default class extends ApiAction {
       status: 200,
       result: {
         restriction_info: {
-          restricted: false
+          restricted: true
         },
-        sns_product_list: [
-          {
-            product_id: "Test",
-            name: "a",
-            price: 0,
-            can_buy: false,
-            product_type: 2,
-            item_list: [
-              {
-                item_id: 4,
-                add_type: 3001,
-                amount: 1,
-                is_freebie: false
-              }
-            ]
-          }
-        ],
-        product_list: [
-        ],
-        subscription_list: [
-        ],
-        show_point_shop: true
+        sns_product_list: [],
+        product_list: [],
+        subscription_list: [],
+        show_point_shop: false
       }
     }
   }

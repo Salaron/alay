@@ -237,7 +237,7 @@ export default class extends ApiAction {
     const pointList = <any>[]
     for (const rarity of Object.keys(seals)) {
       if (seals[rarity] > 0) pointList.push({
-        rarity,
+        rarity: parseInt(rarity, 10),
         exchange_point: seals[rarity]
       })
     }

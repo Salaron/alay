@@ -13,7 +13,14 @@ export default class extends ApiAction {
   public async execute() {
     return {
       status: 200,
-      result: []
+      result: [
+        {
+          filter_category_id: 1,
+          task_list: [],
+          count: 0,
+          is_last: true
+        }
+      ]
     }
   }
 }

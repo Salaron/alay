@@ -13,7 +13,16 @@ export default class extends ApiAction {
   public async execute() {
     return {
       status: 200,
-      result: []
+      result: {
+        task_list: [],
+        as_name: "SunLight",
+        can_sync: false,
+        is_klab_id_task_flag: false,
+        as_app_info: {
+          app_name: "SunLight",
+          app_url: ""
+        }
+      }
     }
   }
 }

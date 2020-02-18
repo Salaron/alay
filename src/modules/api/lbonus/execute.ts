@@ -53,6 +53,7 @@ export default class extends ApiAction {
         reward: []
       },
       license_lbonus_list: [],
+      start_dash_sheets: [],
       item_piece_info: {
         reset_exchange_rate: false,
         unite_info: []
