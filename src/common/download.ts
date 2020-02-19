@@ -1,8 +1,6 @@
-import { readFile } from "fs"
-import { promisify } from "util"
+import { Gris } from "../core/gris"
 import { Logger } from "../core/logger"
 import { Utils } from "./utils"
-import { Gris } from "../core/gris"
 
 const logger = new Logger("Download")
 const downloadDB = sqlite3.getDownload()
@@ -11,6 +9,18 @@ type os = "Android" | "iOS"
 export interface urlObject {
   size: number
   url: string
+}
+
+export enum PACKAGE_TYPE {
+  BOOTSTRAP = 0,
+  LIVE = 1,
+  SCENARIO = 2,
+  SUBSCENARIO = 3,
+  MICRO = 4,
+  EVENT_SCENARIO = 5,
+  MULTI_UNIT_SCENARIO = 6,
+
+  SUNLIGHT_LIVE = 100
 }
 
 let additionalUrls: urlObject[] = []
@@ -44,6 +54,7 @@ export async function init() {
 }
 
 export class Download {
+  public static TYPE = PACKAGE_TYPE
   public static async getUpdatePackages(os: os, clientVersion: string) {
     let packages = await downloadDB.all("SELECT url, size, version FROM update_packages WHERE version > :client AND os = :os", {
       client: clientVersion.split(".")[0],
@@ -68,10 +79,12 @@ export class Download {
     return batchUrls
   }
 
-  public static async getSongPackages(os: os, excludedIds: number[] = []) {
+  public static async getPackagesByType(os: os, type: number, excludedIds: number[] = [], targetId?: number) {
     if (excludedIds.length === 0) excludedIds.push(0)
-    const packages = await downloadDB.all(`SELECT size, url FROM packages WHERE type = 1 AND id NOT IN (${excludedIds.join(",")}) AND os = :os`, {
-      os
+    const packages = await downloadDB.all(`SELECT size, url FROM packages WHERE type = :type AND id NOT IN (${excludedIds.join(",")}) AND os = :os ${targetId ? "AND id = :targetId" : ""}`, {
+      os,
+      type,
+      targetId
     })
     return packages
   }

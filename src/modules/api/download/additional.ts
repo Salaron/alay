@@ -2,7 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Download } from "../../../common/download"
 import { TYPE } from "../../../common/type"
-import { ErrorUserId } from "../../../models/error"
+import { ErrorUserId, ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -15,7 +15,8 @@ export default class extends ApiAction {
 
   public paramTypes() {
     return {
-      target_os: TYPE.STRING
+      target_os: TYPE.STRING,
+      package_type: TYPE.INT
     }
   }
   public paramCheck() {
@@ -26,20 +27,16 @@ export default class extends ApiAction {
     if (this.params.excluded_package_ids) this.params.excluded_package_ids.map((id: number) => {
       if (isNaN(Number(id))) throw new ErrorUserId(`Invalid type provided`, this.user_id)
     })
-    if (this.params.target_os !== "Android" && this.params.target_os !== "iOS") throw new ErrorUserId(`Invalid target_os`, this.user_id)
+    if (this.params.target_os !== "Android" && this.params.target_os !== "iOS") throw new ErrorUserId("Invalid target_os", this.user_id)
+    if (this.params.package_id && !(Type.isInt(this.params.package_id))) throw new ErrorUserId("Invalid param", this.user_id)
 
-    if (this.requestData.params.package_type === 0) return {
+    if (this.requestData.params.package_type === Download.TYPE.BOOTSTRAP) return {
       status: 200,
       result: Download.getAdditional()
     }
-    if (this.requestData.params.package_type === 1) return {
-      status: 200,
-      result: await Download.getSongPackages(this.params.target_os, this.params.excluded_package_ids)
-    }
-
     return {
       status: 200,
-      result: []
+      result: await Download.getPackagesByType(this.params.target_os, this.requestData.params.package_type, this.params.excluded_package_ids, this.params.package_id)
     }
   }
 }

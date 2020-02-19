@@ -90,6 +90,7 @@ export class Sqlite3 {
   private achievement: Sqlite3Wrapper
   private download: Sqlite3Wrapper
   private banner: Sqlite3Wrapper
+  private customLive: Sqlite3Wrapper
   constructor() {
     this.checkAllDatabases([
       "unit.db_",
@@ -105,7 +106,8 @@ export class Sqlite3 {
       "achievement.db_",
       "sv_live_notes.db_",
       "sv_download.db_",
-      "sv_banner.db_"
+      "sv_banner.db_",
+      "sv_custom_live.db_"
     ])
   }
   public getUnit() {
@@ -163,6 +165,10 @@ export class Sqlite3 {
   public getBanner() {
     if (!this.banner || this.banner.closed) return this.banner = new Sqlite3Wrapper("data/db/sv_banner.db_", "rw")
     else return this.banner
+  }
+  public getCustomLive() {
+    if (!this.customLive || this.customLive.closed) return this.customLive = new Sqlite3Wrapper("data/db/sv_custom_live.db_", "rw")
+    else return this.customLive
   }
 
   private checkAllDatabases(dbNames: string[]) {

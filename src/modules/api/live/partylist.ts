@@ -1,11 +1,8 @@
 import { Event } from "../../../common/event"
 import { TYPE } from "../../../common/type"
-import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
-
-// const marathonDB = sqlite3.getMarathon()
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -30,7 +27,12 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const liveData = await this.live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    let liveData: liveData
+    if (this.params.customLive) {
+      liveData = await this.live.getCustomLiveData(this.params.live_difficulty_id)
+    } else {
+      liveData = await this.live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
+    }
     if (liveData.capital_type === 2) {
       const eventStatus = await this.event.getEventStatus(Event.getEventTypes().TOKEN)
       if (!eventStatus.active) throw new ErrorAPI(3418, "ERROR_CODE_LIVE_EVENT_HAS_GONE")

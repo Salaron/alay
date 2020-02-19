@@ -33,6 +33,7 @@ interface liveData {
   swing_flag: number
   live_setting_id: number
   live_difficulty_id: number
+  custom_live_id?: number
   random_flag: number
   capital_value: number
   capital_type: number

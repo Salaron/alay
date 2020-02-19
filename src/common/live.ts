@@ -7,6 +7,7 @@ import { Randomizer } from "./live/randomizer"
 
 const log = new Logger("Live")
 
+const customLiveDB = sqlite3.getCustomLive()
 const liveDB = sqlite3.getLive()
 const liveNotesDB = sqlite3.getNotes()
 const marathonDB = sqlite3.getMarathon()
@@ -98,12 +99,26 @@ export class Live extends CommonModule {
       if (params.hp === 2) hp = 1
     }
 
-    let notes = await liveNotesDB.all(`
-    SELECT
-      timing_sec, notes_attribute, notes_level, effect, position,
-      effect_value, ${vanish === true ? params.vanish : 0} as vanish
-    FROM live_note
-    WHERE live_setting_id = :id`, { id: liveData.live_setting_id })
+    let notes
+    if (liveData.custom_live_id) {
+      notes = await customLiveDB.all(`
+      SELECT
+        timing_sec, notes_attribute, notes_level, effect, position,
+        effect_value, ${vanish === true ? params.vanish : 0} as vanish
+      FROM custom_live_notes
+      WHERE custom_live_id = :id`, {
+        id: liveData.custom_live_id
+      })
+    } else {
+      notes = await liveNotesDB.all(`
+      SELECT
+        timing_sec, notes_attribute, notes_level, effect, position,
+        effect_value, ${vanish === true ? params.vanish : 0} as vanish
+      FROM live_note
+      WHERE live_setting_id = :id`, {
+        id: liveData.live_setting_id
+      })
+    }
     if (notes.length === 0) throw new Error(`Live notes data for LSID #${liveData.live_setting_id} is missing in database`)
 
     if (random === true) {
@@ -122,6 +137,24 @@ export class Live extends CommonModule {
       hp,
       notes
     }
+  }
+
+  public async getCustomLiveData(customLiveId: number | string): Promise<liveData> {
+    const liveData = await customLiveDB.get(`
+    SELECT * FROM custom_live
+      JOIN custom_live_setting ON custom_live.custom_live_id = custom_live_setting.custom_live_id
+    WHERE custom_live.custom_live_id = :customLiveId`, {
+      customLiveId
+    })
+    if (!liveData) throw new ErrorAPI("Custom Live Data is missing")
+    liveData.live_difficulty_id = liveData.live_setting_id = liveData.custom_live_id
+    liveData.capital_type = 1
+    liveData.capital_value = 0
+    liveData.marathon_live = false
+    liveData.score_rank_info = this.generateRankInfo(liveData, "score")
+    liveData.combo_rank_info = this.generateRankInfo(liveData, "combo")
+    liveData.complete_rank_info = this.generateRankInfo(liveData, "complete")
+    return liveData
   }
 
   /**
