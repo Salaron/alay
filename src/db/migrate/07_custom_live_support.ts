@@ -21,6 +21,7 @@ export async function migrate(connection: Connection) {
       complete_rank TINYINT(1) UNSIGNED NOT NULL,
       status TINYINT(1) UNSIGNED NOT NULL,
       insert_date TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+      PRIMARY KEY (user_id, custom_live_id),
       INDEX FK__users (user_id),
       CONSTRAINT FK__users FOREIGN KEY (user_id) REFERENCES users (user_id) ON UPDATE CASCADE ON DELETE CASCADE
     ) COLLATE='utf8mb4_unicode_ci' ENGINE=InnoDB;

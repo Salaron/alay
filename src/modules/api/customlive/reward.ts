@@ -74,10 +74,10 @@ export default class extends ApiAction {
     const completeRank = this.live.getRank(liveData.complete_rank_info, liveStatus.complete_cnt + 1)
     await this.connection.execute(`INSERT INTO user_custom_live_status (
       user_id, custom_live_id, hi_score, hi_combo,
-      complete_rank, combo_rank, score_rank, status
+      complete_rank, combo_rank, score_rank, status, complete_cnt
     ) VALUES (
       :userId, :liveId, :hiScore, :maxCombo,
-      :completeRank, :maxComboRank, :hiScoreRank, 2
+      :completeRank, :maxComboRank, :hiScoreRank, 2, 1
     ) ON DUPLICATE KEY UPDATE complete_cnt = complete_cnt + 1`, {
       userId: this.user_id,
       liveId: session.live_difficulty_id,
