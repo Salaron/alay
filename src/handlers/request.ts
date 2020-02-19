@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http"
-import * as path from "path"
+import { posix } from "path"
 import { Utils } from "../common/utils"
 import { Logger } from "../core/logger"
 
@@ -10,13 +10,14 @@ import { writeJsonResponse } from "./response"
 import webapiHandler from "./webapi"
 import webviewHandler from "./webview"
 import { AssertionError } from "assert"
+import { RequestError } from "../models/error"
 
 const log = new Logger("Request Handler")
 
 export default async function requestHandler(request: IncomingMessage, response: ServerResponse): Promise<void> {
   try {
     response.setHeader("X-Powered-By", "SunLight Project v3 (Alay)")
-    request.url = path.posix.normalize(request.url || "")
+    request.url = posix.normalize(request.url || "")
 
     // ignore favicon.ico for now
     if (request.url!.includes("favicon.ico")) {
@@ -28,6 +29,32 @@ export default async function requestHandler(request: IncomingMessage, response:
     if (urlSplit.length < 2) return response.end()
 
     switch (urlSplit[1]) {
+      case "livejson": {
+        if (urlSplit.length <= 1 || request.method !== "GET")
+          throw new RequestError("Bad request", 400)
+
+        const notesAsset = request.url!.split("/")[2]
+        if (!notesAsset) throw new RequestError("Invalid note setting asset", 400)
+        const liveDB = sqlite3.getLive()
+        const liveNotesDB = sqlite3.getNotes()
+
+        const live = await liveDB.get("SELECT live_setting_id FROM live_setting_m WHERE notes_setting_asset = :notesAsset", {
+          notesAsset
+        })
+        if (!live) throw new RequestError("Not found", 404)
+        const notes = await liveNotesDB.all(`
+          SELECT
+            timing_sec, notes_attribute, notes_level,
+            effect, effect_value, position FROM live_note
+          WHERE live_setting_id = :id`, {
+          id: live.live_setting_id
+        })
+        response.setHeader("Content-Type", "application/json")
+        response.write(JSON.stringify(notes))
+        response.end()
+        return
+      }
+
       case "main.php": {
         if (
           !(urlSplit.length >= 3 &&
@@ -37,7 +64,7 @@ export default async function requestHandler(request: IncomingMessage, response:
             request.headers["application-id"] &&
             request.headers.authorize &&
             request.headers["x-message-code"])
-        ) throw new Error("nope")
+        ) throw new RequestError("Bad request", 400)
 
         if (
           Utils.isUnderMaintenance() &&
@@ -58,11 +85,12 @@ export default async function requestHandler(request: IncomingMessage, response:
 
         return await mainHandler(request, response)
       }
+
       case "webview.php": {
         if (
           !(urlSplit.length >= 3 &&
             request.method === "GET")
-        ) throw new Error("nope")
+        ) throw new RequestError("Bad request", 400)
 
         if (
           Utils.isUnderMaintenance() &&
@@ -82,7 +110,7 @@ export default async function requestHandler(request: IncomingMessage, response:
             request.headers["client-version"] &&
             request.headers.authorize) &&
           request.headers["x-requested-with"] === "XMLHttpRequest"
-        ) throw new Error("nope")
+        ) throw new RequestError("Bad request", 400)
         return await webapiHandler(request, response)
       }
 
@@ -107,19 +135,11 @@ export default async function requestHandler(request: IncomingMessage, response:
         }
         return await resourcesHandler(request, response)
       }
-      default: { // Not support
-        throw new Error("nope")
+      default: {
+        throw new RequestError("Not implemented", 501)
       }
     }
   } catch (err) {
-    if (err.message != "nope") {
-      if (!isNaN(parseInt(<string>request.headers["user-id"]))) {
-        let msg = ""
-        msg += `${err.message}; UserId: ${request.headers["user-id"]}`
-        err.stack = err.stack.replace(err.message, msg)
-      }
-      log.error(err.stack)
-    }
     if (err instanceof AssertionError) {
       await writeJsonResponse(response, {
         responseData: {
@@ -127,13 +147,30 @@ export default async function requestHandler(request: IncomingMessage, response:
         },
         httpStatusCode: 600
       })
-    } else {
-      await writeJsonResponse(response, {
-        responseData: Config.server.debug_mode ? { message: err.message } : { message: "Internal Server Error" },
-        direct: true,
-        httpStatusCode: 500
-      })
+      return
     }
 
+    if (err instanceof RequestError) {
+      await writeJsonResponse(response, {
+        responseData: {
+          message: err.message
+        },
+        direct: true,
+        httpStatusCode: err.statusCode
+      })
+      return
+    }
+
+    if (!isNaN(parseInt(<string>request.headers["user-id"]))) {
+      let msg = ""
+      msg += `${err.message}; UserId: ${request.headers["user-id"]}`
+      err.stack = err.stack.replace(err.message, msg)
+    }
+    log.error(err.stack)
+    await writeJsonResponse(response, {
+      responseData: Config.server.debug_mode ? { message: err.message } : { message: "Internal Server Error" },
+      direct: true,
+      httpStatusCode: 500
+    })
   }
 }

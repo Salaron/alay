@@ -32,3 +32,13 @@ export class ErrorWebApi extends Error {
     this.sendToClient = sendToClient
   }
 }
+
+export class RequestError extends Error {
+  public message: string
+  public statusCode: number
+  constructor(message: string, statusCode: number) {
+    super(message)
+    this.message = message
+    this.statusCode = statusCode
+  }
+}
