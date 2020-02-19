@@ -57,7 +57,7 @@ export default class extends ApiAction {
       })
     ])
 
-    deckInfo.total_hp = 10000
+    if (liveNotes.hp !== 0) deckInfo.total_hp = liveNotes.hp
     const result = {
       rank_info: liveData.score_rank_info,
       energy_full_time: Utils.toSpecificTimezone(9),
