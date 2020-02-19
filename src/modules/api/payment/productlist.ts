@@ -15,7 +15,7 @@ export default class extends ApiAction {
       status: 200,
       result: {
         restriction_info: {
-          restricted: true
+          restricted: false
         },
         sns_product_list: [],
         product_list: [],
