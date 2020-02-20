@@ -49,8 +49,10 @@ export default async function requestHandler(request: IncomingMessage, response:
           WHERE live_setting_id = :id`, {
           id: live.live_setting_id
         })
+        const jsonResult = JSON.stringify(notes)
         response.setHeader("Content-Type", "application/json")
-        response.write(JSON.stringify(notes))
+        response.setHeader("Content-Length", Buffer.byteLength(jsonResult, "utf-8"))
+        response.write(jsonResult)
         response.end()
         return
       }
