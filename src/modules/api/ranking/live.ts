@@ -22,23 +22,34 @@ export default class extends ApiAction {
     if (parsedNumber === null) throw new ErrorAPI(1, "live_difficulty_id doesn't contain numbers")
     this.params.live_difficulty_id = parsedNumber[0]
 
+    let liveStatusTable = "user_live_status"
+    let liveId = "live_difficulty_id"
+
+    if (this.params.customLive) {
+      liveStatusTable = "user_custom_live_status"
+      liveId = "custom_live_id"
+    }
+
     const users = await this.connection.query(`
     SELECT
-      users.user_id, users.name, users.level,
-      unit_id, units.level as unit_level, units.max_level,
-      units.rank as unit_rank, units.max_rank as unit_max_rank, units.love, units.max_love, units.unit_skill_level, units.display_rank, units.unit_skill_exp,
-      units.removable_skill_capacity, users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool, user_live_status.hi_score,
-      FIND_IN_SET(user_live_status.hi_score, (SELECT GROUP_CONCAT(hi_score ORDER BY hi_score DESC) FROM user_live_status WHERE live_difficulty_id=:diff )) AS rank
+      users.user_id, users.name, users.level, unit_id, units.level as unit_level, units.max_level,
+      units.rank as unit_rank, units.max_rank as unit_max_rank, units.love, units.max_love,
+      units.unit_skill_level, units.display_rank, units.unit_skill_exp, units.removable_skill_capacity,
+      users.setting_award_id, units.attribute, units.stat_smile, units.stat_pure, units.stat_cool, ${liveStatusTable}.hi_score,
+      FIND_IN_SET(${liveStatusTable}.hi_score, (
+        SELECT GROUP_CONCAT(hi_score ORDER BY hi_score DESC) FROM ${liveStatusTable} WHERE ${liveId} = :liveId
+      )) AS rank
     FROM users
-      JOIN user_live_status ON users.user_id=user_live_status.user_id AND user_live_status.live_difficulty_id=:diff
-      JOIN user_unit_deck ON users.user_id=user_unit_deck.user_id AND users.main_deck=user_unit_deck.unit_deck_id
-      JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id=5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id
-      JOIN units ON user_unit_deck_slot.unit_owning_user_id=units.unit_owning_user_id
-    ORDER BY hi_score DESC LIMIT 10`, { diff: this.params.live_difficulty_id })
+      JOIN ${liveStatusTable} ON users.user_id = ${liveStatusTable}.user_id AND ${liveStatusTable}.${liveId} = :liveId
+      JOIN user_unit_deck ON users.user_id = user_unit_deck.user_id AND users.main_deck = user_unit_deck.unit_deck_id
+      JOIN user_unit_deck_slot ON user_unit_deck.unit_deck_id AND user_unit_deck_slot.slot_id = 5 AND user_unit_deck_slot.user_id=users.user_id AND users.main_deck=user_unit_deck_slot.deck_id
+      JOIN units ON user_unit_deck_slot.unit_owning_user_id = units.unit_owning_user_id
+    ORDER BY hi_score DESC LIMIT 10`, {
+      liveId: this.params.live_difficulty_id
+    })
 
-    const result = []
-    for (const user of users) {
-      result.push({
+    const items = users.map(user => {
+      return {
         rank: user.rank,
         score: user.hi_score,
         user_data: {
@@ -63,17 +74,17 @@ export default class extends ApiAction {
           removable_skill_ids: []
         },
         setting_award_id: user.setting_award_id
-      })
-    }
+      }
+    })
 
-    if (result.length === 0) throw new ErrorAPI(1602)
+    if (items.length === 0) throw new ErrorAPI(1602)
 
     return {
       status: 200,
       result: {
-        total_cnt: result.length,
+        total_cnt: items.length,
         page: 0,
-        items: result
+        items
       }
     }
   }

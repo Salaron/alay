@@ -78,7 +78,10 @@ export default class extends ApiAction {
     ) VALUES (
       :userId, :liveId, :hiScore, :maxCombo,
       :completeRank, :maxComboRank, :hiScoreRank, 2, 1
-    ) ON DUPLICATE KEY UPDATE complete_cnt = complete_cnt + 1`, {
+    ) ON DUPLICATE KEY UPDATE
+    complete_cnt = complete_cnt + 1, hi_score = :hiScore, hi_combo = :maxCombo,
+    complete_rank = :completeRank, combo_rank = :maxComboRank, score_rank = :hiScoreRank
+    `, {
       userId: this.user_id,
       liveId: session.live_difficulty_id,
       hiScore, maxCombo,
