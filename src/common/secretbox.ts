@@ -180,7 +180,7 @@ export class Secretbox extends CommonModule {
   public async getSecretboxList(userId: number): Promise<ISecretbox[]> {
     if (Config.server.debug_mode) await updateSettings()
 
-    let list = await this.connection.query(`SELECT * FROM secretbox_list WHERE (start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2`, {
+    let list = await this.connection.query(`SELECT * FROM secretbox_list WHERE (enabled = 1 AND start_date <= :date AND end_date > :date) OR enabled = 2`, {
       date: Utils.toSpecificTimezone(9)
     })
     return <ISecretbox[]>(await Promise.all(list.map(async secretbox => {
@@ -360,7 +360,7 @@ export class Secretbox extends CommonModule {
   private async getTab(userId: number, secretboxId: number): Promise<ISecretbox>
   private async getTab(userId: number, secretboxData: ISecretboxData | number): Promise<ISecretbox | undefined> {
     if (Type.isInt(secretboxData)) {
-      let data = await this.connection.first(`SELECT * FROM secretbox_list WHERE ((start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2) AND secretbox_id = :id`, {
+      let data = await this.connection.first(`SELECT * FROM secretbox_list WHERE ((enabled = 1 AND start_date <= :date AND end_date > :date) OR enabled = 2) AND secretbox_id = :id`, {
         date: Utils.toSpecificTimezone(9),
         id: secretboxData
       })
@@ -412,7 +412,7 @@ export class Secretbox extends CommonModule {
   private async getButtons(userId: number, secretboxId: number): Promise<ISecretboxButton[]>
   private async getButtons(userId: number, secretboxData: ISecretboxData | number): Promise<ISecretboxButton[] | false> {
     if (Type.isInt(secretboxData)) {
-      let data = await this.connection.first(`SELECT * FROM secretbox_list WHERE ((start_date >= :date AND end_date < :date AND enabled = 1) OR enabled = 2) AND secretbox_id = :id`, {
+      let data = await this.connection.first(`SELECT * FROM secretbox_list WHERE ((enabled = 1 AND start_date <= :date AND end_date > :date) OR enabled = 2) AND secretbox_id = :id`, {
         date: Utils.toSpecificTimezone(9),
         id: secretboxData
       })
