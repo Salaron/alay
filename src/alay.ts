@@ -25,6 +25,8 @@ import { Gris } from "./core/gris"
 (async () => {
   // Load config
   await Config.prepareConfig()
+  // Decrypt release info rows
+  await sqlite3.decryptReleaseInfo()
   // Init readline interface
   ReadLine()
   // Connect to MySQL/MariaDB database

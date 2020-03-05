@@ -2,6 +2,9 @@ import { existsSync } from "fs"
 import * as sqliteDB from "sqlite3"
 import { formatQuery } from "./query"
 import { Utils } from "../../common/utils"
+import { Logger } from "../logger"
+
+const logger = new Logger("sqlite3")
 
 // make sqlite3 promise-like
 class Sqlite3Wrapper {
@@ -26,6 +29,7 @@ class Sqlite3Wrapper {
   }
 
   public async exec(query: string, values?: any): Promise<void> {
+    if (this.closed) throw new Error(`The database "${this.fileName}" is closed.\nLast query: "${this.lastQuery}"`)
     const preparedQuery = this.lastQuery = formatQuery(query, values)
     return new Promise((res, rej) => {
       this.db.exec(preparedQuery, (err) => {
@@ -36,6 +40,7 @@ class Sqlite3Wrapper {
   }
 
   public async run(query: string, values?: any): Promise<void> {
+    if (this.closed) throw new Error(`The database "${this.fileName}" is closed.\nLast query: "${this.lastQuery}"`)
     const preparedQuery = formatQuery(query, values)
     this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
@@ -47,6 +52,7 @@ class Sqlite3Wrapper {
   }
 
   public async get(query: string, values?: any): Promise<any> {
+    if (this.closed) throw new Error(`The database "${this.fileName}" is closed.\nLast query: "${this.lastQuery}"`)
     const preparedQuery = formatQuery(query, values)
     this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
@@ -58,6 +64,7 @@ class Sqlite3Wrapper {
   }
 
   public async all(query: string, values?: any): Promise<any[]> {
+    if (this.closed) throw new Error(`The database "${this.fileName}" is closed.\nLast query: "${this.lastQuery}"`)
     const formatedQuery = formatQuery(query, values)
     this.lastQuery = formatedQuery
     return new Promise((res, rej) => {
@@ -66,10 +73,6 @@ class Sqlite3Wrapper {
         res(rows)
       })
     })
-  }
-
-  public checkIfClosed() {
-    if (this.closed) throw new Error(`The database "${this.fileName}" is closed.\nLast query: "${this.lastQuery}"`)
   }
 }
 
@@ -109,7 +112,6 @@ export class Sqlite3 {
   private liveNotesSVDB: Sqlite3Wrapper
   constructor() {
     this.checkDatabases()
-    this.decryptReleaseInfo()
     this.initDatabases()
   }
 
@@ -158,15 +160,16 @@ export class Sqlite3 {
     return this.liveNotesSVDB
   }
 
-  private async decryptReleaseInfo() {
+  public async decryptReleaseInfo() {
     let keys: { [id: number]: string } = {}
     let missingKeys: number[] = []
+    let decCount = 0
     Config.server.release_info.map((k) => {
       keys[k.id] = k.key
     })
 
     await this.dbNames.forEachAsync(async (dbName) => {
-      const database = new Sqlite3Wrapper(dbName, sqliteDB.OPEN_READWRITE)
+      const database = new Sqlite3Wrapper("./data/db/" + dbName, sqliteDB.OPEN_READWRITE)
 
       const tables = await database.all("SELECT * FROM sqlite_master WHERE type='table'")
 
@@ -187,16 +190,22 @@ export class Sqlite3 {
           let setValues = []
           for (const key in jsonData) {
             if (jsonData.hasOwnProperty(key)) {
-              setValues.push(`${key} = ${jsonData[key]}`)
+              setValues.push(`'${key}' = '${jsonData[key]}'`)
             }
           }
-
-          await database.exec(`UPDATE ${table.name} SET ${setValues.join(",")} WHERE _rowid_ = ${row["__rowid"]}`)
-          await database.exec(`UPDATE ${table.name} SET release_tag = NULL, _encryption_release_id = NULL WHERE _rowid_ = ${row["__rowid"]}`)
+          await database.exec(`UPDATE ${table.name} SET ${setValues.join(",")}, release_tag = NULL, _encryption_release_id = NULL WHERE _rowid_ = ${row["__rowid"]}`)
+          decCount++
         })
       })
       await database.close()
     })
+
+    if (missingKeys.length > 0) {
+      logger.warn("Missing key for release id: " + missingKeys.join(", "))
+    }
+    if (decCount > 0) {
+      logger.info(`Decrypted ${decCount} release tag rows`)
+    }
   }
 
   private checkDatabases(): void {
@@ -208,20 +217,20 @@ export class Sqlite3 {
   }
 
   private initDatabases(): void {
-    this.eventCommonDB = new Sqlite3Wrapper("event_common.db_", sqliteDB.OPEN_READONLY)
-    this.exchangeDB = new Sqlite3Wrapper("exchange.db_", sqliteDB.OPEN_READONLY)
-    this.festivalDB = new Sqlite3Wrapper("festival.db_", sqliteDB.OPEN_READONLY)
-    this.itemDB = new Sqlite3Wrapper("item.db_", sqliteDB.OPEN_READONLY)
-    this.liveDB = new Sqlite3Wrapper("live.db_", sqliteDB.OPEN_READONLY)
-    this.marathonDB = new Sqlite3Wrapper("marathon.db_", sqliteDB.OPEN_READONLY)
-    this.otherDB = new Sqlite3Wrapper("other.db_", sqliteDB.OPEN_READONLY)
-    this.secretboxDB = new Sqlite3Wrapper("secretbox.db_", sqliteDB.OPEN_READONLY)
-    this.teamDutyDB = new Sqlite3Wrapper("team_duty.db_", sqliteDB.OPEN_READONLY)
-    this.unitDB = new Sqlite3Wrapper("unit.db_", sqliteDB.OPEN_READONLY)
+    this.eventCommonDB = new Sqlite3Wrapper("./data/db/event_common.db_", sqliteDB.OPEN_READONLY)
+    this.exchangeDB = new Sqlite3Wrapper("./data/db/exchange.db_", sqliteDB.OPEN_READONLY)
+    this.festivalDB = new Sqlite3Wrapper("./data/db/festival.db_", sqliteDB.OPEN_READONLY)
+    this.itemDB = new Sqlite3Wrapper("./data/db/item.db_", sqliteDB.OPEN_READONLY)
+    this.liveDB = new Sqlite3Wrapper("./data/db/live.db_", sqliteDB.OPEN_READONLY)
+    this.marathonDB = new Sqlite3Wrapper("./data/db/marathon.db_", sqliteDB.OPEN_READONLY)
+    this.otherDB = new Sqlite3Wrapper("./data/db/other.db_", sqliteDB.OPEN_READONLY)
+    this.secretboxDB = new Sqlite3Wrapper("./data/db/secretbox.db_", sqliteDB.OPEN_READONLY)
+    this.teamDutyDB = new Sqlite3Wrapper("./data/db/team_duty.db_", sqliteDB.OPEN_READONLY)
+    this.unitDB = new Sqlite3Wrapper("./data/db/unit.db_", sqliteDB.OPEN_READONLY)
 
-    this.bannerSVDB = new Sqlite3Wrapper("sv_banner.db_", sqliteDB.OPEN_READONLY)
-    this.customLiveSVDB = new Sqlite3Wrapper("sv_custom_live.db_", sqliteDB.OPEN_READONLY)
-    this.downloadSVDB = new Sqlite3Wrapper("sv_download.db_", sqliteDB.OPEN_READONLY)
-    this.liveNotesSVDB = new Sqlite3Wrapper("sv_live_notes.db_", sqliteDB.OPEN_READONLY)
+    this.bannerSVDB = new Sqlite3Wrapper("./data/db/sv_banner.db_", sqliteDB.OPEN_READONLY)
+    this.customLiveSVDB = new Sqlite3Wrapper("./data/db/sv_custom_live.db_", sqliteDB.OPEN_READONLY)
+    this.downloadSVDB = new Sqlite3Wrapper("./data/db/sv_download.db_", sqliteDB.OPEN_READONLY)
+    this.liveNotesSVDB = new Sqlite3Wrapper("./data/db/sv_live_notes.db_", sqliteDB.OPEN_READONLY)
   }
 }
