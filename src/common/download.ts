@@ -3,7 +3,7 @@ import { Logger } from "../core/logger"
 import { Utils } from "./utils"
 
 const logger = new Logger("Download")
-const downloadDB = sqlite3.getDownload()
+const downloadDB = sqlite3.getDownloadSVDB()
 
 type os = "Android" | "iOS"
 export interface urlObject {

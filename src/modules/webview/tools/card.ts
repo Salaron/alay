@@ -1,7 +1,7 @@
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import RequestData from "../../../core/requestData"
 
-const unitDB = sqlite3.getUnit()
+const unitDB = sqlite3.getUnitDB()
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BROWSER

@@ -14,7 +14,7 @@ const normalLiveUnlock = [
   1218, 1219, 1220, 1221,
   1222, 1223, 1224, 1225
 ]
-const marathonDB = sqlite3.getMarathon()
+const marathonDB = sqlite3.getMarathonDB()
 enum liveType {
   NORMAL,
   SPECIAL,

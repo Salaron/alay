@@ -2,7 +2,7 @@ import { BaseAction } from "../models/actions"
 import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
 
-const eventDB = sqlite3.getEvent()
+const eventDB = sqlite3.getEventCommonDB()
 
 export enum eventType {
   TOKEN = 1,

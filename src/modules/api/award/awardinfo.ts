@@ -3,7 +3,7 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Utils } from "../../../common/utils"
 
 const defaultUnlock = [1, 23]
-const itemDB = sqlite3.getItem()
+const itemDB = sqlite3.getItemDB()
 const awardList = [1, 23]
 
 export async function init(): Promise<void> {

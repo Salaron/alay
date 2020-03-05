@@ -35,8 +35,8 @@ export default async function requestHandler(request: IncomingMessage, response:
 
         const notesAsset = request.url!.split("/")[2]
         if (!notesAsset) throw new RequestError("Invalid note setting asset", 400)
-        const liveDB = sqlite3.getLive()
-        const liveNotesDB = sqlite3.getNotes()
+        const liveDB = sqlite3.getLiveDB()
+        const liveNotesDB = sqlite3.getLiveNotesSVDB()
 
         const live = await liveDB.get("SELECT live_setting_id FROM live_setting_m WHERE notes_setting_asset = :notesAsset", {
           notesAsset

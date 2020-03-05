@@ -3,7 +3,7 @@ import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
-const liveDB = sqlite3.getLive()
+const liveDB = sqlite3.getLiveDB()
 
 const lives: { [count: number]: { name: string, query: string } } = {
   5: {

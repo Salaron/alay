@@ -9,8 +9,8 @@ import { Connection } from "../core/database/mysql"
 import { ErrorAPI } from "../models/error"
 
 const log = new Logger("Secretbox")
-const unitDB = sqlite3.getUnit()
-const secretboxDB = sqlite3.getSecretbox()
+const unitDB = sqlite3.getUnitDB()
+const secretboxDB = sqlite3.getSecretboxDB()
 
 let secretboxSettings: ISecretboxSettings = {}
 async function updateSettings() {
@@ -284,7 +284,7 @@ export class Secretbox extends CommonModule {
         name: "card",
         id
       }, `Gained from Scouting Box "${secretboxTab.secret_box_info.name}"`, 1, true)
-      unitData.is_hit = false
+      unitData.is_hit = true
       unitData.is_signed = false
       return unitData
     }))

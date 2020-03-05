@@ -3,8 +3,8 @@ import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
 import { ErrorAPI } from "../models/error"
 
-const unitDB = sqlite3.getUnit()
-const exchangeDB = sqlite3.getExchange()
+const unitDB = sqlite3.getUnitDB()
+const exchangeDB = sqlite3.getExchangeDB()
 const addUnitDefault = {
   level: 1,
   rank: 1,

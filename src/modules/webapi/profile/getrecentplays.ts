@@ -4,7 +4,7 @@ import { WebView } from "../../../common/webview"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
 
-const liveDB = sqlite3.getLive()
+const liveDB = sqlite3.getLiveDB()
 const convertRank = <any>{
   1: "S",
   2: "A",

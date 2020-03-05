@@ -5,8 +5,8 @@ import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, Mods, PERMISSION, REQUEST_TYPE, FESTIVAL_BONUS } from "../../../models/constant"
 import { ErrorAPI, ErrorUserId } from "../../../models/error"
 
-const liveDB = sqlite3.getLive()
-const festDB = sqlite3.getFestival()
+const liveDB = sqlite3.getLiveDB()
+const festDB = sqlite3.getFestivalDB()
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE

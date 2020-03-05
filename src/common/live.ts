@@ -7,11 +7,11 @@ import { Randomizer } from "./live/randomizer"
 
 const log = new Logger("Live")
 
-const customLiveDB = sqlite3.getCustomLive()
-const liveDB = sqlite3.getLive()
-const liveNotesDB = sqlite3.getNotes()
-const marathonDB = sqlite3.getMarathon()
-const unitDB = sqlite3.getUnit()
+const customLiveDB = sqlite3.getCustomLiveSVDB()
+const liveDB = sqlite3.getLiveDB()
+const liveNotesDB = sqlite3.getLiveNotesSVDB()
+const marathonDB = sqlite3.getMarathonDB()
+const unitDB = sqlite3.getUnitDB()
 
 const expTable = [0, 12, 26, 46, 65, 71, 84]
 

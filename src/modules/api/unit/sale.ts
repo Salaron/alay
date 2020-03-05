@@ -3,7 +3,7 @@ import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
 
-const unitDB = sqlite3.getUnit()
+const unitDB = sqlite3.getUnitDB()
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE

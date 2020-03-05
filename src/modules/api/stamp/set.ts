@@ -2,7 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
 
-const otherDB = sqlite3.getOther()
+const otherDB = sqlite3.getOtherDB()
 let ids: number[] = []
 
 export async function init(): Promise<void> {

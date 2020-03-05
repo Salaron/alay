@@ -4,7 +4,7 @@ import { TYPE } from "../../../common/type"
 import { ErrorUserId } from "../../../models/error"
 
 const defaultUnlock = [1, 23]
-const itemDB = sqlite3.getItem()
+const itemDB = sqlite3.getItemDB()
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE

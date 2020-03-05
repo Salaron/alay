@@ -4,7 +4,7 @@ import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
 
-const unitDB = sqlite3.getUnit()
+const unitDB = sqlite3.getUnitDB()
 
 const rankUpCost = <any>{ // cost[RARITY][POINT_ID]
   2: [null, null,   1, null, null, null], // R sticker. Only R cards

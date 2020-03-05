@@ -3,7 +3,7 @@ import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 import moment = require("moment")
 
-const marathonDB = sqlite3.getMarathon()
+const marathonDB = sqlite3.getMarathonDB()
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.MULTI

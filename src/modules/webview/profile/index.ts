@@ -3,8 +3,8 @@ import { WebView } from "../../../common/webview"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 
-const unitDB = sqlite3.getUnit()
-const liveDB = sqlite3.getLive()
+const unitDB = sqlite3.getUnitDB()
+const liveDB = sqlite3.getLiveDB()
 const convertRank = <any>{
   1: "S",
   2: "A",

@@ -3,7 +3,7 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import moment from "moment"
 import { Utils } from "../../../common/utils"
 
-const bannerDB = sqlite3.getBanner()
+const bannerDB = sqlite3.getBannerSVDB()
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.BOTH

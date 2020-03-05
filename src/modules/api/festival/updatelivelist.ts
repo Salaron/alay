@@ -3,8 +3,8 @@ import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, FESTIVAL_SETLIST, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
 
-const liveDB = sqlite3.getLive()
-const festDB = sqlite3.getFestival()
+const liveDB = sqlite3.getLiveDB()
+const festDB = sqlite3.getFestivalDB()
 
 export const enum costType {
   GAME_COIN = 3,

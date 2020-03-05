@@ -5,7 +5,7 @@ import RequestData from "../../../core/requestData"
 import executeAction from "../../../handlers/action"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE, RESPONSE_TYPE } from "../../../models/constant"
 
-const liveDB = sqlite3.getLive()
+const liveDB = sqlite3.getLiveDB()
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
