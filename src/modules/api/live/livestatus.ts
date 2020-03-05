@@ -56,10 +56,10 @@ export default class extends ApiAction {
     return {
       status: 200,
       result: {
-        normal_live_status_list: await this.getLiveStatusList(this.live.normalLiveList, liveType.NORMAL),
-        special_live_status_list: await this.getLiveStatusList(this.live.specialLiveList, liveType.SPECIAL),
+        normal_live_status_list: await this.getLiveStatusList(this.live.getNormalLiveSettingIds(), liveType.NORMAL),
+        special_live_status_list: await this.getLiveStatusList(this.live.getSpecialLiveSettingIds(), liveType.SPECIAL),
         marathon_live_status_list: await this.getLiveStatusList([], liveType.MARATHON),
-        training_live_status_list: [], // possible will be not implemented on this server
+        training_live_status_list: [], // will be not implemented
         free_live_status_list: [], // quest event lives?
         can_resume_live: true
       }

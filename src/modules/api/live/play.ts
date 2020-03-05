@@ -76,7 +76,7 @@ export default class extends ApiAction {
       })
     ])
 
-    if (liveNotes.hp !== 0) deckInfo.total_hp = liveNotes.hp
+    if (liveNotes.mods.hp !== 0) deckInfo.total_hp = liveNotes.mods.hp
     const result = {
       rank_info: liveInfo.score_rank_info,
       energy_full_time: Utils.toSpecificTimezone(9),
@@ -86,10 +86,10 @@ export default class extends ApiAction {
         {
           live_info: {
             live_difficulty_id: liveInfo.live_difficulty_id,
-            is_random: !!liveInfo.random_flag || liveNotes.random,
+            is_random: !!liveInfo.random_flag || liveNotes.mods.random,
             ac_flag: liveInfo.ac_flag,
             swing_flag: liveInfo.swing_flag,
-            notes_list: liveNotes.notes
+            notes_list: liveNotes.liveNotes
           },
           deck_info: deckInfo
         }

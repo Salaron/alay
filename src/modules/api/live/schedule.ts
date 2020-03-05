@@ -38,7 +38,7 @@ export default class extends ApiAction {
     }
 
     if (Config.modules.live.unlockAll) {
-      const specialLiveList = this.live.specialLiveList
+      const specialLiveList = this.live.getSpecialLiveSettingIds()
       for (const live of specialLiveList) {
         response.live_list.push({
           live_difficulty_id: live,

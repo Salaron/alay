@@ -15,37 +15,37 @@ const unitDB = sqlite3.getUnitDB()
 
 const expTable = [0, 12, 26, 46, 65, 71, 84]
 
-const availableLiveList: number[] = [] // Live setting ids that exists in live_note.db_
-const normalLiveList: number[] = [] // Available normal live setting ids
-const specialLiveList: number[] = [] // Available special live setting ids
+const availableLiveSettingIds: number[] = [] // Live setting ids that exists in sv_live_notes.db_
+const normaLiveSettingIds: number[] = [] // Available normal live setting ids
+const specialLiveSettingIds: number[] = [] // Available special live setting ids
 const marathonLiveList: { [eventId: number]: number[] } = {}
 export async function init() {
-  const availableLiveSettingIds = await liveNotesDB.all("SELECT DISTINCT live_setting_id FROM live_note")
+  const allLiveSettings = await liveDB.all("SELECT live_setting_id, notes_setting_asset FROM live_setting_m")
+  const availableNotesAssets = (await liveNotesDB.all("SELECT notes_setting_asset FROM live_notes")).map(obj => obj.notes_setting_asset)
 
-  for (const liveSetting of availableLiveSettingIds) {
-    availableLiveList.push(liveSetting.live_setting_id)
+  for (const liveSetting of allLiveSettings) {
+    if (availableNotesAssets.includes(liveSetting.notes_setting_asset))
+      availableLiveSettingIds.push(liveSetting.live_setting_id)
   }
-  log.info(`Found note data for ${availableLiveList.length} lives`)
+  log.info(`Found note data for ${availableLiveSettingIds.length} lives`)
 
   const normal = await liveDB.all("SELECT live_difficulty_id, live_setting_id FROM normal_live_m")
   for (const liveSetting of normal) {
-    if (availableLiveList.includes(liveSetting.live_setting_id)) {
-      normalLiveList.push(liveSetting.live_difficulty_id)
-    } else {
+    if (availableLiveSettingIds.includes(liveSetting.live_setting_id))
+      normaLiveSettingIds.push(liveSetting.live_difficulty_id)
+    else
       log.verbose(`Missing Note Data for Normal Live #${liveSetting.live_difficulty_id} (Setting #${liveSetting.live_setting_id})`)
-    }
   }
-  log.info(`Found data for ${normalLiveList.length} normal lives`)
+  log.info(`Found data for ${normaLiveSettingIds.length} normal lives`)
 
   const special = await liveDB.all("SELECT live_difficulty_id, live_setting_id FROM special_live_m")
   for (const liveSetting of special) {
-    if (availableLiveList.includes(liveSetting.live_setting_id)) {
-      specialLiveList.push(liveSetting.live_difficulty_id)
-    } else {
+    if (availableLiveSettingIds.includes(liveSetting.live_setting_id))
+      specialLiveSettingIds.push(liveSetting.live_difficulty_id)
+    else
       log.verbose(`Missing Note Data for Special Live #${liveSetting.live_difficulty_id} (Setting #${liveSetting.live_setting_id})`)
-    }
   }
-  log.info(`Found data for ${specialLiveList.length} special lives`)
+  log.info(`Found data for ${specialLiveSettingIds.length} special lives`)
 
   const marathon = await marathonDB.all(`
   SELECT
@@ -55,7 +55,7 @@ export async function init() {
   JOIN event_marathon_live_schedule_m as schedule
     ON schedule.live_difficulty_id = live.live_difficulty_id`)
   for (const live of marathon) {
-    if (availableLiveList.includes(live.live_setting_id)) {
+    if (availableLiveSettingIds.includes(live.live_setting_id)) {
       if (!marathonLiveList[live.event_id]) marathonLiveList[live.event_id] = []
       marathonLiveList[live.event_id].push(live.live_difficulty_id)
     } else {
@@ -65,19 +65,15 @@ export async function init() {
 }
 
 export class Live extends CommonModule {
-
-  public static getAvailableLiveList() {
-    return availableLiveList
+  public getAvailableLiveSettingIds() {
+    return availableLiveSettingIds
   }
-  public static getNormalLiveList() {
-    return normalLiveList
+  public getNormalLiveSettingIds() {
+    return normaLiveSettingIds
   }
-  public static getSpecialLiveList() {
-    return specialLiveList
+  public getSpecialLiveSettingIds() {
+    return specialLiveSettingIds
   }
-  public availableLiveList = availableLiveList
-  public specialLiveList = specialLiveList
-  public normalLiveList = normalLiveList
   constructor(action: BaseAction) {
     super(action)
   }
@@ -99,43 +95,45 @@ export class Live extends CommonModule {
       if (params.hp === 2) hp = 1
     }
 
-    let notes
-    if (liveData.custom_live_id) {
-      notes = await customLiveDB.all(`
-      SELECT
-        timing_sec, notes_attribute, notes_level, effect, position,
-        effect_value, ${vanish === true ? params.vanish : 0} as vanish
-      FROM custom_live_notes
-      WHERE custom_live_id = :id`, {
+    let liveNotes = null
+    if (typeof liveData.custom_live_id === "number") {
+      // custom live
+      liveNotes = await customLiveDB.get("SELECT json FROM custom_live_notes WHERE custom_live_id = :id", {
         id: liveData.custom_live_id
       })
-    } else {
-      notes = await liveNotesDB.all(`
-      SELECT
-        timing_sec, notes_attribute, notes_level, effect, position,
-        effect_value, ${vanish === true ? params.vanish : 0} as vanish
-      FROM live_note
-      WHERE live_setting_id = :id`, {
-        id: liveData.live_setting_id
+    }
+    if (typeof liveData.notes_setting_asset === "string") {
+      // usual live
+      liveNotes = await liveNotesDB.get("SELECT json FROM live_notes WHERE notes_setting_asset = :asset", {
+        asset: liveData.notes_setting_asset
       })
     }
-    if (notes.length === 0) throw new Error(`Live notes data for LSID #${liveData.live_setting_id} is missing in database`)
+    if (!liveNotes)
+      throw new Error(`Live notes data for LSID #${liveData.live_setting_id} is missing in database`)
 
-    if (random === true) {
-      notes = new Randomizer(notes).randomize()
-    }
-    if (mirror === true) {
-      notes.forEach(note => {
+    liveNotes = <any[]>JSON.parse(liveNotes.json)
+
+    for (const note of liveNotes) {
+      if (!mirror && !vanish) break
+      if (mirror) {
         note.position = 10 - note.position
-      })
+      }
+      if (vanish) {
+        note.vanish = vanish
+      }
+    }
+    if (random === true) {
+      liveNotes = new Randomizer(liveNotes).randomize()
     }
 
     return {
-      vanish,
-      random,
-      mirror,
-      hp,
-      notes
+      mods: {
+        vanish,
+        random,
+        mirror,
+        hp
+      },
+      liveNotes
     }
   }
 
@@ -167,7 +165,7 @@ export class Live extends CommonModule {
       c_rank_combo, b_rank_combo, a_rank_combo, s_rank_combo,
       c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete,
       difficulty, ac_flag, swing_flag, setting.live_setting_id, difficulty.live_difficulty_id,
-      capital_type, capital_value
+      capital_type, capital_value, notes_setting_asset
     FROM live_setting_m as setting INNER JOIN (
       SELECT
         live_setting_id, live_difficulty_id, capital_type, capital_value,
@@ -181,7 +179,7 @@ export class Live extends CommonModule {
     ) as difficulty ON setting.live_setting_id = difficulty.live_setting_id
     WHERE live_difficulty_id = :ldid`, { ldid: liveDifficultyId })
     if (!data) {
-      // Token live?
+      // Token (marathon) live?
       data = {
         marathon_live: true
       }
@@ -223,7 +221,7 @@ export class Live extends CommonModule {
     JOIN units
       ON units.unit_owning_user_id = user_unit_deck_slot.unit_owning_user_id
     WHERE user_unit_deck_slot.user_id = :user AND deck_id = :deck`, { user: userId, deck: deckId })
-    if (deck.length != 9) throw new ErrorAPI(`Deck is invalid`)
+    if (deck.length !== 9) throw new ErrorAPI(`Invalid deck`)
     deck = deck.map((unit) => {
       return {
         unit_owning_user_id: unit.unit_owning_user_id,
@@ -289,8 +287,7 @@ export class Live extends CommonModule {
     // 4. Caclulate Center and Extra bonus of guest if exists
     // 5. Apply Center and Extra bonus
 
-    // Some temporary fields
-    // will be removed if cleanup flag is true
+    // "bonus" fields will be removed if cleanup flag is true
     for (const unit of deck) {
       if (unit.attribute === 1) unit.stat_smile += unit.love
       if (unit.attribute === 2) unit.stat_pure += unit.love
@@ -305,12 +302,13 @@ export class Live extends CommonModule {
 
     // First step: calculate and apply SIS bonus
     await this.applySISbonus(userId, deck)
+    // Second step: calculate and apply center bonus
     await this.calculateCenterUnitBonus(deck)
     // If there a guest (unit_id), calculate Center and Extra bonus from it
     if (guestUnitId) await this.calculateCenterUnitBonus(deck, guestUnitId)
 
     // Apply Center and Extra bonus.
-    // Also do clean-up by setting 'undefined' value
+  // Also do cleanup by setting 'undefined' to it
     for (const unit of deck) {
       unit.stat_smile += unit.center_bonus_smile
       unit.stat_pure += unit.center_bonus_pure

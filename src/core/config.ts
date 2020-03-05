@@ -82,6 +82,7 @@ export class config {
     this.gris = <typeof Gris><unknown>(await import("../config/gris")).default
 
     await this.prepareConfig()
+    await sqlite3.decryptReleaseInfo()
     updateLevelForAllLoggers(Config.server.log_level)
   }
 }

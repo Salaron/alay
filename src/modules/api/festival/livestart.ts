@@ -96,12 +96,11 @@ export default class extends ApiAction {
         live_info: {
           live_difficulty_id: liveInfo.live_difficulty_id,
           live_setting_id: liveInfo.live_setting_id,
-          is_random: liveInfo.difficulty === 5 || liveNotes.random,
+          is_random: liveInfo.difficulty === 5 || liveNotes.mods.random,
           ac_flag: liveInfo.ac_flag || 0,
           swing_flag: liveInfo.swing_flag || 0,
-          notes_list: liveNotes.notes
+          notes_list: liveNotes.liveNotes
         },
-        asset_background_id: 10,
         deck_info: {
           ...units,
           prepared_hp_damage: 0

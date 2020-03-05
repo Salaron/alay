@@ -57,7 +57,7 @@ export default class extends ApiAction {
       })
     ])
 
-    if (liveNotes.hp !== 0) deckInfo.total_hp = liveNotes.hp
+    if (liveNotes.mods.hp !== 0) deckInfo.total_hp = liveNotes.mods.hp
     const result = {
       rank_info: liveData.score_rank_info,
       energy_full_time: Utils.toSpecificTimezone(9),
@@ -67,16 +67,15 @@ export default class extends ApiAction {
         {
           live_info: {
             live_difficulty_id: liveData.live_difficulty_id,
-            is_random: !!liveData.random_flag || liveNotes.random,
+            is_random: !!liveData.random_flag || liveNotes.mods.random,
             ac_flag: liveData.ac_flag,
             swing_flag: liveData.swing_flag,
-            notes_list: liveNotes.notes
+            notes_list: liveNotes.liveNotes
           },
           deck_info: deckInfo
         }
       ],
       is_marathon_event: false,
-      marathon_event_id: undefined,
       no_skill: false,
       can_activate_effect: true,
       custom_live: true

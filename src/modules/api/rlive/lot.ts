@@ -29,7 +29,7 @@ export default class extends ApiAction {
       this.params.member_category === this.params.mgd &&
       [1, 2, 3, 4].includes(this.params.difficulty) &&
       [1, 2, 3].includes(this.params.attribute) &&
-      (moment().utcOffset("+0900").day() % 3 + 1) === this.params.attribute
+      (moment().utcOffset("+0900").day() % 3 + 1) === this.params.attribute // same rotation as on official server
     )
   }
 
@@ -58,11 +58,15 @@ export default class extends ApiAction {
         FROM normal_live_m
       ) as difficulty ON setting.live_setting_id = difficulty.live_setting_id
       INNER JOIN live_track_m ON live_track_m.live_track_id = setting.live_track_id
-      WHERE difficulty = :diff AND attribute_icon_id = :attr AND member_category = :category AND setting.live_setting_id IN (${this.live.availableLiveList.join(",")})`, {
+      WHERE
+        difficulty = :diff AND attribute_icon_id = :attr AND
+        member_category = :category AND setting.live_setting_id IN (${this.live.getAvailableLiveSettingIds().join(",")})`, {
         diff: this.params.difficulty,
         attr: this.params.attribute,
         category: this.params.member_category
       })
+
+      // set random live difficulty id
       this.requestData.params.live_difficulty_id = ids.randomValue().live_difficulty_id.toString()
       await this.connection.execute("INSERT INTO user_live_random (user_id, attribute, difficulty, token, live_difficulty_id, member_category) VALUES (:user, :atb, :difficulty, :token, :ldid, :category)", {
         user: this.user_id,

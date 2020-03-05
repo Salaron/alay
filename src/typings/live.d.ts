@@ -28,6 +28,7 @@ interface liveData {
   b_rank_complete: number
   a_rank_complete: number
   s_rank_complete: number
+  notes_setting_asset?: string
   difficulty: number
   ac_flag: number
   swing_flag: number
