@@ -11,27 +11,26 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const userAlbum = await this.connection.query("SELECT * FROM user_unit_album WHERE user_id=:user", {
+    const userAlbum = await this.connection.query("SELECT * FROM user_unit_album WHERE user_id = :user", {
       user: this.user_id
     })
-    const albumData = <any>[]
 
-    for (const data of userAlbum) {
-      albumData.push({
-        unit_id: data.unit_id,
-        rank_max_flag: data.rank_max_flag === 1,
-        love_max_flag: data.love_max_flag === 1,
-        rank_level_max_flag: data.rank_level_max_flag === 1,
-        all_max_flag: data.all_max_flag === 1,
-        highest_love_per_unit: data.highest_love_per_unit,
-        total_love: data.total_love,
-        favorite_point: data.favorite_point
-      })
-    }
+    const result = userAlbum.map(cardData => {
+      return {
+        unit_id: cardData.unit_id,
+        rank_max_flag: cardData.rank_max_flag === 1,
+        love_max_flag: cardData.love_max_flag === 1,
+        rank_level_max_flag: cardData.rank_level_max_flag === 1,
+        all_max_flag: cardData.all_max_flag === 1,
+        highest_love_per_unit: cardData.highest_love_per_unit,
+        total_love: cardData.total_love,
+        favorite_point: cardData.favorite_point
+      }
+    })
 
     return {
       status: 200,
-      result: albumData
+      result
     }
   }
 }

@@ -17,12 +17,12 @@
     "@types/formidable": "^1.0.31",
     "@types/mime": "^2.0.1",
     "@types/mysql2": "types/npm-mysql2",
-    "@types/node": "^13.7.7",
+    "@types/node": "^13.9.1",
     "@types/nodemailer": "^6.4.0",
     "@types/showdown": "^1.9.3",
     "@types/sqlite3": "^3.1.6",
     "@types/superagent": "^4.1.7",
-    "tslint": "^6.0.0",
+    "tslint": "^6.1.0",
     "typescript": "^3.8.3"
   },
   "dependencies": {
