@@ -21,6 +21,7 @@ export class Gris extends GrisClient {
   }
 
   public async prepare() {
+    await gris.updateVersionInfo()
     await gris.startApp()
     logger.info(`Successfully connected to official server`)
     logger.info(`User ID: ${gris.session.userId}`)
