@@ -4,7 +4,7 @@ import { Logger } from "../logger"
 
 const log = new Logger("MySQL/MariaDB")
 export const pool = mysql.createPool({
-  ...Object.omit(Config.database, ["reconnectMaxAttempt", "reconnectDelay"]),
+  ...Object.omit(Config.database.mysql, ["reconnectMaxAttempt", "reconnectDelay"]),
   dateStrings: true,
   namedPlaceholders: true,
   waitForConnections: true
@@ -117,13 +117,13 @@ export async function Connect() {
     reconnectAttempts += 1
     if (e.code === "ECONNREFUSED")
       log.error(
-        `Unable to connect to MySQL/MariaDB Server [ECONNREFUSED] ${reconnectAttempts}/${Config.database.reconnectMaxAttempt}`
+        `Unable to connect to MySQL/MariaDB Server [ECONNREFUSED] ${reconnectAttempts}/${Config.database.mysql.reconnectMaxAttempt}`
       )
-    if (reconnectAttempts >= Config.database.reconnectMaxAttempt) {
+    if (reconnectAttempts >= Config.database.mysql.reconnectMaxAttempt) {
       log.fatal(`Max reconnect attempts reached`)
       process.exit(0)
     }
-    await promisify(setTimeout)(Config.database.reconnectDelay)
+    await promisify(setTimeout)(Config.database.mysql.reconnectDelay)
     await Connect()
   } finally {
     if (connection) connection.release()
