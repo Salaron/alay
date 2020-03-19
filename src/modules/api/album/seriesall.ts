@@ -52,7 +52,17 @@ export default class extends ApiAction {
     const owningInfo: IOwningAlbumSeiresUnitIdMap = Utils.createObjCopy(owningAlbumSeriesTemplate)
     userAlbum.map(cardData => {
       const albumSeriesId = albumSeriesUnitIdMap[cardData.unit_id]
-      owningInfo[albumSeriesId].push(cardData)
+      owningInfo[albumSeriesId].push({
+        unit_id: cardData.unit_id,
+        rank_max_flag: cardData.rank_max_flag === 1,
+        love_max_flag: cardData.love_max_flag === 1,
+        rank_level_max_flag: cardData.rank_level_max_flag === 1,
+        all_max_flag: cardData.all_max_flag === 1,
+        highest_love_per_unit: cardData.highest_love_per_unit,
+        total_love: cardData.total_love,
+        favorite_point: cardData.favorite_point,
+        sign_flag: false
+      })
     })
 
     const result: ISeries[] = Object.keys(owningInfo).map(albumSeriesIdString => {

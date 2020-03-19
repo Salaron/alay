@@ -24,7 +24,8 @@ export default class extends ApiAction {
         all_max_flag: cardData.all_max_flag === 1,
         highest_love_per_unit: cardData.highest_love_per_unit,
         total_love: cardData.total_love,
-        favorite_point: cardData.favorite_point
+        favorite_point: cardData.favorite_point,
+        sign_flag: false
       }
     })
 
