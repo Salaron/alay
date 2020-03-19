@@ -3,7 +3,8 @@ import "./core/config"
 import "./models/error"
 import { Logger } from "./core/logger"
 import { Sqlite3 } from "./core/database/sqlite3"
-import { Connect } from "./core/database/mysql"
+import { Connect as ConnectToMySQL } from "./core/database/mysql"
+import { Connect as ConnectToRedis } from "./core/database/redis"
 
 const logger = new Logger("Setup")
 try {
@@ -30,7 +31,9 @@ import { Gris } from "./core/gris"
   // Init readline interface
   ReadLine()
   // Connect to MySQL/MariaDB database
-  await Connect()
+  await ConnectToMySQL()
+  // And connect to the Redis database
+  await ConnectToRedis()
   // Prepare common modules
   // execute init function if exists
   for (const module in modules) {
@@ -43,7 +46,7 @@ import { Gris } from "./core/gris"
     logger.info(`Listening on ${address.address}:${address.port}`)
 
     if (Config.gris.enabled) {
-      // Connect to official server
+      // Connect to the official server
       try {
         const gris = new Gris()
         await gris.prepare()
@@ -52,7 +55,7 @@ import { Gris } from "./core/gris"
         logger.error(err.message, "Gris")
       }
     } else {
-      logger.warn("Gris is disabled. 'download/*' actions may not work properly")
+      logger.warn("Gris module is disabled. 'download/*' actions may not work properly")
     }
   })
   server.on("error", async (err) => {
