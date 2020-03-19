@@ -79,7 +79,8 @@ export default class extends ApiAction {
       }
     }
 
-    const festivalLiveSettingIds = await festDB.all(`SELECT live_setting_id FROM event_festival_live_m WHERE live_setting_id IN (${this.live.availableLiveList.join(",")})`)
+    const availableLiveSettingIds = this.live.getAvailableLiveSettingIds().join(",")
+    const festivalLiveSettingIds = await festDB.all(`SELECT live_setting_id FROM event_festival_live_m WHERE live_setting_id IN (${availableLiveSettingIds})`)
     let trackIds = await liveDB.all(`
     SELECT
       live_track_m.live_track_id
