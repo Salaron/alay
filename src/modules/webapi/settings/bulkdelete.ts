@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { ErrorWebApi } from "../../../models/error"
+import { ErrorWebAPI } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
@@ -18,20 +18,20 @@ export default class extends WebApiAction {
     }
   }
   public paramCheck() {
-    if (this.params.rarity < 1 || this.params.rarity > 5) throw new ErrorWebApi("nope")
+    if (this.params.rarity < 1 || this.params.rarity > 5) throw new ErrorWebAPI("nope")
   }
 
   public async execute() {
     const strings = await this.i18n.getStrings(this.requestData, "login-startup", "settings-index")
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
-    if (!Utils.checkPass(password)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
+    if (!Utils.checkPass(password)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
 
     const userData = await this.connection.first("SELECT user_id FROM users WHERE user_id = :user AND password = :pass", {
       user: this.user_id,
       pass: password
     })
-    if (!userData) throw new ErrorWebApi(strings.passwordNotValid, true)
+    if (!userData) throw new ErrorWebAPI(strings.passwordNotValid)
 
     let deckData = (await this.connection.query(`
     SELECT

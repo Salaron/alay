@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
-import { IApiResult } from "../models/handlers"
+import { IAPIResult } from "../models/handlers"
 import executeAction from "./action"
 import { writeJsonResponse } from "./response"
 
@@ -34,7 +34,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
     const module = urlSplit[2].replace(/[^a-z]/g, "")
     const action = urlSplit[3].replace(/[^a-z]/g, "")
 
-    const result: IApiResult = await executeAction(module, action, requestData)
+    const result: IAPIResult = await executeAction(module, action, requestData)
 
     response.setHeader("Content-Type", "text/html; charset=utf-8")
     if (result.headers && Object.keys(result.headers).length > 0) {
@@ -44,7 +44,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
     }
 
     await requestData.connection.commit()
-    response.end(result.result)
+    response.end(Type.isString(result.result) ? result.result : JSON.stringify(result.result))
   } catch (err) {
     await requestData.connection.rollback()
     throw err

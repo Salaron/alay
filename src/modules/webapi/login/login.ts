@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { ErrorAPI, ErrorWebApi } from "../../../models/error"
+import { ErrorAPI, ErrorWebAPI } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -37,19 +37,19 @@ export default class extends WebApiAction {
     } else if (Utils.checkMail(login)) {
       // select by mail
       transferUserDataQuery = "SELECT * FROM users WHERE mail = :login AND password = :password"
-    } else throw new ErrorWebApi(i18n.invalidUserIdOrMail, true)
-    if (!Utils.checkPass(password)) throw new ErrorWebApi(i18n.passwordInvalidFormat, true)
+    } else throw new ErrorWebAPI(i18n.invalidUserIdOrMail)
+    if (!Utils.checkPass(password)) throw new ErrorWebAPI(i18n.passwordInvalidFormat)
 
     const transferUserData = await this.connection.first(transferUserDataQuery, {
       login,
       password
     })
-    if (!transferUserData) throw new ErrorWebApi(i18n.invalidLoginOrPass, true)
+    if (!transferUserData) throw new ErrorWebAPI(i18n.invalidLoginOrPass)
 
     const cred = await this.connection.first("SELECT * FROM auth_tokens WHERE token = :token", {
       token: this.requestData.auth_token
     })
-    if (!cred) throw new ErrorWebApi("Token expired; Try again", true)
+    if (!cred) throw new ErrorWebAPI("Close this tab and try again")
     if (
       (cred.login_key.length !== 36) ||
       (cred.login_passwd.length !== 128) ||
@@ -60,7 +60,7 @@ export default class extends WebApiAction {
       key: cred.login_key,
       pass: cred.login_passwd
     })
-    if (check) throw new ErrorWebApi("This credentials already used")
+    if (check) throw new ErrorWebAPI("This credentials already used")
 
     await this.connection.query(`INSERT INTO user_login (user_id, login_key, login_passwd) VALUES (:userId, :key, :pass) ON DUPLICATE KEY UPDATE login_key = :key, login_passwd = :pass`, {
       key: cred.login_key,

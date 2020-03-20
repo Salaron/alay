@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { ErrorWebApi, ErrorAPI } from "../../../models/error"
+import { ErrorWebAPI, ErrorAPI } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -35,14 +35,14 @@ export default class extends WebApiAction {
     } else if (Utils.checkMail(login)) {
       // select by mail
       dataQuery = "SELECT * FROM users WHERE mail = :login AND password = :password"
-    } else throw new ErrorWebApi(i18n.invalidUserIdOrMail, true)
-    if (!Utils.checkPass(password)) throw new ErrorWebApi(i18n.passwordInvalidFormat, true)
+    } else throw new ErrorWebAPI(i18n.invalidUserIdOrMail)
+    if (!Utils.checkPass(password)) throw new ErrorWebAPI(i18n.passwordInvalidFormat)
 
     const data = await this.connection.first(dataQuery, {
       login,
       password
     })
-    if (!data) throw new ErrorWebApi(i18n.invalidLoginOrPass, true)
+    if (!data) throw new ErrorWebAPI(i18n.invalidLoginOrPass)
     const userId = this.user_id = data.user_id
 
     const currentToken = await this.connection.first("SELECT login_token FROM user_login WHERE user_id = :userId", {
@@ -66,7 +66,7 @@ export default class extends WebApiAction {
     if (this.requestData.auth_level !== AUTH_LEVEL.ADMIN) {
       this.requestData.user_id = 0
       this.requestData.auth_token = ""
-      throw new ErrorWebApi("You're not an admin .-.", true)
+      throw new ErrorWebAPI("You're not an admin .-.")
     }
     await this.connection.query(`DELETE FROM auth_tokens WHERE token = :token`, { token: this.requestData.auth_token })
     return {

@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { ErrorAPI, ErrorWebApi } from "../../../models/error"
+import { ErrorAPI, ErrorWebAPI } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -21,12 +21,14 @@ export default class extends WebApiAction {
   }
   public checkTypes() {
     if (this.params.name.length === 0 || this.params.name.length > 20) throw new ErrorAPI("Invalid name provided")
-    if (!checkMail(this.params.mail)) throw new ErrorAPI("Invalid mail provided")
+    if (!Utils.checkMail(this.params.mail)) throw new ErrorAPI("Invalid mail provided")
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorAPI("Access only with a certain auth level")
-    if (!Config.modules.login.enable_registration) throw new ErrorWebApi("Registration is disabled!", true)
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
+      throw new ErrorAPI(403)
+    if (!Config.modules.login.enable_registration)
+      throw new ErrorWebAPI("Registration disabled, sorry")
 
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error("Missing recaptcha")
@@ -37,18 +39,18 @@ export default class extends WebApiAction {
     const strings = await this.i18n.getStrings(this.requestData, "login-login", "login-startup", "mailer")
 
     const pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
-    if (!checkPass(pass)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
+    if (!Utils.checkPass(pass)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
 
     // tslint:disable-next-line
     const _mailCheck = await this.connection.first(`SELECT * FROM users WHERE mail = :mail`, {
       mail: this.params.mail
     })
-    if (_mailCheck) throw new ErrorWebApi(strings.emailExists, true)
+    if (_mailCheck) throw new ErrorWebAPI(strings.emailExists)
 
     const userData = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
       token: this.requestData.auth_token
     })
-    if (!userData) throw new ErrorWebApi("Token is expired")
+    if (!userData) throw new ErrorWebAPI("Token is expired")
     if (
       (userData.login_key.length != 36) ||
       (userData.login_passwd.length != 128) ||
@@ -86,11 +88,4 @@ export default class extends WebApiAction {
       }
     }
   }
-}
-function checkPass(input: string) {
-  return input.match(/^[A-Za-z0-9]\w{1,32}$/)
-}
-function checkMail(input: string) {
-  const regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,6})+$/
-  return regex.test(input)
 }

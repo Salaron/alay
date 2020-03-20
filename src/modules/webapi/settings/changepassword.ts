@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { ErrorWebApi } from "../../../models/error"
+import { ErrorWebAPI } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.CONFIRMED_USER
@@ -23,13 +23,13 @@ export default class extends WebApiAction {
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     const newPassword = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.newPassword), "base64").toString(), this.requestData.auth_token).toString()
-    if (!Utils.checkPass(password) || !Utils.checkPass(newPassword)) throw new ErrorWebApi(strings.passwordInvalidFormat, true)
+    if (!Utils.checkPass(password) || !Utils.checkPass(newPassword)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
 
     const passwordCheck = await this.connection.first("SELECT name, mail FROM users WHERE user_id = :user AND password = :pass", {
       user: this.user_id,
       pass: password
     })
-    if (!passwordCheck) throw new ErrorWebApi(strings.invalidPassword, true)
+    if (!passwordCheck) throw new ErrorWebAPI(strings.invalidPassword)
 
     await this.connection.execute("UPDATE users SET password = :pass WHERE user_id = :user", {
       pass: newPassword,

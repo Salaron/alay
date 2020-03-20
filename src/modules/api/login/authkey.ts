@@ -43,12 +43,12 @@ export default class extends ApiAction {
       const sessionKey = Utils.xor(Buffer.from(clientKey, "base64"), Buffer.from(serverKey, "base64")).toString("base64") // Generate session key by XORing client and server keys
       const authData = JSON.parse(Utils.AESDecrypt(Buffer.from(clientKey, "base64").slice(0, 16), this.params.auth_data)) // device info
 
-      let divineKey = Utils.xor(Buffer.from(Config.client.XMC_base), Buffer.from(Config.client.application_key))
-      divineKey = Utils.xor(divineKey, Buffer.from(clientKey, "base64"))
-      const xmc = Utils.hmacSHA1(this.requestData.raw_request_data, divineKey)
+      const xorBase = Utils.xor(Buffer.from(Config.client.XMC_base), Buffer.from(Config.client.application_key))
+      const signKey = Utils.xor(xorBase, Buffer.from(clientKey, "base64"))
+      const xmcStatus = this.requestData.checkXMessageCode(false, signKey)
 
       const xmcVerifyEnabled = this.requestData.auth_level === AUTH_LEVEL.NONE && Config.server.XMC_check === true
-      if (xmc != this.requestData.headers["x-message-code"] && xmcVerifyEnabled) { // do the trick if it's incorrect
+      if (!xmcStatus && xmcVerifyEnabled) { // do the trick if it's incorrect
         return trick
       }
 

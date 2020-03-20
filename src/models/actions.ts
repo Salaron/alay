@@ -10,7 +10,7 @@ import { WebView } from "../common/webview"
 import { Connection } from "../core/database/mysql"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE, WV_REQUEST_TYPE } from "./constant"
-import { IApiResult, IWebApiResult, IWebViewResult } from "./handlers"
+import { IAPIResult, IWebAPIResult, IWebViewResult } from "./handlers"
 
 export abstract class BaseAction {
   public abstract requiredAuthLevel: AUTH_LEVEL
@@ -56,11 +56,11 @@ export abstract class BaseAction {
     return
   }
 
-  public abstract execute(): Promise<IApiResult | void> // void if there is throwable error
+  public abstract execute(): Promise<IAPIResult | void> // void if there is throwable error
 }
 
 export abstract class WebApiAction extends BaseAction {
-  public abstract execute(): Promise<IWebApiResult>
+  public abstract execute(): Promise<IWebAPIResult>
 }
 (<any>global).WebApiAction = WebApiAction
 

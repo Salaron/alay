@@ -4,7 +4,7 @@ import { TYPE } from "../../../common/type"
 import { User } from "../../../common/user"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
-import { ErrorUserId, ErrorAPI } from "../../../models/error"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -57,7 +57,7 @@ export default class extends ApiAction {
     }
 
     const maxKizuna = this.live.calculateMaxKizuna(liveData.s_rank_combo)
-    if (this.params.love_cnt > maxKizuna) throw new ErrorUserId(`Too more kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`, this.user_id)
+    if (this.params.love_cnt > maxKizuna) throw new Error(`Too more kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`)
     let deck = (await this.live.getUserDeck(this.user_id, session.deck_id, false, undefined, true)).deck
     deck = await this.live.applyKizunaBonusToDeck(this.user_id, deck!, this.params.love_cnt)
 

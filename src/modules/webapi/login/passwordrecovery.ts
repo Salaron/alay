@@ -3,7 +3,7 @@ import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
 import moment from "moment"
-import { ErrorWebApi, ErrorAPI } from "../../../models/error"
+import { ErrorWebAPI, ErrorAPI } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -20,7 +20,9 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode) throw new ErrorWebApi("Access only with a certain auth level")
+    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
+      throw new ErrorAPI(403)
+
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error("Missing recaptcha")
       const reResult = await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
@@ -29,7 +31,7 @@ export default class extends WebApiAction {
 
     const strings = await this.i18n.getStrings(this.requestData, "login-login", "mailer")
     const userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })
-    if (!userData) throw new ErrorWebApi(strings.mailNotExists, true)
+    if (!userData) throw new ErrorWebAPI(strings.mailNotExists)
 
     const confirmationCode = Utils.randomString(10, "upper")
     await this.connection.execute(`
@@ -46,7 +48,7 @@ export default class extends WebApiAction {
       ip: Utils.getRemoteAddress(this.requestData.request),
       sendTime: moment().format("YYYY.MM.DD HH:mm Z")
     }))
-    if (!result) throw new ErrorWebApi(strings.sendError, true)
+    if (!result) throw new ErrorWebAPI(strings.sendError)
     return {
       status: 200,
       result: true

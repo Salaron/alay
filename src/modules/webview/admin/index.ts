@@ -2,7 +2,6 @@ import { Utils } from "../../../common/utils"
 import { WebView } from "../../../common/webview"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import { ErrorUserId } from "../../../models/error"
 
 export default class extends WebViewAction {
   public requestType: WV_REQUEST_TYPE = WV_REQUEST_TYPE.BOTH
@@ -56,7 +55,7 @@ export default class extends WebViewAction {
       }
       default: {
         this.requestData.resetCookieAuth()
-        throw new ErrorUserId("Attempt to get access to admin panel", this.user_id)
+        throw new Error("Attempt to get access to admin panel")
       }
     }
   }

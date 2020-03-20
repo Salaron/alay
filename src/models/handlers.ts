@@ -4,16 +4,16 @@ export interface IApiMultiResponse {
   status: number
   commandNum: false
 }
-export interface IApiResult {
+export interface IAPIResult {
   status: number
   result: any
   headers?: any
 }
 // tslint:disable-next-line: no-empty-interface
-export interface IWebApiResult extends IApiResult {
+export interface IWebAPIResult extends IAPIResult {
 
 }
 // tslint:disable-next-line: no-empty-interface
-export interface IWebViewResult extends IApiResult {
+export interface IWebViewResult extends IAPIResult {
 
 }

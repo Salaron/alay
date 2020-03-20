@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
-import { ErrorWebApi } from "../models/error"
+import { ErrorWebAPI } from "../models/error"
 import executeAction from "./action"
 import { writeJsonResponse } from "./response"
 
@@ -9,10 +9,10 @@ export default async function webapiHandler(request: IncomingMessage, response: 
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBAPI)
   try {
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
-      throw new ErrorWebApi("An error occurred while processing the request. Please close the current tab and try again")
+      throw new ErrorWebAPI("An error occurred while processing the request. Please close the current tab and try again")
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {
-      throw new ErrorWebApi("You have been banned on this server")
+      throw new ErrorWebAPI("You have been banned on this server")
     }
 
     // "extract" module & action
@@ -37,7 +37,7 @@ export default async function webapiHandler(request: IncomingMessage, response: 
     })
   } catch (err) {
     await requestData.connection.rollback()
-    if (err instanceof ErrorWebApi) {
+    if (err instanceof ErrorWebAPI) {
       await writeJsonResponse(response, {
         responseData: err.response,
         direct: true,

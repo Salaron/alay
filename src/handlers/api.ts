@@ -4,7 +4,7 @@ import { Utils } from "../common/utils"
 import { Logger } from "../core/logger"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, HANDLER_TYPE, RESPONSE_TYPE } from "../models/constant"
-import { IApiMultiResponse, IApiResult } from "../models/handlers"
+import { IApiMultiResponse, IAPIResult } from "../models/handlers"
 import executeAction from "./action"
 import { writeJsonResponse } from "./response"
 import { ErrorAPI } from "../models/error"
@@ -54,7 +54,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
           commandNum: false
         }
         requestData.params = params
-        let result: IApiResult
+        let result: IAPIResult
         try {
           result = await executeAction(params.module, params.action, requestData, {
             responseType: RESPONSE_TYPE.MULTI,
@@ -87,7 +87,7 @@ export default async function moduleHandler(request: IncomingMessage, response: 
     } else {
       if (!urlSplit[3]) throw new Error(`Invalid action name (${urlSplit[3]})`)
       const action = urlSplit[3].replace(/[^a-z]/g, "")
-      const result: IApiResult = await executeAction(module, action, requestData, {
+      const result: IAPIResult = await executeAction(module, action, requestData, {
         responseType: RESPONSE_TYPE.SINGLE,
         xmc: <string>request.headers["x-message-code"]
       })

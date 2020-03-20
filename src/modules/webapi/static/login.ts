@@ -2,7 +2,7 @@ import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { ErrorWebApi, ErrorAPI } from "../../../models/error"
+import { ErrorWebAPI, ErrorAPI } from "../../../models/error"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -22,7 +22,7 @@ export default class extends WebApiAction {
     if (Config.modules.login.enable_recaptcha) {
       if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error("Missing recaptcha")
       const reResult = await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
-      if (!reResult) throw new ErrorAPI("reCaptcha test failed")
+      if (!reResult) throw new ErrorWebAPI("reCaptcha test failed")
     }
     const i18n = await this.i18n.getStrings(this.requestData, "login-login", "login-startup")
     const login = Utils.decryptSlAuth(this.params.login, this.requestData.auth_token)
@@ -35,14 +35,14 @@ export default class extends WebApiAction {
     } else if (Utils.checkMail(login)) {
       // select by mail
       dataQuery = "SELECT * FROM users WHERE mail = :login AND password = :password"
-    } else throw new ErrorWebApi(i18n.invalidUserIdOrMail, true)
-    if (!Utils.checkPass(password)) throw new ErrorWebApi(i18n.passwordInvalidFormat, true)
+    } else throw new ErrorWebAPI(i18n.invalidUserIdOrMail)
+    if (!Utils.checkPass(password)) throw new ErrorWebAPI(i18n.passwordInvalidFormat)
 
     const data = await this.connection.first(dataQuery, {
       login,
       password
     })
-    if (!data) throw new ErrorWebApi(i18n.invalidLoginOrPass, true)
+    if (!data) throw new ErrorWebAPI(i18n.invalidLoginOrPass)
     this.requestData.user_id = this.user_id = data.user_id
 
     const currentToken = await this.connection.first("SELECT login_token FROM user_login WHERE user_id = :user", {

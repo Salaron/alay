@@ -1,7 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Download } from "../../../common/download"
-import { ErrorUserId } from "../../../models/error"
 import { TYPE } from "../../../common/type"
 
 export default class extends ApiAction {
@@ -26,9 +25,9 @@ export default class extends ApiAction {
 
   public async execute() {
     this.params.excluded_package_ids.map((id: number) => {
-      if (isNaN(Number(id))) throw new ErrorUserId(`Invalid type provided`, this.user_id)
+      if (isNaN(Number(id))) throw new Error(`Invalid type provided`)
     })
-    if (this.params.os !== "Android" && this.params.os !== "iOS") throw new ErrorUserId(`Invalid os`, this.user_id)
+    if (this.params.os !== "Android" && this.params.os !== "iOS") throw new Error(`Invalid os`)
 
     if (this.requestData.params.package_type === Download.TYPE.BOOTSTRAP) return {
       status: 200,

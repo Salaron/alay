@@ -3,7 +3,7 @@ import { TYPE } from "../../../common/type"
 import { User } from "../../../common/user"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, Mods, PERMISSION, REQUEST_TYPE, FESTIVAL_BONUS } from "../../../models/constant"
-import { ErrorAPI, ErrorUserId } from "../../../models/error"
+import { ErrorAPI } from "../../../models/error"
 
 const liveDB = sqlite3.getLiveDB()
 const festDB = sqlite3.getFestivalDB()
@@ -168,8 +168,8 @@ export default class extends ApiAction {
 
     // calculate max kizuna and compare with input
     const maxKizuna = this.live.calculateMaxKizuna(liveResult.s_rank_combo)
-    if (this.params.love_cnt > maxKizuna) throw new ErrorUserId(`Too more kizuna...`, this.user_id)
-    if (this.params.max_combo > liveResult.s_rank_combo) throw new ErrorUserId("inject detected [max_combo > s_rank_combo]", this.user_id)
+    if (this.params.love_cnt > maxKizuna) throw new Error("Too more kizuna...")
+    if (this.params.max_combo > liveResult.s_rank_combo) throw new Error("inject detected [max_combo > s_rank_combo]")
 
     // get rank for score and combo
     const scoreRank = this.live.getRank(this.live.generateRankInfo(liveResult, "score"), totalScore)

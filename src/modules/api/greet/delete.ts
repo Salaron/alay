@@ -1,7 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
-import { ErrorUserId, ErrorAPI } from "../../../models/error"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -35,7 +35,7 @@ export default class extends ApiAction {
         id: this.params.mail_notice_id
       })
     } else {
-      throw new ErrorUserId(`You're not receiver or owner of this notice`, this.user_id)
+      throw new ErrorAPI("You're not receiver or owner of this notice")
     }
 
     return {

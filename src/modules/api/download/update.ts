@@ -3,7 +3,7 @@ import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Download } from "../../../common/download"
 import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
-import { ErrorUserId, ErrorAPI } from "../../../models/error"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -24,7 +24,7 @@ export default class extends ApiAction {
 
   public async execute() {
     if (this.params.target_os !== "Android" && this.params.target_os !== "iOS")
-      throw new ErrorUserId(`Invalid target_os`, this.user_id)
+      throw new Error(`Invalid target_os`)
     const clientExternal = this.params.external_version
     const clientInstall = this.params.install_version
 

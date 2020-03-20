@@ -4,7 +4,7 @@ import { Utils } from "../common/utils"
 import { Logger } from "../core/logger"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, HANDLER_TYPE, PERMISSION, REQUEST_TYPE, RESPONSE_TYPE } from "../models/constant"
-import { ErrorAPI, ErrorWebApi } from "../models/error"
+import { ErrorAPI } from "../models/error"
 
 const log = new Logger("Action Handler")
 interface Options {

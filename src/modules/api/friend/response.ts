@@ -1,7 +1,6 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
-import { ErrorUserId } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -39,7 +38,7 @@ export default class extends ApiAction {
         await this.notice.addNotice(this.user_id, this.notice.FILTER.FRIENDS, this.notice.TYPE.ACCEPTED_FRIEND_REQUEST, this.params.user_id)
         break
       }
-      default: throw new ErrorUserId(`Unknown status: ${this.params.status}`, this.user_id)
+      default: throw new Error(`Unknown status: ${this.params.status}`)
     }
     return {
       status: 200,

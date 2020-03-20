@@ -1,7 +1,6 @@
 import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
-import { ErrorUserId } from "../../../models/error"
 
 const defaultUnlock = [1]
 const itemDB = sqlite3.getItemDB()
@@ -25,14 +24,14 @@ export default class extends ApiAction {
     const check = await itemDB.get("SELECT background_id FROM background_m WHERE background_id = :id", {
       id: this.params.background_id
     })
-    if (!check) throw new ErrorUserId("Invalid background_id", this.user_id)
+    if (!check) throw new Error("Invalid background_id")
 
     if (!Config.modules.background.unlockAll && !defaultUnlock.includes(this.params.background_id)) {
       const check = await this.connection.first(`SELECT background_id FROM user_background_unlock WHERE user_id = :user AND background_id = :id`, {
         user: this.user_id,
         id: this.params.background_id
       })
-      if (!check) throw new ErrorUserId(`User not yet unlocked background ${this.params.background_id}`, this.user_id)
+      if (!check) throw new Error(`User not yet unlocked background ${this.params.background_id}`)
     }
     await this.connection.query("UPDATE users SET setting_background_id = :id WHERE user_id = :user", {
       id: this.params.background_id,

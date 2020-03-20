@@ -50,10 +50,10 @@ export default class RequestData {
   public request: IncomingMessage
   public handlerType: HANDLER_TYPE
   public connection: Connection
-  public raw_request_data: any // JSON.parse can make XMC calculation wrong
   public requestFromBrowser = false
   public response: ServerResponse
 
+  private raw_request_data: any // JSON.parse can make XMC calculation wrong
   constructor(request: IncomingMessage, response: ServerResponse, formData: any, hType: HANDLER_TYPE) {
     this.headers = request.headers
     this.request = request
@@ -106,7 +106,6 @@ export default class RequestData {
       try {
         this.raw_request_data = formData.request_data
         this.params = JSON.parse(formData.request_data)
-        this.params.precise_score_log = undefined // Remove it for now
       } catch (e) {
         log.error(e)
         this.auth_level = AUTH_LEVEL.REJECTED
@@ -165,16 +164,20 @@ export default class RequestData {
         user: this.user_id,
         token: this.auth_token
       })
-      if (Config.server.admin_ids.includes(this.user_id)) return this.auth_level = AUTH_LEVEL.ADMIN
-      else return this.auth_level = AUTH_LEVEL.CONFIRMED_USER
+      if (Config.server.admin_ids.includes(this.user_id))
+        return this.auth_level = AUTH_LEVEL.ADMIN
+      else
+        return this.auth_level = AUTH_LEVEL.CONFIRMED_USER
     }
   }
-  public async checkXMessageCode(useSpecialKey = false) {
+  public async checkXMessageCode(useSpecialKey = false, customKey?: Buffer) {
     if (Config.server.XMC_check === false) return true // xmc check force disabled
 
     let xmc = ""
     if (useSpecialKey) {
       xmc = Utils.hmacSHA1(this.raw_request_data, Config.specialKey)
+    } else if (this.auth_level === AUTH_LEVEL.NONE && customKey) {
+      xmc = Utils.hmacSHA1(this.raw_request_data, customKey)
     } else if (this.auth_level === AUTH_LEVEL.PRE_LOGIN) {
       const key = await this.connection.first(`SELECT session_key FROM auth_tokens WHERE token = :token`, { token: this.auth_token })
       if (!key) return false
