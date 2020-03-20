@@ -86,14 +86,14 @@ export class Sqlite3 {
     "live.db_",
     "marathon.db_",
     "other.db_",
-    "secretbox.db_",
     "team_duty.db_",
     "unit.db_",
     // server-side
     "sv_banner.db_",
     "sv_custom_live.db_",
     "sv_download.db_",
-    "sv_live_notes.db_"
+    "sv_live_notes.db_",
+    "sv_secretbox.db_"
   ]
   private eventCommonDB: Sqlite3Wrapper
   private exchangeDB: Sqlite3Wrapper
@@ -102,7 +102,6 @@ export class Sqlite3 {
   private liveDB: Sqlite3Wrapper
   private marathonDB: Sqlite3Wrapper
   private otherDB: Sqlite3Wrapper
-  private secretboxDB: Sqlite3Wrapper
   private teamDutyDB: Sqlite3Wrapper
   private unitDB: Sqlite3Wrapper
 
@@ -110,6 +109,7 @@ export class Sqlite3 {
   private customLiveSVDB: Sqlite3Wrapper
   private downloadSVDB: Sqlite3Wrapper
   private liveNotesSVDB: Sqlite3Wrapper
+  private secretboxSVDB: Sqlite3Wrapper
   constructor() {
     this.checkDatabases()
     this.initDatabases()
@@ -136,9 +136,6 @@ export class Sqlite3 {
   public getOtherDB() {
     return this.otherDB
   }
-  public getSecretboxDB() {
-    return this.secretboxDB
-  }
   public getTeamDutyDB() {
     return this.teamDutyDB
   }
@@ -158,6 +155,9 @@ export class Sqlite3 {
   }
   public getLiveNotesSVDB() {
     return this.liveNotesSVDB
+  }
+  public getSecretboxSVDB() {
+    return this.secretboxSVDB
   }
 
   public async decryptReleaseInfo() {
@@ -224,7 +224,6 @@ export class Sqlite3 {
     this.liveDB = new Sqlite3Wrapper("./data/db/live.db_", sqliteDB.OPEN_READONLY)
     this.marathonDB = new Sqlite3Wrapper("./data/db/marathon.db_", sqliteDB.OPEN_READONLY)
     this.otherDB = new Sqlite3Wrapper("./data/db/other.db_", sqliteDB.OPEN_READONLY)
-    this.secretboxDB = new Sqlite3Wrapper("./data/db/secretbox.db_", sqliteDB.OPEN_READONLY)
     this.teamDutyDB = new Sqlite3Wrapper("./data/db/team_duty.db_", sqliteDB.OPEN_READONLY)
     this.unitDB = new Sqlite3Wrapper("./data/db/unit.db_", sqliteDB.OPEN_READONLY)
 
@@ -232,5 +231,6 @@ export class Sqlite3 {
     this.customLiveSVDB = new Sqlite3Wrapper("./data/db/sv_custom_live.db_", sqliteDB.OPEN_READONLY)
     this.downloadSVDB = new Sqlite3Wrapper("./data/db/sv_download.db_", sqliteDB.OPEN_READONLY)
     this.liveNotesSVDB = new Sqlite3Wrapper("./data/db/sv_live_notes.db_", sqliteDB.OPEN_READONLY)
+    this.secretboxSVDB = new Sqlite3Wrapper("./data/db/sv_secretbox.db_", sqliteDB.OPEN_READONLY)
   }
 }

@@ -14,11 +14,16 @@ export default class extends ApiAction {
     const data = await this.connection.first("SELECT sns_coin, unit_max, box_gauge, bt_tickets, green_tickets, (SELECT count(*) FROM units WHERE user_id=:user AND deleted=0) as unit_count FROM users WHERE user_id=:user", {
       user: this.user_id
     })
-    const sbList = await this.secretbox.getSecretboxList(this.user_id)
+
+    const [musePageList, aqoursPageList] = await Promise.all([
+      this.secretbox.getSecretboxPageList(1),
+      this.secretbox.getSecretboxPageList(2)
+    ])
 
     const response: any = {
-      is_unit_max: data.unit_count >= data.unit_max,
+      is_unit_max: false,
       item_list: [
+        // TODO
         {
           item_id: 1,
           amount: data.green_tickets
@@ -33,28 +38,10 @@ export default class extends ApiAction {
         gauge_point: data.box_gauge
       },
       member_category_list: [
-        {
-          member_category: 1,
-          page_list: []
-        },
-        {
-          member_category: 2,
-          page_list: []
-        }
+        musePageList,
+        aqoursPageList
       ]
     }
-
-    sbList.forEach(secretbox => {
-      const category: number = secretbox.secret_box_info.member_category || 0
-      secretbox.secret_box_info.member_category = undefined
-      if (category === 0) {
-        response.member_category_list[0].page_list.push(secretbox)
-        response.member_category_list[1].page_list.push(secretbox)
-        return
-      } else {
-        response.member_category_list[category - 1].page_list.push(secretbox)
-      }
-    })
 
     return {
       status: 200,
