@@ -1,32 +1,18 @@
 import { IncomingMessage, ServerResponse } from "http"
-import { writeJsonResponse } from "./response"
-import executeAction from "./action"
 import RequestData from "../core/requestData"
-import { HANDLER_TYPE, AUTH_LEVEL } from "../models/constant"
+import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
 import { ErrorWebApi } from "../models/error"
+import executeAction from "./action"
+import { writeJsonResponse } from "./response"
 
 export default async function webapiHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBAPI)
   try {
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
-      await requestData.connection.commit()
-      await writeJsonResponse(response, {
-        httpStatusCode: 600,
-        responseData: {
-          message: "An error occurred while processing the request. Please close the current tab and try again"
-        }
-      })
-      return
+      throw new ErrorWebApi("An error occurred while processing the request. Please close the current tab and try again")
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {
-      await requestData.connection.commit()
-      await writeJsonResponse(response, {
-        httpStatusCode: 600,
-        responseData: {
-          message: "You have been banned on this server"
-        }
-      })
-      return
+      throw new ErrorWebApi("You have been banned on this server")
     }
 
     // "extract" module & action
@@ -47,14 +33,13 @@ export default async function webapiHandler(request: IncomingMessage, response: 
       responseData: result.result,
       authToken: requestData.auth_token,
       userId: requestData.user_id,
-      encoding: <string>request.headers["accept-encoding"],
       nonce: requestData.auth_header.nonce
     })
   } catch (err) {
     await requestData.connection.rollback()
-    if (err instanceof ErrorWebApi && err.sendToClient === true) {
+    if (err instanceof ErrorWebApi) {
       await writeJsonResponse(response, {
-        responseData: { message: err.message },
+        responseData: err.response,
         direct: true,
         httpStatusCode: 600
       })

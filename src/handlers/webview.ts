@@ -1,11 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http"
-import { writeJsonResponse } from "./response"
-import executeAction from "./action"
 import RequestData from "../core/requestData"
-import { promisify } from "util"
-import { gzip } from "zlib"
+import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
 import { IApiResult } from "../models/handlers"
-import { HANDLER_TYPE, AUTH_LEVEL } from "../models/constant"
+import executeAction from "./action"
+import { writeJsonResponse } from "./response"
 
 export default async function webviewHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.WEBVIEW)
@@ -45,10 +43,6 @@ export default async function webviewHandler(request: IncomingMessage, response:
       }
     }
 
-    if (request.headers["accept-encoding"] && request.headers["accept-encoding"]!.indexOf("gzip") != -1) {
-      response.setHeader("Content-Encoding", "gzip")
-      result.result = await promisify(gzip)(result.result)
-    }
     await requestData.connection.commit()
     response.end(result.result)
   } catch (err) {

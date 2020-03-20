@@ -7,21 +7,15 @@ import { AUTH_LEVEL, HANDLER_TYPE, RESPONSE_TYPE } from "../models/constant"
 import { IApiMultiResponse, IApiResult } from "../models/handlers"
 import executeAction from "./action"
 import { writeJsonResponse } from "./response"
-import { ErrorUserId } from "../models/error"
+import { ErrorAPI } from "../models/error"
 
-const log = new Logger("Api Handler")
+const log = new Logger("API Handler")
 
 export default async function moduleHandler(request: IncomingMessage, response: ServerResponse) {
   const requestData = await RequestData.Create(request, response, HANDLER_TYPE.API)
   try {
     if (requestData.auth_level === AUTH_LEVEL.REJECTED || requestData.auth_level === AUTH_LEVEL.SESSION_EXPIRED) {
-      await requestData.connection.commit()
-      await writeJsonResponse(response, {
-        httpStatusCode: 403,
-        responseData: "No permissions",
-        direct: true
-      })
-      return
+      throw new ErrorAPI("No permissions")
     }
     if (requestData.auth_level === AUTH_LEVEL.BANNED) {
       await requestData.connection.commit()
@@ -40,27 +34,29 @@ export default async function moduleHandler(request: IncomingMessage, response: 
 
     if (module === "api") {
       const actionsList = requestData.params
-      if (actionsList.length > Config.server.API_request_limit) throw new ErrorUserId(`API request limit reached ${actionsList.length}/${Config.server.API_request_limit}`, requestData.user_id)
-
       const responseData: any[] = []
+      if (actionsList.length > Config.server.API_request_limit)
+        throw new Error(`API request limit reached ${actionsList.length}/${Config.server.API_request_limit}`)
 
       const xmcStatus = await requestData.checkXMessageCode(false)
-      if (xmcStatus === false) throw new ErrorUserId(`Invalid X-Message-Code; user #${requestData.user_id}`, requestData.user_id)
+      if (xmcStatus === false)
+        throw new Error(`Invalid X-Message-Code on multi-API request`)
 
-      await actionsList.forEachAsync(async (data: any, i: number) => {
-        data.module = data.module.toLowerCase().replace(/[^a-z]/g, "")
-        data.action = data.action.toLowerCase().replace(/[^a-z]/g, "")
-        log.verbose(chalk.yellow(`${data.module}/${data.action} [${i + 1}/${actionsList.length}]`), "multirequest")
+      await actionsList.forEachAsync(async (params: any, i: number) => {
+        params.module = params.module.toLowerCase().replace(/[^a-z]/g, "")
+        params.action = params.action.toLowerCase().replace(/[^a-z]/g, "")
+        log.verbose(chalk.yellow(`${params.module}/${params.action} [${i + 1}/${actionsList.length}]`), "multi-API")
+
         const res: IApiMultiResponse = {
           result: {},
           timeStamp: Utils.timeStamp(),
           status: 0,
           commandNum: false
         }
-        requestData.params = data
+        requestData.params = params
         let result: IApiResult
         try {
-          result = await executeAction(data.module, data.action, requestData, {
+          result = await executeAction(params.module, params.action, requestData, {
             responseType: RESPONSE_TYPE.MULTI,
             xmc: <string>request.headers["x-message-code"]
           })
@@ -86,7 +82,6 @@ export default async function moduleHandler(request: IncomingMessage, response: 
         authToken: requestData.auth_token,
         userId: requestData.user_id,
         xmc: <string>request.headers["x-message-code"],
-        encoding: <string>request.headers["accept-encoding"],
         nonce: requestData.auth_header.nonce
       })
     } else {
@@ -110,7 +105,6 @@ export default async function moduleHandler(request: IncomingMessage, response: 
         authToken: requestData.auth_token,
         userId: requestData.user_id,
         xmc: <string>request.headers["x-message-code"],
-        encoding: <string>request.headers["accept-encoding"],
         nonce: requestData.auth_header.nonce
       })
     }
