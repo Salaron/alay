@@ -52,5 +52,7 @@ for live in lives:
   except sqlite3.IntegrityError:
     pass
 
+# remove old table
+curNotes.execute("DROP TABLE IF EXISTS `live_note`")
 liveNotesDB.commit()
 liveNotesDB.close()
