@@ -13,7 +13,7 @@ export default <IDatabaseConfig>{
   },
   redis: {
     host: "localhost",
-    port: 6393,
+    port: 6379,
     password: ""
   }
 }

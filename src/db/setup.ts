@@ -1,6 +1,6 @@
 import "../global"
 import "../core/config"
-Config.database.multipleStatements = true
+Config.database.mysql.multipleStatements = true
 import { readdirSync } from "fs"
 import { Utils } from "../common/utils"
 import { Connect as ConnectToMariaDB, Connection } from "../core/database/mysql"
