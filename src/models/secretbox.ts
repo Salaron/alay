@@ -39,3 +39,5 @@ export enum costType {
   FREE_TICKET = 100,
   GAME_COIN = 3000
 }
+
+export class ErrorSecretboxNotAvailable extends Error { }

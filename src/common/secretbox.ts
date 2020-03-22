@@ -1,8 +1,8 @@
 import { Redis } from "../core/database/redis"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
-import { costType, secretboxType } from "../models/secretbox"
-import { ISecretboxAnimationAssets, ISecretboxButton, ISecretboxInfo, ISecretboxM, ISecretboxPage } from "../typings/secretbox"
+import { costType, secretboxType, ErrorSecretboxNotAvailable } from "../models/secretbox"
+import { ISecretboxAnimationAssets, ISecretboxButton, ISecretboxInfo, ISecretboxM, ISecretboxPage, IStepAdditionalInfo, ISecretboxCost } from "../typings/secretbox"
 import { Utils } from "./utils"
 
 const unitDB = sqlite3.getUnitDB()
@@ -25,9 +25,16 @@ export class Secretbox extends CommonModule {
     })
 
     const pageList = <ISecretboxPage[]>(await Promise.all(secretboxList.map(async (secretbox) => {
-      const available = await this.isAvailable(secretbox)
+      const available = await this.isSecretboxAvailable(secretbox)
       if (!available) return false
-      return await this.getSecretboxPage(secretbox)
+      try {
+        return await this.getSecretboxPage(secretbox)
+      } catch (err) {
+        if (err instanceof ErrorSecretboxNotAvailable) {
+          return false
+        }
+        throw err
+      }
     }))).filter(secretbox => !!secretbox)
 
     return {
@@ -44,14 +51,14 @@ export class Secretbox extends CommonModule {
   private async getSecretboxPage(secretBoxM: ISecretboxM): Promise<ISecretboxPage> {
     let secretboxPage: ISecretboxPage
 
-    const cachedData = await Redis.get(`Secretbox:Page:${secretBoxM.secret_box_id}`)
+    const cachedData = await Redis.get(`Secretbox:Page:${secretBoxM.secret_box_id}:${this.userId}`)
     if (cachedData && this.useCache) {
       // use cached data
       secretboxPage = JSON.parse(cachedData)
     } else {
       const [animationAssets, secretboxInfo, buttonList] = await Promise.all([
         this.getAnimationAssets(secretBoxM.secret_box_id, secretBoxM.secret_box_type),
-        this.getSecretboxInfo(secretBoxM.secret_box_id),
+        this.getSecretboxInfo(secretBoxM.secret_box_id, secretBoxM.secret_box_type),
         this.getButtons(secretBoxM.secret_box_id, secretBoxM.secret_box_type)
       ])
 
@@ -62,30 +69,48 @@ export class Secretbox extends CommonModule {
         button_list: buttonList,
         secret_box_info: secretboxInfo
       }
-      await Redis.set(`Secretbox:Page:${secretBoxM.secret_box_id}`, JSON.stringify(secretboxPage), "ex", 86400)
+      await Redis.set(`Secretbox:Page:${secretBoxM.secret_box_id}:${this.userId}`, JSON.stringify(secretboxPage), "ex", 86400)
     }
-
-    // set user pon count
-    const userPonCount = await this.getUserPonCount(secretBoxM.secret_box_id)
-    secretboxPage.secret_box_info.pon_count = userPonCount
-
-    // update cost status
-    for (const button of secretboxPage.button_list) {
-      for (const cost of button.cost_list) {
-        cost.payable = await this.isPayable(cost.type, cost.item_id, cost.amount)
-      }
-      // TODO: remove costs with field "removable"
-    }
-
-    // TODO: additional secretbox info
 
     return secretboxPage
   }
 
-  private async getSecretboxInfo(id: number): Promise<ISecretboxInfo> {
-    const secretbox: ISecretboxM = await secretboxSVDB.get("SELECT * FROM secret_box_m WHERE secret_box_id = :id", { id })
-    if (!secretbox) throw new Error("No data for secretbox id #" + id)
+  private async getAdditionalInfo(id: number, type: number): Promise<undefined | IStepAdditionalInfo> {
+    switch (type) {
+      case secretboxType.STEP_UP: {
+        // seems like klab removed step boxes...
+        // for now it will be incomplete until it shows on official
+        const [userPonCount, stepBase] = await Promise.all([
+          this.getUserPonCount(id),
+          secretboxSVDB.get("SELECT * FROM secret_box_step_up_base_m WHERE secret_box_id = :id", { id })
+        ])
+        if (!stepBase) throw new Error(`Step base data for secretbox #${id} is missing`)
 
+        const currentStep = userPonCount + 1 % stepBase.number_of_steps
+        const stepItemBonus = await secretboxSVDB.all("SELECT add_type, item_id, amount FROM secret_box_step_up_bonus_item_m WHERE secret_box_id = :id AND step = :currentStep", {
+          id,
+          currentStep
+        })
+        return <IStepAdditionalInfo>{
+          secret_box_type: secretboxType.STEP_UP,
+          step: 1,
+          show_step: 1,
+          end_step: stepBase.default_end_step,
+          term_count: 0,
+          step_up_bonus_bonus_item_list: stepItemBonus
+        }
+      }
+      default: return undefined
+    }
+  }
+
+  private async getSecretboxInfo(id: number, type: number): Promise<ISecretboxInfo> {
+    const [secretbox, userPonCount, additionalInfo] = await Promise.all([
+      secretboxSVDB.get("SELECT * FROM secret_box_m WHERE secret_box_id = :id", { id }),
+      this.getUserPonCount(id),
+      this.getAdditionalInfo(id, type)
+    ])
+    if (!secretbox) throw new Error("No data for secretbox id #" + id)
     const secretboxInfo: ISecretboxInfo = {
       secret_box_id: secretbox.secret_box_id,
       secret_box_type: secretbox.secret_box_type,
@@ -95,52 +120,73 @@ export class Secretbox extends CommonModule {
       end_date: secretbox.end_date,
       show_end_date: secretbox.show_end_date_flag ? secretbox.end_date : undefined,
       add_gauge: secretbox.add_gauge,
-      pon_count: 0,
+      pon_count: userPonCount,
       pon_upper_limit: secretbox.upper_limit,
-      // additional_info: null
+      additional_info: additionalInfo
     }
 
     return secretboxInfo
   }
 
   private async getButtons(id: number, type: number): Promise<ISecretboxButton[]> {
-    let buttons: ISecretboxButton[]
+    await this.updateUserItems() // TODO: move it to some other place
+    const buttonList = await secretboxSVDB.all("SELECT * FROM secret_box_button_m WHERE secret_box_id = :id", { id })
+    const secretboxM: ISecretboxM = await secretboxSVDB.get("SELECT always_display_flag from secret_box_m WHERE secret_box_id = :id", { id })
+    const alwaysDisplayFlag = !!secretboxM.always_display_flag
+    let isPayable = false
 
-    switch (type) {
-      case secretboxType.DEFAULT:
-      case secretboxType.STUB: {
-        const buttonList = await secretboxSVDB.all("SELECT * FROM secret_box_button_m WHERE secret_box_id = :id", { id })
-        buttons = await Promise.all(buttonList.map(async (button) => {
-          const costList = (await secretboxSVDB.all("SELECT * FROM secret_box_cost_m WHERE secret_box_id = :id AND secret_box_button_type = :buttonType ORDER BY cost_order ASC", {
-            id,
-            buttonType: button.secret_box_button_type
-          })).map(cost => {
-            let removable = false
-            if (type === secretboxType.DEFAULT && cost.cost_type === 1000) removable = true
-            return {
-              id: cost.secret_box_cost_id,
-              payable: false,
-              removable,
-              unit_count: cost.unit_count,
-              type: cost.cost_type,
-              item_id: cost.item_id,
-              amount: cost.amount
-            }
-          })
+    const buttons = await Promise.all(buttonList.map(async button => {
+      let costList: any
+      if (type === secretboxType.STEP_UP) {
+        const stepInfo = await this.getAdditionalInfo(id, type)
+        const stepSetting = await secretboxSVDB.get("SELECT balloon_asset FROM secret_box_step_up_step_setting_m WHERE secret_box_id = :id AND step = :step", {
+          id,
+          step: stepInfo?.show_step
+        })
+        if (stepSetting) {
+          button.balloon_asset = stepSetting.balloon_asset
+        }
 
-          // TODO: timelimited ballons
-          return {
-            secret_box_button_type: button.secret_box_button_type,
-            secret_box_name: button.secret_box_name,
-            balloon_asset: button.balloon_asset !== null ? button.balloon_asset : undefined,
-            cost_list: costList
-          }
-        }))
-        break
+        costList = await secretboxSVDB.all("SELECT * FROM secret_box_step_up_cost_m WHERE secret_box_id = :id AND secret_box_button_type = :buttonType AND step = :step", {
+          id,
+          buttonType: button.secret_box_button_type,
+          step: stepInfo?.show_step
+        })
+      } else {
+        costList = await secretboxSVDB.all("SELECT * FROM secret_box_cost_m WHERE secret_box_id = :id AND secret_box_button_type = :buttonType ORDER BY cost_order ASC", {
+          id,
+          buttonType: button.secret_box_button_type
+        })
       }
 
-      default: throw new Error(`Secretbox type "${type}" is not supported`)
-    }
+      // process cost
+      for (let i = costList.length - 1; i >= 0; i--) {
+        let cost = costList[i]
+        const payable = this.isCostPayable(cost.cost_type, cost.item_id, cost.amount)
+        if (cost.cost_type === 1000 && (cost.item_id === 1 || cost.item_id === 8) && !payable) {
+          // make ticket cost not visible
+          costList.splice(i, 1)
+          continue
+        }
+        if (payable === true) isPayable = true
+        costList[i] = {
+          id: cost.secret_box_cost_id,
+          payable,
+          unit_count: cost.unit_count,
+          type: cost.cost_type,
+          item_id: cost.item_id,
+          amount: cost.amount
+        }
+      }
+      return {
+        secret_box_button_type: button.secret_box_button_type,
+        secret_box_name: button.secret_box_name,
+        balloon_asset: button.balloon_asset !== null ? button.balloon_asset : undefined,
+        cost_list: costList
+      }
+    }))
+    if (alwaysDisplayFlag === false && isPayable === false)
+      throw new ErrorSecretboxNotAvailable()
 
     return buttons
   }
@@ -167,7 +213,7 @@ export class Secretbox extends CommonModule {
       background_asset: animationAssetsData.background_asset,
       additional_asset_1: animationAssetsData.additional_asset_1,
       additional_asset_2: animationAssetsData.additional_asset_2,
-      additional_asset_3: animationAssetsData.additional_asset_3 === null ? undefined : animationAssetsData.additional_asset_3,
+      additional_asset_3: animationAssetsData.additional_asset_3,
       menu_asset: animationAssetsData.menu_asset,
       menu_se_asset: animationAssetsData.menu_se_asset
     }
@@ -182,9 +228,9 @@ export class Secretbox extends CommonModule {
     return pon.pon_count
   }
 
-  private async isAvailable(secretboxM: ISecretboxM): Promise<boolean>
-  private async isAvailable(id: number): Promise<boolean>
-  private async isAvailable(input: number | ISecretboxM): Promise<boolean> {
+  private async isSecretboxAvailable(secretboxM: ISecretboxM): Promise<boolean>
+  private async isSecretboxAvailable(id: number): Promise<boolean>
+  private async isSecretboxAvailable(input: number | ISecretboxM): Promise<boolean> {
     let secretboxM: ISecretboxM
     if (typeof input === "number") {
       secretboxM = await secretboxSVDB.get("SELECT start_date, end_date FROM secret_box_m WHERE secret_box_id = :id", {
@@ -201,13 +247,8 @@ export class Secretbox extends CommonModule {
     return true
   }
 
-  private async isPayable(itemType: number, itemId: number | null, amount: number): Promise<boolean> {
-    if (!this.userItems) {
-      this.userItems = await this.connection.first("SELECT sns_coin, bt_tickets, green_tickets, social_point, game_coin FROM users WHERE user_id = :user", {
-        user: this.userId
-      })
-    }
-
+  private isCostPayable(itemType: number, itemId: number | null, amount: number): boolean {
+    if (!this.userItems) throw new Error("You need to update user items first")
     switch (itemType) {
       case costType.NON_COST: {
         return true
@@ -218,6 +259,9 @@ export class Secretbox extends CommonModule {
         }
         if (itemId === 5) {
           return this.userItems.bt_tickets >= amount
+        }
+        if (itemId === 8) {
+          return Math.floor(this.userItems.green_tickets / 10) >= amount // green tickets <--> 10+1 ticket [1 : 10]
         }
         // TODO: other tickets
       }
@@ -233,5 +277,12 @@ export class Secretbox extends CommonModule {
     }
 
     return false
+  }
+
+  private async updateUserItems() {
+    this.userItems = await this.connection.first("SELECT sns_coin, bt_tickets, green_tickets, social_point, game_coin FROM users WHERE user_id = :user", {
+      user: this.userId
+    })
+    // TODO: other tickets
   }
 }

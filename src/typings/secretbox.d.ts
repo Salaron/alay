@@ -25,7 +25,7 @@ export interface ISecretboxInfo {
   add_gauge: number
   pon_count: number
   pon_upper_limit: number
-  additional_info?: null // TODO
+  additional_info?: IStepAdditionalInfo
 }
 
 export interface ISecretboxAnimationAssets {
@@ -60,8 +60,18 @@ export interface ISecretboxButton {
 export interface ISecretboxCost {
   id: number
   payable: boolean
+  removable: boolean
   unit_count: number
   type: number
   item_id: number | null,
   amount: number
+}
+
+export interface IStepAdditionalInfo {
+  secret_box_type: secretboxType
+  step: number
+  end_step: number
+  show_step: number
+  term_count: number
+  step_up_bonus_bonus_item_list: any[] // TODO: type definition
 }

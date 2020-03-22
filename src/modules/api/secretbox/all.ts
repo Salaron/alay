@@ -31,6 +31,10 @@ export default class extends ApiAction {
         {
           item_id: 5,
           amount: data.bt_tickets
+        },
+        {
+          item_id: 8,
+          amount: Math.floor(data.green_tickets / 10)
         }
       ],
       gauge_info: {
