@@ -50,7 +50,8 @@
 
 "@types/mysql2@types/npm-mysql2":
   version "1.0.0"
-  resolved "https://codeload.github.com/types/npm-mysql2/tar.gz/583484cfbc124214b06a65d0ac87251212b3c5d2"
+  uid b549352cda0b83fe8c4f4c11a1b4beb0b0cb0f5d
+  resolved "https://codeload.github.com/types/npm-mysql2/tar.gz/b549352cda0b83fe8c4f4c11a1b4beb0b0cb0f5d"
   dependencies:
     "@types/mysql" types/mysql
 
