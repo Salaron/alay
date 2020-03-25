@@ -13,12 +13,6 @@ export default <IModules>{
     unlockAll: false,
     continueAttemptsCount: 3
   },
-  liveSe: {
-    list: []
-  },
-  liveIcon: {
-    list: []
-  },
   login: {
     auth_logging: true,
     webview_login: true,
@@ -68,12 +62,6 @@ interface IModules {
   live: {
     unlockAll: boolean
     continueAttemptsCount: number
-  }
-  liveSe: {
-    list: number[]
-  }
-  liveIcon: {
-    list: number[]
   }
   login: {
     auth_logging: boolean
