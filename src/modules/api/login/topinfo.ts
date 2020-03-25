@@ -13,7 +13,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const [birthInfo, presents, messages, notifications, friendsRequest, friendsApproval] = await Promise.all([
+    const [userBirth, present, message, notification, friendRequest, friendApproval] = await Promise.all([
       this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
         user: this.user_id
       }),
@@ -57,24 +57,23 @@ export default class extends ApiAction {
       })
     ])
 
-    const isTodayBirthday = moment(birthInfo.birth_day, "DD")
-      .isSame(Date.now(), "day") && moment(birthInfo.birth_month, "MM")
-      .isSame(Date.now(), "month")
+    const currentDatetime = Utils.toSpecificTimezone(9)
+    const isSameDay = moment(userBirth.birth_day, "DD").isSame(Utils.toSpecificTimezone(9), "day")
+    const isSameMonth = moment(userBirth.birth_month, "MM").isSame(Utils.toSpecificTimezone(9), "month")
 
     const result = {
-      friend_action_cnt: (notifications.count || 0) + messages.count,
-      friend_greet_cnt: messages.count,
-      friend_variety_cnt: notifications.count || 0,
-      friend_new_cnt: friendsRequest.count + friendsApproval.count,
-      friends_request_cnt: friendsRequest.count,
-      firends_approval_wait_cnt: friendsApproval.count,
-      present_cnt: presents.count,
-      server_datetime: Utils.toSpecificTimezone(9),
+      friend_action_cnt: (notification.count || 0) + message.count,
+      friend_greet_cnt: message.count,
+      friend_variety_cnt: notification.count || 0,
+      friend_new_cnt: friendRequest.count + friendApproval.count,
+      friends_request_cnt: friendRequest.count,
+      firends_approval_wait_cnt: friendApproval.count,
+      present_cnt: present.count,
+      server_datetime: currentDatetime,
       server_timestamp: Utils.timeStamp(),
-      // Not sure about datetime
-      notice_friend_datetime: Utils.toSpecificTimezone(9),
-      notice_mail_datetime: Utils.toSpecificTimezone(9),
-      is_today_birthday: isTodayBirthday,
+      notice_friend_datetime: currentDatetime,
+      notice_mail_datetime: currentDatetime,
+      is_today_birthday: isSameDay && isSameMonth,
       license_info: {
         expired_info: [],
         licensed_info: []
@@ -84,14 +83,14 @@ export default class extends ApiAction {
       is_klab_id_task_flag: false,
       has_unread_announce: false,
       secret_box_id_list: [
-        [], // muse
-        []  // aqours
+        [], // μ's
+        []  // Aqours
       ],
       exchange_badge_cnt: [
         0, // seal shop
         0  // point shop
       ],
-      limit_bonus_ur_info: [], // idk
+      limit_bonus_ur_info: [],
       free_ticket_list: [],
       free_muse_gacha_flag: false,
       free_aqours_gacha_flag: false

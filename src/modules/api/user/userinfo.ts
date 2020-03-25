@@ -1,4 +1,3 @@
-import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
@@ -12,20 +11,17 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const birth = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
+    const user = await this.user.getUserInfo(this.user_id)
+    let birth = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
       user: this.user_id
     })
-
-    let user = await this.user.getUserInfo(this.user_id)
-    if (birth.birth_month != null && birth.birth_day != null) user.birth = {
-      birth_month: birth.birth_month,
-      birth_day: birth.birth_day
-    }
+    if (birth.birth_month === null && birth.birth_day === null) birth = undefined
 
     return {
       status: 200,
       result: {
-        user
+        user,
+        birth
       }
     }
   }

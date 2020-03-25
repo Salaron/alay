@@ -1,7 +1,8 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { TYPE } from "../../../common/type"
 import moment from "moment"
+import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
+import RequestData from "../../../core/requestData"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
@@ -25,27 +26,29 @@ export default class extends ApiAction {
       this.params.birth_day < 1 ||
       this.params.birth_day > moment(this.params.birth_month.toString(), "MM").daysInMonth() ||
       this.params.birth_month < 1 || this.params.birth_month > 12
-    ) throw new ErrorAPI("date is invalid")
+    ) throw new ErrorAPI("Date is invalid")
   }
 
   public async execute() {
     if (Config.modules.user.setBirthOnlyOnce) {
-      let date = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
+      const user = await this.connection.first("SELECT birth_day, birth_month FROM users WHERE user_id = :user", {
         user: this.user_id
       })
-      if (date.birth_day != null || date.birth_month != null) throw new ErrorAPI(`date of birth is already set and it can not be changed`)
+      if (user.birth_day !== null || user.birth_month !== null)
+        throw new ErrorAPI("Birth date already settled")
     }
-
-    await this.connection.query("UPDATE users SET birth_day=:day, birth_month=:month WHERE user_id=:user", {
+    await this.connection.query("UPDATE users SET birth_day = :day, birth_month = :month WHERE user_id = :user", {
       day: this.params.birth_day,
       month: this.params.birth_month,
       user: this.user_id
     })
 
+    const isSameDay = moment(this.params.birth_day, "DD").isSame(Utils.toSpecificTimezone(9), "day")
+    const isSameMonth = moment(this.params.birth_month, "MM").isSame(Utils.toSpecificTimezone(9), "month")
     return {
       status: 200,
       result: {
-        is_today_birthday: moment(this.params.birth_day, "DD").isSame(Date.now(), "day") && moment(this.params.birth_month, "MM").isSame(Date.now(), "month")
+        is_today_birthday: isSameDay && isSameMonth
       }
     }
   }
