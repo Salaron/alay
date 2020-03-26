@@ -269,7 +269,7 @@ export class Secretbox extends CommonModule {
         return this.userItems.game_coin >= amount
       }
       case costType.LOVECA: {
-        return this.userItems.sns_coint >= amount
+        return this.userItems.sns_coin >= amount
       }
       case costType.FRIEND: {
         return this.userItems.social_point >= amount
