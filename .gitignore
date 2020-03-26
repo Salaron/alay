@@ -1,6 +1,7 @@
 node_modules/*
 compile/*
 dist/*
+logs/*
 
 src/config/*
 tsconfig.tsbuildinfo
