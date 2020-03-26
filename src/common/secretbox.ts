@@ -2,8 +2,18 @@ import { Redis } from "../core/database/redis"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
 import { costType, secretboxType, ErrorSecretboxNotAvailable } from "../models/secretbox"
-import { ISecretboxAnimationAssets, ISecretboxButton, ISecretboxInfo, ISecretboxM, ISecretboxPage, IStepAdditionalInfo, ISecretboxCost } from "../typings/secretbox"
+import {
+  ISecretboxAnimationAssets,
+  ISecretboxButton,
+  ISecretboxInfo,
+  ISecretboxM,
+  ISecretboxPage,
+  IStepAdditionalInfo,
+  ISecretboxCost,
+  ISecretboxUnitInfo
+} from "../typings/secretbox"
 import { Utils } from "./utils"
+import { ErrorAPI } from "../models/error"
 
 const unitDB = sqlite3.getUnitDB()
 const secretboxSVDB = sqlite3.getSecretboxSVDB()
@@ -25,8 +35,6 @@ export class Secretbox extends CommonModule {
     })
 
     const pageList = <ISecretboxPage[]>(await Promise.all(secretboxList.map(async (secretbox) => {
-      const available = await this.isSecretboxAvailable(secretbox)
-      if (!available) return false
       try {
         return await this.getSecretboxPage(secretbox)
       } catch (err) {
@@ -43,14 +51,243 @@ export class Secretbox extends CommonModule {
     }
   }
 
-  /**
-   * Compile secretbox page by id
-   * @returns `ISecretbox`
-   * @returns `false` if this secretbox is not available
-   */
-  private async getSecretboxPage(secretBoxM: ISecretboxM): Promise<ISecretboxPage> {
-    let secretboxPage: ISecretboxPage
+  public async makePon(secretboxId: number, costId: number) {
+    const secretboxM = await secretboxSVDB.get("SELECT * FROM secret_box_m WHERE secret_box_id = :secretboxId", { secretboxId })
+    if (!secretboxM) throw new ErrorSecretboxNotAvailable(1500)
+    const [beforeUserInfo, secretboxPage, user] = await Promise.all([
+      this.action.user.getUserInfo(this.userId),
+      this.getSecretboxPage(secretboxM),
+      this.connection.first("SELECT box_gauge FROM users WHERE user_id = :user", { user: this.userId }),
+      this.connection.query("INSERT INTO secretbox_pon (user_id, secretbox_id, pon_count) VALUES (:user, :sbId, 0) ON DUPLICATE KEY UPDATE pon_count = pon_count + 0", {
+        user: this.userId,
+        sbId: secretboxId
+      })
+    ])
 
+    // find selected cost
+    let currentButton: ISecretboxButton | null = null
+    let currentCost: ISecretboxCost | null = null
+    for (const button of secretboxPage.button_list) {
+      if (currentCost) break
+      for (const cost of button.cost_list) {
+        if (cost.id === costId) {
+          currentCost = cost
+          currentButton = button
+          break
+        }
+      }
+    }
+    if (!currentCost || !currentButton) throw new ErrorSecretboxNotAvailable(1500)
+    if (currentCost.payable === false) throw new ErrorAPI(1507)
+    // TODO: check upper limit
+
+    if (currentCost.type !== costType.NON_COST) {
+      await this.action.item.addItemToUser(this.userId, {
+        type: currentCost.type,
+        id: currentCost.item_id
+      }, parseInt(`-${currentCost.amount}`))
+    }
+
+    let secretboxUnitInfoJSON = await Redis.get(`Secretbox:UnitInfo:${secretboxId}`)
+    if (!secretboxUnitInfoJSON) {
+      secretboxUnitInfoJSON = await Redis.get(`Secretbox:UnitInfo:${secretboxId}:Button:${currentButton.secret_box_button_type}`)
+    }
+    let secretboxUnitInfo: ISecretboxUnitInfo
+    if (secretboxUnitInfoJSON && this.useCache) {
+      secretboxUnitInfo = JSON.parse(secretboxUnitInfoJSON)
+    } else {
+      secretboxUnitInfo = await this.getSecretboxUnitInfo(secretboxId, currentButton.secret_box_button_type)
+    }
+
+    let gainedUnit = []
+    while (gainedUnit.length !== currentCost.unit_count) {
+      gainedUnit.push(this.getRandomUnit(secretboxUnitInfo))
+    }
+
+    if (currentCost.unit_count > 1) {
+      let currentRarityMap: { [unitGroupId: number]: number } = {}
+      for (const unitGroupId of gainedUnit) {
+        if (!currentRarityMap[unitGroupId.groupId]) currentRarityMap[unitGroupId.groupId] = 0
+        currentRarityMap[unitGroupId.groupId] += 1
+      }
+
+      for (const unitGroupIdString of Object.keys(secretboxUnitInfo.fixRarity)) {
+        const unitGroupId = parseInt(unitGroupIdString)
+        if (!currentRarityMap[unitGroupId]) currentRarityMap[unitGroupId] = 0
+        let attempts = 0
+        while (currentRarityMap[unitGroupId] < secretboxUnitInfo.fixRarity[unitGroupId]) {
+          const oldUnit = gainedUnit.randomValue()
+          if (oldUnit.groupId >= unitGroupId) {
+            attempts += 1
+            if (attempts > 3) break
+            continue
+          }
+          const index = gainedUnit.map(unit => unit.unitId).indexOf(oldUnit.unitId)
+          const newUnit = this.getRandomUnit(secretboxUnitInfo, unitGroupId)
+          currentRarityMap[oldUnit.groupId] -= 1
+          currentRarityMap[newUnit.groupId] += 1
+          gainedUnit[index] = newUnit
+        }
+      }
+    }
+
+    // prepare result of unit
+    const unitResult = await Promise.all(gainedUnit.map(async unit => {
+      const unitData: any = await this.action.unit.addUnit(this.userId, unit.unitId)
+      unitData.is_hit = unitData.unit_rarity_id === 4
+      unitData.is_signed = false
+      return unitData
+    }))
+
+    // prepare result of item
+    const gaugeReward = await secretboxSVDB.all("SELECT * FROM secret_box_gauge_reward_m")
+    const addedGaugePoint = secretboxM.add_gauge * currentCost.unit_count
+    const totalGaugePoint = user.box_gauge + addedGaugePoint
+    let gainedItem = []
+    if (totalGaugePoint >= 100) {
+      gainedItem = gaugeReward
+    }
+    const itemResult = await Promise.all(gainedItem.map(async item => {
+      item.reward_box_flag = false
+      item.amount = Math.floor(totalGaugePoint / 100) * item.amount
+      await this.action.item.addItemToUser(this.userId, {
+        type: item.add_type,
+      id: item.item_id
+      }, item.amount)
+      return item
+    }))
+
+    await Redis.del(`Secretbox:Page:${secretboxId}:${this.userId}`)
+    const [afterSecretboxPage, afterUserInfo, supportUnits, userItems] = await Promise.all([
+      this.getSecretboxPage(secretboxM),
+      this.action.user.getUserInfo(this.userId),
+      this.action.user.getSupportUnits(this.userId),
+      this.connection.first("SELECT sns_coin, bt_tickets, green_tickets FROM users WHERE user_id = :userId", {
+        userId: this.userId
+      }),
+      this.connection.execute("UPDATE secretbox_pon SET pon_count = pon_count + :count WHERE user_id = :userId AND secretbox_id = :secretboxId", {
+        userId: this.userId,
+        secretboxId,
+        count: currentCost.unit_count
+      }),
+      this.connection.execute("UPDATE users SET box_gauge = :gauge WHERE user_id = :userId", {
+        gauge: totalGaugePoint % 100,
+        userId: this.userId
+      })
+    ])
+
+    return {
+      is_unit_max: false,
+      item_list: [
+        {
+          item_id: 1,
+          amount: userItems.green_tickets
+        },
+        {
+          item_id: 5,
+          amount: userItems.bt_tickets
+        }
+      ],
+      gauge_info: {
+        max_gauge_point: 100,
+        gauge_point: totalGaugePoint,
+        added_gauge_point: addedGaugePoint
+      },
+      button_list: afterSecretboxPage.button_list,
+      secret_box_info: afterSecretboxPage.secret_box_info,
+      secret_box_items: {
+        unit: unitResult,
+        item: itemResult
+      },
+      before_user_info: beforeUserInfo,
+      after_user_info: afterUserInfo,
+      free_muse_gacha_flag: false,
+      free_aqours_gacha_flag: false,
+      lowest_rarity: 4,
+      promotion_performance_rate: 25, // flip rate
+      secret_box_parcel_type: 2,
+      limit_bonus_info: [],
+      limit_bonus_rewards: [],
+      unit_support_list: supportUnits
+    }
+  }
+
+  private getRandomUnit(secretboxUnitInfo: ISecretboxUnitInfo, groupId?: number) {
+    if (!groupId) {
+      let unitGroupIds: number[] = []
+      for (const unitGroup of secretboxUnitInfo.unitGroup) {
+        unitGroupIds.push(...new Array(unitGroup.weight).fill(unitGroup.id).flat())
+      }
+      groupId = unitGroupIds.randomValue()
+    }
+
+    let selectedUnitGroup: any
+    for (const unitGroup of secretboxUnitInfo.unitGroup) {
+      if (unitGroup.id === groupId) {
+        selectedUnitGroup = unitGroup
+      }
+    }
+
+    return {
+      unitId: selectedUnitGroup!.unitIds.randomValue(),
+      groupId
+    }
+  }
+
+  private async getSecretboxUnitInfo(secretboxId: number, buttonType?: number): Promise<ISecretboxUnitInfo> {
+    let unitInfoByButton = false
+    const unitInfo: ISecretboxUnitInfo = {
+      fixRarity: {},
+      unitGroup: []
+    }
+    const fixRarityList = await secretboxSVDB.all("SELECT * FROM secret_box_fix_rarity_m WHERE secret_box_id = :secretboxId", { secretboxId })
+    fixRarityList.map(fixRarity => {
+      unitInfo.fixRarity[fixRarity.unit_group_id] = fixRarity.fix_rarity_count
+    })
+
+    let unitGroupList = await secretboxSVDB.all("SELECT * FROM secret_box_unit_group_m WHERE secret_box_id = :secretboxId", { secretboxId })
+    if (unitGroupList.length === 0) {
+      unitGroupList = await secretboxSVDB.all("SELECT * FROM secret_box_button_type_unit_group_m WHERE secret_box_id = :secretboxId AND secret_box_button_type = :buttonType", {
+        secretboxId,
+        buttonType
+      })
+      if (unitGroupList.length === 0) throw new Error("Unit group info is missing")
+      unitInfoByButton = true
+    }
+
+    unitInfo.unitGroup = await Promise.all(unitGroupList.map(async unitGroup => {
+      const unitFamilyList = await secretboxSVDB.all("SELECT * FROM secret_box_unit_family_m WHERE secret_box_id = :secretboxId AND unit_group_id = :rarity", {
+        secretboxId,
+        rarity: unitGroup.unit_group_id
+      })
+
+      let unitIds: number[] = []
+      for (const unitFamily of unitFamilyList) {
+        const familyUnitIds = (await unitDB.all(`SELECT unit_id FROM unit_m WHERE ${unitFamily.query}`)).map(unit => unit.unit_id)
+        unitIds.push(...new Array(unitFamily.weight).fill(familyUnitIds).flat())
+      }
+      // TODO: limited rate support
+      return {
+        id: unitGroup.unit_group_id,
+        weight: unitGroup.weight,
+        unitIds
+      }
+    }))
+    let redisKey = `Secretbox:UnitInfo:${secretboxId}`
+    if (unitInfoByButton)
+      redisKey += `:Button:${buttonType}`
+    await Redis.set(redisKey, JSON.stringify(unitInfo), "ex", 86000)
+    return unitInfo
+  }
+
+  private async getSecretboxPage(secretBoxM: ISecretboxM): Promise<ISecretboxPage> {
+    const currentDate = Utils.toSpecificTimezone(9)
+    if (
+      secretBoxM.start_date > currentDate ||
+      secretBoxM.end_date <= currentDate
+    ) throw new ErrorSecretboxNotAvailable(1508)
+
+    let secretboxPage: ISecretboxPage
     const cachedData = await Redis.get(`Secretbox:Page:${secretBoxM.secret_box_id}:${this.userId}`)
     if (cachedData && this.useCache) {
       // use cached data
@@ -186,7 +423,7 @@ export class Secretbox extends CommonModule {
       }
     }))
     if (alwaysDisplayFlag === false && isPayable === false)
-      throw new ErrorSecretboxNotAvailable()
+      throw new ErrorSecretboxNotAvailable(0)
 
     return buttons
   }
@@ -226,25 +463,6 @@ export class Secretbox extends CommonModule {
     })
     if (!pon) pon = { pon_count: 0 }
     return pon.pon_count
-  }
-
-  private async isSecretboxAvailable(secretboxM: ISecretboxM): Promise<boolean>
-  private async isSecretboxAvailable(id: number): Promise<boolean>
-  private async isSecretboxAvailable(input: number | ISecretboxM): Promise<boolean> {
-    let secretboxM: ISecretboxM
-    if (typeof input === "number") {
-      secretboxM = await secretboxSVDB.get("SELECT start_date, end_date FROM secret_box_m WHERE secret_box_id = :id", {
-        id: input
-      })
-    } else {
-      secretboxM = input
-    }
-    const currentDate = Utils.toSpecificTimezone(9)
-    if (
-      secretboxM.start_date > currentDate ||
-      secretboxM.end_date <= currentDate
-    ) return false
-    return true
   }
 
   private isCostPayable(itemType: number, itemId: number | null, amount: number): boolean {

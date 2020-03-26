@@ -1,3 +1,5 @@
+import { ErrorAPI } from "./error"
+
 export enum buttonType {
   DEFAULT_SINGLE = 1,
   DEFAULT_MULTI = 2,
@@ -16,10 +18,10 @@ export enum buttonType {
 export enum secretboxType {
   DEFAULT = 0,
   STEP_UP = 1,
-  EXTRA = 2,    // Select???
-  BOX = 3,      // Knapsack
-  BOX_TYPE = 4, // Not used?
-  STUB = 5,     // a.k.a. blue ticket box
+  EXTRA = 2,
+  BOX = 3,
+  BOX_TYPE = 4,
+  STUB = 5,
   SELECT = 6
 }
 export enum animationType {
@@ -40,4 +42,8 @@ export enum costType {
   GAME_COIN = 3000
 }
 
-export class ErrorSecretboxNotAvailable extends Error { }
+export class ErrorSecretboxNotAvailable extends ErrorAPI {
+  constructor(errorCode: number) {
+    super(errorCode)
+  }
+}

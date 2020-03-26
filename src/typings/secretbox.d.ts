@@ -72,6 +72,15 @@ export interface IStepAdditionalInfo {
   step: number
   end_step: number
   show_step: number
-  term_count: number
-  step_up_bonus_bonus_item_list: any[] // TODO: type definition
+}
+
+export interface ISecretboxUnitInfo {
+  fixRarity: {
+    [unitGroupId: number]: number // [unitGroupId] => count
+  }
+  unitGroup: Array<{
+    id: number
+    weight: number
+    unitIds: number[]
+  }>
 }

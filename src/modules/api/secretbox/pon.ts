@@ -21,7 +21,7 @@ export default class extends ApiAction {
   public async execute() {
     return {
       status: 200,
-      result: {} // await this.secretbox.makePon(this.user_id, this.params.secret_box_id, this.params.id)
+      result: await this.secretbox.makePon(this.params.secret_box_id, this.params.id)
     }
   }
 }
