@@ -24,27 +24,33 @@ export default async function webviewHandler(request: IncomingMessage, response:
     ) {
       await requestData.connection.rollback()
       response.statusCode = 302
-      response.setHeader("Location", "../../webview.php/static/index?id=13") // user banned page
+      response.setHeader("Location", "../../webview.php/static/index?id=13")
       return response.end()
     }
 
     // "extract" module & action
     const urlSplit = request.url!.toLowerCase().split(/[?]+/)[0].split("/")
     if (!urlSplit[2] || !urlSplit[3]) throw new Error(`Invalid module/action (${urlSplit[2]}/${urlSplit[3]})`)
-    const module = urlSplit[2].replace(/[^a-z]/g, "")
-    const action = urlSplit[3].replace(/[^a-z]/g, "")
+    const moduleName = urlSplit[2].replace(/[^a-z]/g, "")
+    const actionName = urlSplit[3].replace(/[^a-z]/g, "")
 
-    const result: IAPIResult = await executeAction(module, action, requestData)
+    const action: IAPIResult = await executeAction(moduleName, actionName, requestData)
 
     response.setHeader("Content-Type", "text/html; charset=utf-8")
-    if (result.headers && Object.keys(result.headers).length > 0) {
-      for (const key of Object.keys(result.headers)) {
-        response.setHeader(key, result.headers[key])
+    if (action.headers && Object.keys(action.headers).length > 0) {
+      for (const key of Object.keys(action.headers)) {
+        response.setHeader(key, action.headers[key])
       }
     }
 
     await requestData.connection.commit()
-    response.end(Type.isString(result.result) ? result.result : JSON.stringify(result.result))
+    if (action.status !== 200) {
+      response.setHeader("Content-Type", "application/json")
+      response.write(JSON.stringify(action.result))
+    } else {
+      response.write(action.result)
+    }
+    response.end()
   } catch (err) {
     await requestData.connection.rollback()
     throw err

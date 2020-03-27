@@ -1,7 +1,7 @@
 import { TYPE } from "../../../common/type"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
-import { ErrorWebAPI } from "../../../models/error"
+import { ErrorAPI } from "../../../models/error"
 
 function getRarityString(rarity: number) {
   switch (rarity) {
@@ -37,6 +37,6 @@ export default class extends WebViewAction {
   }
 
   public async execute(): Promise<any> {
-    throw new ErrorWebAPI("NOT IMPLEMENTED")
+    throw new ErrorAPI("NOT IMPLEMENTED")
   }
 }
