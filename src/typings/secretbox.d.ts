@@ -82,5 +82,6 @@ export interface ISecretboxUnitInfo {
     id: number
     weight: number
     unitIds: number[]
+    unitLineUp: number[]
   }>
 }

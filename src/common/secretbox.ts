@@ -77,9 +77,12 @@ export class Secretbox extends CommonModule {
         }
       }
     }
-    if (!currentCost || !currentButton) throw new ErrorSecretboxNotAvailable(1500)
-    if (currentCost.payable === false) throw new ErrorAPI(1507)
-    // TODO: check upper limit
+    if (!currentCost || !currentButton)
+      throw new ErrorSecretboxNotAvailable(1500)
+    if (currentCost.payable === false)
+      throw new ErrorAPI(1507, "ERROR_CODE_SECRET_BOX_REMAINING_COST_IS_NOT_ENOUGH")
+    if (secretboxPage.secret_box_info.pon_upper_limit > secretboxPage.secret_box_info.pon_count + currentCost.unit_count)
+      throw new ErrorAPI(1509, "ERROR_CODE_SECRET_BOX_UPPER_LIMIT")
 
     if (currentCost.type !== costType.NON_COST) {
       await this.action.item.addItemToUser(this.userId, {
@@ -99,9 +102,31 @@ export class Secretbox extends CommonModule {
       secretboxUnitInfo = await this.getSecretboxUnitInfo(secretboxId, currentButton.secret_box_button_type)
     }
 
+    function getRandomUnit(groupId?: number) {
+      if (!groupId) {
+        let unitGroupIds: number[] = []
+        for (const unitGroup of secretboxUnitInfo.unitGroup) {
+          unitGroupIds.push(...new Array(unitGroup.weight).fill(unitGroup.id).flat())
+        }
+        groupId = unitGroupIds.randomValue()
+      }
+
+      let selectedUnitGroup: any
+      for (const unitGroup of secretboxUnitInfo.unitGroup) {
+        if (unitGroup.id === groupId) {
+          selectedUnitGroup = unitGroup
+        }
+      }
+
+      return {
+        unitId: selectedUnitGroup!.unitIds.randomValue(),
+        groupId
+      }
+    }
+
     let gainedUnit = []
     while (gainedUnit.length !== currentCost.unit_count) {
-      gainedUnit.push(this.getRandomUnit(secretboxUnitInfo))
+      gainedUnit.push(getRandomUnit())
     }
 
     if (currentCost.unit_count > 1) {
@@ -123,7 +148,7 @@ export class Secretbox extends CommonModule {
             continue
           }
           const index = gainedUnit.map(unit => unit.unitId).indexOf(oldUnit.unitId)
-          const newUnit = this.getRandomUnit(secretboxUnitInfo, unitGroupId)
+          const newUnit = getRandomUnit(unitGroupId)
           currentRarityMap[oldUnit.groupId] -= 1
           currentRarityMap[newUnit.groupId] += 1
           gainedUnit[index] = newUnit
@@ -212,29 +237,7 @@ export class Secretbox extends CommonModule {
     }
   }
 
-  private getRandomUnit(secretboxUnitInfo: ISecretboxUnitInfo, groupId?: number) {
-    if (!groupId) {
-      let unitGroupIds: number[] = []
-      for (const unitGroup of secretboxUnitInfo.unitGroup) {
-        unitGroupIds.push(...new Array(unitGroup.weight).fill(unitGroup.id).flat())
-      }
-      groupId = unitGroupIds.randomValue()
-    }
-
-    let selectedUnitGroup: any
-    for (const unitGroup of secretboxUnitInfo.unitGroup) {
-      if (unitGroup.id === groupId) {
-        selectedUnitGroup = unitGroup
-      }
-    }
-
-    return {
-      unitId: selectedUnitGroup!.unitIds.randomValue(),
-      groupId
-    }
-  }
-
-  private async getSecretboxUnitInfo(secretboxId: number, buttonType?: number): Promise<ISecretboxUnitInfo> {
+  public async getSecretboxUnitInfo(secretboxId: number, buttonType?: number): Promise<ISecretboxUnitInfo> {
     let unitInfoByButton = false
     const unitInfo: ISecretboxUnitInfo = {
       fixRarity: {},
@@ -261,16 +264,19 @@ export class Secretbox extends CommonModule {
         rarity: unitGroup.unit_group_id
       })
 
+      let unitLineUp: number[] = []
       let unitIds: number[] = []
       for (const unitFamily of unitFamilyList) {
-        const familyUnitIds = (await unitDB.all(`SELECT unit_id FROM unit_m WHERE ${unitFamily.query}`)).map(unit => unit.unit_id)
+        const familyUnitIds = (await unitDB.all(`SELECT unit_id FROM unit_m WHERE ${unitFamily.query} ORDER BY unit_id DESC`)).map(unit => unit.unit_id)
         unitIds.push(...new Array(unitFamily.weight).fill(familyUnitIds).flat())
+        unitLineUp.push(...familyUnitIds)
       }
       // TODO: limited rate support
       return {
         id: unitGroup.unit_group_id,
         weight: unitGroup.weight,
-        unitIds
+        unitIds,
+        unitLineUp
       }
     }))
     let redisKey = `Secretbox:UnitInfo:${secretboxId}`
@@ -280,23 +286,31 @@ export class Secretbox extends CommonModule {
     return unitInfo
   }
 
-  private async getSecretboxPage(secretBoxM: ISecretboxM): Promise<ISecretboxPage> {
+  public async getSecretboxPage(secretboxId: number): Promise<ISecretboxPage>
+  public async getSecretboxPage(secretboxM: number): Promise<ISecretboxPage>
+  public async getSecretboxPage(input: ISecretboxM | number): Promise<ISecretboxPage> {
+    let secretboxM: ISecretboxM
+    if (typeof input === "number") {
+      secretboxM = await secretboxSVDB.get("SELECT * FROM secret_box_m WHERE secret_box_id = :id", { id: input })
+    } else {
+      secretboxM = input
+    }
     const currentDate = Utils.toSpecificTimezone(9)
     if (
-      secretBoxM.start_date > currentDate ||
-      secretBoxM.end_date <= currentDate
+      secretboxM.start_date > currentDate ||
+      secretboxM.end_date <= currentDate
     ) throw new ErrorSecretboxNotAvailable(1508)
 
     let secretboxPage: ISecretboxPage
-    const cachedData = await Redis.get(`Secretbox:Page:${secretBoxM.secret_box_id}:${this.userId}`)
+    const cachedData = await Redis.get(`Secretbox:Page:${secretboxM.secret_box_id}:${this.userId}`)
     if (cachedData && this.useCache) {
       // use cached data
       secretboxPage = JSON.parse(cachedData)
     } else {
       const [animationAssets, secretboxInfo, buttonList] = await Promise.all([
-        this.getAnimationAssets(secretBoxM.secret_box_id, secretBoxM.secret_box_type),
-        this.getSecretboxInfo(secretBoxM.secret_box_id, secretBoxM.secret_box_type),
-        this.getButtons(secretBoxM.secret_box_id, secretBoxM.secret_box_type)
+        this.getAnimationAssets(secretboxM.secret_box_id, secretboxM.secret_box_type),
+        this.getSecretboxInfo(secretboxM.secret_box_id, secretboxM.secret_box_type),
+        this.getButtons(secretboxM.secret_box_id, secretboxM.secret_box_type)
       ])
 
       secretboxPage = {
@@ -306,7 +320,7 @@ export class Secretbox extends CommonModule {
         button_list: buttonList,
         secret_box_info: secretboxInfo
       }
-      await Redis.set(`Secretbox:Page:${secretBoxM.secret_box_id}:${this.userId}`, JSON.stringify(secretboxPage), "ex", 86400)
+      await Redis.set(`Secretbox:Page:${secretboxM.secret_box_id}:${this.userId}`, JSON.stringify(secretboxPage), "ex", 86400)
     }
 
     return secretboxPage
