@@ -35,25 +35,15 @@ export default async function requestHandler(request: IncomingMessage, response:
 
         const notesAsset = request.url!.split("/")[2]
         if (!notesAsset) throw new RequestError("Invalid note setting asset", 400)
-        const liveDB = sqlite3.getLiveDB()
         const liveNotesDB = sqlite3.getLiveNotesSVDB()
-
-        const live = await liveDB.get("SELECT live_setting_id FROM live_setting_m WHERE notes_setting_asset = :notesAsset", {
+        const notes = await liveNotesDB.get("SELECT json FROM live_notes WHERE notes_setting_asset = :notesAsset", {
           notesAsset
         })
-        if (!live) throw new RequestError("Not found", 404)
-        const notes = await liveNotesDB.all(`
-          SELECT
-            timing_sec, notes_attribute, notes_level,
-            effect, effect_value, position FROM live_note
-          WHERE live_setting_id = :id`, {
-          id: live.live_setting_id
-        })
-        const jsonResult = JSON.stringify(notes)
+        if (!notes) throw new RequestError("Not found", 404)
+        const jsonResult = JSON.stringify(JSON.parse(notes.json)) // remove whitespaces
         response.setHeader("Content-Type", "application/json")
         response.setHeader("Content-Length", Buffer.byteLength(jsonResult, "utf-8"))
-        response.write(jsonResult)
-        response.end()
+        response.end(jsonResult)
         return
       }
 
