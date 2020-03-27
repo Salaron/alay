@@ -39,7 +39,7 @@ for live in lives:
   })
   cur.execute("INSERT INTO temp1234 (custom_live_id, json) VALUES (?, ?)", (
     live["custom_live_id"],
-    json.dumps(insertData)
+    json.dumps(insertData, separators=(',',':'))
   ))
 
 cur.execute("DROP TABLE custom_live_notes")

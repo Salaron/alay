@@ -47,7 +47,7 @@ for live in lives:
   try:
     curNotes.execute("INSERT INTO live_notes (notes_setting_asset, json) VALUES (?, ?)", (
       liveSetting["notes_setting_asset"],
-      json.dumps(insertData)
+      json.dumps(insertData, separators=(',',':'))
     ))
   except sqlite3.IntegrityError:
     pass

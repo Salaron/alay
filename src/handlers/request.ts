@@ -40,10 +40,9 @@ export default async function requestHandler(request: IncomingMessage, response:
           notesAsset
         })
         if (!notes) throw new RequestError("Not found", 404)
-        const jsonResult = JSON.stringify(JSON.parse(notes.json)) // remove whitespaces
         response.setHeader("Content-Type", "application/json")
-        response.setHeader("Content-Length", Buffer.byteLength(jsonResult, "utf-8"))
-        response.end(jsonResult)
+        response.setHeader("Content-Length", Buffer.byteLength(notes.json, "utf-8"))
+        response.end(notes.json)
         return
       }
 
