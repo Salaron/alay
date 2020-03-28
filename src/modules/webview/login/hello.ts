@@ -12,21 +12,18 @@ export default class extends WebViewAction {
 
   public async execute() {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
-      throw new ErrorAPI("Access only with a certain auth level")
+      throw new ErrorAPI("No permissions")
 
-    const [strings, template] = await Promise.all([
-      this.i18n.getStrings(this.requestData, "login-hello"),
-      this.webview.getTemplate("login", "hello")
-    ])
-
+    const i18n = await this.i18n.getStrings(this.requestData, "login-hello")
     const values = {
-      i18n: strings,
-      regEnabled: Config.modules.login.enable_registration,
-      pageTitle: strings.hello
+      i18n,
+      registrationEnabled: Config.modules.login.enable_registration,
+      pageTitle: i18n.hello
     }
+    const result = await this.webview.renderTemplate("login", "hello", this.requestData, values)
     return {
       status: 200,
-      result: await this.webview.compileBodyTemplate(template, this.requestData, values),
+      result
     }
   }
 }

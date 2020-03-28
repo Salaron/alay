@@ -1,0 +1,18 @@
+div(id="changeLanguageModal", class="uk-dark", uk-modal)
+  .uk-modal-dialog
+    button(class="uk-modal-close-default", type="button", uk-close)
+    .uk-modal-header
+      h2(class="uk-modal-title") Change Language
+    .uk-modal-body
+      each langCode, language in languageList
+        label
+          if langCode === currentLanguage
+            input(class="uk-radio" type="radio" name="language_radio" value=langCode, checked)
+          else
+            input(class="uk-radio" type="radio" name="language_radio" value=langCode)
+          |  #{language}  
+        br
+    
+    .uk-modal-footer
+      h5 The selected language will be used in mail, web pages and in some parts of the game.
+      

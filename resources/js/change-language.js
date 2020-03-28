@@ -1,10 +1,10 @@
 $(function () {
-  $("#changeLanguage").on("click", function () {
-    UIkit.modal("#languageSelect").toggle()
+  $("#changeLanguageButton").on("click", function () {
+    UIkit.modal("#changeLanguageModal").toggle()
   })
   $("input[type=radio][name='language_radio']").change(function () {
     setCookie("language", $(this).val(), 10000)
-    if (userId !== "0") {
+    if (userId !== 0) {
       var params = {
         module: "settings",
         action: "changeLanguage",

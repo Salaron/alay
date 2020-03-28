@@ -1,0 +1,41 @@
+extends ../../includes/head.pug
+
+block body
+  style.
+    #wrapper {
+      background-image: url("/resources/img/hello_bg.png");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+    }
+  
+  div(id="wrapper", class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden")
+    div(class="uk-overlay-primary uk-position-cover")
+    div(class="uk-light")
+      a(id="changeLanguageButton", style="margin: 10px;", class="uk-icon-button uk-position-right uk-position-z-index", uk-icon="icon: world; ratio: 1.25")
+
+    div(class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium")
+      h3 #{i18n.hello}
+      p #{i18n.introduction}
+      a(class="uk-button uk-button-default uk-border-pill" href="/webview.php/login/login") #{i18n.login}
+      if registrationEnabled
+        a(class="uk-button uk-button-default uk-border-pill" href="/webview.php/login/startUp") #{i18n.registration}
+      a(class="uk-button uk-button-default uk-border-pill" href="/webview.php/tos/read") #{i18n.tos}
+
+block footer
+  script.
+    $(document).ready(function () {
+      setCookie("user_id", "", 1)
+      var values = window.location.href.split("?")[1]
+      if (values) {
+        values = parseQueryString(values)
+        if (values.token) setCookie("token", values.token, 1)
+      }
+    })
+  include ../../includes/changeLanguage.pug
+
+block append scripts
+  script(src="/resources/js/change-language.js")

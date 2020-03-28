@@ -1,0 +1,44 @@
+doctype html
+html
+  head
+    title #{pageTitle}
+    meta(name="charset", content="utf-8") 
+    meta(http-equiv="X-UA-Compatible", content="ie=edge, chrome=1")
+    meta(name="format-detection", content="telephone=no")
+    if webview
+      meta(name="viewport", content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1")
+    else
+      meta(name="viewport", content="width=device-width")
+    
+    block stylesheets
+      link(rel="stylesheet", href="/resources/css/uikit.min.css")
+      link(rel="stylesheet", href="/resources/css/styles.css")
+      link(rel="stylesheet", href="/resources/css/overlayScrollbars.min.css")
+      if webview
+        link(rel="stylesheet", href="/resources/css/webview.css")
+
+  body
+    block body
+
+    block scripts
+      script(src="/resources/js/uikit.min.js")
+      script(src="/resources/js/jquery.min.js")
+      script(src="/resources/js/common.js")
+      script(src="/resources/js/uikit-icons.min.js")
+      script(src="/resources/js/jquery.overlayScrollbars.min.js")
+    
+
+    script.
+      var userId = !{userId}
+      var authToken = "!{token}"
+      var isWebview = !{webview}
+      var headers = !{headers}
+
+      $(function () {
+        window.scrollbar = $("#body").overlayScrollbars({
+          className: "os-theme-dark os-theme-sunlight"
+        })
+      })
+    
+    block footer
+    
