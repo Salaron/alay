@@ -17,7 +17,7 @@
     "@types/formidable": "^1.0.31",
     "@types/mime": "^2.0.1",
     "@types/mysql2": "types/npm-mysql2",
-    "@types/node": "^13.9.4",
+    "@types/node": "^13.9.5",
     "@types/nodemailer": "^6.4.0",
     "@types/showdown": "^1.9.3",
     "@types/sqlite3": "^3.1.6",
