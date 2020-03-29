@@ -19,7 +19,7 @@ export class WebView extends CommonModule {
       ...values,
       userId: requestData.user_id,
       token: requestData.auth_token,
-      webview: requestData.requestFromBrowser,
+      webview: !requestData.requestFromBrowser,
       headers: JSON.stringify(requestData.getWebapiHeaders()),
       isAdmin: Config.server.admin_ids.includes(requestData.user_id || 0),
       languageList: Config.i18n.languages,
