@@ -90,8 +90,3 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance:textfield;
 }
-
-
-.sl-overlay {
-  background: rgba(34,34,34,.6)
-}

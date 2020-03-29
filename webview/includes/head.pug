@@ -9,15 +9,13 @@ html
     meta(name="format-detection", content="telephone=no")
     if webview
       meta(name="viewport", content="width=650, user-scalable=no")
-    else
-      meta(name="viewport", content="width=device-width")
-    script.
-      if (!{webview}) {
+      script.
         var width = screen.width || 0
         if (width > 650) {
           document.querySelector("meta[name=viewport]").setAttribute("content", "width=device-width, user-scalable=no")
         }
-      }
+    else
+      meta(name="viewport", content="width=device-width")
     
     block stylesheets
       link(rel="stylesheet", href="/resources/css/uikit.min.css")
