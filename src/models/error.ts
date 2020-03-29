@@ -17,7 +17,8 @@ export class ErrorAPI extends Error {
     }
   }
 }
-export class ErrorWebAPI extends ErrorAPI {
+export class ErrorWebAPI extends Error {
+  public response: any
   constructor(message: string) {
     super(message)
     this.response = {
