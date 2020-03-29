@@ -17,7 +17,6 @@ body {
   overflow: hidden;
 }
 
-
 .no-hover {
   pointer-events: none;
 }
@@ -89,4 +88,8 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance:textfield;
+}
+
+.uk-h1, .uk-h2, .uk-h3, .uk-h4, .uk-h5, .uk-h6, .uk-heading-2xlarge, .uk-heading-large, .uk-heading-medium, .uk-heading-small, .uk-heading-xlarge, h1, h2, h3, h4, h5, h6, body {
+  font-family: 'Open Sans', sans-serif;
 }
