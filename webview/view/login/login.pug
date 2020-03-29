@@ -13,15 +13,21 @@ block body
     }
 
     .sl-icon-back {
+      left: 0;
+      top: 0;
+      margin: 10px;
       border-radius: 12px;
-      left: 8px;
       height: 40px;
-      position: absolute;
-      top: 11px;
       width: 40px;
+      position: absolute;
     }
   
   div(id="container", class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light")
+    #backButton(class="uk-position-z-index" hidden)
+      a(onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5")
+    if webview
+      div(class="uk-position-z-index uk-position-right uk-dark" style="margin: 10px")
+        a(id="external" class="uk-button uk-button-default uk-button-small uk-border-pill") #{i18n.openInBrowser}
     div(class="uk-position-cover uk-overlay-primary")
     div(class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade")
 
@@ -39,8 +45,6 @@ block body
         // open in browser button
         .uk-margin-small
           button(type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="doLogin()") #{i18n.login}
-          if webview
-            a(id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small") #{i18n.openInBrowser}
 
         .uk-text-center
           a(class="uk-link-reset uk-text-small uk-margin-top uk-button-text" 
@@ -74,8 +78,15 @@ block body
           data-uk-toggle="target: #recoverForm, #loginForm; animation: uk-animation-fade")
             span(data-uk-icon="arrow-left") #{i18n.backToLogin}
       
-      form(id="recoverHelpForm" class="uk-position-center" hidden)
-        p !{i18n.ifYouLostLoginDataContactUs}
+      form(id="recoverHelpForm" hidden)
+        .uk-text-center
+          p !{i18n.ifYouLostLoginDataContactUs}
+        .uk-margin-small
+          a(class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small external-link" href="https://vk.me/sunlight_project") #{i18n.writeToVk}
+        .uk-text-center
+          a(class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
+          data-uk-toggle="target: #recoverHelpForm, #loginForm; animation: uk-animation-fade")
+            span(data-uk-icon="arrow-left") #{i18n.backToLogin}
     
     div(id="loginSuccess" class="uk-overlay uk-position-bottom" hidden)
       h1 !{i18n.success}
@@ -94,9 +105,9 @@ block footer
     RSAEncrypt.setKey(!{publicKey})
 
     $(document).ready(function () {
-      if (window.history.length != 1) 
-        $("#container").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
-      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + authToken))
+      if (window.history.length !== 1) 
+        $("#backButton").removeAttr("hidden")
+      $("#external").attr("href", getExternalUrl())
       var form = "#loginForm"
       if (window.location.href.split("?")[1] && parseQueryString(window.location.href.split("?")[1]).recovery) {
         form = "#confirmCodeForm"
@@ -108,14 +119,15 @@ block footer
       })
       toggle.toggle()
       toggle.$destroy()
+      updateLinks()
     })
     function disableButtons() {
       $(".uk-button").attr("disabled", true)
-      $("#back").fadeOut(200)
+      $("#backButton").fadeOut(200)
     }
     function enableButtons() {
       $(".uk-button").attr("disabled", false)
-      $("#back").fadeIn(200)
+      $("#backButton").fadeIn(200)
     }
     function doLogin() {
       var login = $("#login").val()
