@@ -11,31 +11,22 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
-      throw new ErrorAPI("Access only with a certain auth level")
+    if (this.requestData.auth_level !== this.requiredAuthLevel && !Config.server.debug_mode)
+      throw new ErrorAPI("No permissions")
 
-    const [strings, template] = await Promise.all([
-      this.i18n.getStrings(this.requestData, "login-startup", "login-login"),
-      this.webview.getTemplate("login", "login")
-    ])
+    const i18n = await this.i18n.getStrings(this.requestData, "login-startup", "login-login")
 
     const values = {
       module: "login",
-      scripts: [
-        "/resources/js/jsencrypt.min.js",
-      ],
+      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
       siteKey: Config.modules.login.recaptcha_site_key,
       enableRecaptcha: Config.modules.login.enable_recaptcha,
-      i18n: strings,
+      i18n,
       pageTitle: "SunLight Login"
-    }
-
-    if (Config.modules.login.enable_recaptcha) {
-      values.scripts.push(`https://www.google.com/recaptcha/api.js?render=${Config.modules.login.recaptcha_site_key}`)
     }
     return {
       status: 200,
-      result: await this.webview.compileBodyTemplate(template, this.requestData, values)
+      result: await this.webview.renderTemplate("login", "login", this.requestData, values)
     }
   }
 }

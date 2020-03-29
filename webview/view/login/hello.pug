@@ -20,10 +20,10 @@ block body
     div(class="uk-overlay uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium")
       h3 #{i18n.hello}
       p #{i18n.introduction}
-      a(class="uk-button uk-button-default uk-border-pill" href="/webview.php/login/login") #{i18n.login}
+      a(class="uk-button uk-button-default uk-border-pill uk-margin-small-right" href="/webview.php/login/login") #{i18n.login}
       if registrationEnabled
-        a(class="uk-button uk-button-default uk-border-pill" href="/webview.php/login/startUp") #{i18n.registration}
-      a(class="uk-button uk-button-default uk-border-pill" href="/webview.php/tos/read") #{i18n.tos}
+        a(class="uk-button uk-button-default uk-border-pill uk-margin-small-right" href="/webview.php/login/startUp") #{i18n.registration}
+      a(class="uk-button uk-button-default uk-border-pill uk-margin-small-right" href="/webview.php/tos/read") #{i18n.tos}
 
 block footer
   script.

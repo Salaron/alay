@@ -1,0 +1,217 @@
+extends ../../includes/head.pug
+
+block body
+  style.
+    #wrapper {
+      background-image: url("/resources/img/login_bg.png");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .sl-icon-back {
+      border-radius: 12px;
+      left: 8px;
+      height: 40px;
+      position: absolute;
+      top: 11px;
+      width: 40px;
+    }
+  
+  div(id="wrapper", class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light")
+    div(class="uk-position-cover uk-overlay-primary")
+    div(class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade")
+
+      form(id="loginForm")
+        // email input
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user")
+            input(id="login" class="uk-input uk-border-pill" required placeholder="Email / User ID" type="email")
+        // password input
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock")
+            input(id="password" class="uk-input uk-border-pill" required placeholder=i18n.password + " / Handover ID" type="password" onkeydown="if (event.keyCode == 13) { doLogin (); blur(); }")
+        // open in browser button
+        .uk-margin-small
+          button(type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="doLogin()") #{i18n.login}
+          if isWebview
+            a(id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small") #{i18n.openInBrowser}
+
+        .uk-text-center
+          a(class="uk-link-reset uk-text-small uk-margin-top uk-button-text" 
+          data-uk-toggle="target: #loginForm, #recoverForm; animation: uk-animation-fade") #{i18n.forgotPassword}
+          br
+          a(class="uk-link-reset uk-text-small uk-margin-top uk-button-text"
+          data-uk-toggle="target: #loginForm, #recoverHelpForm; animation: uk-animation-fade") #{i18n.needHelpWithRecovery}
+
+      form(id="confirmCodeForm" hidden)
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock")
+            input(id="code" class="uk-input uk-border-pill" required placeholder=i18n.confirmationCode type="text")
+        .uk-margin-small
+          button(type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="confirmCode()") #{i18n.send}
+        .uk-text-center
+          a(class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
+          data-uk-toggle="target: #confirmCodeForm, #loginForm; animation: uk-animation-fade")
+            span(data-uk-icon="arrow-left") #{i18n.backToLogin}
+
+      form(id="recoverForm" hidden)
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail")
+            input(id="mail" class="uk-input uk-border-pill" required placeholder=i18n.email type="text")
+        .uk-margin-small
+          button(type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+          onclick="recoverPassword()") #{i18n.send}
+        .uk-text-center
+          a(class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
+          data-uk-toggle="target: #recoverForm, #loginForm; animation: uk-animation-fade")
+            span(data-uk-icon="arrow-left") #{i18n.backToLogin}
+      
+      form(id="recoverHelpForm" class="uk-position-center" hidden)
+        p !{i18n.ifYouLostLoginDataContactUs}
+    
+    div(id="loginSuccess" class="uk-overlay uk-position-bottom" hidden)
+      h1 !{i18n.success}
+      p !{i18n.successDescriptionLogin}
+
+
+block append scripts
+  script(src="/resources/js/jsencrypt.min.js")
+  if enableRecaptcha
+    script(src="https://www.google.com/recaptcha/api.js?render=" + siteKey)
+
+block footer
+  script.
+    var enableRecaptcha = !{enableRecaptcha}
+    var publicKey = !{publicKey}
+    var RSAEncrypt = new JSEncrypt()
+    RSAEncrypt.setKey(publicKey)
+
+    $(document).ready(function () {
+      if (window.history.length != 1) 
+        $("#wrapper").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + parseQueryString(headers.authorize).token))
+      if (window.location.href.split("?")[1] && parseQueryString(window.location.href.split("?")[1]).recovery) {
+        var toggle = UIkit.toggle("#loginForm", {
+          target: "#loginForm, #confirmCodeForm",
+          animation: "uk-animation-fade"
+        })
+        toggle.toggle()
+        toggle.$destroy()
+        sendNotification("#{i18n.mailSuccess}", "success")
+      }
+    })
+    function disableButtons() {
+      $(".uk-button").attr("disabled", true)
+      $("#back").fadeOut(200)
+    }
+    function enableButtons() {
+      $(".uk-button").attr("disabled", false)
+      $("#back").fadeIn(200)
+    }
+    function doLogin() {
+      var login = $("#login").val()
+      var pass = $("#password").val()
+      if (pass.length === 0) return sendNotification("#{i18n.passwordBlank}", "warning")
+      if (pass.length > 32) return sendNotification("#{i18n.passwordLimit}", "warning")
+      if (!checkPass(pass)) return sendNotification("#{i18n.passwordInvalidFormat}", "warning")
+      disableButtons()
+      function send(token) {
+        $.when(sendRequest({
+          module: "!{module}",
+          action: "login",
+          login: RSAEncrypt.encrypt(xor(login, parseQueryString(headers.authorize).token)),
+          password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
+          recaptcha: token || "",
+          timestamp: Math.floor(Date.now() / 1000)
+        })).done(function (response) {
+          if (response.error || response.maintenance || !response) return
+          if ("!{redirect}".length != 0) {
+            window.location.replace(window.location.protocol + "//" + window.location.host + "/!{redirect}")
+          } else {
+            UIkit.toggle("#loginForm", {
+              target: "#loginForm, #loginSuccess",
+              animation: "uk-animation-fade"
+            }).toggle()
+          }
+        }).fail(function () {
+          enableButtons()
+        })
+      }
+      if (enableRecaptcha === true) {
+        grecaptcha.ready(function () {
+          grecaptcha.execute("#{siteKey}", { action: "login" }).then(function (token) {
+            send(token)
+          })
+        })
+      } else {
+        send()
+      }
+    }
+    function recoverPassword() {
+      var mail = $("#mail").val()
+      if (!checkMail(mail)) return sendNotification("#{i18n.mailInvalidFormat}", "warning")
+      disableButtons()
+      function send(token) {
+        $.when(sendRequest({
+          module: "login",
+          action: "passwordRecovery",
+          mail: mail,
+          recaptcha: token || "",
+          timestamp: Math.floor(Date.now() / 1000)
+        })).done(function (response) {
+          if (response.error || response.maintenance || !response) return
+          if (!external) {
+            window.location.replace("native://browser?url=" + encodeURIComponent(window.location.href + "?recovery=true&user_id=&token=" + parseQueryString(headers.authorize).token))
+          } else {
+            var toggle = UIkit.toggle("#loginForm", {
+              target: "#recoverForm, #confirmCodeForm",
+              animation: "uk-animation-fade"
+            })
+            toggle.toggle()
+            toggle.$destroy()
+            sendNotification("#{i18n.mailSuccess}", "success")
+          }
+        }).always(function () {
+          enableButtons()
+        })
+      }
+      if (enableRecaptcha === true) {
+        grecaptcha.ready(function () {
+          grecaptcha.execute("#{siteKey}", { action: "login" }).then(function (token) {
+            send(token)
+          })
+        })
+      } else {
+        send()
+      }
+    }
+    function confirmCode() {
+      var code = $("#code").val()
+      if (!checkPass(code) || code.length != 10) return sendNotification("#{i18n.confirmationCodeInvalidFormat}", "warning")
+      disableButtons()
+      $.when(sendRequest({
+        module: "login",
+        action: "codeVerify",
+        code: code,
+        timestamp: Math.floor(Date.now() / 1000)
+      })).done(function (response) {
+        if (response.error || response.maintenance || !response) return
+        var toggle = UIkit.toggle("#loginForm", {
+          target: "#loginForm, #confirmCodeForm",
+          animation: "uk-animation-fade"
+        })
+        toggle.toggle()
+        toggle.$destroy()
+        sendNotification("#{i18n.passwordResetSuccess}", "success")
+      }).always(function () {
+        enableButtons()
+      })
+    }
