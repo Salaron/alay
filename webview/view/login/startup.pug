@@ -1,0 +1,139 @@
+extends ../../includes/head.pug
+
+block body
+  style.
+    #container {
+      background-image: url("/resources/img/startup_bg.png");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .sl-icon-back {
+      border-radius: 12px;
+      left: 8px;
+      height: 40px;
+      position: absolute;
+      top: 11px;
+      width: 40px;
+    }
+  
+  div(id="container", class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light")
+    div(class="uk-position-cover uk-overlay-primary")
+    div(class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade")
+      form(id="startupForm")
+        // nickname
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user")
+            input(id="nickname" class="uk-input uk-border-pill" required placeholder=i18n.nickname type="text")
+        // email
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail")
+            input(id="email" class="uk-input uk-border-pill" required placeholder=i18n.email type="email")
+        // password
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock")
+            input(id="password" class="uk-input uk-border-pill" required placeholder=i18n.password type="password")
+        // password confirm
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock")
+            input(id="password-confirm" class="uk-input uk-border-pill" required placeholder=i18n.repeatPassword type="password")
+        // buttons
+        .uk-margin-small
+          button(type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
+          onclick="startUp()") #{i18n.send}
+          if webview
+            a(id="external" class="uk-button uk-button-primary uk-border-pill uk-width-1-1 uk-margin-small") #{i18n.openInBrowser}
+    div(id="startupSuccess" class="uk-overlay uk-position-bottom" hidden)
+      h1 !{i18n.success}
+      p !{i18n.successDescription}
+
+
+block append scripts
+  script(src="/resources/js/jsencrypt.min.js")
+  if enableRecaptcha
+    script(src="https://www.google.com/recaptcha/api.js?render=" + siteKey)
+
+block footer
+  script.
+    var enableRecaptcha = !{enableRecaptcha}
+    var RSAEncrypt = new JSEncrypt()
+    RSAEncrypt.setKey(!{publicKey})
+
+    $(document).ready(function () {
+      if (window.history.length != 1) 
+        $("#container").append('<div id="back"><a onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5"></a></div>')
+      $("#external").attr("href", "native://browser?url=" + encodeURIComponent(window.location.href + "?user_id=&token=" + authToken))
+      if (window.location.href.split("?")[1] && parseQueryString(window.location.href.split("?")[1]).recovery) {
+        var toggle = UIkit.toggle("#loginForm", {
+          target: "#loginForm, #confirmCodeForm",
+          animation: "uk-animation-fade"
+        })
+        toggle.toggle()
+        toggle.$destroy()
+        sendNotification("#{i18n.mailSuccess}", "success")
+      }
+    })
+    function disableButtons() {
+      $(".uk-button").attr("disabled", true)
+      $("#back").fadeOut(200)
+    }
+    function enableButtons() {
+      $(".uk-button").attr("disabled", false)
+      $("#back").fadeIn(200)
+    }
+
+    function startUp() {
+      var name = $("#nickname").val()
+      var email = $("#email").val()
+      var password = $("#password").val()
+      var passwordConfirm = $("#password-confirm").val()
+      if (name.length === 0) return sendNotification("#{i18n.nicknameBlank}", "warning")
+      if (name.length > 20) return sendNotification("#{i18n.nicknameLimit}", "warning")
+      if (email.length === 0) return sendNotification("#{i18n.mailBlank}", "warning")
+      if (!checkMail(email)) return sendNotification("#{i18n.mailInvalidFormat}", "warning")
+      if (password.length === 0) return sendNotification("#{i18n.passwordBlank}", "warning")
+      if (password.length > 32) return sendNotification("#{i18n.passwordLimit}", "warning")
+      if (!checkPass(password)) return sendNotification("#{i18n.passwordInvalidFormat}", "warning")
+      if (password !== passwordConfirm) return sendNotification("#{i18n.passwordsNotMatch}", "warning")
+      disableButtons()
+      function send(token) {
+        $.when(sendRequest({
+          module: "login",
+          action: "startUp",
+          name: name,
+          mail: email,
+          password: RSAEncrypt.encrypt(xor(password, authToken)),
+          recaptcha: token || "",
+          timestamp: Math.floor(Date.now() / 1000)
+        })).done(function (response) {
+          if (!response || !response.response_data) return enableButtons()
+          $("#startupSuccess").html(replacePlaceholders($("#startupSuccess").html(), {
+            userId: response.response_data.user_id,
+            mail: response.response_data.mail_sended === true ? "#{i18n.checkMail}" : ""
+          }))
+          UIkit.toggle("#startupForm", {
+            target: "#startupForm, #startupSuccess",
+            animation: "uk-animation-fade"
+          }).toggle()
+        }).fail(function () {
+          enableButtons()
+        })
+      }
+      if (enableRecaptcha === true) {
+        grecaptcha.ready(function () {
+          grecaptcha.execute("#{siteKey}", { action: "login" }).then(function (token) {
+            send(token)
+          })
+        })
+      } else {
+        send()
+      }
+    }

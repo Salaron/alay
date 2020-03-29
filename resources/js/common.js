@@ -135,8 +135,8 @@ function replacePlaceholders(input, values) {
   })
 }
 
-function updateHref() {
-  if (!external) {
+function updateLinks() {
+  if (isWebview) {
     $('a[href^="http"]').each(function () {
       $(this).attr("href", "native://browser?url=" + encodeURIComponent($(this).attr("href")))
     })
