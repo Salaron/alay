@@ -1,41 +1,45 @@
 @charset "utf-8";
 
-html, body {
-  -webkit-text-size-adjust: 100%;
+* {
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.5;
+  -webkit-text-size-adjust: none;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   background: transparent;
 }
 
-body {
-  margin: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  position: fixed;
-  tab-size: 4;
+html, body {
   overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+#outer, #inner {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#body {
+  height: 100%;
+  margin: 2px 0px 2px 0px;
+  overflow: auto;
+  /* indent for scrollbar */
+  border-right: solid 2px transparent;
 }
 
 .no-hover {
   pointer-events: none;
-}
-
-/* Header */
-.sl-navbar-container:not(.uk-navbar-transparent) {
-  background: linear-gradient(to left, #28a5f5, #1e87f0);
-  min-height: 50px;
-}
-
-.sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
-  color: rgba(255,255,255,0.8);
-  min-height: 50px;
-  font-size: 1.2em;
-}
-
-.sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li.uk-active>a {
-  color: #fff;
-  font-size: 1.2em;
 }
 
 .sl-icon {
@@ -66,17 +70,6 @@ body {
   border-radius: 100%;
 }
 
-.os-theme-dark.os-theme-sunlight > .os-scrollbar  > .os-scrollbar-track > .os-scrollbar-handle {
-  background: #84a8e2;
-}
-.os-theme-dark>.os-scrollbar:hover>.os-scrollbar-track:hover>.os-scrollbar-handle {
-  background: rgb(108, 162, 250);
-}
-.os-theme-dark.os-theme-sunlight > .os-scrollbar  > .os-scrollbar-track > .os-scrollbar-handle.active {
-  background: #4286f4;
-}
-
-
 /* Remove arrows from input=[number] */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
@@ -84,12 +77,47 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 /* Firefox */
 input[type=number] {
-  -moz-appearance:textfield;
+  -moz-appearance: textfield;
 }
 
-.uk-h1, .uk-h2, .uk-h3, .uk-h4, .uk-h5, .uk-h6, .uk-heading-2xlarge, .uk-heading-large, .uk-heading-medium, .uk-heading-small, .uk-heading-xlarge, h1, h2, h3, h4, h5, h6, body {
+/* Set Open Sans as default font */
+.uk-h1, .uk-h2, .uk-h3, .uk-h4, .uk-h5, .uk-h6, 
+.uk-heading-2xlarge, .uk-heading-large, .uk-heading-medium, 
+.uk-heading-small, .uk-heading-xlarge, 
+h1, h2, h3, h4, h5, h6, 
+body {
   font-family: 'Open Sans', sans-serif;
+}
+
+/* Scrollbar color theme */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track, ::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #84a8e2;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Header */
+.sl-navbar-container:not(.uk-navbar-transparent) {
+  background: linear-gradient(to left, #28a5f5, #1e87f0);
+  min-height: 50px;
+}
+
+.sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li>a {
+  color: rgba(255,255,255,0.8);
+  min-height: 50px;
+  font-size: 1.2em;
+}
+
+.sl-navbar-container:not(.uk-navbar-transparent) .uk-navbar-nav>li.uk-active>a {
+  color: #fff;
+  font-size: 1.2em;
 }

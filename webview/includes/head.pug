@@ -33,19 +33,11 @@ html
       script(src="/resources/js/jquery.min.js")
       script(src="/resources/js/common.js")
       script(src="/resources/js/uikit-icons.min.js")
-      script(src="/resources/js/jquery.overlayScrollbars.min.js")
     
     script.
       var userId = !{userId}
       var authToken = "!{token}"
       var isWebview = !{webview}
       var headers = !{headers}
-      var scrollbar = null
-
-      $(function () {
-        scrollbar = $("#body").overlayScrollbars({
-          className: "os-theme-dark os-theme-sunlight"
-        })
-      })
     
     block footer

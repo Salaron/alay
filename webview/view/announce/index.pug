@@ -1,0 +1,33 @@
+extends ../../includes/head.pug
+
+block body
+  #outer
+    #inner
+      #header
+       include ../../includes/header.pug 
+        
+      #body
+        div(class="uk-container")
+          br
+          each announce in announceList
+            div(class="uk-card uk-card-default uk-width-1-1")
+              div(class="uk-card-header")
+                div(class="uk-grid-small uk-flex-middle" uk-grid)
+                  div(class="uk-width-expand")
+                    h4(class="uk-margin-remove-bottom") !{announce.title}
+                    p(class="uk-text-meta uk-margin-remove-top") !{announce.date}
+
+              div(class="uk-card-body")
+                p(class="uk-margin-remove" style="white-space: pre-line") !{announce.description}
+
+              if announce.extendable
+                div(class="uk-card-footer")
+                  a(class="uk-button uk-button-text uk-margin-remove" href="/webview.php/announce/detail?id=" + announce.id) !{i18n.more}
+            br
+
+
+block append scripts
+  script(src="/resources/js/change-language.js")
+
+block footer
+  include ../../includes/changeLanguage.pug
