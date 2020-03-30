@@ -30,7 +30,7 @@
     "formidable": "^1.2.2",
     "gris": "^1.0.4",
     "handlebars": "^4.7.3",
-    "ioredis": "^4.16.0",
+    "ioredis": "^4.16.1",
     "mime": "^2.4.4",
     "moment": "^2.24.0",
     "mysql2": "^2.1.0",
