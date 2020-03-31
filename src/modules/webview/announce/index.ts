@@ -15,7 +15,7 @@ export default class extends WebViewAction {
       this.i18n.getStrings(this.requestData, "common", "announce-index"),
       this.connection.query(`SELECT * FROM webview_announce ORDER BY insert_date DESC`),
     ])
-    this.requestData.requestFromBrowser = false
+
     announceList = announceList.map((announce: any) => {
       return {
         id: announce.id,
