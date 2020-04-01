@@ -8,11 +8,11 @@ html
     meta(http-equiv="X-UA-Compatible", content="ie=edge, chrome=1")
     meta(name="format-detection", content="telephone=no")
     if webview
-      meta(name="viewport", content="width=650, user-scalable=no")
+      meta(name="viewport", content="width=device-width, user-scalable=no")
       script.
-        var width = screen.width || 0
-        if (width > 650) {
-          document.querySelector("meta[name=viewport]").setAttribute("content", "width=device-width, user-scalable=no")
+        var width = Math.max(window.innerWidth || 0)
+        if (width < 655) {
+          document.querySelector("meta[name=viewport]").setAttribute("content", "width=650, user-scalable=no")
         }
     else
       meta(name="viewport", content="width=device-width")
