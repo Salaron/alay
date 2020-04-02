@@ -16,7 +16,7 @@ export default class extends WebViewAction {
 
     const i18n = await this.i18n.getStrings(this.requestData, "login-startup", "login-login")
 
-    const values = {
+    const locals = {
       module: "login",
       publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
       siteKey: Config.modules.login.recaptcha_site_key,
@@ -26,7 +26,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: await this.webview.renderTemplate("login", "login", this.requestData, values)
+      result: await this.webview.renderTemplate("login", "login", locals)
     }
   }
 }

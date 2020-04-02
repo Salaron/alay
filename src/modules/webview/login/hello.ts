@@ -15,12 +15,12 @@ export default class extends WebViewAction {
       throw new ErrorAPI("No permissions")
 
     const i18n = await this.i18n.getStrings(this.requestData, "login-hello")
-    const values = {
+    const locals = {
       i18n,
       registrationEnabled: Config.modules.login.enable_registration,
       pageTitle: i18n.hello
     }
-    const result = await this.webview.renderTemplate("login", "hello", this.requestData, values)
+    const result = await this.webview.renderTemplate("login", "hello", locals)
     return {
       status: 200,
       result

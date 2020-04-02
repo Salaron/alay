@@ -16,7 +16,7 @@ export default class extends WebViewAction {
     if (!Config.modules.login.enable_registration) throw new ErrorAPI("Registration disabled")
 
     const i18n = await this.i18n.getStrings(this.requestData, "login-startup", "login-login")
-    const values = {
+    const locals = {
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,
       publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
@@ -25,7 +25,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: await this.webview.renderTemplate("login", "startup", this.requestData, values)
+      result: await this.webview.renderTemplate("login", "startup", locals)
     }
   }
 }

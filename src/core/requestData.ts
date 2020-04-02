@@ -194,25 +194,6 @@ export default class RequestData {
     return xmc === this.headers["x-message-code"]
   }
 
-  public getWebapiHeaders() {
-    const authorizeHeader = {
-      consumerKey: Config.client.consumer_key.length > 0 ? Config.client.consumer_key : "lovelive_test",
-      timeStamp: Utils.timeStamp(),
-      version: "1.1",
-      nonce: "WA0",
-      token: this.auth_token
-    }
-    const headers = {
-      "user-id": this.user_id ? this.user_id.toString() : "",
-      "bundle-version": this.headers["bundle-version"] || Config.client.application_version,
-      "client-version": this.headers["client-version"] || Config.server.server_version,
-      "application-id": this.headers["application-id"] || Config.client.application_id,
-      "os-version": this.request.headers["os-version"],
-      "authorize": querystring.stringify(authorizeHeader)
-    }
-    return headers
-  }
-
   public resetCookieAuth() {
     this.response.setHeader("Set-Cookie", [
       `user_id=; expires=${new Date(new Date().getTime() - 600000).toUTCString()}; path=/;`,
