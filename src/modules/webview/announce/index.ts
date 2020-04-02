@@ -32,7 +32,7 @@ export default class extends WebViewAction {
     }
     return {
       status: 200,
-      result: await this.webview.renderTemplate("announce", "index", this.requestData, values)
+      result: await this.webview.renderTemplate("announce", "index", values)
     }
   }
 }
