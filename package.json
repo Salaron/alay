@@ -29,7 +29,7 @@
     "@types/ioredis": "^4.14.9",
     "formidable": "^1.2.2",
     "gris": "^1.0.6",
-    "handlebars": "^4.7.3",
+    "handlebars": "^4.7.6",
     "ioredis": "^4.16.1",
     "mime": "^2.4.4",
     "moment": "^2.24.0",
