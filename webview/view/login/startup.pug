@@ -3,7 +3,7 @@ extends ../../includes/head.pug
 block body
   style.
     #container {
-      background-image: url("/resources/img/startup_bg.png");
+      background-image: url("/public/img/startup_bg.png");
       background-position: center center;
       background-repeat: no-repeat;
       background-size: cover;
@@ -61,7 +61,7 @@ block body
 
 
 block append scripts
-  script(src="/resources/js/jsencrypt.min.js")
+  script(src="/public/js/jsencrypt.min.js")
   if enableRecaptcha
     script(src="https://www.google.com/recaptcha/api.js?render=" + siteKey)
 

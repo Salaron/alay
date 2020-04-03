@@ -1,9 +1,11 @@
+import { promises, readFileSync } from "fs"
 import Pug from "pug"
 import querystring from "querystring"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
 import { Utils } from "./utils"
 
+let assets = JSON.parse(readFileSync("webpack-assets.json", "utf-8"))
 export class WebView extends CommonModule {
   constructor(action: BaseAction) {
     super(action)
@@ -15,6 +17,9 @@ export class WebView extends CommonModule {
       currentLanguage = await this.action.i18n.getUserLocalizationCode(this.requestData)
     } catch { } // tslint:disable-line
 
+    if (Config.server.debug_mode) {
+      assets = JSON.parse(await promises.readFile("webpack-assets.json", "utf-8"))
+    }
     const defaultLocals: Pug.LocalsObject = {
       pageTitle: "SunLight WebView", // page title can be overridden
       ...locals,
@@ -24,6 +29,7 @@ export class WebView extends CommonModule {
       headers: JSON.stringify(this.getHeaders()),
       isAdmin: Config.server.admin_ids.includes(this.requestData.user_id || 0),
       languageList: Config.i18n.languages,
+      scriptBundle: assets.main.js,
       currentLanguage
     }
 

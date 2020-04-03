@@ -19,24 +19,20 @@ html
     
     block stylesheets
       link(rel="stylesheet", href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300;1,400;1,600;1,700;1,800&display=swap")
-      link(rel="stylesheet", href="/resources/css/uikit.min.css")
-      link(rel="stylesheet", href="/resources/css/styles.css")
+      link(rel="stylesheet", href="/public/css/uikit.min.css")
+      link(rel="stylesheet", href="/public/css/styles.css")
       if webview
-        link(rel="stylesheet", href="/resources/css/webview.css")
-
-  body
-    block body
-
-    block scripts
-      script(src="/resources/js/uikit.min.js")
-      script(src="/resources/js/uikit-icons.min.js")
-      script(src="/resources/js/jquery.min.js")
-      script(src="/resources/js/common.js")
+        link(rel="stylesheet", href="/public/css/webview.css")
     
     script.
       var userId = !{userId}
       var authToken = "!{token}"
       var isWebview = !{webview}
       var headers = !{headers}
+
+  body
+    block body
     
+    block scripts
+      script(src=scriptBundle) 
     block footer

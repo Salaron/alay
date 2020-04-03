@@ -35,7 +35,6 @@ import { Gris } from "./core/gris"
   // And connect to the Redis database
   await ConnectToRedis()
   // Prepare common modules
-  // execute init function if exists
   for (const module in modules) {
     if ((<any>modules)[module].init) await (<any>modules)[module].init()
   }

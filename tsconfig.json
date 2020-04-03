@@ -1,19 +1,21 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "target": "ES2019",
     "module": "commonjs", 
-    "declaration": true,
-    "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist/",
     "rootDir": "./src/",
-    "preserveSymlinks": true,
+    "incremental": true,
     "removeComments": true,
     "strict": true,
-    "strictPropertyInitialization": false,
     "alwaysStrict": true,
+    "strictPropertyInitialization": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
-  }
+  },
+  "exclude": [
+    "webpack",
+    "webpack.config.ts",
+    "node_modules"
+  ]
 }

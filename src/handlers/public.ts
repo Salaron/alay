@@ -2,7 +2,7 @@ import { createReadStream } from "fs"
 import { IncomingMessage, ServerResponse } from "http"
 import mime from "mime"
 
-export default async function resourcesHandler(request: IncomingMessage, response: ServerResponse) {
+export default async function publicHandler(request: IncomingMessage, response: ServerResponse) {
   const pathName = request.url!.split("?")[0]
   const mimeType = mime.getType(pathName)
   if (mimeType == null) throw new Error("Unknown type")
@@ -14,7 +14,7 @@ export default async function resourcesHandler(request: IncomingMessage, respons
   const [, , ...path] = pathName.split("/")
 
   try {
-    const stream = createReadStream(`./resources/${path.join("/")}`)
+    const stream = createReadStream(`./public/${path.join("/")}`)
 
     stream.on("open", () => {
       response.setHeader("Content-Type", mimeType)

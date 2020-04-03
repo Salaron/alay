@@ -2,9 +2,11 @@ node_modules/*
 compile/*
 dist/*
 logs/*
+public/js/*
 
 src/config/*
 tsconfig.tsbuildinfo
+webpack-assets.json
 
 data/**/*.db_
 !data/db/sv_live_notes.db_
