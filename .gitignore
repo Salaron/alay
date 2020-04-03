@@ -2,7 +2,7 @@ node_modules/*
 compile/*
 dist/*
 logs/*
-public/js/*
+public/*
 
 src/config/*
 tsconfig.tsbuildinfo

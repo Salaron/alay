@@ -29,7 +29,7 @@ export class WebView extends CommonModule {
       headers: JSON.stringify(this.getHeaders()),
       isAdmin: Config.server.admin_ids.includes(this.requestData.user_id || 0),
       languageList: Config.i18n.languages,
-      scriptBundle: assets.main.js,
+      webpackAssets: assets,
       currentLanguage
     }
 
