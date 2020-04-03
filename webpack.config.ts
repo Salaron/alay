@@ -17,7 +17,7 @@ const config: webpack.Configuration = {
     ]
   },
   output: {
-    filename: "bundle.js",
+    filename: "bundle-[hash].js",
     path: pathResolve(__dirname, "public/js"),
     publicPath: "/public/js"
   },

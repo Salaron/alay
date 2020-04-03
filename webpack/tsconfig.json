@@ -3,6 +3,7 @@
   "exclude": [],
   "compilerOptions": {
     "incremental": false,
+    "allowJs": true,
     "rootDir": "./ts"
   }
 }

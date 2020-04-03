@@ -4,10 +4,15 @@
   "description": "SunLight",
   "main": "dist/alay.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "tslint": "tslint -c tslint.json 'src/**/*.ts'",
     "tslint:fix": "tslint -c tslint.json 'src/**/*.ts' --fix",
-    "build": "tsc && webpack --config webpack.config.ts"
+    "start": "node dist/alay.js",
+    "build": "npm run build:ts && npm run build:webpack",
+    "build:ts": "tsc",
+    "build:webpack": "webpack --config webpack.config.ts -p",
+    "watch": "concurrently \"npm:watch:*\"",
+    "watch:ts": "tsc --watch",
+    "watch:webpack": "webpack --config webpack.config.ts --watch -d"
   },
   "author": "Salaron",
   "license": "MIT",
@@ -29,6 +34,7 @@
     "@types/webpack-env": "^1.15.1",
     "assets-webpack-plugin": "^3.9.12",
     "clean-webpack-plugin": "^3.0.0",
+    "concurrently": "^5.1.0",
     "file-loader": "^6.0.0",
     "ts-loader": "^6.2.2",
     "ts-node": "^8.8.1",
