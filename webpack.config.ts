@@ -8,9 +8,9 @@ const config: webpack.Configuration = {
   entry: {
     main: [
       "./webpack/ts/index.ts",
-      "./webpack/styles/default.scss",
+      "./webpack/sass/default.sass",
     ],
-    webview: "./webpack/styles/webview.scss"
+    webview: "./webpack/sass/webview.sass"
   },
   module: {
     rules: [
@@ -28,6 +28,13 @@ const config: webpack.Configuration = {
           "css-loader",
           "sass-loader"
         ]
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/,
+        loader: "file-loader",
+        options: {
+          name: "/img/[name]-[hash].[ext]"
+        }
       }
     ]
   },
@@ -37,7 +44,7 @@ const config: webpack.Configuration = {
     publicPath: "/public"
   },
   resolve: {
-    extensions: [".ts"]
+    extensions: [".ts", ".css", ".js", ".png"]
   },
   plugins: [
     new CleanWebpackPlugin(),

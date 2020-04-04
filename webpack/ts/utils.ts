@@ -1,6 +1,6 @@
-import UIkit from "uikit"
 import $ from "jquery"
-import { headers } from "./global"
+import UIkit from "uikit"
+import { headers, userId, authToken, isWebview } from "./global"
 
 /**
  * Set a cookies in browser
@@ -30,10 +30,18 @@ export function getCookie(name: string) {
   return null
 }
 
+/**
+ * Remove a cookie
+ * @param name Cookie name
+ */
 export function removeCookie(name: string) {
   setCookie(name, "", -1)
 }
 
+/**
+ * Parse query
+ * @param str
+ */
 export function parseQueryString(str?: string): { [key: string]: string } {
   if (!str) {
     str = window.location.search.replace("?", "")
@@ -48,6 +56,9 @@ export function parseQueryString(str?: string): { [key: string]: string } {
   }, <any>{})
 }
 
+/**
+ * Show a notification in bottom
+ */
 export function showNotification(message: string, status?: "primary" | "success" | "warning" | "danger") {
   UIkit.notification({
     message,
@@ -82,5 +93,29 @@ export async function sendRequest(endpoint: string, data: any) {
     } else {
       showNotification("Проблема с интернет-соединением", "danger")
     }
+  }
+}
+
+/**
+ * Format URL to open it in browser from application
+ */
+export function getExternalURL(url?: string) {
+  let sp = "?"
+  if (location.href.includes("?")) {
+    sp = "&"
+  }
+  if (!url) url = location.href
+  const browserURL = `${url}${sp}user_id=${userId}&token=${authToken}`
+  return `native://browser?url=${encodeURIComponent(browserURL)}`
+}
+
+/**
+ * Not finished
+ */
+export function getMailToURL(mail: string) {
+  if (isWebview) {
+    return `native://mail`
+  } else {
+    return `mailto:${mail}`
   }
 }

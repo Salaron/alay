@@ -1,18 +1,7 @@
 extends ../../includes/head.pug
 
 block body
-  style.
-    #container {
-      background-image: url("/public/img/hello_bg.png");
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-    }
-  
-  div(id="container", class="uk-cover-container uk-overflow-hidden")
+  div(class="uk-cover-container uk-overflow-hidden sl-login-hello-container")
     div(class="uk-overlay uk-overlay-primary uk-position-bottom uk-light" uk-scrollspy="cls: uk-animation-slide-bottom-medium")
       h2 #{i18n.hello}
       p !{nl2br(i18n.introduction)}

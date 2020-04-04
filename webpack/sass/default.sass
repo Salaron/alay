@@ -1,0 +1,31 @@
+// Import default variables and available mixins
+@import ~uikit/src/scss/variables-theme.scss
+@import ~uikit/src/scss/mixins-theme.scss
+
+// Import UIkit
+@import ~uikit/src/scss/uikit-theme.scss
+
+@import pages/login 
+
+html
+  background: transparent
+  text-rendering: optimizeLegibility
+  font-size: 14px
+  line-height: 1.5
+
+html, body
+  overflow: hidden
+  height: 100%
+  width: 100%
+
+
+.no-hover 
+  pointer-events: none
+
+// Set open sans as default font
+.uk-h1, .uk-h2, .uk-h3, .uk-h4, .uk-h5, .uk-h6, 
+.uk-heading-2xlarge, .uk-heading-large, .uk-heading-medium, 
+.uk-heading-small, .uk-heading-xlarge, 
+h1, h2, h3, h4, h5, h6, 
+html, body
+  font-family: "Open Sans", sans-serif

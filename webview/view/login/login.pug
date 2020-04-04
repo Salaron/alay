@@ -1,17 +1,11 @@
 extends ../../includes/head.pug
 
+block variables
+  script.
+    var enableRecaptcha = !{enableRecaptcha}
+
 block body
   style.
-    #container {
-      background-image: url("/public/img/login_bg.png");
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-    }
-
     .sl-icon-back {
       left: 0;
       top: 0;
@@ -22,12 +16,14 @@ block body
       position: absolute;
     }
   
-  div(id="container", class="uk-cover-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light")
+  div(class="uk-cover-container sl-login-login-container uk-background-secondary uk-flex uk-flex-center uk-flex-middle uk-overflow-hidden uk-light")
     #backButton(class="uk-position-z-index" hidden)
       a(onclick="window.history.back()" class="uk-icon-button sl-icon-back" uk-icon="icon: arrow-left; ratio: 1.5")
     if webview
-      div(class="uk-position-z-index uk-position-right uk-dark" style="margin: 10px")
+      div(class="uk-position-z-index uk-position-right uk-dark" style="margin: 12px")
         a(id="external" class="uk-button uk-button-default uk-button-small uk-border-pill") #{i18n.openInBrowser}
+    
+    // create overlay
     div(class="uk-position-cover uk-overlay-primary")
     div(class="uk-width-medium uk-padding-small uk-position-z-index" uk-scrollspy="cls: uk-animation-fade")
 
@@ -36,15 +32,15 @@ block body
         .uk-margin-small
           div(class="uk-inline uk-width-1-1")
             span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: user")
-            input(id="login" class="uk-input uk-border-pill" required placeholder="Email / User ID" type="email")
+            input(id="login" class="uk-input uk-border-pill" required placeholder="Email / User ID")
         // password input
         .uk-margin-small
           div(class="uk-inline uk-width-1-1")
             span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock")
-            input(id="password" class="uk-input uk-border-pill" required placeholder=i18n.password + " / Handover ID" type="password" onkeydown="if (event.keyCode == 13) { doLogin (); blur(); }")
-        // open in browser button
+            input(id="password" class="uk-input uk-border-pill" required placeholder=i18n.password + " / Handover ID" type="password" autocomplete="on")
+        // submit button
         .uk-margin-small
-          button(type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="doLogin()") #{i18n.login}
+          button(type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1") #{i18n.login}
 
         .uk-text-center
           a(class="uk-link-reset uk-text-small uk-margin-top uk-button-text" 
@@ -59,7 +55,7 @@ block body
             span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock")
             input(id="code" class="uk-input uk-border-pill" required placeholder=i18n.confirmationCode type="text")
         .uk-margin-small
-          button(type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1" onclick="confirmCode()") #{i18n.send}
+          button(type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1") #{i18n.send}
         .uk-text-center
           a(class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
           data-uk-toggle="target: #confirmCodeForm, #loginForm; animation: uk-animation-fade")
@@ -69,10 +65,9 @@ block body
         .uk-margin-small
           div(class="uk-inline uk-width-1-1")
             span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: mail")
-            input(id="mail" class="uk-input uk-border-pill" required placeholder=i18n.email type="text")
+            input(id="mail" class="uk-input uk-border-pill" required placeholder=i18n.email type="email")
         .uk-margin-small
-          button(type="button" class="uk-button uk-button-primary uk-border-pill uk-width-1-1"
-          onclick="recoverPassword()") #{i18n.send}
+          button(type="submit" class="uk-button uk-button-primary uk-border-pill uk-width-1-1") #{i18n.send}
         .uk-text-center
           a(class="uk-link-reset uk-text-small uk-margin-small uk-button-text"
           data-uk-toggle="target: #recoverForm, #loginForm; animation: uk-animation-fade")
@@ -94,137 +89,5 @@ block body
 
 
 block append scripts
-  script(src="/public/js/jsencrypt.min.js")
   if enableRecaptcha
     script(src="https://www.google.com/recaptcha/api.js?render=" + siteKey)
-
-block footer
-  script.
-    var enableRecaptcha = !{enableRecaptcha}
-    var RSAEncrypt = new JSEncrypt()
-    RSAEncrypt.setKey(!{publicKey})
-
-    $(document).ready(function () {
-      if (window.history.length !== 1) 
-        $("#backButton").removeAttr("hidden")
-      $("#external").attr("href", getExternalUrl())
-      var form = "#loginForm"
-      if (window.location.href.split("?")[1] && parseQueryString(window.location.href.split("?")[1]).recovery) {
-        form = "#confirmCodeForm"
-        sendNotification("#{i18n.mailSuccess}", "success")
-      }
-      var toggle = UIkit.toggle(form, {
-        target: form,
-        animation: "uk-animation-fade"
-      })
-      toggle.toggle()
-      toggle.$destroy()
-      updateLinks()
-    })
-    function disableButtons() {
-      $(".uk-button").attr("disabled", true)
-      $("#backButton").fadeOut(200)
-    }
-    function enableButtons() {
-      $(".uk-button").attr("disabled", false)
-      $("#backButton").fadeIn(200)
-    }
-    function doLogin() {
-      var login = $("#login").val()
-      var pass = $("#password").val()
-      if (pass.length === 0) return sendNotification("#{i18n.passwordBlank}", "warning")
-      if (pass.length > 32) return sendNotification("#{i18n.passwordLimit}", "warning")
-      if (!checkPass(pass)) return sendNotification("#{i18n.passwordInvalidFormat}", "warning")
-      disableButtons()
-      function send(token) {
-        $.when(sendRequest({
-          module: "!{module}",
-          action: "login",
-          login: RSAEncrypt.encrypt(xor(login, parseQueryString(headers.authorize).token)),
-          password: RSAEncrypt.encrypt(xor(pass, parseQueryString(headers.authorize).token)),
-          recaptcha: token || "",
-          timestamp: Math.floor(Date.now() / 1000)
-        })).done(function (response) {
-          if (response.error || response.maintenance || !response) return
-          if ("!{redirect}".length != 0) {
-            window.location.replace(window.location.protocol + "//" + window.location.host + "/!{redirect}")
-          } else {
-            UIkit.toggle("#loginForm", {
-              target: "#loginForm, #loginSuccess",
-              animation: "uk-animation-fade"
-            }).toggle()
-          }
-        }).fail(function () {
-          enableButtons()
-        })
-      }
-      if (enableRecaptcha === true) {
-        grecaptcha.ready(function () {
-          grecaptcha.execute("#{siteKey}", { action: "login" }).then(function (token) {
-            send(token)
-          })
-        })
-      } else {
-        send()
-      }
-    }
-    function recoverPassword() {
-      var mail = $("#mail").val()
-      if (!checkMail(mail)) return sendNotification("#{i18n.mailInvalidFormat}", "warning")
-      disableButtons()
-      function send(token) {
-        $.when(sendRequest({
-          module: "login",
-          action: "passwordRecovery",
-          mail: mail,
-          recaptcha: token || "",
-          timestamp: Math.floor(Date.now() / 1000)
-        })).done(function (response) {
-          if (response.error || response.maintenance || !response) return
-          if (!external) {
-            window.location.replace("native://browser?url=" + encodeURIComponent(window.location.href + "?recovery=true&user_id=&token=" + parseQueryString(headers.authorize).token))
-          } else {
-            var toggle = UIkit.toggle("#loginForm", {
-              target: "#recoverForm, #confirmCodeForm",
-              animation: "uk-animation-fade"
-            })
-            toggle.toggle()
-            toggle.$destroy()
-            sendNotification("#{i18n.mailSuccess}", "success")
-          }
-        }).always(function () {
-          enableButtons()
-        })
-      }
-      if (enableRecaptcha === true) {
-        grecaptcha.ready(function () {
-          grecaptcha.execute("#{siteKey}", { action: "login" }).then(function (token) {
-            send(token)
-          })
-        })
-      } else {
-        send()
-      }
-    }
-    function confirmCode() {
-      var code = $("#code").val()
-      if (!checkPass(code) || code.length != 10) return sendNotification("#{i18n.confirmationCodeInvalidFormat}", "warning")
-      disableButtons()
-      $.when(sendRequest({
-        module: "login",
-        action: "codeVerify",
-        code: code,
-        timestamp: Math.floor(Date.now() / 1000)
-      })).done(function (response) {
-        if (response.error || response.maintenance || !response) return
-        var toggle = UIkit.toggle("#loginForm", {
-          target: "#loginForm, #confirmCodeForm",
-          animation: "uk-animation-fade"
-        })
-        toggle.toggle()
-        toggle.$destroy()
-        sendNotification("#{i18n.passwordResetSuccess}", "success")
-      }).always(function () {
-        enableButtons()
-      })
-    }
