@@ -12,4 +12,6 @@ export const headers: any = window.headers
 // login
 export const enableRecaptcha: boolean = window.enableRecaptcha
 export const publicKey: string = window.publicKey
-export const siteKey: string = window.siteKey
+export const recaptchaSiteKey: string = window.recaptchaSiteKey
+export const grecaptcha: any = window.grecaptcha // tooooo lazy to do typings
+export const redirect: string = window.redirect

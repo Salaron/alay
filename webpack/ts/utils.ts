@@ -1,6 +1,6 @@
 import $ from "jquery"
 import UIkit from "uikit"
-import { headers, userId, authToken, isWebview } from "./global"
+import { authToken, headers, isWebview, userId } from "./global"
 
 /**
  * Set a cookies in browser
@@ -93,6 +93,7 @@ export async function sendRequest(endpoint: string, data: any) {
     } else {
       showNotification("Проблема с интернет-соединением", "danger")
     }
+    throw err
   }
 }
 

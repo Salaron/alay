@@ -2,7 +2,7 @@ import { authToken, publicKey } from "./global"
 const { JSEncrypt } = require("jsencrypt") // tslint:disable-line
 
 const JSEncryptInstance = new JSEncrypt()
-JSEncryptInstance.setPublicKey(publicKey)
+JSEncryptInstance.setKey(publicKey)
 export function simpleEncrypt(data: string) {
   return RSAEncrypt(xor(data, authToken))
 }

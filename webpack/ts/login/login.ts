@@ -1,6 +1,9 @@
 import $ from "jquery"
 import UIkit from "uikit"
-import { getExternalURL, parseQueryString } from "../utils"
+import { promisify } from "util"
+import { simpleEncrypt } from "../crypto"
+import { enableRecaptcha, grecaptcha, recaptchaSiteKey } from "../global"
+import { parseQueryString, sendRequest } from "../utils"
 
 $(() => {
   if (window.history.length !== 1) {
@@ -20,10 +23,33 @@ $(() => {
   // @ts-ignore $destroy method fully deactivate component
   toggle.$destroy()
 
-  $("#loginForm").submit(form => {
+  $("#loginForm").submit(async form => {
     form.preventDefault()
-    // do login
-    console.log("login")
+    $("input").blur() // hide android keyboard
+    const login = <string>$("#login").val()
+    const password = <string>$("#password").val()
+    // todo: sanity check
+
+    let recaptcha = ""
+    if (enableRecaptcha === true) {
+      await promisify(grecaptcha.ready)()
+      recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "login" })
+    }
+    try {
+      await sendRequest("login/login", {
+        recaptcha,
+        login: simpleEncrypt(login),
+        password: simpleEncrypt(password)
+      })
+      UIkit.toggle("#loginForm", {
+        target: "#loginForm, #loginSuccess",
+        animation: "uk-animation-fade"
+      }).toggle()
+    } catch {
+      // handle errors?
+    } finally {
+      // enable buttons
+    }
   })
 
   $("#confirmCodeForm").submit(form => {
@@ -35,7 +61,3 @@ $(() => {
     form.preventDefault()
   })
 })
-
-export function doLogin() {
-  console.log("DO!")
-}

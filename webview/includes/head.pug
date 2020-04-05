@@ -23,16 +23,16 @@ html
       if webview
         link(rel="stylesheet", href=webpackAssets.webview.css)
       
-      script.
-        var userId = !{userId}
-        var authToken = "!{token}"
-        var isWebview = !{webview}
-        var headers = !{headers}
-      block variables
+    script.
+      var userId = !{userId}
+      var authToken = "!{token}"
+      var isWebview = !{webview}
+      var headers = !{headers}
+    block variables
 
   body
     block body
     
     block scripts
-      script(src=webpackAssets.main.js) 
-    block footer
+    
+    script(src=webpackAssets.main.js) 

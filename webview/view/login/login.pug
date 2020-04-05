@@ -2,7 +2,10 @@ extends ../../includes/head.pug
 
 block variables
   script.
-    var enableRecaptcha = !{enableRecaptcha}
+    var recaptchaSiteKey = "!{siteKey}" // string
+    var publicKey = !{publicKey} // string
+    var enableRecaptcha = !{enableRecaptcha} // boolean
+    var redirect = "!{redirect}" // string
 
 block body
   style.
@@ -87,7 +90,6 @@ block body
       h1 !{i18n.success}
       p !{i18n.successDescriptionLogin}
 
-
-block append scripts
+block scripts
   if enableRecaptcha
     script(src="https://www.google.com/recaptcha/api.js?render=" + siteKey)
