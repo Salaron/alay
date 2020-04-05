@@ -10,7 +10,7 @@ $(() => {
   $("input[type=radio][name='language_radio']").change(async function() {
     const langCode = <string>$(this).val()
     setCookie("language", langCode, 100)
-    if (userId !== 1) {
+    if (userId !== 0) {
       // send request to server
       await sendRequest("settings/changeLanguage", {
         code: langCode
