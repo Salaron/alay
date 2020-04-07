@@ -25,7 +25,7 @@ export default class extends ApiAction {
         highest_love_per_unit: cardData.highest_love_per_unit,
         total_love: cardData.total_love,
         favorite_point: cardData.favorite_point,
-        sign_flag: false
+        sign_flag: this.unit.isSignUnit(cardData.unit_id)
       }
     })
 

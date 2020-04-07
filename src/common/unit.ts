@@ -20,12 +20,13 @@ const updateAlbumDefault = {
   addFavPt: 0
 }
 
-const supportUnitData: { [unitId: number]: supportUnitData } = {}
 let supportUnitList: number[] = []
 let removableSkillList: number[] = []
-const noExchangePointList: number[] = []
-const attributeUnits: { [attribute: number]: number[] } = {}
-const rarityUnits: { [rarity: number]: number[] } = {}
+let noExchangePointList: number[] = []
+let signUnitList: number[] = []
+let attributeUnits: { [attribute: number]: number[] } = {}
+let rarityUnits: { [rarity: number]: number[] } = {}
+let supportUnitData: { [unitId: number]: supportUnitData } = {}
 
 export async function init() {
   const supports = await unitDB.all(`
@@ -51,10 +52,9 @@ export async function init() {
     return unit.unit_id
   })
 
-  const noEpList = await exchangeDB.all("SELECT * FROM exchange_nopoint_unit_m")
-  for (const unit of noEpList) {
-    noExchangePointList.push(unit.unit_id)
-  }
+  noExchangePointList = (await exchangeDB.all("SELECT * FROM exchange_nopoint_unit_m")).map(unit => unit.unit_id)
+  removableSkillList = (await unitDB.all("SELECT unit_removable_skill_id FROM unit_removable_skill_m")).map(skill => skill.unit_removable_skill_id)
+  signUnitList = (await unitDB.all("SELECT * FROM unit_sign_asset_m")).map(unit => unit.unit_id)
 
   const allUnits = await unitDB.all("SELECT rarity, attribute_id, unit_id FROM unit_m")
   for (const unit of allUnits) {
@@ -64,11 +64,6 @@ export async function init() {
     if (!rarityUnits[unit.rarity]) rarityUnits[unit.rarity] = []
     rarityUnits[unit.rarity].push(unit.unit_id)
   }
-
-  const skills = await unitDB.all("SELECT unit_removable_skill_id FROM unit_removable_skill_m")
-  for (const skill of skills) {
-    removableSkillList.push(skill.unit_removable_skill_id)
-  }
 }
 
 export class Unit extends CommonModule {
@@ -76,40 +71,6 @@ export class Unit extends CommonModule {
   public rarityUnits = rarityUnits
   constructor(action: BaseAction) {
     super(action)
-  }
-
-  public parseUnitData(unitData: any) {
-    return {
-      unit_owning_user_id: unitData.unit_owning_user_id,
-      unit_id: unitData.unit_id,
-      exp: unitData.exp,
-      next_exp: unitData.next_exp,
-      level: unitData.level,
-      max_level: unitData.max_level,
-      rank: unitData.rank,
-      max_rank: unitData.max_rank,
-      love: unitData.love,
-      max_love: unitData.max_love,
-      unit_skill_level: unitData.unit_skill_level,
-      skill_level: unitData.unit_skill_level,
-      unit_skill_exp: unitData.unit_skill_exp,
-      skill_exp: unitData.unit_skill_exp,
-      max_hp: unitData.max_hp,
-      unit_removable_skill_capacity: unitData.removable_skill_capacity,
-      favorite_flag: (unitData.favorite_flag == 1),
-      display_rank: unitData.display_rank,
-      is_rank_max: unitData.rank >= unitData.max_rank,
-      is_love_max: unitData.love >= unitData.max_love && unitData.rank >= unitData.max_rank,
-      is_level_max: unitData.level >= unitData.max_level && unitData.rank >= unitData.max_rank,
-      is_skill_level_max: unitData.unit_skill_level >= unitData.max_skill_level,
-      is_removable_skill_capacity_max: unitData.removable_skill_capacity >= unitData.max_removable_skill_capacity && unitData.rank >= unitData.max_rank,
-      is_support_member: supportUnitList.includes(unitData.unit_id),
-      item_category_id: 0,
-      insert_date: Utils.parseDate(unitData.insert_date),
-      stat_smile: unitData.stat_smile,
-      stat_pure: unitData.stat_pure,
-      stat_cool: unitData.stat_cool
-    }
   }
 
   public async addUnit(userId: number, unitId: number, options: Partial<typeof addUnitDefault> = {}): Promise<IAddUnitResult> {
@@ -389,6 +350,10 @@ export class Unit extends CommonModule {
     AND units.unit_owning_user_id IN (${units.join(",")}) AND user_id = :user`, {
       user: userId
     })
+  }
+
+  public isSignUnit(unitId: number) {
+    return signUnitList.includes(unitId)
   }
 
   public getSupportUnitList() {

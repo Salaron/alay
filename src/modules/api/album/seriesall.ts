@@ -29,7 +29,7 @@ interface IOwningAlbumSeiresUnitIdMap {
 const albumSeriesUnitIdMap: IAlbumSeriesUnitIdMap = {}
 const owningAlbumSeriesTemplate: IOwningAlbumSeiresUnitIdMap = {}
 export async function init() {
-  (await unitDB.all("SELECT * FROM album_unit_series_m")).map(unitSeries => {
+  (await unitDB.all("SELECT * FROM unit_m")).map(unitSeries => {
     albumSeriesUnitIdMap[unitSeries.unit_id] = unitSeries.album_series_id
     owningAlbumSeriesTemplate[unitSeries.album_series_id] = []
   })
@@ -61,7 +61,7 @@ export default class extends ApiAction {
         highest_love_per_unit: cardData.highest_love_per_unit,
         total_love: cardData.total_love,
         favorite_point: cardData.favorite_point,
-        sign_flag: false
+        sign_flag: this.unit.isSignUnit(cardData.unit_id)
       })
     })
 
