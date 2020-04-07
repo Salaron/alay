@@ -15,16 +15,16 @@ export default async function publicHandler(request: IncomingMessage, response: 
 
   try {
     const stream = createReadStream(`./public/${path.join("/")}`)
-
-    stream.on("open", () => {
-      response.setHeader("Content-Type", mimeType)
-      stream.pipe(response)
-    })
     stream.on("error", () => {
       response.setHeader("Content-Type", "text/plain")
       response.statusCode = 404
       response.end("Not found")
     })
+    stream.on("end", () => {
+      response.end()
+    })
+    response.setHeader("Content-Type", mimeType)
+    stream.pipe(response)
   } catch (err) {
     response.writeHead(404)
     response.end()

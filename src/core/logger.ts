@@ -1,4 +1,4 @@
-import { createLogger, format, transports, Logger as IWinstonLogger, LeveledLogMethod, addColors, LogEntry } from "winston"
+import { createLogger, format, transports, Logger as IWinstonLogger, LeveledLogMethod, addColors } from "winston"
 
 interface ILogger extends IWinstonLogger {
   fatal: LeveledLogMethod
