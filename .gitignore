@@ -3,12 +3,8 @@ compile/*
 dist/*
 logs/*
 public/*
+db/*
 
 src/config/*
 tsconfig.tsbuildinfo
 webpack-assets.json
-
-data/**/*.db_
-!data/db/sv_live_notes.db_
-!data/db/sv_download.db_
-!data/db/sv_banner.db_

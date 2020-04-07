@@ -1,3 +1,0 @@
-**/*.json
-!secretbox/main/**
-!secretbox/stub/**

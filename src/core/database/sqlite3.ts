@@ -169,7 +169,7 @@ export class Sqlite3 {
     })
 
     await this.dbNames.forEachAsync(async (dbName) => {
-      const database = new Sqlite3Wrapper("./data/db/" + dbName, sqliteDB.OPEN_READWRITE)
+      const database = new Sqlite3Wrapper("./db/" + dbName, sqliteDB.OPEN_READWRITE)
 
       const tables = await database.all("SELECT * FROM sqlite_master WHERE type='table'")
 
@@ -210,27 +210,27 @@ export class Sqlite3 {
 
   private checkDatabases(): void {
     this.dbNames.forEach(dbName => {
-      if (!existsSync(`./data/db/${dbName}`)) {
-        throw new Error(`Required file 'data/db/${dbName}' is missing`)
+      if (!existsSync(`./db/${dbName}`)) {
+        throw new Error(`Required file 'db/${dbName}' is missing`)
       }
     })
   }
 
   private initDatabases(): void {
-    this.eventCommonDB = new Sqlite3Wrapper("./data/db/event_common.db_", sqliteDB.OPEN_READONLY)
-    this.exchangeDB = new Sqlite3Wrapper("./data/db/exchange.db_", sqliteDB.OPEN_READONLY)
-    this.festivalDB = new Sqlite3Wrapper("./data/db/festival.db_", sqliteDB.OPEN_READONLY)
-    this.itemDB = new Sqlite3Wrapper("./data/db/item.db_", sqliteDB.OPEN_READONLY)
-    this.liveDB = new Sqlite3Wrapper("./data/db/live.db_", sqliteDB.OPEN_READONLY)
-    this.marathonDB = new Sqlite3Wrapper("./data/db/marathon.db_", sqliteDB.OPEN_READONLY)
-    this.otherDB = new Sqlite3Wrapper("./data/db/other.db_", sqliteDB.OPEN_READONLY)
-    this.teamDutyDB = new Sqlite3Wrapper("./data/db/team_duty.db_", sqliteDB.OPEN_READONLY)
-    this.unitDB = new Sqlite3Wrapper("./data/db/unit.db_", sqliteDB.OPEN_READONLY)
+    this.eventCommonDB = new Sqlite3Wrapper("./db/event_common.db_", sqliteDB.OPEN_READONLY)
+    this.exchangeDB = new Sqlite3Wrapper("./db/exchange.db_", sqliteDB.OPEN_READONLY)
+    this.festivalDB = new Sqlite3Wrapper("./db/festival.db_", sqliteDB.OPEN_READONLY)
+    this.itemDB = new Sqlite3Wrapper("./db/item.db_", sqliteDB.OPEN_READONLY)
+    this.liveDB = new Sqlite3Wrapper("./db/live.db_", sqliteDB.OPEN_READONLY)
+    this.marathonDB = new Sqlite3Wrapper("./db/marathon.db_", sqliteDB.OPEN_READONLY)
+    this.otherDB = new Sqlite3Wrapper("./db/other.db_", sqliteDB.OPEN_READONLY)
+    this.teamDutyDB = new Sqlite3Wrapper("./db/team_duty.db_", sqliteDB.OPEN_READONLY)
+    this.unitDB = new Sqlite3Wrapper("./db/unit.db_", sqliteDB.OPEN_READONLY)
 
-    this.bannerSVDB = new Sqlite3Wrapper("./data/db/sv_banner.db_", sqliteDB.OPEN_READONLY)
-    this.customLiveSVDB = new Sqlite3Wrapper("./data/db/sv_custom_live.db_", sqliteDB.OPEN_READONLY)
-    this.downloadSVDB = new Sqlite3Wrapper("./data/db/sv_download.db_", sqliteDB.OPEN_READONLY)
-    this.liveNotesSVDB = new Sqlite3Wrapper("./data/db/sv_live_notes.db_", sqliteDB.OPEN_READONLY)
-    this.secretboxSVDB = new Sqlite3Wrapper("./data/db/sv_secretbox.db_", sqliteDB.OPEN_READONLY)
+    this.bannerSVDB = new Sqlite3Wrapper("./db/sv_banner.db_", sqliteDB.OPEN_READONLY)
+    this.customLiveSVDB = new Sqlite3Wrapper("./db/sv_custom_live.db_", sqliteDB.OPEN_READONLY)
+    this.downloadSVDB = new Sqlite3Wrapper("./db/sv_download.db_", sqliteDB.OPEN_READONLY)
+    this.liveNotesSVDB = new Sqlite3Wrapper("./db/sv_live_notes.db_", sqliteDB.OPEN_READONLY)
+    this.secretboxSVDB = new Sqlite3Wrapper("./db/sv_secretbox.db_", sqliteDB.OPEN_READONLY)
   }
 }
