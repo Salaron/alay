@@ -18,7 +18,6 @@ export default class extends WebViewAction {
 
     const locals = {
       module: "login",
-      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
       siteKey: Config.modules.login.recaptcha_site_key,
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       i18n,

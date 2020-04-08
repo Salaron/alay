@@ -27,6 +27,7 @@ export class WebView extends CommonModule {
       token: this.requestData.auth_token,
       webview: !this.requestData.requestFromBrowser,
       headers: JSON.stringify(this.getHeaders()),
+      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
       isAdmin: Config.server.admin_ids.includes(this.requestData.user_id || 0),
       languageList: Config.i18n.languages,
       webpackAssets: assets,

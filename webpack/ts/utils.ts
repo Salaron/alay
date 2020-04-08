@@ -73,8 +73,9 @@ export function showNotification(message: string, status?: "primary" | "success"
  */
 export async function sendRequest(endpoint: string, data: any) {
   try {
-    const module = endpoint.split("/")[0]
-    const action = endpoint.split("/")[1]
+    const _endpointSplit = endpoint.split("/")
+    const module = _endpointSplit[0]
+    const action = _endpointSplit[1]
     data.module = module
     data.action = action
     data.timeStamp = Math.floor(Date.now() / 1000) // is that useful?
@@ -86,6 +87,7 @@ export async function sendRequest(endpoint: string, data: any) {
       headers,
       data: JSON.stringify(data)
     })
+    if (response.response_data) return response.response_data
     return response
   } catch (err) {
     if (err.status > 500 && err.responseJSON && err.responseJSON.message) {
@@ -121,12 +123,35 @@ export function getMailToURL(mail: string) {
   }
 }
 
-export function protectPage(unlock: boolean) {
-  if (unlock) {
+export function protectPage(disableProtect?: boolean): void {
+  if (disableProtect) {
     $("#backButton, #external").fadeIn(200)
     $(".uk-button").removeAttr("disabled")
   } else {
     $("#backButton, #external").fadeOut(200)
     $(".uk-button").attr("disabled")
   }
+}
+
+export function hideVirtualKeyboard(): void {
+  $("input").blur()
+}
+
+export function formatString(template: string, values: any): string {
+  return template.replace(/{{\s?([^{}\s]*)\s?}}/g, (txt: any, key: any) => {
+    if (values.hasOwnProperty(key)) {
+      return values[key]
+    }
+    return txt
+  })
+}
+
+export function checkMailFormat(mail: string): boolean {
+  const regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
+  return regex.test(mail)
+}
+
+export function checkPasswordFormat(pass: string): boolean {
+  const regex = /^[A-Za-z0-9]\w{1,32}$/ // max 32 symbols
+  return regex.test(pass)
 }

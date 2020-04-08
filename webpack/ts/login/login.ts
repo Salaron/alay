@@ -3,10 +3,10 @@ import UIkit from "uikit"
 import { promisify } from "util"
 import { simpleEncrypt } from "../crypto"
 import { enableRecaptcha, grecaptcha, i18n, isWebview, recaptchaSiteKey } from "../global"
-import { getExternalURL, protectPage, parseQueryString, sendRequest, showNotification } from "../utils"
+import { getExternalURL, hideVirtualKeyboard, parseQueryString, protectPage, sendRequest, showNotification } from "../utils"
 
 $(() => {
-  if (window.history.length !== 1) {
+  if (window.history.length > 0) {
     $("#backButton").removeAttr("hidden")
   }
   if (isWebview) {
@@ -28,18 +28,18 @@ $(() => {
 
   $("#loginForm").submit(async form => {
     form.preventDefault()
-    $("input").blur() // hide android keyboard
+    hideVirtualKeyboard()
     const login = <string>$("#login").val()
     const password = <string>$("#password").val()
     // todo: sanity check
 
-    protectPage(false)
-    let recaptcha = ""
-    if (enableRecaptcha === true) {
-      await promisify(grecaptcha.ready)()
-      recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "login" })
-    }
+    protectPage()
     try {
+      let recaptcha = ""
+      if (enableRecaptcha === true) {
+        await promisify(grecaptcha.ready)()
+        recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "login" })
+      }
       await sendRequest("login/login", {
         recaptcha,
         login: simpleEncrypt(login),
@@ -56,17 +56,18 @@ $(() => {
 
   $("#recoverForm").submit(async form => {
     form.preventDefault()
-    $("input").blur()
+    hideVirtualKeyboard()
 
     const mail = <string>$("#mail").val()
-    protectPage(false)
-    let recaptcha = ""
-    if (enableRecaptcha === true) {
-      await promisify(grecaptcha.ready)()
-      recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "passwordRecovery" })
-    }
+    // additional checks
 
+    protectPage()
     try {
+      let recaptcha = ""
+      if (enableRecaptcha === true) {
+        await promisify(grecaptcha.ready)()
+        recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "passwordRecovery" })
+      }
       await sendRequest("login/passwordRecovery", {
         mail,
         recaptcha
@@ -84,7 +85,7 @@ $(() => {
         showNotification(i18n.mailSuccess, "success")
       }
     } catch {
-      // nothing
+      // ignore
     } finally {
       protectPage(true)
     }
@@ -92,11 +93,12 @@ $(() => {
 
   $("#codeVerifyForm").submit(async form => {
     form.preventDefault()
-    $("input").blur()
+    hideVirtualKeyboard()
 
     const code = <string>$("#verifyCode").val()
     if (code.length !== 10) return showNotification(i18n.confirmationCodeInvalidFormat, "warning")
-    protectPage(false)
+
+    protectPage()
     try {
       await sendRequest("login/codeVerify", { code })
       const toggle = UIkit.toggle("#codeVerifyForm", {
@@ -109,7 +111,7 @@ $(() => {
       $("#verifyCode").val("")
       showNotification(i18n.passwordResetSuccess, "success")
     } catch {
-      // nothing to handle
+      // ignore
     } finally {
       protectPage(true)
     }

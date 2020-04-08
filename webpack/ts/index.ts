@@ -15,9 +15,12 @@ context.keys().forEach(context)
 
 // Attempt to load page script
 try {
-  const urlSplit = location.pathname.split("/")
+  const urlSplit = location.pathname.toLowerCase().split("/")
   require(`./${urlSplit[2]}/${urlSplit[3]}`) // tslint:disable-line
-} catch { } // tslint:disable-line
+} catch {
+  // script not exist
+  // just ignore that
+}
 
 // Do init stuff
 import { isWebview } from "./global"

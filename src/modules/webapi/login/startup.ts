@@ -15,13 +15,13 @@ export default class extends WebApiAction {
     return {
       name: TYPE.STRING,
       password: TYPE.STRING,
-      mail: TYPE.STRING,
+      email: TYPE.STRING,
       recaptcha: TYPE.STRING
     }
   }
   public checkTypes() {
     if (this.params.name.length === 0 || this.params.name.length > 20) throw new ErrorAPI("Invalid name provided")
-    if (!Utils.checkMailFormat(this.params.mail)) throw new ErrorAPI("Invalid mail provided")
+    if (!Utils.checkMailFormat(this.params.email)) throw new ErrorAPI("Invalid email provided")
   }
 
   public async execute() {
@@ -43,7 +43,7 @@ export default class extends WebApiAction {
 
     // tslint:disable-next-line
     const _mailCheck = await this.connection.first(`SELECT * FROM users WHERE mail = :mail`, {
-      mail: this.params.mail
+      mail: this.params.email
     })
     if (_mailCheck) throw new ErrorWebAPI(strings.emailExists)
 
@@ -62,7 +62,7 @@ export default class extends WebApiAction {
       name: this.params.name,
       pass,
       lang: userData.language,
-      mail: this.params.mail
+      mail: this.params.email
     })).insertId
     await this.connection.query("INSERT INTO user_login (user_id, login_key, login_passwd, login_token) VALUES (:id, :key, :pass, null);", {
       id: this.user_id,
@@ -74,7 +74,7 @@ export default class extends WebApiAction {
     })
 
     // send mail
-    const status = await Utils.sendMail(this.params.mail, strings.subjectWelcome, Utils.prepareTemplate(strings.bodyWelcome, {
+    const status = await Utils.sendMail(this.params.email, strings.subjectWelcome, Utils.prepareTemplate(strings.bodyWelcome, {
       userName: this.params.name
     }))
 
@@ -84,7 +84,7 @@ export default class extends WebApiAction {
       status: 200,
       result: {
         user_id: this.user_id,
-        mail_sended: status != false
+        mail_success: status !== false
       }
     }
   }

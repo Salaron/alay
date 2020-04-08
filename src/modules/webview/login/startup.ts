@@ -19,7 +19,6 @@ export default class extends WebViewAction {
     const locals = {
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,
-      publicKey: JSON.stringify(Config.server.PUBLIC_KEY),
       i18n,
       pageTitle: "SunLight Registration"
     }
