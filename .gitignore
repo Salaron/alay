@@ -3,7 +3,7 @@ compile/*
 dist/*
 logs/*
 public/*
-db/*
+db/**/*.db_
 
 src/config/*
 tsconfig.tsbuildinfo

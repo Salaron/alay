@@ -44,7 +44,7 @@ const config: webpack.Configuration = {
     publicPath: "/public"
   },
   resolve: {
-    extensions: [".ts", ".css", ".js", ".png"]
+    extensions: [".ts", ".js"]
   },
   plugins: [
     new CleanWebpackPlugin(),

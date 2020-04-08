@@ -8,6 +8,7 @@ export const authToken: string = window.authToken
 export const isWebview: boolean = window.isWebview
 export const isAdmin: boolean = window.isAdmin
 export const headers: any = window.headers
+export const i18n: any = window.i18n
 
 // login
 export const enableRecaptcha: boolean = window.enableRecaptcha

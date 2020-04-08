@@ -120,3 +120,13 @@ export function getMailToURL(mail: string) {
     return `mailto:${mail}`
   }
 }
+
+export function protectPage(unlock: boolean) {
+  if (unlock) {
+    $("#backButton, #external").fadeIn(200)
+    $(".uk-button").removeAttr("disabled")
+  } else {
+    $("#backButton, #external").fadeOut(200)
+    $(".uk-button").attr("disabled")
+  }
+}
