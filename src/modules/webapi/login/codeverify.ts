@@ -18,7 +18,7 @@ export default class extends WebApiAction {
     }
   }
   public paramCheck() {
-    assert(Utils.checkPass(this.params.code) && this.params.code.length === 10, "Invalid code format")
+    assert(Utils.checkPasswordFormat(this.params.code) && this.params.code.length === 10, "Invalid code format")
   }
 
   public async execute() {

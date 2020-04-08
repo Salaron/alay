@@ -25,7 +25,7 @@ export default class extends WebApiAction {
     const strings = await this.i18n.getStrings(this.requestData, "login-startup", "settings-index")
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
-    if (!Utils.checkPass(password)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
+    if (!Utils.checkPasswordFormat(password)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
 
     const userData = await this.connection.first("SELECT user_id FROM users WHERE user_id = :user AND password = :pass", {
       user: this.user_id,

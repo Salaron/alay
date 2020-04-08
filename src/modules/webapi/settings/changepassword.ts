@@ -23,7 +23,7 @@ export default class extends WebApiAction {
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     const newPassword = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.newPassword), "base64").toString(), this.requestData.auth_token).toString()
-    if (!Utils.checkPass(password) || !Utils.checkPass(newPassword)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
+    if (!Utils.checkPasswordFormat(password) || !Utils.checkPasswordFormat(newPassword)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
 
     const passwordCheck = await this.connection.first("SELECT name, mail FROM users WHERE user_id = :user AND password = :pass", {
       user: this.user_id,

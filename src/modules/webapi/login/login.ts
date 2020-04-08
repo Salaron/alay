@@ -31,14 +31,14 @@ export default class extends WebApiAction {
     const password = Utils.decryptSlAuth(this.params.password, this.requestData.auth_token)
 
     let transferUserDataQuery = ""
-    if (Utils.checkUserId(parseInt(login))) {
+    if (Utils.checkUserIDFormat(parseInt(login))) {
       // select by user id
       transferUserDataQuery = "SELECT * FROM users WHERE user_id = :login AND password = :password"
-    } else if (Utils.checkMail(login)) {
+    } else if (Utils.checkMailFormat(login)) {
       // select by mail
       transferUserDataQuery = "SELECT * FROM users WHERE mail = :login AND password = :password"
     } else throw new ErrorWebAPI(i18n.invalidUserIdOrMail)
-    if (!Utils.checkPass(password)) throw new ErrorWebAPI(i18n.passwordInvalidFormat)
+    if (!Utils.checkPasswordFormat(password)) throw new ErrorWebAPI(i18n.passwordInvalidFormat)
 
     const transferUserData = await this.connection.first(transferUserDataQuery, {
       login,

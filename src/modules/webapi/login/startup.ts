@@ -21,7 +21,7 @@ export default class extends WebApiAction {
   }
   public checkTypes() {
     if (this.params.name.length === 0 || this.params.name.length > 20) throw new ErrorAPI("Invalid name provided")
-    if (!Utils.checkMail(this.params.mail)) throw new ErrorAPI("Invalid mail provided")
+    if (!Utils.checkMailFormat(this.params.mail)) throw new ErrorAPI("Invalid mail provided")
   }
 
   public async execute() {
@@ -39,7 +39,7 @@ export default class extends WebApiAction {
     const strings = await this.i18n.getStrings(this.requestData, "login-login", "login-startup", "mailer")
 
     const pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
-    if (!Utils.checkPass(pass)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
+    if (!Utils.checkPasswordFormat(pass)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
 
     // tslint:disable-next-line
     const _mailCheck = await this.connection.first(`SELECT * FROM users WHERE mail = :mail`, {
