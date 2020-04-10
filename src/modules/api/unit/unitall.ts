@@ -37,7 +37,7 @@ export default class extends ApiAction {
       max_love: data.max_love,
       unit_skill_level: data.unit_skill_level,
       unit_skill_exp: data.unit_skill_level,
-      map_hp: data.max_hp,
+      max_hp: data.max_hp,
       unit_removable_skill_capacity: data.removable_skill_capacity,
       favorite_flag: !!data.favorite_flag,
       display_rank: data.display_rank,
