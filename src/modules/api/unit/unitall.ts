@@ -31,6 +31,7 @@ export default class extends ApiAction {
       next_exp: data.next_exp,
       level: data.level,
       max_level: data.max_level,
+      level_limit_id: 0, // TODO
       rank: data.rank,
       max_rank: data.max_rank,
       love: data.love,

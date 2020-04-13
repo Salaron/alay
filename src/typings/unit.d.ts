@@ -18,6 +18,7 @@ interface detailUnitData {
   next_exp: number
   level: number
   max_level: number
+  level_limit_id: number
   rank: number
   max_rank: number
   love: number
