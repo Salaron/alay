@@ -1,31 +1,26 @@
+// format: [pageName, iconName, path]
+-
+  var allItems = [
+    [i18n.announce, "home", "/webview.php/announce/index"], 
+    ["Коробки", "album","/webview.php/secretbox/list"],
+    [i18n.profile, "user", "/webview.php/profile/index"],
+    [i18n.settings, "settings", "/webview.php/settings/index"],
+    [i18n.aboutServer, "nut", "/webview.php/server/info"]
+  ]
+
 ul(class="uk-navbar-nav")
   li
     a(uk-icon="menu")
     div(class="uk-navbar-dropdown")
       ul(class="uk-nav uk-navbar-dropdown-nav")
-        li
-          a(href="/webview.php/announce/index")
-            span(uk-icon="home" class="uk-icon")
-            |  #{i18n.announce}
-        li
-          a(href="/webview.php/secretbox/list")
-            span(uk-icon="album" class="uk-icon")
-            |  Коробки
-        // profile and settings
-        if userId != 0
-          li
-            a(href="/webview.php/profile/index")
-              span(uk-icon="user" class="uk-icon")
-              |  #{i18n.profile}
-          li
-            a(href="/webview.php/settings/index")
-              span(uk-icon="settings" class="uk-icon")
-              |  #{i18n.settings}
-        
-        li
-          a(href="/webview.php/server/info")
-            span(uk-icon="nut" class="uk-icon")
-            |  #{i18n.aboutServer}
+        each item in allItems
+          - var className = ""
+          if pageTitle == item[0]
+            - className = "uk-active"
+          li(class=className)
+            a(href=item[2])
+              span(uk-icon=item[1] class="uk-icon")
+              |  !{item[0]}
         
         li(class="uk-nav-divider")
 
