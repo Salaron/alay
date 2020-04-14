@@ -1,7 +1,6 @@
 extends ../../includes/head.pug
 
 block body
-  - function updateLink(url) { return url.replace("login", "'../login/login?type=0'") }
   #outer
     #inner
       #header
@@ -19,7 +18,7 @@ block body
             each source in downloadSources
               a(href=source.url) !{i18n.updateDownloadFrom} !{source.name}
           else
-            h5(class="uk-margin-remove") !{updateLink(i18n.updateLoginIntoYourAccountToDownload)}
+            h5(class="uk-margin-remove") !{replaceHref(i18n.updateLoginIntoYourAccountToDownload, "login", "'../login/login?type=0'")}
               
           if supportMail.length > 0
             hr

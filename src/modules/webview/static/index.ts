@@ -75,6 +75,7 @@ export default class extends WebViewAction {
         })
         if (!data) throw new ErrorAPI("you want to be banned?")
         const locals = {
+          permanent: data.expiration_date === null,
           expirationDate: moment(data.expiration_date).locale(languageCode).format("LLL"),
           expirationDateHuman: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").locale(languageCode).humanize() : null,
           message: data.message,

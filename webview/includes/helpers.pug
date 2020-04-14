@@ -1,1 +1,9 @@
-- function nl2br(string) { return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>') } 
+-
+  function nl2br(string) { 
+    return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>') 
+  } 
+  
+-
+  function replaceHref(i18nString, placeholderName, value) {
+    return i18nString.replace(placeholderName, value)
+  }
