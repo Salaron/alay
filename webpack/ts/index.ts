@@ -24,7 +24,7 @@ try {
 
 // Do init stuff
 import { isWebview } from "./global"
-import { getExternalURL } from "./utils"
+import { getExternalURL, sendRequest } from "./utils"
 import $ from "jquery"
 
 if (isWebview) {
@@ -32,4 +32,13 @@ if (isWebview) {
   $(".external-link").each(function () {
     $(this).attr("href", "native://browser?url=" + encodeURIComponent(<string>$(this).attr("href")))
   })
+}
+
+window.onerror = (msg, url, lineNo, columnNo, error) => {
+  sendRequest("report/error", {
+    url,
+    msg,
+    stack: error == undefined ? null : error.stack
+  })
+  return false
 }
