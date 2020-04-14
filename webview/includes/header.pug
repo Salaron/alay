@@ -1,6 +1,14 @@
-nav(class="uk-navbar-container sl-navbar-container uk-position-z-index")
+nav(class="uk-navbar-container sl-navbar-container uk-position-z-index" uk-navbar)
   .uk-navbar-left
-
+    if backButtonLink
+      a(id="backButton" href=backButtonLink class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5" hidden)
+    else
+      include ./header/left.pug
+  
   .uk-navbar-center
+    ul(class="uk-navbar-nav")
+      li(class="uk-active")
+        a(class="uk-text-bold uk-text-uppercase no-hover") #{pageTitle}
 
   .uk-navbar-right
+    include ./header/right.pug

@@ -20,7 +20,7 @@ export default class extends WebViewAction {
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,
       i18n,
-      pageTitle: "SunLight Registration"
+      pageTitle: "Registration"
     }
     return {
       status: 200,

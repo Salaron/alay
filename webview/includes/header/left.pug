@@ -1,0 +1,40 @@
+ul(class="uk-navbar-nav")
+  li
+    a(uk-icon="menu")
+    div(class="uk-navbar-dropdown")
+      ul(class="uk-nav uk-navbar-dropdown-nav")
+        li
+          a(href="/webview.php/announce/index")
+            span(uk-icon="home" class="uk-icon")
+            |  #{i18n.announce}
+        li
+          a(href="/webview.php/secretbox/list")
+            span(uk-icon="album" class="uk-icon")
+            |  Коробки
+        // profile and settings
+        if userId != 0
+          li
+            a(href="/webview.php/profile/index")
+              span(uk-icon="user" class="uk-icon")
+              |  #{i18n.profile}
+          li
+            a(href="/webview.php/settings/index")
+              span(uk-icon="settings" class="uk-icon")
+              |  #{i18n.settings}
+        
+        li
+          a(href="/webview.php/server/info")
+            span(uk-icon="nut" class="uk-icon")
+            |  #{i18n.aboutServer}
+        
+        li(class="uk-nav-divider")
+
+        li
+          a(id="changeLanguageButton")
+            span(uk-icon="world" class="uk-icon")
+            |  Change Language
+        if webview
+          li
+            a(id="external")
+              span(uk-icon="expand" class="uk-icon")
+              |  Open In Browser

@@ -1,0 +1,20 @@
+extends ../../includes/head.pug
+
+block body
+  style.
+    #detail-container {
+      padding-left: 15px;
+      padding-right: 15px;
+      box-sizing: content-box;
+    }
+  #outer
+    #inner
+      #header
+        - var backButtonLink = "/webview.php/announce/index?id=" + announce.id
+        include ../../includes/header.pug
+            
+      #body
+        #detail-container
+          span !{announce.body}
+          div(style="text-align: right; margin-bottom: 5px;") 
+            span !{announce.date}
