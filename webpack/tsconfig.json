@@ -4,6 +4,6 @@
   "compilerOptions": {
     "incremental": false,
     "allowJs": true,
-    "rootDir": "./ts"
+    "rootDir": "../"
   }
 }

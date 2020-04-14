@@ -1,0 +1,20 @@
+extends ../../includes/head.pug
+
+block body
+  #outer
+    #inner
+      #header
+        - var languageButton = true
+        include ../../includes/header.pug
+            
+      #body
+        div(class="uk-container uk-container-medium uk-margin-top")
+          h4 !{i18n.bannedNotice}
+          p(style="color: red") !{i18n.bannedMessageFromAdmin} !{message}
+
+          if expirationDate
+            p(style="color: blue") !{i18n.bannedTemporary} !{expirationDateHuman} (!{expirationDate})
+          if supportMail.length > 0
+            hr
+            center !{supportMail}
+  include ../../includes/changeLanguage.pug

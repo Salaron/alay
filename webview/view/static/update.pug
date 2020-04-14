@@ -1,0 +1,27 @@
+extends ../../includes/head.pug
+
+block body
+  - function updateLink(url) { return url.replace("login", "'../login/login?type=0'") }
+  #outer
+    #inner
+      #header
+        - var languageButton = true
+        include ../../includes/header.pug
+            
+      #body
+        div(class="uk-container uk-container-medium uk-margin-top")
+          h4(class="uk-margin-remove") !{i18n.updateNotice}
+          h5(class="uk-margin-small-top uk-margin-small-bottom")  !{i18n.updateCurrentVersion} !{latestVersion} <br>
+            | !{i18n.updateUserClientVersion} !{clientVersion}
+
+          if loggedIn
+            h5(class="uk-margin-remove") !{i18n.updateYouCanDownloadANewVersionFromLinksBellow}
+            each source in downloadSources
+              a(href=source.url) !{i18n.updateDownloadFrom} !{source.name}
+          else
+            h5(class="uk-margin-remove") !{updateLink(i18n.updateLoginIntoYourAccountToDownload)}
+              
+          if supportMail.length > 0
+            hr
+            center !{supportMail}
+  include ../../includes/changeLanguage.pug

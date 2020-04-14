@@ -14,7 +14,8 @@ $(() => {
   }
 
   let defaultForm = "#loginForm"
-  if (parseQueryString().recovery) {
+  const params = parseQueryString()
+  if (params.recovery) {
     defaultForm = "#codeVerifyForm"
   }
   const toggle = UIkit.toggle(defaultForm, {
@@ -40,11 +41,16 @@ $(() => {
         await promisify(grecaptcha.ready)()
         recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "login" })
       }
-      await sendRequest("login/login", {
+      let type = isNaN(parseInt(params.type)) ? undefined : parseInt(params.type)
+      const response = await sendRequest("login/login", {
         recaptcha,
         login: simpleEncrypt(login),
-        password: simpleEncrypt(password)
+        password: simpleEncrypt(password),
+        type
       })
+      if (response.redirect) {
+        location.replace(response.redirect)
+      }
       UIkit.toggle("#loginForm", {
         target: "#loginForm, #loginSuccess",
         animation: "uk-animation-fade"

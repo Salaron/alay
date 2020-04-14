@@ -2,7 +2,12 @@ nav(class="uk-navbar-container sl-navbar-container uk-position-z-index" uk-navba
   .uk-navbar-left
     if backButtonLink
       a(id="backButton" href=backButtonLink class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5" hidden)
-    else
+    else if languageButton
+      ul(class="uk-navbar-nav")
+        li
+          a(id="changeLanguageButton")
+            span(uk-icon="world" class="uk-icon")
+    else if !disableMenu
       include ./header/left.pug
   
   .uk-navbar-center

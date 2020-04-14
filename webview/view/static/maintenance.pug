@@ -1,0 +1,21 @@
+extends ../../includes/head.pug
+
+block body
+  #outer
+    #inner
+      #header
+        - var languageButton = true
+        include ../../includes/header.pug
+            
+      #body
+        div(class="uk-container uk-container-medium uk-margin-top")
+          h4(style="color: red") !{i18n.maintenanceNotice}
+
+          h4(class="uk-margin-remove") !{i18n.maintenancePeriod}
+          p !{startDate} ~ !{endDate} UTC!{timezone}<br>
+            stub(style="color: blue") !{i18n.maintenancePeriodCanBeChanged}
+          h5 !{i18n.maintenanceApologize}
+          if supportMail.length > 0
+            hr
+            center !{supportMail}
+  include ../../includes/changeLanguage.pug

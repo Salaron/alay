@@ -118,8 +118,21 @@
   },
   "static": {
     "maintenance": "На техобслуживании",
-    "banner": "Вход",
-    "update": "Требуется обновление"
+    "maintenanceNotice": "На сервере проводится плановое техническое обслуживание, в связи с этим доступ к нему временно ограничен.",
+    "maintenancePeriod": "Ожидаемый период проведения обновления",
+    "maintenancePeriodCanBeChanged": "Период обновления может быть изменён без предварительного предупреждения.",
+    "maintenanceApologize": "Приносим извинения за неудобства и благодарим Вас за терпение.",
+    "update": "Требуется обновление",
+    "updateNotice": "Пожалуйста, обновите приложение до последней версии, чтобы использовать все новые возможности.",
+    "updateCurrentVersion": "Текущая версия:",
+    "updateUserClientVersion": "Ваша версия:",
+    "updateYouCanDownloadANewVersionFromLinksBellow": "Вы можете скачать обновление по одной из ссылок ниже:",
+    "updateDownloadFrom": "Скачать с",
+    "updateLoginIntoYourAccountToDownload": "Чтобы скачать новую версию, <a href=login>войдите в свой аккаунт</a>.",
+    "banned": "Аккаунт заблокирован",
+    "bannedNotice": "Ваш аккаунт был заблокирован за нарушение <a href=tos>правил сервера</a>.",
+    "bannedMessageFromAdmin": "Сообщение от администратора сервера:",
+    "bannedTemporary": "Данная блокировка является временной и доступ будет возобновлён через"
   },
   "notice": {
     "REMOVED_FROM_FRIENDS": "{{affectorName}} удалил(-а) Вас из своего списка друзей",
