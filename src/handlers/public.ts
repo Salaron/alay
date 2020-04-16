@@ -7,10 +7,8 @@ export default async function publicHandler(request: IncomingMessage, response: 
   const mimeType = mime.getType(pathName)
   if (mimeType == null) throw new Error("Unknown type")
 
-  if (!Config.server.debug_mode) {
-    response.setHeader("Cache-Control", "max-age=21600")
-    response.setHeader("Expires", new Date(Date.now() + 21600000).toUTCString())
-  }
+  response.setHeader("Cache-Control", "max-age=21600")
+  response.setHeader("Expires", new Date(Date.now() + 21600000).toUTCString())
   const [, , ...path] = pathName.split("/")
 
   try {

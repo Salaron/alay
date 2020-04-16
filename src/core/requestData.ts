@@ -90,8 +90,8 @@ export default class RequestData {
       if (this.user_id !== 0 && this.auth_token !== "") {
         // renewal session
         response.setHeader("Set-Cookie", [
-          `user_id=${this.user_id}; expires=${new Date(new Date().getTime() + Config.modules.user.userSessionExpire * 1000).toUTCString()}; path=/; SameSite=Strict;`,
-          `token=${this.auth_token}; expires=${new Date(new Date().getTime() + Config.modules.user.userSessionExpire * 1000).toUTCString()}; path=/; SameSite=Strict;`
+          Utils.getCookieHeader("user_id", this.user_id, 23),
+          Utils.getCookieHeader("token", this.auth_token, 23)
         ])
       }
       if (
@@ -196,8 +196,8 @@ export default class RequestData {
 
   public resetCookieAuth() {
     this.response.setHeader("Set-Cookie", [
-      `user_id=; expires=${new Date(new Date().getTime() - 600000).toUTCString()}; path=/;`,
-      `token=; expires=${new Date(new Date().getTime() - 600000).toUTCString()}; path=/;`
+      Utils.getCookieHeader("user_id", "", -1),
+      Utils.getCookieHeader("token", "", -1)
     ])
   }
 

@@ -261,4 +261,13 @@ export class Utils {
   public static decryptSlAuth(input: string, token: string): string {
     return Utils.xor(Buffer.from(Utils.RSADecrypt(input), "base64").toString(), token).toString()
   }
+  public static getCookieHeader(name: string, value: string | number, exHours: number) {
+    let expires = ""
+    if (exHours) {
+      const date = new Date()
+      date.setDate(date.getHours() + exHours)
+      expires = `expires=${date.toUTCString()};`
+    }
+    return `${name}=${value}; ${expires} path=/`
+  }
 }
