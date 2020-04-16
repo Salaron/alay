@@ -16,4 +16,5 @@ nav(class="uk-navbar-container sl-navbar-container uk-position-z-index" uk-navba
         a(class="uk-text-bold uk-text-uppercase no-hover") #{pageTitle}
 
   .uk-navbar-right
-    include ./header/right.pug
+    if !hideIcon
+      include ./header/right.pug
