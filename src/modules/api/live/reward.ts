@@ -131,7 +131,7 @@ export default class extends ApiAction {
       class_system: User.getClassSystemStatus(this.user_id)
     }
 
-    await this.live.writeToLog(this.user_id, {
+    await this.live.saveResultToLog(this.user_id, {
       live_setting_id: liveData.live_setting_id,
       is_event: eventLive,
       score: totalScore,

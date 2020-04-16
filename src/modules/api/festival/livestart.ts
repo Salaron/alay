@@ -72,7 +72,7 @@ export default class extends ApiAction {
       const liveInfo = await liveDB.get(`
       SELECT
         swing_flag, ac_flag, difficulty, live_setting_id, attribute_icon_id as attribute,
-        live_track_m.live_track_id, member_category,
+        live_track_m.live_track_id, member_category, notes_setting_asset,
         c_rank_score, b_rank_score, a_rank_score, s_rank_score
       FROM live_setting_m
         INNER JOIN live_track_m ON live_setting_m.live_track_id = live_track_m.live_track_id

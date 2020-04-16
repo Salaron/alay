@@ -79,8 +79,8 @@ export default class extends WebApiAction {
         },
         headers: {
           "Set-Cookie": [
-            `user_id=${transferUserData.user_id}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/; SameSite=Strict;`,
-            `token=${tokenData.login_token}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/; SameSite=Strict;`
+            Utils.getCookieHeader("user_id", transferUserData.user_id, 23),
+            Utils.getCookieHeader("token", tokenData.login_token, 23)
           ]
         }
       }

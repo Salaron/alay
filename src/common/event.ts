@@ -157,7 +157,8 @@ export class Event extends CommonModule {
   }
 
   public async writeHiScore(userId: number, eventId: number, deck: any, liveList: liveInfo[], scoreInfo: scoreInfo) {
-    const json = {
+    let userDeck = Utils.createObjCopy(deck) // protect original deck
+    let jsonResult = {
       live_list: liveList,
       score_info: scoreInfo,
       deck: {
@@ -183,20 +184,20 @@ export class Event extends CommonModule {
       }
     }
 
-    for (const unit of deck) {
+    for (const unit of userDeck) {
       // total score for deck
-      json.deck.total_status.smile += unit.stat_smile
-      json.deck.total_status.cute += unit.stat_pure
-      json.deck.total_status.cool += unit.stat_cool
-      json.deck.total_status.hp += unit.max_hp
+      jsonResult.deck.total_status.smile += unit.stat_smile
+      jsonResult.deck.total_status.cute += unit.stat_pure
+      jsonResult.deck.total_status.cool += unit.stat_cool
+      jsonResult.deck.total_status.hp += unit.max_hp
       // center bonus for deck
-      json.deck.center_bonus.smile += unit.center_bonus_smile
-      json.deck.center_bonus.cute += unit.center_bonus_pure
-      json.deck.center_bonus.cool += unit.center_bonus_cool
+      jsonResult.deck.center_bonus.smile += unit.center_bonus_smile
+      jsonResult.deck.center_bonus.cute += unit.center_bonus_pure
+      jsonResult.deck.center_bonus.cool += unit.center_bonus_cool
       // sis bonus for deck
-      json.deck.si_bonus.smile += unit.bonus_smile
-      json.deck.si_bonus.cute += unit.bonus_pure
-      json.deck.si_bonus.cool += unit.bonus_cool
+      jsonResult.deck.si_bonus.smile += unit.bonus_smile
+      jsonResult.deck.si_bonus.cute += unit.bonus_pure
+      jsonResult.deck.si_bonus.cool += unit.bonus_cool
       // sis data for unit
       unit.removable_skill_ids = await this.action.unit.getUnitSiS(unit.unit_owning_user_id)
       // total score for unit
@@ -229,14 +230,14 @@ export class Event extends CommonModule {
       unit.max_love = undefined
       unit.max_skill_level = undefined
 
-      json.deck.units.push(unit)
+      jsonResult.deck.units.push(unit)
     }
 
     await this.connection.query(`INSERT INTO event_ranking (user_id, event_id, event_point, score, deck) VALUES (:user, :event, 0, :score, :deck) ON DUPLICATE KEY UPDATE score = :score, deck = :deck`, {
       user: userId,
       event: eventId,
-      score: json.score_info.score,
-      deck: JSON.stringify(json)
+      score: jsonResult.score_info.score,
+      deck: JSON.stringify(jsonResult)
     })
   }
 

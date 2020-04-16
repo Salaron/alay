@@ -44,7 +44,7 @@ export default class extends WebViewAction {
       result: await this.webview.renderTemplate("login", "login", locals),
       headers: {
         "Set-Cookie": [
-          `token=${this.requestData.auth_token}; expires=${new Date(new Date().getTime() + 600000).toUTCString()}; path=/; SameSite=Strict;`
+          Utils.getCookieHeader("token", this.requestData.auth_token, 23)
         ]
       }
     }

@@ -2,7 +2,7 @@ import assert from "assert"
 import { TYPE } from "../../../common/type"
 import { User } from "../../../common/user"
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, Mods, PERMISSION, REQUEST_TYPE, FESTIVAL_BONUS } from "../../../models/constant"
+import { AUTH_LEVEL, FESTIVAL_BONUS, Mods, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
 
 const liveDB = sqlite3.getLiveDB()
@@ -217,7 +217,7 @@ export default class extends ApiAction {
         user: this.user_id,
         liveCnt: trackIds.length
       }),
-      this.live.writeToLog(this.user_id, {
+      this.live.saveResultToLog(this.user_id, {
         live_setting_ids: liveSettingIds,
         is_event: true,
         score: totalScore,

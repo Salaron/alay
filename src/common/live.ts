@@ -211,7 +211,7 @@ export class Live extends CommonModule {
   }
 
   public async getUserDeck(userId: number, deckId: number, calculateScore = true, guestUnitId?: number | null, includeDeckData?: boolean, cleanup = true) {
-    let deck = await this.connection.query(`
+    let deckData = await this.connection.query(`
     SELECT
       max_removable_skill_capacity, units.unit_owning_user_id,
       slot_id, unit_id, stat_smile, stat_pure, stat_cool, max_hp,
@@ -221,8 +221,8 @@ export class Live extends CommonModule {
     JOIN units
       ON units.unit_owning_user_id = user_unit_deck_slot.unit_owning_user_id
     WHERE user_unit_deck_slot.user_id = :user AND deck_id = :deck`, { user: userId, deck: deckId })
-    if (deck.length !== 9) throw new ErrorAPI(`Invalid deck`)
-    deck = deck.map((unit) => {
+    if (deckData.length !== 9) throw new ErrorAPI(`Invalid deck`)
+    const userDeck = deckData.map((unit) => {
       return {
         unit_owning_user_id: unit.unit_owning_user_id,
         unit_id: unit.unit_id,
@@ -249,7 +249,7 @@ export class Live extends CommonModule {
     })
 
     if (calculateScore) {
-      await this.calculateScoreBonus(userId, deck, guestUnitId, cleanup)
+      await this.calculateScoreBonus(userId, userDeck, guestUnitId, cleanup)
     }
 
     const units = []
@@ -257,7 +257,7 @@ export class Live extends CommonModule {
     let pure = 0
     let cool = 0
     let hp = 0
-    for (const unit of deck) {
+    for (const unit of userDeck) {
       units.push({
         smile: unit.stat_smile,
         cute: unit.stat_pure,
@@ -276,7 +276,7 @@ export class Live extends CommonModule {
       total_cool: cool,
       total_hp: hp,
       unit_list: units,
-      deck: includeDeckData ? deck : undefined
+      deck: includeDeckData ? userDeck : undefined
     }
   }
 
@@ -430,7 +430,7 @@ export class Live extends CommonModule {
     return deck
   }
 
-  public async writeToLog(userId: number, result: writeToLogResult) {
+  public async saveResultToLog(userId: number, result: writeToLogResult) {
     await this.connection.execute("INSERT INTO user_live_log (user_id, live_setting_id, live_setting_ids, is_event, score, combo, combo_rank, score_rank, mods) VALUES (:user, :lsid, :lsids, :event, :score, :combo, :combo_r, :score_r, :mods)", {
       user: userId,
       lsid: result.live_setting_id,
@@ -520,6 +520,7 @@ export class Live extends CommonModule {
       id: this.action.unit.getSupportUnitList().randomValue()
     }, "Live Show! Reward", 1, true)
     res.new_unit_flag = false
+    res.unit_rarity_id = 5
     rewardUnitList.live_clear.push(res)
 
     return {
