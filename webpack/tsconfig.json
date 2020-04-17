@@ -1,9 +1,11 @@
 {
   "extends": "../tsconfig.json",
-  "exclude": [],
+  "exclude": [
+    "dist"
+  ],
   "compilerOptions": {
     "incremental": false,
     "allowJs": true,
-    "rootDir": "../"
+    "rootDir": "./.."
   }
 }

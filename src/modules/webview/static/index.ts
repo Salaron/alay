@@ -1,9 +1,9 @@
 import moment from "moment"
-import { ErrorAPI } from "../../../../dist/models/error"
 import { TYPE } from "../../../common/type"
 import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
+import { ErrorAPI } from "../../../models/error"
 
 enum staticPageType {
   MAINTENANCE = 10,
