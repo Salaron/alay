@@ -23,7 +23,7 @@ export default class extends WebViewAction {
     if (!Type.isInt(this.params.type) && this.requestData.auth_level !== AUTH_LEVEL.PRE_LOGIN)
       throw new ErrorAPI("No permissions")
 
-    if (this.params.type === loginType.UPDATE && this.requestData.auth_token.length === 0) {
+    if (Type.isInt(this.params.type) && this.requestData.auth_token.length === 0) {
       const token = Utils.randomString(80 + Math.floor(Math.random() * 10))
       await this.connection.execute("INSERT INTO auth_tokens (token, expire, session_key, login_key, login_passwd) VALUES (:token, DATE_ADD(NOW(), INTERVAL 30 MINUTE), '', '', '')", {
         token

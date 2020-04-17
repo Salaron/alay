@@ -41,7 +41,7 @@ export class WebView extends CommonModule {
       partnerUnitIcon = unitIcons[partner.unit_id][partner.rank]
     }
     const defaultLocals: Pug.LocalsObject = {
-      pageTitle: "SunLight WebView", // page title can be overridden
+      pageTitle: "WebView", // page title can be overridden
       ...locals,
       userId: this.requestData.user_id,
       token: this.requestData.auth_token,

@@ -50,11 +50,12 @@ $(() => {
       })
       if (response.redirect) {
         location.replace(response.redirect)
+      } else {
+        UIkit.toggle("#loginForm", {
+          target: "#loginForm, #loginSuccess",
+          animation: "uk-animation-fade"
+        }).toggle()
       }
-      UIkit.toggle("#loginForm", {
-        target: "#loginForm, #loginSuccess",
-        animation: "uk-animation-fade"
-      }).toggle()
     } catch {
       protectPage(true)
     }

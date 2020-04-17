@@ -45,6 +45,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
 
     await requestData.connection.commit()
     if (action.status !== 200) {
+      response.statusCode = action.status
       response.setHeader("Content-Type", "application/json")
       response.write(JSON.stringify(action.result))
     } else {

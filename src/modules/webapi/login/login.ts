@@ -48,7 +48,13 @@ export default class extends WebApiAction {
     })
     if (!transferUserData) throw new ErrorWebAPI(i18n.invalidLoginOrPass)
 
-    if (this.params.type === loginType.UPDATE) {
+    if (this.params.type === loginType.UPDATE || this.params.type === loginType.ADMIN) {
+      let redirectURL = "../static/index?id=11"
+      if (this.params.type === loginType.ADMIN) {
+        redirectURL = "../admin/index"
+        if (!Config.server.admin_ids.includes(transferUserData.user_id))
+          throw new ErrorAPI("Nice try")
+      }
       // update token time
       let tokenData = await this.connection.first("SELECT login_token FROM user_login WHERE user_id = :id", {
         id: transferUserData.user_id
@@ -67,6 +73,11 @@ export default class extends WebApiAction {
         await this.connection.execute("UPDATE user_login SET last_activity = current_timestamp() WHERE user_id = :id", {
           id: transferUserData.user_id
         })
+        if (this.params.type === loginType.ADMIN) {
+          await this.connection.execute("UPDATE user_login SET last_admin_access = current_timestamp() WHERE user_id = :id", {
+            id: transferUserData.user_id
+          })
+        }
       }
 
       // destroy token
@@ -75,7 +86,7 @@ export default class extends WebApiAction {
         status: 200,
         result: {
           success: true,
-          redirect: "../static/index?id=11"
+          redirect: redirectURL
         },
         headers: {
           "Set-Cookie": [

@@ -414,7 +414,7 @@ export class Secretbox extends CommonModule {
       for (let i = costList.length - 1; i >= 0; i--) {
         let cost = costList[i]
         const payable = this.isCostPayable(cost.cost_type, cost.item_id, cost.amount)
-        if (cost.cost_type === 1000 && (cost.item_id === 1 || cost.item_id === 8) && !payable) {
+        if (cost.hide_flag && !payable) {
           // make ticket cost not visible
           costList.splice(i, 1)
           continue
