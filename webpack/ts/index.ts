@@ -34,10 +34,10 @@ if (isWebview) {
   })
 }
 
-window.onerror = (msg, url, lineNo, columnNo, error) => {
+window.onerror = (message, url, lineNo, columnNo, error) => {
   sendRequest("report/error", {
     url,
-    msg,
+    message,
     stack: error == undefined ? null : error.stack
   })
   return false
