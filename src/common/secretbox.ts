@@ -19,7 +19,7 @@ const unitDB = sqlite3.getUnitDB()
 const secretboxSVDB = sqlite3.getSecretboxSVDB()
 
 export class Secretbox extends CommonModule {
-  private useCache = Config.server.debug_mode
+  private useCache = !Config.server.debug_mode
   private userItems: any
   constructor(action: BaseAction) {
     super(action)
@@ -307,6 +307,8 @@ export class Secretbox extends CommonModule {
     if (cachedData && this.useCache) {
       // use cached data
       secretboxPage = JSON.parse(cachedData)
+      // can we do something with this?
+      secretboxPage.button_list = await this.getButtons(secretboxM.secret_box_id, secretboxM.secret_box_type)
     } else {
       const [animationAssets, secretboxInfo, buttonList] = await Promise.all([
         this.getAnimationAssets(secretboxM.secret_box_id, secretboxM.secret_box_type),
@@ -332,7 +334,7 @@ export class Secretbox extends CommonModule {
       case secretboxType.STEP_UP: {
         // seems like klab removed step boxes...
         // for now it will be incomplete until it shows on official
-        const [userPonCount, stepBase] = await Promise.all([
+/*         const [userPonCount, stepBase] = await Promise.all([
           this.getUserPonCount(id),
           secretboxSVDB.get("SELECT * FROM secret_box_step_up_base_m WHERE secret_box_id = :id", { id })
         ])
@@ -350,7 +352,7 @@ export class Secretbox extends CommonModule {
           end_step: stepBase.default_end_step,
           term_count: 0,
           step_up_bonus_bonus_item_list: stepItemBonus
-        }
+        } */
       }
       default: return undefined
     }
@@ -382,8 +384,10 @@ export class Secretbox extends CommonModule {
 
   private async getButtons(id: number, type: number): Promise<ISecretboxButton[]> {
     await this.updateUserItems() // TODO: move it to some other place
-    const buttonList = await secretboxSVDB.all("SELECT * FROM secret_box_button_m WHERE secret_box_id = :id", { id })
-    const secretboxM: ISecretboxM = await secretboxSVDB.get("SELECT always_display_flag from secret_box_m WHERE secret_box_id = :id", { id })
+    const [buttonList, secretboxM]: [any[], ISecretboxM]= await Promise.all([
+      secretboxSVDB.all("SELECT * FROM secret_box_button_m WHERE secret_box_id = :id", { id }),
+      secretboxSVDB.get("SELECT always_display_flag from secret_box_m WHERE secret_box_id = :id", { id })
+    ])
     const alwaysDisplayFlag = !!secretboxM.always_display_flag
     let isPayable = false
 
