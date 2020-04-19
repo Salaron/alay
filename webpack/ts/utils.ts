@@ -85,7 +85,10 @@ export async function sendRequest(endpoint: string, data: any) {
       dataType: "JSON",
       contentType: "application/json",
       headers,
-      data: JSON.stringify(data)
+      data: JSON.stringify(data),
+      xhrFields: {
+        withCredentials: true // to allow send cookies
+      }
     })
     if (response.response_data) return response.response_data
     return response

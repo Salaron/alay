@@ -1,6 +1,8 @@
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
-import { TYPE } from "../../../common/type"
+import { Logger } from "../../../core/logger"
+
+const logger = new Logger("Browser Error")
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.NONE
@@ -9,22 +11,18 @@ export default class extends WebApiAction {
     super(requestData)
   }
 
-  public paramTypes() {
-    return {
-      message: TYPE.STRING
-    }
-  }
-
   public async execute() {
-    await this.connection.query(`INSERT INTO error_log (user_id, message, stacktrace) VALUES (:user, :msg, :stack)`, {
-      user: this.user_id,
-      msg: this.params.message,
-      stack: `Url: ${this.params.url}\n\nStack:\n${this.params.stacktrace || null}`
-    })
+    // this error will be saved in logs (logs/error.log)
+    logger.error(`
+      User ID: ${this.user_id}
+      Message: ${this.params.message || null}
+      URL: ${this.params.url || null}
+      Stack: ${this.params.stacktrace || null}
+    `)
 
     return {
       status: 200,
-      result: true
+      result: []
     }
   }
 }
