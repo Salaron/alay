@@ -13,7 +13,7 @@ export default class extends WebViewAction {
   public async execute() {
     const itemList = await itemDB.all("SELECT item_id, name FROM kg_item_m")
     const locals = {
-      i18n: this.i18n.getStrings(this.requestData, "common"),
+      i18n: await this.i18n.getStrings(this.requestData, "common"),
       pageTitle: "New Secretbox",
       itemList
     }

@@ -21,8 +21,8 @@ export default class extends WebViewAction {
       }
     }
     const locals = {
-      i18n: this.i18n.getStrings(this.requestData, "common"),
-      pageTitle: "APANEL"
+      i18n: await this.i18n.getStrings(this.requestData, "common"),
+      pageTitle: "APanel"
     }
     return {
       status: 200,

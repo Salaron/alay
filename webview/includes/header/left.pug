@@ -23,9 +23,11 @@ ul(class="uk-navbar-nav")
               |  !{item[0]}
         
         if isAdmin
-          a(href="/webview.php/admin/index")
-            span(uk-icon="star" class="uk-icon")
-            |  APanel
+          - var className = pageTitle == "APanel" ? "uk-active" : ""
+          li(class=className)
+            a(href="/webview.php/admin/index")
+              span(uk-icon="star" class="uk-icon")
+              |  APanel
         li(class="uk-nav-divider")
 
         li
