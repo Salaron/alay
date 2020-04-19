@@ -21,14 +21,15 @@ $(() => {
     const email = <string>$("#email").val()
     const password =<string> $("#password").val()
     const password2 = <string>$("#password-confirm").val()
-    // is it ok to validate like that?
-    if (name.length === 0) return showNotification(i18n.nicknameBlank, "warning")
-    if (name.length > 20) return showNotification(i18n.nicknameLimit, "warning")
-    if (email.length === 0) return showNotification(i18n.mailBlank, "warning")
-    if (!checkMailFormat(email)) return showNotification(i18n.mailInvalidFormat, "warning")
-    if (password.length === 0) return showNotification(i18n.passwordBlank, "warning")
-    if (password.length > 32) return showNotification(i18n.passwordLimit, "warning")
-    if (!checkPasswordFormat(password)) return showNotification(i18n.passwordInvalidFormat, "warning")
+    if (
+      name.length === 0 || name.length > 20
+    ) return showNotification(i18n.nicknameIncorrect, "warning")
+    if (
+      email.length === 0 || !checkMailFormat(email)
+    ) return showNotification(i18n.mailIncorrect, "warning")
+    if (
+      password.length === 0 || password.length > 32 || !checkPasswordFormat(password)
+    ) return showNotification(i18n.passwordIncorrect, "warning")
     if (password !== password2) return showNotification(i18n.passwordsNotMatch, "warning")
     protectPage()
     try {

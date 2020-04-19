@@ -39,7 +39,7 @@ export default class extends WebApiAction {
     const strings = await this.i18n.getStrings(this.requestData, "login-login", "login-startup", "mailer")
 
     const pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
-    if (!Utils.checkPasswordFormat(pass)) throw new ErrorWebAPI(strings.passwordInvalidFormat)
+    if (!Utils.checkPasswordFormat(pass)) throw new ErrorWebAPI(strings.passwordIncorrect)
 
     // tslint:disable-next-line
     const _mailCheck = await this.connection.first(`SELECT * FROM users WHERE mail = :mail`, {
