@@ -1,5 +1,6 @@
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
+import { ErrorAPI } from "../models/error"
 
 interface ItemObject {
   name?: string
@@ -207,6 +208,8 @@ export class Item extends CommonModule {
       case 3000:
       case 3001:
       case 3002: {
+        const data = await this.connection.first(`SELECT ${item.name} FROM users WHERE user_id = ${userId}`)
+        if (amount < 0 && data[<string>item.name] - amount < 0) throw new ErrorAPI("not enough items")
         await this.connection.query(`UPDATE users SET ${item.name}=${item.name} + ${amount} WHERE user_id=${userId}`)
         break
       }
