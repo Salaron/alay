@@ -31,7 +31,7 @@
     "successDescriptionLogin": "You have successfully logged in!<br>Close this window to enter the game.",
     "invalidLoginOrPass": "Invalid User ID or password",
     "mailNotExists": "Account with this E-mail does not exist",
-    "sendError": "An error occurred while sending the letter. Try again later",
+    "mailSendingError": "An error occurred while sending the letter. Try again later",
     "passwordResetSuccess": "A new password has been sent to your mail",
     "confirmationCodeInvalidFormat": "Field \"Verification code\" is invalid",
     "mailSuccess": "A letter with a verification code was sent to the specified E-mail",

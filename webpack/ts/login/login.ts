@@ -17,6 +17,7 @@ $(() => {
   const params = parseQueryString()
   if (params.recovery) {
     defaultForm = "#codeVerifyForm"
+    showNotification(i18n.mailSuccess, "success")
   }
   const toggle = UIkit.toggle(defaultForm, {
     target: defaultForm,
@@ -80,7 +81,7 @@ $(() => {
         recaptcha
       })
       if (isWebview) {
-        location.replace(getExternalURL() + "&recovery=1")
+        location.replace(getExternalURL(location.href + "?recovery=1"))
       } else {
         const toggle = UIkit.toggle("#recoverForm", {
           target: "#recoverForm, #codeVerifyForm",

@@ -4,6 +4,7 @@ import { Utils } from "../../../common/utils"
 import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL } from "../../../models/constant"
 import { ErrorWebAPI, ErrorAPI } from "../../../models/error"
+import { Redis } from "../../../core/database/redis"
 
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
@@ -22,35 +23,31 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
+    if (this.requestData.auth_level !== this.requiredAuthLevel && !Config.server.debug_mode)
       throw new ErrorAPI(403)
 
-    const strings = await this.i18n.getStrings(this.requestData, "login-login", "mailer")
-
-    const recoveryData = await this.connection.first("SELECT * FROM auth_recovery_codes WHERE token = :token AND expire > CURRENT_TIMESTAMP", {
-      token: this.requestData.auth_token
-    })
-    if (!recoveryData) throw new ErrorWebAPI(strings.confirmationCodeNotExists)
-    if (recoveryData.code != this.params.code.toUpperCase()) throw new ErrorWebAPI(strings.confirmationCodeNotMatch)
-
+    const i18n = await this.i18n.getStrings(this.requestData, "login-login", "mailer")
+    let recoveryData = await Redis.get(`recoveryConfirmationCode:${this.requestData.auth_token}`)
+    if (!recoveryData) throw new ErrorWebAPI(i18n.confirmationCodeNotExists)
+    const code = recoveryData.split(":")[0]
+    if (code !== this.params.code.toUpperCase())
+      throw new ErrorWebAPI(i18n.confirmationCodeNotMatch)
+    const mail = recoveryData.split(":")[1]
     const newPassword = Utils.randomString(10, "upper")
     // TODO: "salt" passwords
     await this.connection.execute("UPDATE users SET password = :pass WHERE mail = :mail", {
-      mail: recoveryData.mail,
+      mail,
       pass: newPassword
     })
-    await this.connection.execute("DELETE FROM auth_recovery_codes WHERE token = :token", {
-      token: this.requestData.auth_token
-    })
     const userData = await this.connection.first("SELECT user_id FROM users WHERE mail = :mail", {
-      mail: recoveryData.mail
+      mail
     })
-
-    const result = await Utils.sendMail(recoveryData.mail, strings.subjectPasswordRecovery, Utils.prepareTemplate(strings.bodyPasswordRecovered, {
+    await Redis.del(`recoveryConfirmationCode:${this.requestData.auth_token}`)
+    const result = await Utils.sendMail(mail, i18n.subjectPasswordRecovery, Utils.prepareTemplate(i18n.bodyPasswordRecovered, {
       userId: userData.user_id,
       password: newPassword
     }))
-    if (!result) throw new ErrorWebAPI(strings.sendError)
+    if (!result) throw new ErrorWebAPI(i18n.mailSendingError)
     return {
       status: 200,
       result: true
