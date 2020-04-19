@@ -33,7 +33,7 @@ export class WebView extends CommonModule {
     if (Config.server.debug_mode) {
       assets = JSON.parse(await promises.readFile("webpack-assets.json", "utf-8"))
     }
-    let partnerUnitIcon = null
+    let partnerUnitIcon = ""
     if (this.requestData.user_id) {
       const partner: { unit_id: number, rank: 1 | 2 } = await this.connection.first("SELECT unit_id, \`rank\` FROM users JOIN units ON users.partner_unit = units.unit_owning_user_id WHERE users.user_id = :userId", {
         userId: this.userId

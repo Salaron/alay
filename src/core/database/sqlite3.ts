@@ -39,14 +39,14 @@ class Sqlite3Wrapper {
     })
   }
 
-  public async run(query: string, values?: any): Promise<void> {
+  public async run(query: string, values?: any): Promise<sqliteDB.RunResult> {
     if (this.closed) throw new Error(`The database "${this.fileName}" is closed.\nLast query: "${this.lastQuery}"`)
     const preparedQuery = formatQuery(query, values)
     this.lastQuery = preparedQuery
     return new Promise((res, rej) => {
-      this.db.run(preparedQuery, (err) => {
+      this.db.run(preparedQuery, function(err) {
         if (err) return rej(err)
-        res()
+        res(this)
       })
     })
   }
@@ -227,10 +227,11 @@ export class Sqlite3 {
     this.teamDutyDB = new Sqlite3Wrapper("./db/team_duty.db_", sqliteDB.OPEN_READONLY)
     this.unitDB = new Sqlite3Wrapper("./db/unit.db_", sqliteDB.OPEN_READONLY)
 
-    this.bannerSVDB = new Sqlite3Wrapper("./db/sv_banner.db_", sqliteDB.OPEN_READONLY)
-    this.customLiveSVDB = new Sqlite3Wrapper("./db/sv_custom_live.db_", sqliteDB.OPEN_READONLY)
-    this.downloadSVDB = new Sqlite3Wrapper("./db/sv_download.db_", sqliteDB.OPEN_READONLY)
-    this.liveNotesSVDB = new Sqlite3Wrapper("./db/sv_live_notes.db_", sqliteDB.OPEN_READONLY)
-    this.secretboxSVDB = new Sqlite3Wrapper("./db/sv_secretbox.db_", sqliteDB.OPEN_READONLY)
+    // open server-side databases in READWRITE mode
+    this.bannerSVDB = new Sqlite3Wrapper("./db/sv_banner.db_", sqliteDB.OPEN_READWRITE)
+    this.customLiveSVDB = new Sqlite3Wrapper("./db/sv_custom_live.db_", sqliteDB.OPEN_READWRITE)
+    this.downloadSVDB = new Sqlite3Wrapper("./db/sv_download.db_", sqliteDB.OPEN_READWRITE)
+    this.liveNotesSVDB = new Sqlite3Wrapper("./db/sv_live_notes.db_", sqliteDB.OPEN_READWRITE)
+    this.secretboxSVDB = new Sqlite3Wrapper("./db/sv_secretbox.db_", sqliteDB.OPEN_READWRITE)
   }
 }

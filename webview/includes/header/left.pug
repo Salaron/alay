@@ -22,6 +22,10 @@ ul(class="uk-navbar-nav")
               span(uk-icon=item[1] class="uk-icon")
               |  !{item[0]}
         
+        if isAdmin
+          a(href="/webview.php/admin/index")
+            span(uk-icon="star" class="uk-icon")
+            |  APanel
         li(class="uk-nav-divider")
 
         li

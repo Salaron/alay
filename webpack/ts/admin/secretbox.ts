@@ -1,5 +1,5 @@
 import $ from "jquery"
-import { secretboxType } from "../../../src/models/secretbox"
+import { secretboxType, buttonType } from "../../../src/models/secretbox"
 import { formatString, sendRequest, showNotification } from "../utils"
 
 enum costType {
@@ -9,12 +9,24 @@ enum costType {
   SOCIAL_POINTS
 }
 
+let sbType = secretboxType.DEFAULT
 $(() => {
   $("#sb-type").change(function () {
+    sbType = parseInt(<string>$(this).val())
+    // clear some stuff
     $(".appeal").removeAttr("hidden")
-    const type = parseInt(<string>$(this).val())
-    if (type === secretboxType.STUB) {
+    $("#addButton").removeAttr("hidden")
+    $("#buttons").html("").attr("hidden", "true")
+    $("#groups").html("").attr("hidden", "true")
+
+    if (sbType === secretboxType.STUB) {
       $(".appeal").attr("hidden", "true")
+      for (let i = 0; i < 3; i++) {
+        $("#addButton").click()
+        $("#sb-button-type-" + i).val(buttonType.STUB_A + i)
+        $("#sb-button-type-" + i).attr("disabled", "true")
+        $("#addButton").attr("hidden", "true")
+      }
     }
   })
 
@@ -64,6 +76,9 @@ $(() => {
     $("#groups").append(formatString(groupTemplate, {
       id: groupId
     }))
+    if (sbType === secretboxType.STUB) {
+      $("#group-stub-" + groupId).removeAttr("hidden")
+    }
 
     $("#addFamily-" + groupId).click(event => {
       const familyId = $("#familyList-" + groupId).find(".group-family").length
@@ -90,11 +105,10 @@ $(() => {
     form.preventDefault()
 
     const secretboxName = $("#sb-name").val()
-    const secretboxType = parseInt(<string>$("#sb-type").val())
     const memberCategory = parseInt(<string>$("#sb-member-category").val())
     const startDate = $("#sb-start-date").val()
     const endDate = $("#sb-end-date").val()
-    const alwaysDisplayFlag = Number($("#sb-always-display-flag").is(":checked"))
+    const alwaysDisplayFlag = Number(!$("#sb-always-display-flag").is(":checked"))
     const showEndDateFlag = Number($("#sb-show-end-date-flag").is(":checked"))
 
     const assets = []
@@ -134,9 +148,11 @@ $(() => {
           case costType.ITEM: {
             type = 1000
             itemId = parseInt(<string>$(`#sb-cost-item-${b}-${c}`).val())
+            break
           }
           case costType.COINS: {
             type = 3000
+            break
           }
           case costType.LOVECA: {
             type = 3001
@@ -144,6 +160,7 @@ $(() => {
           }
           case costType.SOCIAL_POINTS: {
             type = 3002
+            break
           }
         }
 
@@ -170,19 +187,21 @@ $(() => {
     for (let g = 0; g < $("#groups").find(".secretbox-group").length; g++) {
       const rarity = parseInt(<string>$("#sb-group-rarity-" + g).val())
       const weight = parseInt(<string>$("#sb-group-weight-" + g).val())
-      let family = []
+      const buttonType = parseInt(<string>$("#sb-group-btype-" + g).val()) || null
+      let familyList = []
       for (let f = 0; f < $("#familyList-" + g).find(".group-family").length; f++) {
         const familyWeight = parseInt(<string>$(`#sb-family-weight-${g}-${f}`).val())
         const query = $(`#sb-family-query-${g}-${f}`).val()
-        family.push({
+        familyList.push({
           weight: familyWeight,
           query
         })
       }
       groups.push({
+        buttonType,
         rarity,
         weight,
-        family
+        familyList
       })
     }
 
@@ -198,7 +217,7 @@ $(() => {
     const requestData = {
       secretboxInfo: {
         secretboxName,
-        secretboxType,
+        secretboxType: sbType,
         startDate,
         endDate,
         memberCategory,
@@ -212,6 +231,6 @@ $(() => {
     }
 
     const response = await sendRequest("admin/addSecretbox", requestData)
-    showNotification("Успех! ID новой коробки: " + response.id)
+    showNotification("Успех! ID новой коробки: " + response.secretboxID, "success")
   })
 })
