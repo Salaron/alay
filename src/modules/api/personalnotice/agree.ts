@@ -14,7 +14,7 @@ export default class extends ApiAction {
 
   public paramTypes() {
     return {
-      notice_id : TYPE.INT
+      notice_id: TYPE.INT
     }
   }
 
@@ -23,16 +23,18 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    // check if this notice is exists
-    const check = await this.connection.first("SELECT * FROM user_personal_notice WHERE user_id = :user AND notice_id = :id", {
-      user: this.user_id,
-      id: this.params.notice_id
-    })
-    if (!check) throw new ErrorAPI(`Personalnotice ${this.params.notice_id} doesn't exist`)
-    await this.connection.query("UPDATE user_personal_notice SET agreed = 1 WHERE user_id = :user AND notice_id = :id", {
-      user: this.user_id,
-      id: this.params.notice_id
-    })
+    if (this.params.notice_id > 0) {
+      // check if this notice is exists
+      const check = await this.connection.first("SELECT * FROM user_personal_notice WHERE user_id = :user AND notice_id = :id", {
+        user: this.user_id,
+        id: this.params.notice_id
+      })
+      if (!check) throw new ErrorAPI(`Personalnotice ${this.params.notice_id} doesn't exist`)
+      await this.connection.query("UPDATE user_personal_notice SET agreed = 1 WHERE user_id = :user AND notice_id = :id", {
+        user: this.user_id,
+        id: this.params.notice_id
+      })
+    }
 
     return {
       status: 200,

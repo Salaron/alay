@@ -1,7 +1,13 @@
 import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Utils } from "../../../common/utils"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
+interface IPersonalNoticeGetResponse {
+  has_notice: boolean
+  notice_id?: number
+  type?: number
+  title?: string
+  contents?: string
+}
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.XMC
@@ -12,14 +18,9 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const response = {
-      has_notice: false,
-      notice_id: 1,
-      type: 1,
-      title: "",
-      contents: ""
+    let result: IPersonalNoticeGetResponse = {
+      has_notice: false
     }
-
     // if welcome message is enabled check if it is agreed
     if (Config.modules.personalNotice.welcomeMessageEnabled) {
       const notice = Config.modules.personalNotice
@@ -30,7 +31,7 @@ export default class extends ApiAction {
       })
       if (!data) { // this notice is missing. let's fix that
         // insert into db
-        const res = await this.connection.query(`
+        const res = await this.connection.execute(`
         INSERT INTO user_personal_notice(user_id, notice_type, title, contents, agreed) VALUES (:user, :type, :title, :contents, 0)
         `, {
           user: this.user_id,
@@ -39,15 +40,15 @@ export default class extends ApiAction {
           contents: notice.welcomeMessageContents
         })
 
-        // just return prepared response
-        response.has_notice = true
-        response.notice_id = (<any>res).insertId
-        response.type = notice.welcomeMessageType
-        response.title = notice.welcomeMessageTitle
-        response.contents = notice.welcomeMessageContents
         return {
           status: 200,
-          result: response
+          result: {
+            has_notice: true,
+            notice_id: res.insertId,
+            type: notice.welcomeMessageType,
+            title: notice.welcomeMessageTitle,
+            contents: notice.welcomeMessageContents
+          }
         }
       }
     }
@@ -58,16 +59,32 @@ export default class extends ApiAction {
     })
 
     if (notice) {
-      response.has_notice = true
-      response.notice_id = notice.notice_id
-      response.type = notice.notice_type
-      response.title = notice.title
-      response.contents = notice.contents
+      result = {
+        has_notice: true,
+        notice_id: notice.notice_id,
+        type: notice.notice_type,
+        title: notice.title,
+        contents: notice.contents
+      }
+    } else {
+      const cards = await this.connection.first("SELECT COUNT(unit_owning_user_id) as count FROM units WHERE user_id = :user", {
+        user: this.user_id
+      })
+      if (cards.count >= 10000) {
+        const i18n = await this.i18n.getStrings(this.requestData, "personalnotice")
+        result = {
+          has_notice: true,
+          notice_id: -1,
+          type: 1,
+          title: i18n.youHaveTooLotCardsTitle,
+          contents: i18n.youHaveTooLotCardsContent
+        }
+      }
     }
 
     return {
       status: 200,
-      result: response
+      result
     }
   }
 }
