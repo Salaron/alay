@@ -1,5 +1,5 @@
 import $ from "jquery"
-import { secretboxType, buttonType } from "../../../src/models/secretbox"
+import { secretboxType, buttonType } from "../../../models/secretbox"
 import { formatString, sendRequest, showNotification } from "../utils"
 
 enum costType {

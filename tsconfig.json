@@ -14,7 +14,7 @@
     "esModuleInterop": true
   },
   "exclude": [
-    "webpack",
+    "src/webpack",
     "webpack.config.ts",
     "node_modules"
   ]

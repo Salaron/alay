@@ -45,7 +45,7 @@ window.onerror = (message, url, lineNo, columnNo, error) => {
 
 // fix compilation
 // /global variables was a bad idea/
-import { Type as type } from "../../src/common/type"
+import { Type as type } from "../../common/type"
 declare global {
   const Type: typeof type
 }

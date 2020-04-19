@@ -7,10 +7,10 @@ import * as webpack from "webpack"
 const config: webpack.Configuration = {
   entry: {
     main: [
-      "./webpack/ts/index.ts",
-      "./webpack/sass/default.sass",
+      "./src/webpack/ts/index.ts",
+      "./src/webpack/sass/default.sass",
     ],
-    webview: "./webpack/sass/webview.sass"
+    webview: "./src/webpack/sass/webview.sass"
   },
   module: {
     rules: [
