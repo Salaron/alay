@@ -118,9 +118,7 @@
     "update": "Update Required"
   },
   "notice": {
-    "REMOVED_FROM_FRIENDS": "{{affectorName}} removed you from their friend list",
     "SEND_FRIEND_REQUEST": "{{affectorName}} sent you a friend request",
-    "REJECTED_FRIEND_REQUEST": "{{affectorName}} rejected your friend request",
     "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} accepted your friend request"
   },
   "noticemarquee": {

@@ -139,9 +139,7 @@
     "youHaveTooLotCardsContent": "\n\n\n\nКоличество карт в Вашем инвентаре превысило 10 тысяч!\nИз-за этого у Вас могут быть проблемы со входом в игру.\nЧтобы исправить это, пожалуйста, воспользуйтесь массовым\nудалением карт в настройках."
   },
   "notice": {
-    "REMOVED_FROM_FRIENDS": "{{affectorName}} удалил(-а) Вас из своего списка друзей",
     "SEND_FRIEND_REQUEST": "{{affectorName}} отправил(-а) Вам заявку в друзья",
-    "REJECTED_FRIEND_REQUEST": "{{affectorName}} отклонил(-а) Вашу заявку в друзья",
     "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} принял(-а) Вашу заявку в друзья"
   },
   "noticemarquee": {

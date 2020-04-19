@@ -22,7 +22,6 @@ export default class extends ApiAction {
       thisUser: this.user_id,
       recUser: this.params.user_id
     })
-    await this.notice.addNotice(this.user_id, this.notice.FILTER.FRIENDS, this.notice.TYPE.REMOVED_FROM_FRIENDS, this.params.user_id)
 
     return {
       status: 200,

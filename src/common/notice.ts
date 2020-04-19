@@ -3,9 +3,7 @@ import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
 
 enum noticeType {
-  REMOVED_FROM_FRIENDS = 1,
   SEND_FRIEND_REQUEST,
-  REJECTED_FRIEND_REQUEST,
   ACCEPTED_FRIEND_REQUEST
 }
 enum filter {

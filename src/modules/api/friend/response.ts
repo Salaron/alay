@@ -26,7 +26,6 @@ export default class extends ApiAction {
           init: this.params.user_id,
           rec: this.user_id
         })
-        await this.notice.addNotice(this.user_id, this.notice.FILTER.FRIENDS, this.notice.TYPE.REJECTED_FRIEND_REQUEST, this.params.user_id)
         break
       }
       case 2: {
