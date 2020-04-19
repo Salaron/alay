@@ -19,7 +19,7 @@ const unitDB = sqlite3.getUnitDB()
 const secretboxSVDB = sqlite3.getSecretboxSVDB()
 
 export class Secretbox extends CommonModule {
-  private useCache = false
+  private useCache = Config.server.debug_mode
   private userItems: any
   constructor(action: BaseAction) {
     super(action)
