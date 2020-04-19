@@ -29,7 +29,7 @@ export class Secretbox extends CommonModule {
     const secretboxList = await secretboxSVDB.all(`
     SELECT * FROM secret_box_m as box
     JOIN secret_box_page_m as page ON box.secret_box_id = page.secret_box_id
-    WHERE start_date <= :date AND end_date > :date AND member_category = :ctg
+    WHERE start_date <= :date AND end_date > :date AND (member_category = :ctg OR member_category = 0)
     ORDER BY page.page_order DESC`, {
       date: Utils.toSpecificTimezone(9),
       ctg: memberCategory
