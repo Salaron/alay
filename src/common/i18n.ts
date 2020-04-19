@@ -5,6 +5,7 @@ import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
 import RequestData from "../core/requestData"
+import { ErrorAPI } from "../models/error"
 
 interface I18nCache {
   [localizationCode: string]: I18nSection
@@ -71,13 +72,8 @@ export class I18n extends CommonModule {
         code,
         user: requestData.user_id
       })
-    } else if (Type.isString(requestData.auth_token) && requestData.auth_token.match(/^[a-z0-9]{70,90}$/gi) && requestData.user_id === 0) {
-      await this.connection.execute("UPDATE auth_tokens SET language = :code WHERE token = :token", {
-        code,
-        token: requestData.auth_token
-      })
     } else {
-      throw new Error(`Token or user_id is missing`)
+      throw new ErrorAPI(0)
     }
   }
 
@@ -90,8 +86,6 @@ export class I18n extends CommonModule {
     let cookieLanguageCode = this.requestData.getCookie("language")
     if (cookieLanguageCode !== "" && Object.values(Config.i18n.languages).includes(cookieLanguageCode)) {
       languageCode = this.requestData.getCookie("language")
-    } else if (Type.isString(requestData.auth_token) && requestData.auth_token.match(/^[a-z0-9]{70,90}$/gi) && requestData.user_id === 0) {
-      languageCode = (await this.connection.first("SELECT language FROM auth_tokens WHERE token = :token", { token: requestData.auth_token })).language
     } else if (Type.isInt(requestData.user_id) && requestData.user_id > 0) {
       languageCode = (await this.connection.first("SELECT language FROM users WHERE user_id = :user", { user: requestData.user_id })).language
     }

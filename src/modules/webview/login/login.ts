@@ -2,6 +2,7 @@ import RequestData from "../../../core/requestData"
 import { AUTH_LEVEL, WV_REQUEST_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
 import { Utils } from "../../../common/utils"
+import { AuthToken } from "../../../models/authToken"
 
 export enum loginType {
   UPDATE,
@@ -24,11 +25,10 @@ export default class extends WebViewAction {
       throw new ErrorAPI("No permissions")
 
     if (Type.isInt(this.params.type) && this.requestData.auth_token.length === 0) {
-      const token = Utils.randomString(80 + Math.floor(Math.random() * 10))
-      await this.connection.execute("INSERT INTO auth_tokens (token, expire, session_key, login_key, login_passwd) VALUES (:token, DATE_ADD(NOW(), INTERVAL 30 MINUTE), '', '', '')", {
-        token
-      })
-      this.requestData.auth_token = token
+
+      const authToken = new AuthToken(Utils.randomString(80 + Math.floor(Math.random() * 10)))
+      await authToken.save()
+      this.requestData.auth_token = authToken.token
     }
     const i18n = await this.i18n.getStrings(this.requestData, "login-startup", "login-login")
 

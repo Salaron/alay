@@ -23,11 +23,9 @@ export default class extends WebApiAction {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
       throw new ErrorAPI(403)
 
-    if (Config.modules.login.enable_recaptcha) {
-      if (!Type.isString(this.params.recaptcha) || this.params.recaptcha.length === 0) throw new Error("Missing recaptcha")
-      const reResult = await Utils.reCAPTCHAverify(this.params.recaptcha, Utils.getRemoteAddress(this.requestData.request))
-      if (!reResult) throw new ErrorAPI("reCaptcha test failed")
-    }
+    const reResult = await Utils.recaptchaTest(this.params.recaptcha)
+    if (!reResult)
+      throw new ErrorWebAPI("reCAPTCHA test failed")
 
     const strings = await this.i18n.getStrings(this.requestData, "login-login", "mailer")
     const userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })

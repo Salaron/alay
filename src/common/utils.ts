@@ -1,39 +1,15 @@
 import crypto from "crypto"
 import { IncomingMessage } from "http"
 import moment from "moment"
-import superagent from "superagent"
-import { Connection } from "../core/database/mysql"
-import { Logger } from "../core/logger"
 import nodemailer from "nodemailer"
+import superagent from "superagent"
+import { Logger } from "../core/logger"
+import { ErrorAPI } from "../models/error"
 
 const log = new Logger("Utils")
 const mailTransport = nodemailer.createTransport(Config.mailer.transportSettings)
 
 export async function init() {
-  // Handle Clearing Temp Auth Tokens every 5 min
-  setInterval(async () => {
-    try {
-      const connection = await Connection.beginTransaction()
-      try {
-        const [tokens, codes] = await Promise.all([
-          connection.query("SELECT * FROM auth_tokens WHERE expire <= CURRENT_TIMESTAMP"),
-          connection.query("SELECT * FROM auth_recovery_codes WHERE expire <= CURRENT_TIMESTAMP")
-        ])
-        await tokens.forEachAsync(async (token) => {
-          await connection.query("DELETE FROM auth_tokens WHERE token = :token", { token: token.token })
-        })
-        await codes.forEachAsync(async (code) => {
-          await connection.query("DELETE FROM auth_recovery_codes WHERE token = :token", { token: code.token })
-        })
-        await connection.commit(true)
-      } catch (err) {
-        connection.rollback(true)
-        log.error(err)
-      }
-    } catch (err) {
-      log.error(err)
-    }
-  }, 300000)
   moment.locale(Config.i18n.defaultLanguage)
 }
 
@@ -189,16 +165,20 @@ export class Utils {
     )
   }
 
-  public static async reCAPTCHAverify(userToken: string, userIp?: string): Promise<boolean> {
-    const response = await superagent.post("https://www.google.com/recaptcha/api/siteverify").type("form").send({
-      secret: Config.modules.login.recaptcha_private_key,
-      response: userToken,
-      remoteip: userIp
-    })
-    const jsonResponse = JSON.parse(response.text)
-    if (jsonResponse.success !== true) {
-      log.error(`reCAPTCHA test Failed;\n Error-codes: ${jsonResponse["error-codes"].join(", ")}`)
-      return false
+  public static async recaptchaTest(response: string): Promise<boolean> {
+    if (Config.modules.login.enable_recaptcha) {
+      if (!Type.isString(response) || response.length === 0) throw new ErrorAPI("reCAPTCHA result is missing")
+
+      const result = await superagent.post("https://www.google.com/recaptcha/api/siteverify").type("form").send({
+        secret: Config.modules.login.recaptcha_private_key,
+        response
+      })
+      const jsonResult = JSON.parse(result.text)
+      if (jsonResult.success !== true) {
+        log.error(`reCAPTCHA test Failed;\nError-codes: ${jsonResult["error-codes"].join(", ")}`)
+        return false
+      }
+      return true
     }
     return true
   }
@@ -258,7 +238,7 @@ export class Utils {
       parseInt(input) > 0
     )
   }
-  public static decryptSlAuth(input: string, token: string): string {
+  public static simpleDecrypt(input: string, token: string): string {
     return Utils.xor(Buffer.from(Utils.RSADecrypt(input), "base64").toString(), token).toString()
   }
   public static getCookieHeader(name: string, value: string | number, exHours: number) {

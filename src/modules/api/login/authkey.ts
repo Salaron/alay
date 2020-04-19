@@ -1,12 +1,12 @@
-import RequestData from "../../../core/requestData"
-import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
-import { Logger } from "../../../core/logger"
 import crypto from "crypto"
-import { Utils } from "../../../common/utils"
 import { TYPE } from "../../../common/type"
+import { Utils } from "../../../common/utils"
+import { Logger } from "../../../core/logger"
+import RequestData from "../../../core/requestData"
+import { AuthToken } from "../../../models/authToken"
+import { AUTH_LEVEL, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 
-const log = new Logger("Authkey")
-
+const logger = new Logger("Authkey")
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
   public permission: PERMISSION = PERMISSION.NOXMC
@@ -23,12 +23,8 @@ export default class extends ApiAction {
     }
   }
 
-  public paramCheck() {
-    return true
-  }
-
   public async execute() {
-    if (this.requestData.auth_level != this.requiredAuthLevel) throw new Error(`You're already logged in`)
+    if (this.requestData.auth_level !== this.requiredAuthLevel) throw new Error(`You're already logged in`)
     const trick = {
       status: 200,
       result: {
@@ -41,7 +37,7 @@ export default class extends ApiAction {
       const serverKey = crypto.randomBytes(32).toString("base64")
       const clientKey = Utils.RSADecrypt(this.params.dummy_token)
       const sessionKey = Utils.xor(Buffer.from(clientKey, "base64"), Buffer.from(serverKey, "base64")).toString("base64") // Generate session key by XORing client and server keys
-      const authData = JSON.parse(Utils.AESDecrypt(Buffer.from(clientKey, "base64").slice(0, 16), this.params.auth_data)) // device info
+      const authData = JSON.parse(Utils.AESDecrypt(Buffer.from(clientKey, "base64").slice(0, 16), this.params.auth_data))
 
       const xorBase = Utils.xor(Buffer.from(Config.client.XMC_base), Buffer.from(Config.client.application_key))
       const signKey = Utils.xor(xorBase, Buffer.from(clientKey, "base64"))
@@ -49,22 +45,23 @@ export default class extends ApiAction {
 
       const xmcVerifyEnabled = this.requestData.auth_level === AUTH_LEVEL.NONE && Config.server.XMC_check === true
       if (!xmcStatus && xmcVerifyEnabled) { // do the trick if it's incorrect
+        logger.warn("Incorrect X-Message-Code on login/auth")
         return trick
       }
 
       const loginKey = authData[1]
-      const loginPaswd = authData[2]
+      const loginPasswd = authData[2]
       if (authData[1] && authData[2] && authData[3]) {
         if (
           (typeof loginKey != "string") ||
-          (typeof loginPaswd != "string") ||
+          (typeof loginPasswd != "string") ||
           (loginKey.length != 36) ||
-          (loginPaswd.length != 128) ||
+          (loginPasswd.length != 128) ||
           (!loginKey.match(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/gi)) ||
-          (!loginPaswd.match(/^[0-9A-Z]{128}/gi))
+          (!loginPasswd.match(/^[0-9A-Z]{128}/gi))
         ) return trick
 
-        let id = await this.connection.first("SELECT user_id FROM user_login WHERE login_key=:key AND login_passwd=:pass", {
+        let id = await this.connection.first("SELECT user_id FROM user_login WHERE login_key = :key AND login_passwd = :pass", {
           key: authData[1],
           pass: authData[2]
         })
@@ -81,27 +78,24 @@ export default class extends ApiAction {
             device_info: JSON.stringify(assertation)
           })
         }
-      } else return trick
+      } else {
+        logger.warn(`Incorrect JSON data of login data\nClient sends: ${authData}`)
+        return trick
+      }
 
-      const token = Utils.randomString(80 + Math.floor(Math.random() * 10))
-      await this.connection.query("INSERT INTO auth_tokens (token, expire, session_key, login_key, login_passwd, language) VALUES (:token, DATE_ADD(NOW(), INTERVAL 30 MINUTE), :sk, :lk, :lp, 'ru')", {
-        token,
-        sk: sessionKey,
-        lk: loginKey,
-        lp: loginPaswd
-      })
-
+      const authToken = new AuthToken(Utils.randomString(80 + Math.floor(Math.random() * 10)))
+      authToken.set(sessionKey, loginKey, loginPasswd)
+      await authToken.save()
       return {
         status: 200,
         result: {
-          authorize_token: token,
+          authorize_token: authToken.token,
           dummy_token: serverKey
         }
       }
     } catch (err) {
-      log.error(err)
+      logger.error(err)
       return trick
     }
   }
-
 }

@@ -5,9 +5,10 @@ import { IncomingMessage, ServerResponse } from "http"
 import moment from "moment"
 import querystring from "querystring"
 import { Utils } from "../common/utils"
-import { Logger } from "./logger"
+import { AuthToken } from "../models/authToken"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
 import { Connection } from "./database/mysql"
+import { Logger } from "./logger"
 
 const log = new Logger("Request Data")
 
@@ -132,12 +133,9 @@ export default class RequestData {
 
     if (this.user_id === 0 && this.auth_token !== "") {
       // Has token but not user id: PreLogin
-      const checkToken = await this.connection.first(`SELECT * FROM auth_tokens WHERE token = :token`, {
-        token: this.auth_token
-      })
-      if (!checkToken) return this.auth_level = AUTH_LEVEL.REJECTED // Token doesn't exist
-      if (checkToken.expire < Utils.parseDate(Date.now())) return this.auth_level = AUTH_LEVEL.REJECTED // Token expired
-
+      const authToken = new AuthToken(this.auth_token)
+      const tokenData = await authToken.get()
+      if (!tokenData) return this.auth_level = AUTH_LEVEL.REJECTED
       return this.auth_level = AUTH_LEVEL.PRE_LOGIN
     }
 
@@ -179,9 +177,9 @@ export default class RequestData {
     } else if (this.auth_level === AUTH_LEVEL.NONE && customKey) {
       xmc = Utils.hmacSHA1(this.raw_request_data, customKey)
     } else if (this.auth_level === AUTH_LEVEL.PRE_LOGIN) {
-      const key = await this.connection.first(`SELECT session_key FROM auth_tokens WHERE token = :token`, { token: this.auth_token })
-      if (!key) return false
-      xmc = Utils.hmacSHA1(this.raw_request_data, key.session_key)
+      const authToken = new AuthToken(this.auth_token)
+      if (!authToken.sessionKey) return false
+      xmc = Utils.hmacSHA1(this.raw_request_data, authToken.sessionKey)
     } else if (this.auth_level >= AUTH_LEVEL.UPDATE) {
       const key = await this.connection.first(`SELECT session_key FROM user_login WHERE user_id = :user AND login_token = :token`, {
         user: this.user_id,
