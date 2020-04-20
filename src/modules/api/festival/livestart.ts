@@ -33,8 +33,10 @@ export default class extends ApiAction {
       user: this.user_id,
       event: currentEvent.id
     })
-    if (!session) throw new Error(`There is no active festival session`)
-    await this.connection.execute("DELETE FROM user_live_progress")
+    if (!session) throw new Error("There is no active festival session")
+    await this.connection.execute("DELETE FROM user_live_progress WHERE user_id = :user", {
+      user: this.user_id
+    })
 
     const units = await this.live.getUserDeck(this.user_id, this.params.unit_deck_id, true)
     const modsInt = await this.user.getModsInt(this.user_id)
