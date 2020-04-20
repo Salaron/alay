@@ -38,7 +38,7 @@ export async function init() {
       const bth = await gris.APIRequest("download/batch", {
         client_version: gris.session.clientVersion,
         os: "Android",
-        package_type: 4,
+        package_type: 0,
         excluded_package_ids: []
       })
       additionalUrls = ad.response_data
