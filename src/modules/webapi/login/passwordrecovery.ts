@@ -6,7 +6,7 @@ import moment from "moment"
 import { ErrorWebAPI, ErrorAPI } from "../../../models/error"
 import { Redis } from "../../../core/database/redis"
 
-const expireTime = 1000 * 60 * 60 // 1 hour
+const expireTime = 60 * 60 // 1 hour
 export default class extends WebApiAction {
   public requiredAuthLevel: AUTH_LEVEL = AUTH_LEVEL.PRE_LOGIN
 

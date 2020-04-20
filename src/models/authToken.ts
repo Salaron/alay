@@ -5,7 +5,7 @@ export class AuthToken {
   public sessionKey: string
   public loginKey: string
   public loginPasswd: string
-  private expireTime = 1000 * 60 * 30 // 30 mins
+  private expireTime = 60 * 30 // 30 mins
   constructor(token: string) {
     this.token = token
   }

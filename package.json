@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "formidable": "^1.2.2",
-    "gris": "^1.0.6",
+    "gris": "^1.0.7",
     "ioredis": "^4.16.2",
     "jquery": "^3.5.0",
     "mime": "^2.4.4",
