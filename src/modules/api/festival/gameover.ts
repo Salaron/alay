@@ -18,7 +18,7 @@ export default class extends ApiAction {
     await this.connection.query("DELETE FROM user_live_progress WHERE user_id = :user", { user: this.user_id })
     await this.connection.query("DELETE FROM event_festival_users WHERE user_id = :user", { user: this.user_id })
 
-    const data = await this.event.getEventUserStatus(this.user_id, currentEvent.id)
+    const eventInfo = await this.event.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, 0, 0)
     const userInfo = await this.user.getUserInfo(this.user_id)
     return {
       status: 200,
@@ -26,18 +26,23 @@ export default class extends ApiAction {
         event_info: {
           event_id: currentEvent.id,
           event_point_info: {
-            before_event_point: data.event_point,
-            before_total_event_point: data.event_point,
-            after_event_point: data.event_point,
-            after_total_event_point: data.event_point,
-            base_event_point: 0,
-            added_event_point: 0
+            before_event_point: eventInfo!.event_point_info.before_event_point,
+            before_total_event_point: eventInfo!.event_point_info.before_total_event_point,
+            after_event_point: eventInfo!.event_point_info.after_event_point,
+            after_total_event_point: eventInfo!.event_point_info.after_total_event_point,
+            base_event_point: eventInfo!.event_point_info.base_event_point,
+            added_event_point: eventInfo!.event_point_info.added_event_point,
+            score_bonus: 1,
+            combo_bonus: 1,
+            item_bonus: 1,
+            guest_bonus: 1,
+            mission_bonus: 1
           },
-          event_reward_info: [],
-          next_event_reward_info: {
-            event_point: 0,
-            rewards: []
-          }
+          event_reward_info: eventInfo!.event_reward_info,
+          event_mission_reward_info: [],
+          event_mission_bonus_reward_info: [],
+          next_event_reward_info: eventInfo!.next_event_reward_info,
+          event_notice: []
         },
         after_user_info: userInfo
       }
