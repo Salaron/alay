@@ -5,6 +5,7 @@ import { ErrorAPI } from "../models/error"
 
 const unitDB = sqlite3.getUnitDB()
 const exchangeDB = sqlite3.getExchangeDB()
+const eventDB = sqlite3.getEventCommonDB()
 const addUnitDefault = {
   level: 1,
   rank: 1,
@@ -24,6 +25,7 @@ let supportUnitList: number[] = []
 let removableSkillList: number[] = []
 let noExchangePointList: number[] = []
 let signUnitList: number[] = []
+let eventUnitList: number[] = []
 let attributeUnits: { [attribute: number]: number[] } = {}
 let rarityUnits: { [rarity: number]: number[] } = {}
 let supportUnitData: { [unitId: number]: supportUnitData } = {}
@@ -55,6 +57,9 @@ export async function init() {
   noExchangePointList = (await exchangeDB.all("SELECT * FROM exchange_nopoint_unit_m")).map(unit => unit.unit_id)
   removableSkillList = (await unitDB.all("SELECT unit_removable_skill_id FROM unit_removable_skill_m")).map(skill => skill.unit_removable_skill_id)
   signUnitList = (await unitDB.all("SELECT * FROM unit_sign_asset_m")).map(unit => unit.unit_id)
+  const epCountUnit = (await eventDB.all("SELECT item_id FROM event_point_count_reward_m WHERE add_type = 1001")).map(reward => reward.item_id)
+  const epRankingUnit = (await eventDB.all("SELECT item_id FROM event_point_ranking_reward_m WHERE add_type = 1001")).map(reward => reward.item_id)
+  eventUnitList = Utils.mergeArrayDedupe([epCountUnit, epRankingUnit])
 
   const allUnits = await unitDB.all("SELECT rarity, attribute_id, unit_id FROM unit_m")
   for (const unit of allUnits) {
@@ -368,5 +373,8 @@ export class Unit extends CommonModule {
   }
   public getRemovableSkillIds() {
     return removableSkillList
+  }
+  public getEventUnitList() {
+    return eventUnitList
   }
 }

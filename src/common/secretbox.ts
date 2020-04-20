@@ -268,6 +268,9 @@ export class Secretbox extends CommonModule {
       let unitLineUp: number[] = []
       let unitIds: number[] = []
       for (const unitFamily of unitFamilyList) {
+        unitFamily.query = Utils.prepareTemplate(unitFamily.query, {
+          eventCards: this.action.unit.getEventUnitList().join(",")
+        })
         const familyUnitIds = (await unitDB.all(`SELECT unit_id FROM unit_m WHERE ${unitFamily.query} ORDER BY unit_id DESC`)).map(unit => unit.unit_id)
         unitIds.push(...new Array(unitFamily.weight).fill(familyUnitIds).flat())
         unitLineUp.push(...familyUnitIds)
