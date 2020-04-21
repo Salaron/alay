@@ -93,32 +93,46 @@ export class Event extends CommonModule {
     return res
   }
 
-  public async eventInfoWithRewards(userId: number, eventId: number, eventName: string, addedEventPoint: number, base?: number) {
-    const userStatus = await this.getEventUserStatus(userId, eventId)
+  public async eventInfoWithRewards(userId: number, event: eventStatus, addedEventPoint: number, base?: number) {
+    const userStatus = await this.getEventUserStatus(userId, event.id)
     const eventRewardInfo: any[] = []
     const nextEventRewardInfo = {
       event_point: 0,
       rewards: <any[]>[]
     }
 
-    const eventPointReward = await eventDB.all(`
-    SELECT point_count, add_type, item_id, amount, item_category_id FROM event_point_count_m
-    INNER JOIN event_point_count_reward_m ON event_point_count_m.event_point_count_id = event_point_count_reward_m.event_point_count_id
-    WHERE event_id = ${eventId} AND point_count > ${userStatus.event_point + addedEventPoint}`)
-
-    await this.connection.execute("INSERT INTO event_ranking (user_id, event_id, event_point, lives_played) VALUES (:user, :eventId, :point, 1) ON DUPLICATE KEY UPDATE event_point=event_point + :point, lives_played = lives_played + 1", {
-      point: addedEventPoint,
-      eventId,
-      user: userId
+    const eventPointRewards = await eventDB.all(`
+    SELECT
+      point_count, add_type, item_id, amount, item_category_id
+    FROM
+      event_point_count_m as point
+    INNER JOIN
+      event_point_count_reward_m as reward ON point.event_point_count_id = reward.event_point_count_id
+    WHERE
+      event_id = :eventId AND point_count > :pointCount
+    `, {
+      eventId: event.id,
+      pointCount: userStatus.event_point
     })
 
-    for (const reward of eventPointReward) {
+    await this.connection.execute(`
+    INSERT INTO
+      event_ranking (user_id, event_id, event_point, lives_played)
+    VALUES (:userId, :eventId, :addedEventPoint, 0) ON DUPLICATE KEY UPDATE
+      event_point=event_point + :addedEventPoint
+    `, {
+      addedEventPoint,
+      eventId: event.id,
+      userId
+    })
+
+    for (const reward of eventPointRewards) {
       if (reward.point_count < userStatus.event_point + addedEventPoint) {
         try {
           await this.action.item.addPresent(userId, {
             id: reward.item_id,
             type: reward.add_type
-          }, `"${eventName}" reward`, reward.amount, reward.add_type != 1001)
+          }, `"${event.name}" Event Point Reward`, reward.amount, reward.add_type !== 1001)
           eventRewardInfo.push({
             item_id: reward.item_id,
             add_type: reward.add_type,
@@ -127,8 +141,9 @@ export class Event extends CommonModule {
             reward_box_flag: reward.add_type === 1001, // cards should be added to reward box
             required_event_point: reward.point_count
           })
-          // tslint:disable-next-line
-        } catch (_) { } //unsupported type
+        } catch {
+          // unsupported type
+        }
       } else {
         nextEventRewardInfo.event_point = reward.point_count
         nextEventRewardInfo.rewards.push({
@@ -137,22 +152,23 @@ export class Event extends CommonModule {
           amount: reward.amount,
           item_category_id: reward.item_category_id
         })
-
-        return {
-          event_id: eventId,
-          event_point_info: {
-            before_event_point: userStatus.event_point,
-            before_total_event_point: userStatus.event_point,
-            after_event_point: userStatus.event_point + addedEventPoint,
-            after_total_event_point: userStatus.event_point + addedEventPoint,
-            base_event_point: base,
-            added_event_point: addedEventPoint
-          },
-          event_reward_info: eventRewardInfo,
-          next_event_reward_info: nextEventRewardInfo,
-          event_notice: []
-        }
+        break
       }
+    }
+
+    return {
+      event_id: event.id,
+      event_point_info: {
+        before_event_point: userStatus.event_point,
+        before_total_event_point: userStatus.event_point,
+        after_event_point: userStatus.event_point + addedEventPoint,
+        after_total_event_point: userStatus.event_point + addedEventPoint,
+        base_event_point: base,
+        added_event_point: addedEventPoint
+      },
+      event_reward_info: eventRewardInfo,
+      next_event_reward_info: nextEventRewardInfo,
+      event_notice: []
     }
   }
 

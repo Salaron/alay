@@ -199,23 +199,13 @@ export default class extends ApiAction {
     const [afterUserInfo, defaultRewards, eventInfo, unitSupportList] = await Promise.all([
       this.user.getUserInfo(this.user_id),
       this.live.getDefaultRewards(this.user_id, scoreRank, comboRank, liveSession.mods),
-      this.event.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, liveResult.added_event_point, liveResult.base_event_point),
+      this.event.eventInfoWithRewards(this.user_id, currentEvent, liveResult.added_event_point, liveResult.base_event_point),
       this.user.getSupportUnits(this.user_id),
       this.connection.query("DELETE FROM user_live_progress WHERE user_id = :user", {
         user: this.user_id
       }),
       this.connection.query("DELETE FROM event_festival_users WHERE user_id = :user", {
         user: this.user_id
-      }),
-      this.connection.query(`
-      INSERT INTO event_ranking (
-        user_id, event_id, event_point, lives_played
-      ) VALUES (:user, :eventId, :point, 0) ON DUPLICATE KEY UPDATE
-      event_point = event_point + :point, lives_played = lives_played + :liveCnt`, {
-        point: liveResult.added_event_point,
-        eventId: currentEvent.id,
-        user: this.user_id,
-        liveCnt: trackIds.length
       }),
       this.live.saveResultToLog(this.user_id, {
         live_setting_ids: liveSettingIds,
@@ -258,22 +248,17 @@ export default class extends ApiAction {
       event_info: {
         event_id: currentEvent.id,
         event_point_info: {
-          before_event_point: eventInfo!.event_point_info.before_event_point,
-          before_total_event_point: eventInfo!.event_point_info.before_total_event_point,
-          after_event_point: eventInfo!.event_point_info.after_event_point,
-          after_total_event_point: eventInfo!.event_point_info.after_total_event_point,
-          base_event_point: eventInfo!.event_point_info.base_event_point,
-          added_event_point: eventInfo!.event_point_info.added_event_point,
+          ...eventInfo.event_point_info,
           score_bonus: scoreBonus,
           combo_bonus: comboBonus,
           item_bonus: itemBonus,
           guest_bonus: 1,
           mission_bonus: 1
         },
-        event_reward_info: eventInfo!.event_reward_info,
+        event_reward_info: eventInfo.event_reward_info,
+        next_event_reward_info: eventInfo.next_event_reward_info,
         event_mission_reward_info: [],
         event_mission_bonus_reward_info: [],
-        next_event_reward_info: eventInfo.next_event_reward_info,
         event_notice: []
       },
       daily_reward_info: defaultRewards.daily_reward_info,

@@ -57,7 +57,7 @@ export default class extends ApiAction {
       }, 0 - bonus.cost_value)
       return {
         bonus_id: bonus.bonus_id,
-        bonus_param: bonus.bonus_param
+        bonus_param: bonus.bonus_param > 100 ? bonus.bonus_param : bonus.bonus_param
       }
     }))
 
@@ -136,7 +136,7 @@ export default class extends ApiAction {
       this.connection.query("UPDATE event_festival_users SET bonus_ids = :ids WHERE user_id = :user AND event_id = :event", {
         event: currentEvent.id,
         user: this.user_id,
-        ids: this.params.event_festival_item_ids.join(",")
+        ids: bonusList.map(bonus => bonus.bonus_id).join(",")
       })
     ])
 

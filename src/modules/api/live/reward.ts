@@ -1,5 +1,5 @@
 import assert from "assert"
-import { Event } from "../../../common/event"
+import { Event, eventStatus } from "../../../common/event"
 import { TYPE } from "../../../common/type"
 import { User } from "../../../common/user"
 import RequestData from "../../../core/requestData"
@@ -45,7 +45,7 @@ export default class extends ApiAction {
     if (!session) throw new ErrorAPI(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
     if (session.live_difficulty_id != this.params.live_difficulty_id) throw new ErrorAPI(3411, "ERROR_CODE_LIVE_PLAY_DATA_NOT_FOUND")
 
-    const [beforeUserInfo, currentEvent, liveData] = await Promise.all([
+    const [beforeUserInfo, currentEvent, liveData]: [any, eventStatus, liveData] = await Promise.all([
       this.user.getUserInfo(this.user_id),
       this.event.getEventStatus(Event.getEventTypes().TOKEN),
       this.live.getLiveDataByDifficultyId(this.params.live_difficulty_id)
@@ -167,7 +167,7 @@ export default class extends ApiAction {
           })
         }
       }
-      response.event_info = await this.event.eventInfoWithRewards(this.user_id, currentEvent.id, currentEvent.name, this.params.event_point)
+      response.event_info = await this.event.eventInfoWithRewards(this.user_id, currentEvent, this.params.event_point)
       response.event_info.event_point_info.before_event_point = userStatus.token_point
       response.event_info.event_point_info.after_event_point = userStatus.token_point
       if (!eventLive) {
