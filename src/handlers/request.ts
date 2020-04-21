@@ -31,7 +31,7 @@ export default async function requestHandler(request: IncomingMessage, response:
         const notesAsset = urlSplit[2]
         if (!notesAsset) throw new RequestError("Invalid note setting asset", 400)
         const liveNotesDB = sqlite3.getLiveNotesSVDB()
-        const notes = await liveNotesDB.get("SELECT json FROM live_notes WHERE notes_setting_asset = :notesAsset", {
+        const notes = await liveNotesDB.get("SELECT json FROM live_notes WHERE notes_setting_asset = :notesAsset COLLATE NOCASE", {
           notesAsset
         })
         if (!notes) throw new RequestError("Not found", 404)
