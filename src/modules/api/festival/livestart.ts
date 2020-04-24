@@ -57,7 +57,7 @@ export default class extends ApiAction {
       }, 0 - bonus.cost_value)
       return {
         bonus_id: bonus.bonus_id,
-        bonus_param: bonus.bonus_param > 100 ? bonus.bonus_param : bonus.bonus_param
+        bonus_param: bonus.bonus_param > 100 ? Math.floor(bonus.bonus_param / 100) : bonus.bonus_param
       }
     }))
 
