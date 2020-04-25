@@ -30,7 +30,7 @@ export default class extends WebViewAction {
       await authToken.save()
       this.requestData.auth_token = authToken.token
     }
-    const i18n = await this.i18n.getStrings(this.requestData, "login-startup", "login-login")
+    const i18n = await this.i18n.getStrings("login-startup", "login-login")
 
     const locals = {
       module: "login",

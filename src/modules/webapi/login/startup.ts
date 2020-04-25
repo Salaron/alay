@@ -34,7 +34,7 @@ export default class extends WebApiAction {
     if (!reResult)
       throw new ErrorWebAPI("reCAPTCHA test failed")
 
-    const strings = await this.i18n.getStrings(this.requestData, "login-login", "login-startup", "mailer")
+    const strings = await this.i18n.getStrings("login-login", "login-startup", "mailer")
     const pass = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     if (!Utils.checkPasswordFormat(pass)) throw new ErrorWebAPI(strings.passwordIncorrect)
 
@@ -57,7 +57,7 @@ export default class extends WebApiAction {
     this.user_id = (await this.connection.execute("INSERT INTO users (introduction, name, password, language, mail, tutorial_state) VALUES ('Hello!', :name, :pass, :lang, :mail, 1)", {
       name: this.params.name,
       pass,
-      lang: await this.i18n.getUserLocalizationCode(this.requestData),
+      lang: await this.i18n.getUserLocalizationCode(),
       mail: this.params.email
     })).insertId
     await this.connection.query("INSERT INTO user_login (user_id, login_key, login_passwd, login_token) VALUES (:id, :key, :pass, NULL)", {
@@ -70,7 +70,7 @@ export default class extends WebApiAction {
     })
 
     // send mail
-    const status = await Utils.sendMail(this.params.email, strings.subjectWelcome, Utils.prepareTemplate(strings.bodyWelcome, {
+    const status = await Utils.sendMail(this.params.email, strings.welcome.subject, Utils.prepareTemplate(strings.welcome.body, {
       userName: this.params.name
     }))
 

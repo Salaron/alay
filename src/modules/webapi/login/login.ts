@@ -27,7 +27,7 @@ export default class extends WebApiAction {
     const reResult = await Utils.recaptchaTest(this.params.recaptcha)
     if (!reResult)
       throw new ErrorWebAPI("reCAPTCHA test failed")
-    const i18n = await this.i18n.getStrings(this.requestData, "login-login", "login-startup")
+    const i18n = await this.i18n.getStrings("login-login", "login-startup")
     const login = Utils.simpleDecrypt(this.params.login, this.requestData.auth_token)
     const password = Utils.simpleDecrypt(this.params.password, this.requestData.auth_token)
 

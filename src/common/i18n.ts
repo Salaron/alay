@@ -1,59 +1,86 @@
-import { exists, readFile } from "fs"
+import deepmerge from "deepmerge"
+import { exists, promises } from "fs"
 import showdown from "showdown"
 import { promisify } from "util"
 import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
-import RequestData from "../core/requestData"
-import { ErrorAPI } from "../models/error"
 
-interface I18nCache {
-  [localizationCode: string]: I18nSection
-}
-interface I18nSection {
-  [sectionName: string]: any
-}
-interface I18nMdCache {
-  [localizationCode: string]: {
-    [type: string]: string
-  }
-}
 enum I18nMarkdownType {
   TOS
 }
 
-let cache: I18nCache = {}
-const mdCache: I18nMdCache = {}
-let defaultStrings: I18nSection = {}
+interface ICache {
+  markdown: {
+    [languageCode: string]: {
+      [type: string]: string
+    }
+  }
+  strings: {
+    [languageCode: string]: IStringsSection
+  }
+}
+interface IDefault {
+  strings: IStringsSection
+  markdown:{
+    [type: string]: string
+  }
+}
+interface IStringsSection {
+  [key: string]: string | IStringsSection
+}
 
-const log = new Logger("i18n")
+let Cache: ICache = {
+  strings: {},
+  markdown: {}
+}
+let Default: IDefault = {
+  strings: {},
+  markdown: {}
+}
+
+const logger = new Logger("i18n")
 export const showdownConverter = new showdown.Converter({
-  tables: true,
-  simpleLineBreaks: true,
-  smartIndentationFix: true,
-  openLinksInNewWindow: true,
-  emoji: true,
-  omitExtraWLInCodeBlocks: true,
-  strikethrough: true
+  tables: true,                   // add tables support
+  simpleLineBreaks: true,         // enter = new line
+  smartIndentationFix: true,      // idk
+  openLinksInNewWindow: true,     // should be useful on markdown pages
+  emoji: true,                    // just emojis...
+  omitExtraWLInCodeBlocks: true,  // idk
+  strikethrough: true             // idk
 })
 
 export async function init() {
-  if (Object.keys(defaultStrings).length === 0) { // first-time load
+  if (Object.keys(Default.strings).length === 0) { // first-time load
     if (!await promisify(exists)(`./i18n/${Config.i18n.defaultLanguage}.json`))
-      throw new Error(`File with default language is not exists`)
+      throw new Error("File with default language is not exists")
   }
-  for (const localCode of Object.values(Config.i18n.languages)) {
-    let sections
-    try {
-      sections = JSON.parse(await promisify(readFile)(`./i18n/${localCode}.json`, `utf-8`))
-    } catch (err) {
-      err.message = `Can't parse file with strings for '${localCode}' language`
-      throw err
+  let markdownFiles = []
+  for (const file of await promises.readdir("./i18n/markdown")) {
+    // TODO: make it strict
+    const fileSplit = file.split("_")
+    const name = fileSplit[0]
+    const language = fileSplit[1].split(".")[0]
+    markdownFiles.push({
+      filename: file,
+      name,
+      language
+    })
+  }
+  for (const language of Object.values(Config.i18n.languages)) {
+    const stringsFile = JSON.parse(await promises.readFile(`./i18n/${language}.json`, `utf-8`))
+    if (!stringsFile.common) stringsFile.common = {}
+    Cache.strings[language] = stringsFile
+    Cache.markdown[language] = {}
+    for (const file of markdownFiles) {
+      if (file.language === language) {
+        const markdownFile = await promises.readFile(`./i18n/markdown/${file.filename}`, "utf-8")
+        Cache.markdown[language][file.name] = showdownConverter.makeHtml(markdownFile.replace(/--/gi, "—"))
+      }
     }
-    cache[localCode] = sections
-    mdCache[localCode] = {}
   }
-  defaultStrings = JSON.parse(await promisify(readFile)(`./i18n/${Config.i18n.defaultLanguage}.json`, `utf-8`))
+  Default.strings = Cache.strings[Config.i18n.defaultLanguage]
+  Default.markdown = Cache.markdown[Config.i18n.defaultLanguage]
 }
 
 export class I18n extends CommonModule {
@@ -63,94 +90,71 @@ export class I18n extends CommonModule {
   }
 
   /**
-   * @param {RequestData} requestData
-   * @param {string} code - language code
+   * @param {string} languageCode
    */
-  public async setUserLocalizationCode(requestData: RequestData, code: string): Promise<void> {
-    if (Type.isInt(requestData.user_id) && requestData.user_id > 0) {
+  public async setUserLocalizationCode(languageCode: string): Promise<void> {
+    if (Type.isInt(this.userId) && this.userId > 0) {
       await this.connection.execute("UPDATE users SET language = :code WHERE user_id = :user", {
-        code,
-        user: requestData.user_id
+        code: languageCode,
+        user: this.userId
       })
-    } else {
-      throw new ErrorAPI(0)
     }
   }
 
   /**
    * @returns {Promise<string>} user language code
    */
-  public async getUserLocalizationCode(requestData: RequestData): Promise<string> {
+  public async getUserLocalizationCode(): Promise<string> {
     let languageCode = Config.i18n.defaultLanguage
 
     let cookieLanguageCode = this.requestData.getCookie("language")
-    if (cookieLanguageCode !== "" && Object.values(Config.i18n.languages).includes(cookieLanguageCode)) {
+    if (Type.isInt(this.userId) && this.userId > 0) {
+      languageCode = (await this.connection.first("SELECT language FROM users WHERE user_id = :user", { user: this.userId })).language
+    } else if (cookieLanguageCode !== "") {
       languageCode = this.requestData.getCookie("language")
-    } else if (Type.isInt(requestData.user_id) && requestData.user_id > 0) {
-      languageCode = (await this.connection.first("SELECT language FROM users WHERE user_id = :user", { user: requestData.user_id })).language
     }
 
     if (!Object.values(Config.i18n.languages).includes(languageCode)) {
-      log.warn(`Language code ${languageCode} is not exists in config. Using default language instead`)
+      logger.debug(`Language code ${languageCode} is not exists in config. Using default language instead`)
       return Config.i18n.defaultLanguage
     }
     return languageCode
   }
 
-  public async getStrings(input: RequestData | string, ...sections: string[]): Promise<any>
-  public async getStrings(...sections: string[]): Promise<any>
-  public async getStrings(input: RequestData | string, ...sections: string[]): Promise<any> {
-    let languageCode = Config.i18n.defaultLanguage
-    if (input instanceof RequestData) {
-      languageCode = await this.getUserLocalizationCode(input)
-    } else if (Type.isString(input) && Object.values(Config.i18n.languages).includes(input)) {
-      languageCode = input
-    } else {
-      sections.push(input)
-    }
+  public async getStrings(...sections: string[]): Promise<any> {
+    let languageCode = await this.getUserLocalizationCode()
 
     if (Config.server.debug_mode) await this.clearCache()
-    let result: any = {}
+    let strings: any = {}
     for (const section of sections) {
-      result = {
-        ...result,
-        ...defaultStrings[section],
-        ...cache[languageCode][section]
-      }
+      if (!Cache.strings[languageCode][section]) Cache.strings[languageCode][section] = {}
+      strings = deepmerge.all([strings, Default.strings[section], Cache.strings[languageCode][section]])
     }
-    result = {
-      ...result,
-      ...defaultStrings.common || {},
-      ...cache[languageCode].common || {}
-    }
+    // add common strings
+    // @ts-ignore
+    strings.common = deepmerge.all([Default.strings.common, Cache.strings[languageCode].common])
 
-    return result
+    return strings
   }
 
-  public async getMarkdown(input: RequestData | string, type: I18nMarkdownType): Promise<string> {
-    let languageCode = Config.i18n.defaultLanguage
-    if (input instanceof RequestData) {
-      languageCode = await this.getUserLocalizationCode(input)
-    } else if (Type.isString(input) && Object.values(Config.i18n.languages).includes(input)) {
-      languageCode = input
+  public async getMarkdown(type: I18nMarkdownType): Promise<string> {
+    let languageCode = await this.getUserLocalizationCode()
+
+    const markdownType = I18nMarkdownType[type]
+    if (Cache.markdown[languageCode] && Cache.markdown[languageCode][markdownType]) {
+      return Cache.markdown[languageCode][markdownType]
+    } else {
+      // TODO: add "not translated notice"
+      return Default.markdown[markdownType]
     }
-
-    if (mdCache[languageCode] && mdCache[languageCode][I18nMarkdownType[type]]) return mdCache[languageCode][I18nMarkdownType[type]]
-
-    let md = ``
-    try {
-      md = await promisify(readFile)(`./i18n/TOS/${languageCode}.md`, "UTF-8")
-    } catch (err) {
-      const i18n = await this.getStrings(languageCode)
-      md += `*${i18n.notTranslated}*\n\n`
-      md += await promisify(readFile)(`./i18n/TOS/${Config.i18n.defaultLanguage}.md`, "UTF-8")
-    }
-
-    return mdCache[languageCode][I18nMarkdownType[type]] = showdownConverter.makeHtml(md.replace(/--/gi, "—"))
   }
 
   public async clearCache() {
-    cache = {}
+    // reset cache
+    Cache = {
+      markdown: {},
+      strings: {}
+    }
     await init()
   }
 }

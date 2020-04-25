@@ -23,7 +23,7 @@ html
       if webview
         link(rel="stylesheet", href=webpackAssets.webview.css)
     
-    - var i18nStr = JSON.stringify(i18n)
+    - var i18nStr = JSON.stringify(i18n) || '{}'
     script.
       var userId = !{userId}
       var authToken = "!{token}"
@@ -39,6 +39,3 @@ html
     block scripts
     
     script(src=webpackAssets.main.js)
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
-    <![endif]-->

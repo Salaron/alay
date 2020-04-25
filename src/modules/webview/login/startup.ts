@@ -15,7 +15,7 @@ export default class extends WebViewAction {
       throw new ErrorAPI("No permissions")
     if (!Config.modules.login.enable_registration) throw new ErrorAPI("Registration disabled")
 
-    const i18n = await this.i18n.getStrings(this.requestData, "login-startup", "login-login")
+    const i18n = await this.i18n.getStrings("login-startup", "login-login")
     const locals = {
       enableRecaptcha: Config.modules.login.enable_recaptcha,
       siteKey: Config.modules.login.recaptcha_site_key,

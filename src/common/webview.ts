@@ -27,7 +27,7 @@ export class WebView extends CommonModule {
   public async renderTemplate(module: string, action: string, locals: Pug.LocalsObject): Promise<string> {
     let currentLanguage = Config.i18n.defaultLanguage
     try {
-      currentLanguage = await this.action.i18n.getUserLocalizationCode(this.requestData)
+      currentLanguage = await this.action.i18n.getUserLocalizationCode()
     } catch { } // tslint:disable-line
 
     if (Config.server.debug_mode) {

@@ -71,13 +71,13 @@ export default class extends ApiAction {
         user: this.user_id
       })
       if (cards.count >= 10000) {
-        const i18n = await this.i18n.getStrings(this.requestData, "personalnotice")
+        const i18n = await this.i18n.getStrings("personalnotice")
         result = {
           has_notice: true,
           notice_id: -1,
           type: 1,
-          title: i18n.youHaveTooLotCardsTitle,
-          contents: i18n.youHaveTooLotCardsContent
+          title: i18n.tooManyCards.title,
+          contents: i18n.tooManyCards.content
         }
       }
     }

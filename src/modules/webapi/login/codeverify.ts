@@ -26,7 +26,7 @@ export default class extends WebApiAction {
     if (this.requestData.auth_level !== this.requiredAuthLevel && !Config.server.debug_mode)
       throw new ErrorAPI(403)
 
-    const i18n = await this.i18n.getStrings(this.requestData, "login-login", "mailer")
+    const i18n = await this.i18n.getStrings("login-login", "mailer")
     let recoveryData = await Redis.get(`recoveryConfirmationCode:${this.requestData.auth_token}`)
     if (!recoveryData) throw new ErrorWebAPI(i18n.confirmationCodeNotExists)
     const code = recoveryData.split(":")[0]
@@ -43,7 +43,7 @@ export default class extends WebApiAction {
       mail
     })
     await Redis.del(`recoveryConfirmationCode:${this.requestData.auth_token}`)
-    const result = await Utils.sendMail(mail, i18n.subjectPasswordRecovery, Utils.prepareTemplate(i18n.bodyPasswordRecovered, {
+    const result = await Utils.sendMail(mail, i18n.passwordRecovery.subject, Utils.prepareTemplate(i18n.passwordRecovery.newPassword, {
       userId: userData.user_id,
       password: newPassword
     }))

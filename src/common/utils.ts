@@ -245,7 +245,7 @@ export class Utils {
     let expires = ""
     if (exHours) {
       const date = new Date()
-      date.setDate(date.getHours() + exHours)
+      date.setHours(date.getHours() + exHours)
       expires = `expires=${date.toUTCString()};`
     }
     return `${name}=${value}; ${expires} path=/`

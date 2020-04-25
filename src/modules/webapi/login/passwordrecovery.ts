@@ -29,7 +29,7 @@ export default class extends WebApiAction {
     if (!reResult)
       throw new ErrorWebAPI("reCAPTCHA test failed")
 
-    const i18n = await this.i18n.getStrings(this.requestData, "login-login", "mailer")
+    const i18n = await this.i18n.getStrings("login-login", "mailer")
     const userData = await this.connection.first("SELECT name, mail FROM users WHERE mail = :mail", { mail: this.params.mail })
     if (!userData) throw new ErrorWebAPI(i18n.mailNotExists)
 
@@ -43,7 +43,7 @@ export default class extends WebApiAction {
       mail: userData.mail
     })
 
-    const result = await Utils.sendMail(userData.mail, i18n.subjectPasswordRecovery, Utils.prepareTemplate(i18n.bodyPasswordRecovery, {
+    const result = await Utils.sendMail(userData.mail, i18n.passwordRecovery.subject, Utils.prepareTemplate(i18n.passwordRecovery.verifyCode, {
       userName: userData.name,
       code,
       ip: Utils.getRemoteAddress(this.requestData.request),

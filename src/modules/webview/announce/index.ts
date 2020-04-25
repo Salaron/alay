@@ -12,7 +12,7 @@ export default class extends WebViewAction {
 
   public async execute() {
     let [i18n, announceList] = await Promise.all([
-      this.i18n.getStrings(this.requestData, "common", "announce-index"),
+      this.i18n.getStrings("announce-index"),
       this.connection.query("SELECT * FROM webview_announce ORDER BY insert_date DESC"),
     ])
     announceList = announceList.map((announce: any) => {
@@ -28,7 +28,7 @@ export default class extends WebViewAction {
     const values = {
       announceList,
       i18n,
-      pageTitle: i18n.announce
+      pageTitle: i18n.common.announce
     }
     return {
       status: 200,

@@ -22,7 +22,7 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    const strings = await this.i18n.getStrings(this.requestData, "login-startup", "settings-index")
+    const strings = await this.i18n.getStrings("login-startup", "settings-index")
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
     if (!Utils.checkPasswordFormat(password)) throw new ErrorWebAPI(strings.passwordIncorrect)

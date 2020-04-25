@@ -13,8 +13,8 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    const langCode = await this.i18n.getUserLocalizationCode(this.requestData)
-    const strings = await this.i18n.getStrings(langCode, "noticemarquee")
+    const langCode = await this.i18n.getUserLocalizationCode()
+    const strings = await this.i18n.getStrings("noticemarquee")
 
     const response = {
       item_count: 0,

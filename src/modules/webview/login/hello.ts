@@ -14,7 +14,7 @@ export default class extends WebViewAction {
     if (this.requestData.auth_level != this.requiredAuthLevel && !Config.server.debug_mode)
       throw new ErrorAPI("No permissions")
 
-    const i18n = await this.i18n.getStrings(this.requestData, "login-hello")
+    const i18n = await this.i18n.getStrings("login-hello")
     const locals = {
       i18n,
       registrationEnabled: Config.modules.login.enable_registration,

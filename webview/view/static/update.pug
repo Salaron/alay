@@ -9,16 +9,16 @@ block body
             
       #body
         div(class="uk-container uk-container-medium uk-margin-top")
-          h4(class="uk-margin-remove") !{i18n.updateNotice}
-          h5(class="uk-margin-small-top uk-margin-small-bottom")  !{i18n.updateCurrentVersion} !{latestVersion} <br>
-            | !{i18n.updateUserClientVersion} !{clientVersion}
+          h4(class="uk-margin-remove") !{i18n.update.notice}
+          h5(class="uk-margin-small-top uk-margin-small-bottom")  !{i18n.update.currentVersion} !{latestVersion} <br>
+            | !{i18n.update.userVersion} !{clientVersion}
 
           if loggedIn
-            h5(class="uk-margin-remove") !{i18n.updateYouCanDownloadANewVersionFromLinksBellow}
+            h5(class="uk-margin-remove") !{i18n.update.youCanDownloadANewVersionBellow}
             each source in downloadSources
-              a(href=source.url) !{i18n.updateDownloadFrom} !{source.name}
+              a(href=source.url) !{i18n.update.downloadFrom} !{source.name}
           else
-            h5(class="uk-margin-remove") !{replaceHref(i18n.updateLoginIntoYourAccountToDownload, "login", "'../login/login?type=0'")}
+            h5(class="uk-margin-remove") !{replaceHref(i18n.update.loginIntoYourAccountToDownload, "login", "'../login/login?type=0'")}
               
           if supportMail.length > 0
             hr

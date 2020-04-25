@@ -1,69 +1,11 @@
 {
-  "common": {
-    "announce": "News",
-    "settings": "Settings",
-    "profile": "Profile",
-    "aboutServer": "About",
-    "notTranslated": "This page does not yet have a translation for your language :<",
-    "bugReport": "Bug Report",
-    "yes": "Yes",
-    "no": "No"
-  },
-  "announce-index": {
-    "more": "Read more..."
-  },
+  "common": {},
   "login-hello": {
-    "login": "Login",
-    "registration": "Registration",
-    "tos": "TOS",
-    "hello": "Hello!",
-    "introduction": "Welcome to the Love Live! School Idol Festival! private server.\nPlease do not post screenshots, videos and other content from this server in social media or we will have troubles, and also follow our TOS.\nThank you!"
-  },
-  "login-login": {
-    "login": "LOG IN",
-    "forgotPassword": "Forgot your password?",
-    "needHelpWithRecovery": "Need help with recovery?",
-    "ifYouLostLoginDataContactUs": "If you forgot/lost your login or password, you can contact us!",
-    "writeToVk": "Write to VK",
-    "writeToEmail": "Write to Email",
-    "backToLogin": "Back to Login",
-    "userIdShouldBeInt": "Field \"User ID\" should be int",
-    "successDescriptionLogin": "You have successfully logged in!<br>Close this window to enter the game.",
-    "invalidLoginOrPass": "Invalid User ID or password",
-    "mailNotExists": "Account with this E-mail does not exist",
-    "mailSendingError": "An error occurred while sending the letter. Try again later",
-    "passwordResetSuccess": "A new password has been sent to your mail",
-    "confirmationCodeInvalidFormat": "Field \"Verification code\" is invalid",
-    "mailSuccess": "A letter with a verification code was sent to the specified E-mail",
-    "confirmationCode": "Verification code",
-    "confirmationCodeNotExists": "Verification code is outdated, get a new one",
-    "confirmationCodeNotMatch": "Invalid verification code"
-  },
-  "login-startup": {
-    "nickname": "Nickname",
-    "password": "Password",
-    "email": "E-mail",
-    "repeatPassword": "Repeat Password",
-    "send": "SEND",
-    "openInBrowser": "OPEN IN BROWSER",
-    "passwordsNotMatch": "Passwords do not match",
-    "success": "Success!",
-    "checkMail": "We sent an email to the your email address mail.<br>Check the Spam folder if you cannot find it.<br>",
-    "successDescription": "Account #{{userId}} successfully created! Remember/save this number, it will be useful to you when you'll try to login.<br>{{mail}}To continue registration close this window.",
-    "recaptchaFailed": "You must pass the reCAPTCHA",
-    "emailExists": "An account with the specified E-mail is already registered"
+    "login": "LOGIN"
   },
   "static": {
-    "maintenance": "Maintenance",
-    "banner": "Login Restricted",
-    "update": "Update Required"
-  },
-  "notice": {
-    "SEND_FRIEND_REQUEST": "{{affectorName}} sent you a friend request",
-    "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} accepted your friend request"
-  },
-  "noticemarquee": {
-    "maintenanceNotice": "In the period from {{startDay}} {{startTime}} to {{endDay}} {{endTime}} UTC{{timeZone}}, game access will be restricted due to a scheduled maintenance"
-  },
-  "mailer": {}
+    "maintenance": {
+      "title": "maintenance"
+    }
+  }
 }

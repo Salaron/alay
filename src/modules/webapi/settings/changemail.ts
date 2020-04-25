@@ -13,28 +13,24 @@ export default class extends WebApiAction {
 
   public paramTypes() {
     return {
-      mail: TYPE.STRING,
-      password: TYPE.STRING
+      mail: TYPE.STRING
     }
   }
 
   public async execute() {
-    const strings = await this.i18n.getStrings(this.requestData, "login-startup", "settings-index", "mailer")
+    const i18n = await this.i18n.getStrings("login-startup", "settings-index", "mailer")
 
-    const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
-    if (!Utils.checkPasswordFormat(password)) throw new ErrorWebAPI(strings.passwordIncorrect)
-    if (!Utils.checkMailFormat(this.params.mail)) throw new ErrorWebAPI(strings.mailIncorrect)
+    if (!Utils.checkMailFormat(this.params.mail)) throw new ErrorWebAPI(i18n.mailIncorrect)
 
-    const userData = await this.connection.first("SELECT name, mail FROM users WHERE user_id = :user AND password = :pass", {
-      user: this.user_id,
-      pass: password
+    const userData = await this.connection.first("SELECT name, mail FROM users WHERE user_id = :user", {
+      user: this.user_id
     })
-    if (!userData) throw new ErrorWebAPI(strings.invalidPassword)
+    if (!userData) throw new ErrorWebAPI(i18n.invalidPassword)
 
     const mailCheck = await this.connection.first("SELECT user_id FROM users WHERE mail = :mail", {
       mail: this.params.mail
     })
-    if (mailCheck) throw new ErrorWebAPI(strings.emailExists)
+    if (mailCheck) throw new ErrorWebAPI(i18n.emailExists)
 
     await this.connection.execute("UPDATE users SET mail = :mail WHERE user_id = :user", {
       mail: this.params.mail,
@@ -42,7 +38,7 @@ export default class extends WebApiAction {
     })
 
     if (!Type.isNullDef(userData.mail) && userData.mail.length > 0) {
-      await Utils.sendMail(userData.mail, strings.subjectMailChange, Utils.prepareTemplate(strings.bodyMailChange, {
+      await Utils.sendMail(userData.mail, i18n.mailChange.subject, Utils.prepareTemplate(i18n.mailChange.body, {
         userName: userData.name,
         supportMail: Config.mailer.supportMail.length > 0 ? Config.mailer.supportMail : ""
       }))
@@ -50,7 +46,7 @@ export default class extends WebApiAction {
 
     return {
       status: 200,
-      result: true
+      result: []
     }
   }
 }

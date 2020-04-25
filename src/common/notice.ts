@@ -26,7 +26,7 @@ export class Notice extends CommonModule {
 
   public async getNoticeStrings() {
     // based on current user language
-    return await this.action.i18n.getStrings(this.requestData, "notice")
+    return await this.action.i18n.getStrings("notice")
   }
 
   public async getPreparedMessage(noticeTypeId: noticeType | number, values: any) {

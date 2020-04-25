@@ -30,8 +30,8 @@ export default class extends WebViewAction {
   }
 
   public async execute() {
-    const languageCode = await this.i18n.getUserLocalizationCode(this.requestData)
-    const i18n = await this.i18n.getStrings(languageCode, "static")
+    const languageCode = await this.i18n.getUserLocalizationCode()
+    const i18n = await this.i18n.getStrings("static")
 
     switch (this.params.id) {
       case staticPageType.MAINTENANCE: {
@@ -39,7 +39,7 @@ export default class extends WebViewAction {
 
         const locals = {
           i18n,
-          pageTitle: i18n.maintenance,
+          pageTitle: i18n.maintenance.title,
           startDate: moment(Config.maintenance.start_date).locale(languageCode).format("D MMMM HH:mm"),
           endDate: moment(Config.maintenance.end_date).locale(languageCode).format("D MMMM HH:mm"),
           timezone: Utils.getTimeZoneWithPrefix(Config.maintenance.time_zone),
@@ -58,7 +58,7 @@ export default class extends WebViewAction {
           latestVersion: Config.client.application_version,
           clientVersion: this.requestData.request.headers["bundle-version"] || "N/A",
           supportMail: Config.mailer.supportMail,
-          pageTitle: i18n.update,
+          pageTitle: i18n.update.title,
           loggedIn: this.requestData.auth_level > AUTH_LEVEL.PRE_LOGIN,
           downloadSources: Config.modules.download.urls,
           i18n
@@ -80,7 +80,7 @@ export default class extends WebViewAction {
           expirationDateHuman: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").locale(languageCode).humanize() : null,
           message: data.message,
           supportMail: Config.mailer.supportMail,
-          pageTitle: i18n.banned,
+          pageTitle: i18n.banned.title,
           i18n
         }
         return {

@@ -20,7 +20,7 @@ export default class extends WebApiAction {
 
   public async execute() {
     if (!langCodes.includes(this.params.code)) throw new ErrorAPI("Unsupported language code")
-    await this.i18n.setUserLocalizationCode(this.requestData, this.params.code)
+    await this.i18n.setUserLocalizationCode(this.params.code)
 
     return {
       status: 200,
