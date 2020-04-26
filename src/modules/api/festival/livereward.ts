@@ -2,7 +2,7 @@ import assert from "assert"
 import { TYPE } from "../../../common/type"
 import { User } from "../../../common/user"
 import RequestData from "../../../core/requestData"
-import { AUTH_LEVEL, FESTIVAL_BONUS, Mods, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
+import { AUTH_LEVEL, FESTIVAL_BONUS, LiveMods, PERMISSION, REQUEST_TYPE } from "../../../models/constant"
 import { ErrorAPI } from "../../../models/error"
 
 const liveDB = sqlite3.getLiveDB()
@@ -153,7 +153,7 @@ export default class extends ApiAction {
       }
       return {
         live_difficulty_id: liveInfo.live_difficulty_id,
-        is_random: liveInfo.difficulty === 5 || (liveSession.mods & Mods.RANDOM) > 0,
+        is_random: liveInfo.difficulty === 5 || (liveSession.mods & LiveMods.RANDOM) > 0,
         ac_flag: liveInfo.ac_flag || 0,
         swing_flag: liveInfo.swing_flag || 0
       }

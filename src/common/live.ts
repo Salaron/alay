@@ -1,7 +1,7 @@
 import { Logger } from "../core/logger"
 import { BaseAction } from "../models/actions"
 import { CommonModule } from "../models/common"
-import { Mods } from "../models/constant"
+import { LiveMods } from "../models/constant"
 import { ErrorAPI } from "../models/error"
 import { Randomizer } from "./live/randomizer"
 
@@ -445,7 +445,7 @@ export class Live extends CommonModule {
   }
 
   public async getDefaultRewards(userId: number, scoreRank: number, comboRank: number, modsInt: number) {
-    let multiplier = modsInt & Mods.NO_FAIL ? 0.4 : 1
+    let multiplier = modsInt & LiveMods.NO_FAIL ? 0.4 : 1
     let rndGT = Math.floor(Math.random() * (5)) + 1
     let rndBT = Math.floor(Math.random() * (3)) + 1
     let rndLG = Math.floor(Math.random() * (10 * (7 - comboRank) - 10 * (6 - comboRank) + 1)) + 10 * (6 - comboRank)

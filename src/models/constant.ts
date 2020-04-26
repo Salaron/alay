@@ -41,8 +41,8 @@ export enum FESTIVAL_SETLIST {
   MGD
 }
 
-export const modNames = ["random", "vanish", "mirror", "hp"]
-export enum Mods {
+export const liveModsNames = ["random", "vanish", "mirror", "hp"]
+export enum LiveMods {
   RANDOM = 2,
   HIDDEN = 4,
   SUDDEN = 8,
@@ -51,13 +51,15 @@ export enum Mods {
   SUDDEN_DEATH = 64
 }
 
-export const settingNames = ["event", "hp", "mirror", "vanish", "random"]
-export const settingValues: { [name: string]: number } = {
+// warning: name order affects to the settings page
+export const modificatorNames = ["random", "vanish", "mirror", "hp", "event", "cardSign"]
+export const modificatorMaxValue: { [name: string]: number } = {
   event: 1,
   hp: 2,
   mirror: 1,
   vanish: 2,
-  random: 1
+  random: 1,
+  cardSign: 1
 }
 
 export enum FESTIVAL_BONUS {

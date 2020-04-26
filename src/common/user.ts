@@ -1,5 +1,5 @@
 import { BaseAction } from "../models/actions"
-import { FESTIVAL_SETLIST, modNames, Mods } from "../models/constant"
+import { FESTIVAL_SETLIST, liveModsNames, LiveMods } from "../models/constant"
 import { CommonModule } from "../models/common"
 
 interface userParams {
@@ -107,22 +107,22 @@ export class User extends CommonModule {
     if (typeof value !== "number") value = await this.getModsInt(userId)
 
     let result = ""
-    if (value & Mods.RANDOM) {
+    if (value & LiveMods.RANDOM) {
       result += "RANDOM\n"
     }
-    if (value & Mods.HIDDEN) {
+    if (value & LiveMods.HIDDEN) {
       result += "HIDDEN NOTE\n"
     }
-    if (value & Mods.SUDDEN) {
+    if (value & LiveMods.SUDDEN) {
       result += "SUDDEN NOTE\n"
     }
-    if (value & Mods.MIRROR) {
+    if (value & LiveMods.MIRROR) {
       result += "MIRROR\n"
     }
-    if (value & Mods.NO_FAIL) {
+    if (value & LiveMods.NO_FAIL) {
       result += "NO FAIL\n"
     }
-    if (value & Mods.SUDDEN_DEATH) {
+    if (value & LiveMods.SUDDEN_DEATH) {
       result += "SUDDEN DEATH\n"
     }
 
@@ -134,27 +134,27 @@ export class User extends CommonModule {
   }
 
   public async getModsInt(userId: number) {
-    const params = await this.getParams(userId, modNames)
+    const params = await this.getParams(userId, liveModsNames)
 
     let result = 0
     for (const param of Object.keys(params)) {
       switch (param) {
         case "random": {
-          if (params[param] === 1) result += Mods.RANDOM
+          if (params[param] === 1) result += LiveMods.RANDOM
           break
         }
         case "vanish": {
-          if (params[param] === 1) result += Mods.HIDDEN
-          if (params[param] === 2) result += Mods.SUDDEN
+          if (params[param] === 1) result += LiveMods.HIDDEN
+          if (params[param] === 2) result += LiveMods.SUDDEN
           break
         }
         case "mirror": {
-          if (params[param] === 1) result += Mods.MIRROR
+          if (params[param] === 1) result += LiveMods.MIRROR
           break
         }
         case "hp": {
-          if (params[param] === 1) result += Mods.NO_FAIL
-          if (params[param] === 2) result += Mods.SUDDEN_DEATH
+          if (params[param] === 1) result += LiveMods.NO_FAIL
+          if (params[param] === 2) result += LiveMods.SUDDEN_DEATH
           break
         }
       }
