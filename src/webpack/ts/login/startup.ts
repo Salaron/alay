@@ -3,7 +3,7 @@ import UIkit from "uikit"
 import { promisify } from "util"
 import { simpleEncrypt } from "../crypto"
 import { enableRecaptcha, grecaptcha, i18n, isWebview, recaptchaSiteKey } from "../global"
-import { checkMailFormat, checkPasswordFormat, formatString, hideVirtualKeyboard, protectPage, sendRequest, showNotification } from "../utils"
+import * as Utils from "../utils"
 
 $(() => {
   if (window.history.length > 1) {
@@ -15,37 +15,37 @@ $(() => {
 
   $("#startupForm").submit(async form => {
     form.preventDefault()
-    hideVirtualKeyboard()
+    Utils.hideVirtualKeyboard()
 
     const name = <string>$("#nickname").val()
     const email = <string>$("#email").val()
-    const password =<string> $("#password").val()
+    const password = <string>$("#password").val()
     const password2 = <string>$("#password-confirm").val()
     if (
       name.length === 0 || name.length > 20
-    ) return showNotification(i18n.nicknameIncorrect, "warning")
+    ) return Utils.showNotification(i18n.nicknameIncorrect, "warning")
     if (
-      email.length === 0 || !checkMailFormat(email)
-    ) return showNotification(i18n.mailIncorrect, "warning")
+      email.length === 0 || !Utils.checkMailFormat(email)
+    ) return Utils.showNotification(i18n.mailIncorrect, "warning")
     if (
-      password.length === 0 || password.length > 32 || !checkPasswordFormat(password)
-    ) return showNotification(i18n.passwordIncorrect, "warning")
-    if (password !== password2) return showNotification(i18n.passwordsNotMatch, "warning")
-    protectPage()
+      password.length === 0 || password.length > 32 || !Utils.checkPasswordFormat(password)
+    ) return Utils.showNotification(i18n.passwordIncorrect, "warning")
+    if (password !== password2) return Utils.showNotification(i18n.passwordsNotMatch, "warning")
+    Utils.protectPage()
     try {
       let recaptcha = ""
       if (enableRecaptcha === true) {
         await promisify(grecaptcha.ready)()
         recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "startup" })
       }
-      const response = await sendRequest("login/startUp", {
+      const response = await Utils.sendRequest("login/startUp", {
         name,
         email,
         recaptcha,
         password: simpleEncrypt(password)
       })
 
-      $("#startupSuccess").html(formatString($("#startupSuccess").html(), {
+      $("#startupSuccess").html(Utils.formatString($("#startupSuccess").html(), {
         userId: response.user_id,
         mail: response.mail_success === true ? i18n.checkMail : ""
       }))
@@ -53,8 +53,9 @@ $(() => {
         target: "#startupForm, #startupSuccess",
         animation: "uk-animation-fade"
       }).toggle()
+      Utils.resetCookieAuth()
     } catch {
-      protectPage(true)
+      Utils.protectPage(true)
     }
   })
 })

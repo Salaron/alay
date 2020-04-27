@@ -78,14 +78,12 @@ export default class RequestData {
           // queryString
           this.user_id = parseInt(this.params.user_id) || 0
           this.auth_token = this.params.token
-          if (!Config.server.debug_mode) this.requestFromBrowser = true
         } else if (this.getCookie("token") !== "") {
           // cookie
           if (!isNaN(parseInt(this.getCookie("user_id")))) {
             this.user_id = parseInt(this.getCookie("user_id"))
           }
           this.auth_token = this.getCookie("token")
-          if (!Config.server.debug_mode) this.requestFromBrowser = true
         }
       }
       if (this.user_id !== 0 && this.auth_token !== "") {

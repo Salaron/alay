@@ -3,7 +3,7 @@ import UIkit from "uikit"
 import { promisify } from "util"
 import { simpleEncrypt } from "../crypto"
 import { enableRecaptcha, grecaptcha, i18n, isWebview, recaptchaSiteKey } from "../global"
-import { getExternalURL, hideVirtualKeyboard, parseQueryString, protectPage, sendRequest, showNotification } from "../utils"
+import { getExternalURL, hideVirtualKeyboard, parseQueryString, protectPage, sendRequest, showNotification, setCookie, resetCookieAuth } from "../utils"
 
 $(() => {
   if (window.history.length > 0) {
@@ -56,6 +56,7 @@ $(() => {
           target: "#loginForm, #loginSuccess",
           animation: "uk-animation-fade"
         }).toggle()
+        resetCookieAuth()
       }
     } catch {
       protectPage(true)

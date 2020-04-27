@@ -52,7 +52,7 @@ export default async function executeAction(moduleName: string, actionName: stri
       }
     }
 
-    if (requestData.auth_level === AUTH_LEVEL.UPDATE && Action.requiredAuthLevel !== AUTH_LEVEL.UPDATE) {
+    if (requestData.auth_level === AUTH_LEVEL.UPDATE && Action.requiredAuthLevel > AUTH_LEVEL.UPDATE) {
       throw new ErrorAPI("You need to get latest update first")
     }
     if (requestData.auth_level < Action.requiredAuthLevel)

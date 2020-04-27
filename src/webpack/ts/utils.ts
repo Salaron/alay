@@ -158,3 +158,8 @@ export function checkPasswordFormat(pass: string): boolean {
   const regex = /^[A-Za-z0-9]\w{1,32}$/ // max 32 symbols
   return regex.test(pass)
 }
+
+export function resetCookieAuth() {
+  setCookie("user_id", "", -1)
+  setCookie("token", "", -1)
+}
