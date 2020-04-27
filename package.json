@@ -20,7 +20,7 @@
   "devDependencies": {
     "@types/assets-webpack-plugin": "^3.9.0",
     "@types/formidable": "^1.0.31",
-    "@types/ioredis": "^4.14.9",
+    "@types/ioredis": "^4.16.0",
     "@types/jquery": "^3.3.35",
     "@types/mime": "^2.0.1",
     "@types/mini-css-extract-plugin": "^0.9.1",
