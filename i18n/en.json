@@ -1,11 +1,158 @@
 {
-  "common": {},
+  "common": {
+    "announce": "News",
+    "secretbox": "Scout",
+    "profile": "Profile",
+    "settings": "Settigns",
+    "aboutServer": "About our Server"
+  },
+  "announce-index": {
+    "more": "Read More"
+  },
   "login-hello": {
-    "login": "LOGIN"
+    "login": "Sign in",
+    "registration": "Sign up",
+    "hello": "Hello!",
+    "introduction": "Welcome to the private server Love Live! School Idol Festival!\n\\In order to avoid the blocking of our server we ask you not to post screenshots, video and other content from this server to any open source.\nThank you!"
+  },
+  "login-login": {
+    "login": "Login",
+    "forgotPassword": "Forgot Password?",
+    "needHelpWithRecovery": "Need help with recovery?",
+    "ifYouLostLoginDataContactUs": "If you forgot your account password, you can send us a change password request to regain access to your account\n",
+    "writeToVk": "Contact via VK",
+    "writeToEmail": "Contact via E-Mail",
+    "backToLogin": "Back to Login Form",
+    "userIdShouldBeInt": "Value \"User ID\" must be an integer",
+    "successDescriptionLogin": "Login Successfull! <br>Close this window to proceed.",
+    "invalidLoginOrPass": "User ID or Password is invalid",
+    "mailNotExists": "This E-Mail does not exist",
+    "mailSendingError": "An error has occurred while sending your message, please try again later or contact the administrator",
+    "passwordResetSuccess": "New password was sent to E-Mail specified",
+    "confirmationCodeInvalidFormat": "Value \"Confirmation Code\" is invalid",
+    "mailSuccess": "A letter with verfication code was send to E-Mail specified",
+    "confirmationCode": "Verification code",
+    "confirmationCodeNotExists": "Verification code is outdated, receive a new one from previous form",
+    "confirmationCodeNotMatch": "Verification code is invalid",
+    "invalidUserIdOrMail": "User ID or E-Mail is invalid"
+  },
+  "login-startup": {
+    "nickname": "Name",
+    "password": "Password",
+    "email": "E-mail",
+    "repeatPassword": "Confirm password",
+    "send": "Send",
+    "openInBrowser": "Open in web-browser",
+    "nicknameIncorrect": "Username must contain from 0 to 18 alphanumeric characters",
+    "mailIncorrect": "This E-Mail is invalid. Please check the E-Mail specified and try again",
+    "passwordIncorrect": "Password must have from 1 to 32 Latin characters and numbers",
+    "passwordsNotMatch": "Password and confirmation password do not match",
+    "success": "Succeed!",
+    "checkMail": "Check your E-Mail to proceed. <br>If it is not present please check your spam folder.<br>",
+    "successDescription": "Account #{{userId}} is succeed! Keep this number to successful login. <br>{{mail}}Close this window to proceed.",
+    "emailExists": "This E-Mail is already registered"
+  },
+  "settings-index": {
+    "generalSettings": "Основные настройки",
+    "handoverNotice": "Handover ID это пароль от вашего аккаунта.<br>Никому его не сообщайте, а в случае компроментации, измените.",
+    "save": "Сохранить",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль",
+    "nicknameChanged": "Никнейм успешно изменён",
+    "emailChanged": "E-mail успешно изменён",
+    "passwordChanged": "Пароль успешно измнён",
+    "modificators": {
+      "title": "Модификаторы",
+      "description": "",
+      "random": "Random",
+      "randomTip": "",
+      "random-0": "Disable",
+      "random-1": "Enable",
+      "vanish": "Vanish",
+      "vanishTip": "",
+      "vanish-0": "Disable",
+      "vanish-1": "Hidden Note",
+      "vanish-2": "Sudden Note",
+      "mirror": "Mirror",
+      "mirrorTip": "",
+      "mirror-0": "Disable",
+      "mirror-1": "Enable",
+      "hp": "HP",
+      "hpTip": "",
+      "hp-0": "Defaullt",
+      "hp-1": "No Fail",
+      "hp-2": "Sudden Death",
+      "event": "Использовать модификаторы в ивентах?",
+      "eventTip": "",
+      "event-0": "Нет",
+      "event-1": "Да",
+      "cardSign": "Использовать версии карт с подписью?",
+      "cardSignTip": "",
+      "cardSign-0": "Нет",
+      "cardSign-1": "Да"
+    },
+    "bulkCardDeletion": {
+      "title": "Массовое удаление карт",
+      "description": "С помощью этой функции Вы можете удалить за один раз карты, которые не состоят в командах, не выбраны в качестве партнёра и не помечены замочком.",
+      "enterYourPasswordToConfirm": "Введите пароль/Handover ID для подтверждения действия.",
+      "delayNotice": "Выполнение запроса может занять до двух минут."
+    },
+    "rarity": "Редкость:",
+    "delete": "Удалить!",
+    "areYouSure": "Вы уверены?",
+    "confirm": "Подтвердить"
   },
   "static": {
     "maintenance": {
-      "title": "maintenance"
+      "title": "Maintenance",
+      "notice": "The server is currently undergoing maitenance",
+      "period": "Maintenance Period",
+      "periodCanBeChanged": "Please note that maintenance time may vary slightly and changed without prior notice",
+      "apologize": "We apologize for any inconveniences and thank you for your patience."
+    },
+    "update": {
+      "title": "Update required",
+      "notice": "Please update to the latest version of the application to use all the newest features.",
+      "currentVersion": "Current version:",
+      "userVersion": "User version:",
+      "youCanDownloadANewVersionBellow": "You can download a new version of the application from the links below:",
+      "downloadFrom": "Download from",
+      "loginIntoYourAccountToDownload": "To download the newest verison <a href=login>log in to your account</a>."
+    },
+    "banned": {
+      "title": "Your account is banned",
+      "notice": "Your account is banned for violation of<a href=tos>our private server rules</a>.",
+      "messageFromAdmin": "The message from administrator:",
+      "temporaryBanned": "This ban is temporary and the access will be regained in"
+    }
+  },
+  "personalnotice": {
+    "tooManyCards": {
+      "title": "Your Member List is full!",
+      "content": "\nThe amount of cards in your inventory exceeded 10 thousand.\nYou may have problems with login in due to the exceeded Member List.\nTo fix this objectionable problem you may use\nthe remove member tab"
+    }
+  },
+  "notice": {
+    "SEND_FRIEND_REQUEST": "{{affectorName}} send you a friend request",
+    "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} accepted your friend request"
+  },
+  "mailer": {
+    "welcome": {
+      "subject": "Welcome!",
+      "body": "Hello, {{userName}}!\n\nYou received this message since your E-Mail adress was specified in our private server for Love Live! School Idol Festival.\n\nFrom now on this E-Mail adress will be used to notify you about all the actions related to your account."
+    },
+    "passwordChange": {
+      "subject": "Change Password",
+      "body": "Hello, {{userName}}!\n\nthe password of your account in our server has been changed.\n\nIf it was made not by you you should immediately contact the administrator.\n{{supportMail}}"
+    },
+    "passwordRecovery": {
+      "subject": "Recover password",
+      "verifyCode": "Hello, {{userName}}!\n\nYou received this message since you made a password recovery request for your account.\nIf it was not made by you IGNORE and DELETE this message.\nYour password will not change until you input the code shown below.\n\nIf you received several messages about password recovery you should input only the newest verification code.\n\nTo recover your password input this verification code: {{code}}\nThis code is valid only for 10 minutes({{sendTime}})\n\nSender's IP-adress {{ip}}",
+      "newPassword": "Password has been changed successfully!\n\nUse this data for login:\nUser ID: {{userId}}\nPassword: {{password}}\n\nWe suggest you to change the password after the first login."
+    },
+    "mailChange": {
+      "subject": "Change E-Mail",
+      "body": "Hello, {{userName}}!\n\nthe E-Mail adress of your account in our server has been changed.\n\nIf it was made not by you you should immediately contact the administrator.\n{{supportMail}}"
     }
   }
 }
