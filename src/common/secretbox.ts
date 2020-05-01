@@ -229,7 +229,7 @@ export class Secretbox extends CommonModule {
       after_user_info: afterUserInfo,
       free_muse_gacha_flag: false,
       free_aqours_gacha_flag: false,
-      lowest_rarity: 4,
+      lowest_rarity: 2,
       promotion_performance_rate: 25, // flip rate
       secret_box_parcel_type: 2,
       limit_bonus_info: [],

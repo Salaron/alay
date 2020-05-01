@@ -110,8 +110,8 @@ export class I18n extends CommonModule {
     let cookieLanguageCode = this.requestData.getCookie("language")
     if (Type.isInt(this.userId) && this.userId > 0) {
       languageCode = (await this.connection.first("SELECT language FROM users WHERE user_id = :user", { user: this.userId })).language
-    } else if (cookieLanguageCode !== "") {
-      languageCode = this.requestData.getCookie("language")
+    } else if (cookieLanguageCode !== null) {
+      languageCode = cookieLanguageCode
     }
 
     if (!Object.values(Config.i18n.languages).includes(languageCode)) {

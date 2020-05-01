@@ -78,12 +78,13 @@ export default class RequestData {
           // queryString
           this.user_id = parseInt(this.params.user_id) || 0
           this.auth_token = this.params.token
-        } else if (this.getCookie("token") !== "") {
+        } else if (this.getCookie("token") !== null) {
           // cookie
-          if (!isNaN(parseInt(this.getCookie("user_id")))) {
-            this.user_id = parseInt(this.getCookie("user_id"))
+          const userId = this.getCookie("user_id")
+          if (userId !== null) {
+            this.user_id = parseInt(userId)
           }
-          this.auth_token = this.getCookie("token")
+          this.auth_token = this.getCookie("token")!
         }
       }
       if (this.user_id !== 0 && this.auth_token !== "") {
@@ -197,17 +198,10 @@ export default class RequestData {
     ])
   }
 
-  public getCookie(cname: string): string {
-    const name = cname + "="
-    const cArray = (this.headers.cookie || "").split(";")
-    for (let c of cArray) {
-      while (c.charAt(0) == " ") {
-        c = c.substring(1)
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length)
-      }
-    }
-    return ""
+  public getCookie(name: string): string | null {
+    const value = `; ${this.headers.cookie}`
+    const parts = value.split(`; ${name}=`)
+    if (parts.length === 2) return parts.pop()!.split(";").shift()!
+    return null
   }
 }
