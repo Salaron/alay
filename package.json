@@ -25,7 +25,7 @@
     "@types/mime": "^2.0.1",
     "@types/mini-css-extract-plugin": "^0.9.1",
     "@types/mysql2": "types/npm-mysql2",
-    "@types/node": "^13.13.2",
+    "@types/node": "^13.13.4",
     "@types/nodemailer": "^6.4.0",
     "@types/pug": "^2.0.4",
     "@types/showdown": "^1.9.3",
