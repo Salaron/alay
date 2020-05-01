@@ -15,3 +15,10 @@ export const enableRecaptcha: boolean = window.enableRecaptcha
 export const publicKey: string = window.publicKey
 export const recaptchaSiteKey: string = window.recaptchaSiteKey
 export const grecaptcha: any = window.grecaptcha // tooooo lazy to do typings
+
+// settings
+interface ISettingsUser {
+  name: string
+  mail: string
+}
+export const user: ISettingsUser = window.user

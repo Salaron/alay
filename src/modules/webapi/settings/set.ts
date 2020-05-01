@@ -1,6 +1,6 @@
 import RequestData from "../../../core/requestData"
 import assert from "assert"
-import { AUTH_LEVEL, settingValues, settingNames } from "../../../models/constant"
+import { AUTH_LEVEL, modificatorMaxValue, modificatorNames } from "../../../models/constant"
 import { TYPE } from "../../../common/type"
 
 export default class extends WebApiAction {
@@ -17,8 +17,8 @@ export default class extends WebApiAction {
     }
   }
   public paramCheck() {
-    assert(settingNames.includes(this.params.name) && typeof settingValues[this.params.name] !== "undefined", `Unknown setting name "${this.params.name}"`)
-    assert(this.params.value >= 0 && this.params.value <= settingValues[this.params.name], `Invalid param "${this.params.value}" for setting name "${this.params.name}"`)
+    assert(modificatorNames.includes(this.params.name) && typeof modificatorMaxValue[this.params.name] !== "undefined", `Unknown setting name "${this.params.name}"`)
+    assert(this.params.value >= 0 && this.params.value <= modificatorMaxValue[this.params.name], `Invalid param "${this.params.value}" for setting name "${this.params.name}"`)
   }
 
   public async execute() {

@@ -1,0 +1,101 @@
+extends ../../includes/head.pug
+
+block variables
+  - var userStr = JSON.stringify(user)
+  script.
+    var publicKey = !{publicKey}
+    var user = !{userStr}
+
+block body
+  style.
+      .uk-form-label {
+        font-size: 1.1rem;
+      }
+      .settings-radio {
+        font-size: 16px;
+      }
+ 
+  #outer
+    #inner
+      #header
+        include ../../includes/header.pug
+      #body
+        div(class="uk-container uk-container-small uk-margin")
+          h3(class="uk-text-bold") !{i18n.generalSettings}
+          form(id="accountSettingsForm" class="uk-container uk-container-small uk-form-stacked uk-margin")
+            h5(class="uk-margin-remove-top" style="color: red") !{i18n.handoverNotice}
+            div(class="uk-grid-small uk-child-width-1-2" uk-grid)
+              div
+                .uk-margin
+                  label(for="nickname" class="uk-form-label") !{i18n.nickname}
+                  input(id="nickname" class="uk-input uk-border-pill" value=user.name type="text" spellcheck="false")
+                .uk-margin
+                  label(for="email" class="uk-form-label") !{i18n.email}
+                  input(id="email" class="uk-input uk-border-pill" placeholder=user.mail type="email" autocomplete="email")
+                .uk-margin
+                  button(type="submit" class="uk-button uk-border-pill uk-button-primary") !{i18n.save}
+              div
+                .uk-margin
+                  label(for="currentPassword" class="uk-form-label") !{i18n.currentPassword}
+                  input(id="currentPassword" class="uk-input uk-border-pill" type="password")
+                .uk-margin
+                  label(for="newPassword" class="uk-form-label") !{i18n.newPassword}
+                  input(id="newPassword" class="uk-input uk-border-pill" type="password")
+                .uk-margin
+                  label(for="newPassword2" class="uk-form-label") !{i18n.repeatPassword}
+                  input(id="newPassword2" class="uk-input uk-border-pill" type="password")
+          
+          h3(class="uk-text-bold") !{i18n.modificators.title}
+          h5(class="uk-margin-remove-top") !{i18n.modificators.description}
+          each modificator in modificators
+            .uk-margin
+              label(class="uk-form-label" style="font-size: 1.2em;" uk-tooltip="title: " + modificator.tip + "; pos: bottom-left") !{modificator.title}
+              br
+              for state, i in modificator.states
+                - var marginLeft = "0px"
+                if i != 0
+                  - marginLeft = "15px" 
+                label(style="font-size: 1.12em; margin-left: " + marginLeft)
+                  input(type="radio" class="uk-radio settings-radio" name=modificator.title value=state.value checked=state.checked)
+                  |  !{state.name}
+              br
+            
+          h3(class="uk-text-bold") !{i18n.bulkCardDeletion.title}
+          h5(class="uk-margin-remove-top") !{i18n.bulkCardDeletion.description}
+          .uk-margin-small
+            label(class="uk-form-label" style="font-size: 1.12em;") !{i18n.rarity}
+            label(class="uk-margin-small-left")
+              input(type="radio" class="uk-radio bulkDelete-radio" name="bulkDelete" value="4")
+              |  UR
+            label(class="uk-margin-small-left")
+              input(type="radio" class="uk-radio bulkDelete-radio" name="bulkDelete" value="5")
+              |  SSR
+            label(class="uk-margin-small-left")
+              input(type="radio" class="uk-radio bulkDelete-radio" name="bulkDelete" value="3")
+              |  SR
+            label(class="uk-margin-small-left")
+              input(type="radio" class="uk-radio bulkDelete-radio" name="bulkDelete" value="2")
+              |  R
+            label(class="uk-margin-small-left")
+              input(type="radio" class="uk-radio bulkDelete-radio" name="bulkDelete" value="1")
+              |  N
+          button(id="bulkDeleteButton" type="button" class="uk-button uk-button-primary uk-border-pill"
+            href="#bulkDeleteModal" uk-toggle disabled) !{i18n.delete}
+  
+  #bulkDeleteModal(uk-modal="bg-close: false;")
+    form(id="bulkDeleteForm" class="uk-modal-dialog")
+      button(class="uk-modal-close-default" type="button" uk-close)
+      .uk-modal-header
+        h3(class="uk-modal-title uk-dark") !{i18n.areYouSure}
+      .uk-modal-body
+        p(id="deleteNotice" style="color: red")
+        p !{i18n.bulkCardDeletion.enterYourPasswordToConfirm} 
+        .uk-margin-small
+          div(class="uk-inline uk-width-1-1")
+            span(class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: lock")
+            input(id="confirmationPassword" class="uk-input uk-border-pill" required type="password" autofocus placeholder=i18n.currentPassword)
+        p(class="uk-text-muted uk-margin-remove") !{i18n.bulkCardDeletion.delayNotice}
+      .uk-modal-footer
+        .uk-text-right
+          button(type="submit" class="uk-button uk-button-primary uk-border-pill") !{i18n.confirm}
+  include ../../includes/changeLanguage.pug
