@@ -139,12 +139,11 @@ export class I18n extends CommonModule {
 
   public async getMarkdown(type: I18nMarkdownType): Promise<string> {
     let languageCode = await this.getUserLocalizationCode()
-
+    if (Config.server.debug_mode) await this.clearCache()
     const markdownType = I18nMarkdownType[type]
     if (Cache.markdown[languageCode] && Cache.markdown[languageCode][markdownType]) {
       return Cache.markdown[languageCode][markdownType]
     } else {
-      // TODO: add "not translated notice"
       return Default.markdown[markdownType]
     }
   }

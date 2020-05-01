@@ -1,7 +1,7 @@
 // tslint:disable:variable-name
 import chalk from "chalk"
 import { IncomingForm } from "formidable"
-import { IncomingMessage, ServerResponse } from "http"
+import { IncomingMessage, ServerResponse, IncomingHttpHeaders } from "http"
 import moment from "moment"
 import querystring from "querystring"
 import { Utils } from "../common/utils"
@@ -47,7 +47,7 @@ export default class RequestData {
   public params: any = null
   public auth_level: AUTH_LEVEL = AUTH_LEVEL.NONE
   public auth_header: Authorize
-  public headers: any
+  public headers: IncomingHttpHeaders
   public request: IncomingMessage
   public handlerType: HANDLER_TYPE
   public connection: Connection
@@ -61,13 +61,13 @@ export default class RequestData {
     this.response = response
     this.handlerType = hType
 
-    if (this.headers.authorize) {
+    if (this.headers.authorize && Type.isString(this.headers.authorize)) {
       this.auth_header = <any>querystring.parse(this.headers.authorize)
       if (this.auth_header.token && (<string>this.auth_header.token).match(/^[a-z0-9]{70,90}$/gi)) {
         this.auth_token = this.auth_header.token
       }
     }
-    if (this.headers["user-id"]) this.user_id = parseInt(this.headers["user-id"]) || 0
+    if (this.headers["user-id"] && Type.isString(this.headers["user-id"])) this.user_id = parseInt(this.headers["user-id"]) || 0
 
     if (hType === HANDLER_TYPE.WEBVIEW) {
       this.params = querystring.parse(this.request.url!.split(/[?]+/)[1])
