@@ -3,7 +3,7 @@
     "announce": "News",
     "secretbox": "Scout",
     "profile": "Profile",
-    "settings": "Settigns",
+    "settings": "Settings",
     "aboutServer": "About our Server"
   },
   "announce-index": {
@@ -19,7 +19,7 @@
     "login": "Login",
     "forgotPassword": "Forgot Password?",
     "needHelpWithRecovery": "Need help with recovery?",
-    "ifYouLostLoginDataContactUs": "If you forgot your account password, you can send us a change password request to regain access to your account\n",
+    "ifYouLostLoginDataContactUs": "If you forgot your account password, you can send us a change password request to regain access to your account",
     "writeToVk": "Contact via VK",
     "writeToEmail": "Contact via E-Mail",
     "backToLogin": "Back to Login Form",

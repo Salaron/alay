@@ -1,0 +1,14 @@
+extends ../../includes/head.pug
+
+block body
+  #outer
+    #inner
+      #header
+        - var languageButton = true
+        - var backButtonOnClick = "window.history.back()"
+        include ../../includes/header.pug
+            
+      #body
+        div(class="uk-container uk-container-expand") !{content}
+
+  include ../../includes/changeLanguage.pug

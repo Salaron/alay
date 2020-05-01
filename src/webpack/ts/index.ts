@@ -29,9 +29,14 @@ import $ from "jquery"
 
 if (isWebview) {
   $("#external").attr("href", getExternalURL())
+  $("#external").removeAttr("hidden")
   $(".external-link").each(function () {
     $(this).attr("href", "native://browser?url=" + encodeURIComponent(<string>$(this).attr("href")))
   })
+}
+
+if (window.history.length > 0) {
+  $("#backButton").removeAttr("hidden")
 }
 
 window.onerror = (message, url, lineNo, columnNo, error) => {

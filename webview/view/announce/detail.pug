@@ -1,12 +1,6 @@
 extends ../../includes/head.pug
 
 block body
-  style.
-    #detail-container {
-      padding-left: 15px;
-      padding-right: 15px;
-      box-sizing: content-box;
-    }
   #outer
     #inner
       #header
@@ -15,5 +9,5 @@ block body
         include ../../includes/header.pug
             
       #body
-        #detail-container !{announce.body}
-          div(style="text-align: right; margin-bottom: 5px;") !{announce.date}
+        div(class="uk-container uk-container-expand") !{announce.body}
+          div(style="text-align: right; margin-bottom: 25px;") !{announce.date}

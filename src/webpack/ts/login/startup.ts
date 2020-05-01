@@ -6,13 +6,6 @@ import { enableRecaptcha, grecaptcha, i18n, isWebview, recaptchaSiteKey } from "
 import * as Utils from "../utils"
 
 $(() => {
-  if (window.history.length > 1) {
-    $("#backButton").removeAttr("hidden")
-  }
-  if (isWebview) {
-    $("#external").removeAttr("hidden")
-  }
-
   $("#startupForm").submit(async form => {
     form.preventDefault()
     Utils.hideVirtualKeyboard()

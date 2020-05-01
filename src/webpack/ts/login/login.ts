@@ -6,13 +6,6 @@ import { enableRecaptcha, grecaptcha, i18n, isWebview, recaptchaSiteKey } from "
 import * as Utils from "../utils"
 
 $(() => {
-  if (window.history.length > 0) {
-    $("#backButton").removeAttr("hidden")
-  }
-  if (isWebview) {
-    $("#external").removeAttr("hidden")
-  }
-
   let defaultForm = "#loginForm"
   const params = Utils.parseQueryString()
   if (params.recovery) {
