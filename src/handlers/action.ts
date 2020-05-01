@@ -48,7 +48,7 @@ export default async function executeAction(moduleName: string, actionName: stri
       if ((Action.permission !== PERMISSION.NOXMC) && options.responseType !== RESPONSE_TYPE.MULTI) {
         const xmcStatus = await requestData.checkXMessageCode(Action.permission === PERMISSION.STATIC)
         if (xmcStatus === false)
-          throw new Error(`Invalid X-Message-Code (${moduleName}/${actionName})`)
+          log.error(`Invalid X-Message-Code (${moduleName}/${actionName}); User ID: ${requestData.user_id}`)
       }
     }
 
