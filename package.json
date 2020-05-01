@@ -63,7 +63,7 @@
     "pug": "^2.0.4",
     "querystring": "^0.2.0",
     "showdown": "^1.9.1",
-    "sqlite3": "^4.1.1",
+    "sqlite3": "^4.2.0",
     "superagent": "^5.2.2",
     "uikit": "^3.4.2",
     "winston": "^3.2.1"
