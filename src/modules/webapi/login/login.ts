@@ -124,6 +124,7 @@ export default class extends WebApiAction {
     })
 
     await authToken.destroy()
+    this.requestData.resetCookieAuth()
     return {
       status: 200,
       result: {

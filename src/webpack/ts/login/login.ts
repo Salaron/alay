@@ -3,7 +3,7 @@ import UIkit from "uikit"
 import { promisify } from "util"
 import { simpleEncrypt } from "../crypto"
 import { enableRecaptcha, grecaptcha, i18n, isWebview, recaptchaSiteKey } from "../global"
-import { getExternalURL, hideVirtualKeyboard, parseQueryString, protectPage, sendRequest, showNotification, setCookie, resetCookieAuth } from "../utils"
+import * as Utils from "../utils"
 
 $(() => {
   if (window.history.length > 0) {
@@ -14,10 +14,10 @@ $(() => {
   }
 
   let defaultForm = "#loginForm"
-  const params = parseQueryString()
+  const params = Utils.parseQueryString()
   if (params.recovery) {
     defaultForm = "#codeVerifyForm"
-    showNotification(i18n.mailSuccess, "success")
+    Utils.showNotification(i18n.mailSuccess, "success")
   }
   const toggle = UIkit.toggle(defaultForm, {
     target: defaultForm,
@@ -30,12 +30,12 @@ $(() => {
 
   $("#loginForm").submit(async form => {
     form.preventDefault()
-    hideVirtualKeyboard()
+    Utils.hideVirtualKeyboard()
     const login = <string>$("#login").val()
     const password = <string>$("#password").val()
     // todo: sanity check
 
-    protectPage()
+    Utils.protectPage()
     try {
       let recaptcha = ""
       if (enableRecaptcha === true) {
@@ -43,7 +43,7 @@ $(() => {
         recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "login" })
       }
       let type = isNaN(parseInt(params.type)) ? undefined : parseInt(params.type)
-      const response = await sendRequest("login/login", {
+      const response = await Utils.sendRequest("login/login", {
         recaptcha,
         login: simpleEncrypt(login),
         password: simpleEncrypt(password),
@@ -56,33 +56,32 @@ $(() => {
           target: "#loginForm, #loginSuccess",
           animation: "uk-animation-fade"
         }).toggle()
-        resetCookieAuth()
       }
     } catch {
-      protectPage(true)
+      Utils.protectPage(true)
     }
   })
 
   $("#recoverForm").submit(async form => {
     form.preventDefault()
-    hideVirtualKeyboard()
+    Utils.hideVirtualKeyboard()
 
     const mail = <string>$("#mail").val()
     // additional checks
 
-    protectPage()
+    Utils.protectPage()
     try {
       let recaptcha = ""
       if (enableRecaptcha === true) {
         await promisify(grecaptcha.ready)()
         recaptcha = await grecaptcha.execute(recaptchaSiteKey, { action: "passwordRecovery" })
       }
-      await sendRequest("login/passwordRecovery", {
+      await Utils.sendRequest("login/passwordRecovery", {
         mail,
         recaptcha
       })
       if (isWebview) {
-        location.replace(getExternalURL(location.href + "?recovery=1"))
+        location.replace(Utils.getExternalURL(location.href + "?recovery=1"))
       } else {
         const toggle = UIkit.toggle("#recoverForm", {
           target: "#recoverForm, #codeVerifyForm",
@@ -91,25 +90,25 @@ $(() => {
         toggle.toggle()
         // @ts-ignore
         toggle.$destroy()
-        showNotification(i18n.mailSuccess, "success")
+        Utils.showNotification(i18n.mailSuccess, "success")
       }
     } catch {
       // ignore
     } finally {
-      protectPage(true)
+      Utils.protectPage(true)
     }
   })
 
   $("#codeVerifyForm").submit(async form => {
     form.preventDefault()
-    hideVirtualKeyboard()
+    Utils.hideVirtualKeyboard()
 
     const code = <string>$("#verifyCode").val()
-    if (code.length !== 10) return showNotification(i18n.confirmationCodeInvalidFormat, "warning")
+    if (code.length !== 10) return Utils.showNotification(i18n.confirmationCodeInvalidFormat, "warning")
 
-    protectPage()
+    Utils.protectPage()
     try {
-      await sendRequest("login/codeVerify", { code })
+      await Utils.sendRequest("login/codeVerify", { code })
       const toggle = UIkit.toggle("#codeVerifyForm", {
         target: "#codeVerifyForm, #loginForm",
         animation: "uk-animation-fade"
@@ -118,11 +117,11 @@ $(() => {
       // @ts-ignore
       toggle.$destroy()
       $("#verifyCode").val("")
-      showNotification(i18n.passwordResetSuccess, "success")
+      Utils.showNotification(i18n.passwordResetSuccess, "success")
     } catch {
       // ignore
     } finally {
-      protectPage(true)
+      Utils.protectPage(true)
     }
   })
 })

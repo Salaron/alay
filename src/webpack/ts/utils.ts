@@ -24,7 +24,7 @@ export function setCookie(name: string, value: string, exdays?: number) {
  * @returns {null} If cookie not exists
  */
 export function getCookie(name: string) {
-  const value = `$; ${document.cookie}`
+  const value = `; ${document.cookie}`
   const parts = value.split(`; ${name}=`)
   if (parts.length === 2) return parts.pop()!.split(";").shift()
   return null
@@ -157,9 +157,4 @@ export function checkMailFormat(mail: string): boolean {
 export function checkPasswordFormat(pass: string): boolean {
   const regex = /^[A-Za-z0-9]\w{1,32}$/ // max 32 symbols
   return regex.test(pass)
-}
-
-export function resetCookieAuth() {
-  setCookie("user_id", "", -1)
-  setCookie("token", "", -1)
 }

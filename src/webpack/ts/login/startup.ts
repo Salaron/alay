@@ -53,7 +53,6 @@ $(() => {
         target: "#startupForm, #startupSuccess",
         animation: "uk-animation-fade"
       }).toggle()
-      Utils.resetCookieAuth()
     } catch {
       Utils.protectPage(true)
     }
