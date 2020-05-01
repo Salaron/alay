@@ -5,13 +5,13 @@ div(id="changeLanguageModal", class="uk-dark", uk-modal)
       h2(class="uk-modal-title") Change Language
     .uk-modal-body
       each langCode, language in languageList
-        label
-          if langCode === currentLanguage
-            input(class="uk-radio" type="radio" name="language_radio" value=langCode, checked)
-          else
-            input(class="uk-radio" type="radio" name="language_radio" value=langCode)
-          |  #{language}  
-        br
+        .uk-margin-small
+          label
+            if langCode === currentLanguage
+              input(class="uk-radio" type="radio" name="language_radio" value=langCode checked)
+            else
+              input(class="uk-radio" type="radio" name="language_radio" value=langCode)
+            |  #{language}  
     
     .uk-modal-footer
       h6 The selected language will be used in mail, web pages and in some parts of the game.

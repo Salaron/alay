@@ -15,7 +15,5 @@ block body
         include ../../includes/header.pug
             
       #body
-        #detail-container
-          span !{announce.body}
-          div(style="text-align: right; margin-bottom: 5px;") 
-            span !{announce.date}
+        #detail-container !{announce.body}
+          div(style="text-align: right; margin-bottom: 5px;") !{announce.date}
