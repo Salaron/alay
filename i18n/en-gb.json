@@ -13,7 +13,7 @@
     "login": "Sign in",
     "registration": "Sign up",
     "hello": "Hello!",
-    "introduction": "Welcome to the private server Love Live! School Idol Festival!\n\\In order to avoid the blocking of our server we ask you not to post screenshots, video and other content from this server to any open source.\nThank you!"
+    "introduction": "Welcome to the private server Love Live! School Idol Festival!\nIn order to avoid the blocking of our server we ask you not to post screenshots, video and other content from this server to any open source.\nThank you!"
   },
   "login-login": {
     "login": "Login",
@@ -49,18 +49,18 @@
     "passwordsNotMatch": "Password and confirmation password do not match",
     "success": "Succeed!",
     "checkMail": "Check your E-Mail to proceed. <br>If it is not present please check your spam folder.<br>",
-    "successDescription": "Account #{{userId}} is succeed! Keep this number to successful login. <br>{{mail}}Close this window to proceed.",
+    "successDescription": "Account #{{userId}} is succeed! Keep this number to successful login. <br>{{checkMail}}Close this window to proceed.",
     "emailExists": "This E-Mail is already registered"
   },
   "settings-index": {
     "generalSettings": "Основные настройки",
-    "handoverNotice": "Handover ID это пароль от вашего аккаунта.<br>Никому его не сообщайте, а в случае компроментации, измените.",
+    "handoverNotice": "Handover ID — это пароль от вашего аккаунта.<br>Никому его не сообщайте, а в случае компроментации, измените.",
     "save": "Сохранить",
     "currentPassword": "Текущий пароль",
     "newPassword": "Новый пароль",
     "nicknameChanged": "Никнейм успешно изменён",
     "emailChanged": "E-mail успешно изменён",
-    "passwordChanged": "Пароль успешно измнён",
+    "passwordChanged": "Пароль успешно изменён",
     "modificators": {
       "title": "Модификаторы",
       "description": "",
@@ -121,15 +121,15 @@
     },
     "banned": {
       "title": "Your account is banned",
-      "notice": "Your account is banned for violation of<a href=tos>our private server rules</a>.",
+      "notice": "Your account is banned for violation of <a href=tos>our private server rules</a>.",
       "messageFromAdmin": "The message from administrator:",
-      "temporaryBanned": "This ban is temporary and the access will be regained in"
+      "temporaryBanned": "This ban is temporary and the access will be regained in {{time}}"
     }
   },
   "personalnotice": {
     "tooManyCards": {
       "title": "Your Member List is full!",
-      "content": "\nThe amount of cards in your inventory exceeded 10 thousand.\nYou may have problems with login in due to the exceeded Member List.\nTo fix this objectionable problem you may use\nthe remove member tab"
+      "content": "\n\n\n\nThe amount of cards in your inventory exceeded 10 thousand.\nYou may have problems with login in due to the exceeded Member List.\nTo fix this objectionable problem you may use\nthe remove member tab"
     }
   },
   "notice": {

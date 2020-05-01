@@ -47,7 +47,7 @@ $(() => {
 
       $("#startupSuccess").html(Utils.formatString($("#startupSuccess").html(), {
         userId: response.user_id,
-        mail: response.mail_success === true ? i18n.checkMail : ""
+        checkMail: response.mail_success === true ? i18n.checkMail : ""
       }))
       UIkit.toggle("#startupForm", {
         target: "#startupForm, #startupSuccess",

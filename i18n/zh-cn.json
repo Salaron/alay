@@ -1,0 +1,158 @@
+{
+  "common": {
+    "announce": "公告",
+    "secretbox": "招募",
+    "profile": "个人资料",
+    "settings": "设置",
+    "aboutServer": "关于"
+  },
+  "announce-index": {
+    "more": "阅读更多"
+  },
+  "login-hello": {
+    "login": "登录",
+    "registration": "注册",
+    "hello": "您好!",
+    "introduction": "欢迎来到Love Live! 学园偶像祭!的私服\n 为了避免关服风险，请不要公开发表任何关于本服务器的截图、视频。\n感谢您的配合！"
+  },
+  "login-login": {
+    "login": "登录",
+    "forgotPassword": "忘记密码?",
+    "needHelpWithRecovery": "密码重置遇到问题?",
+    "ifYouLostLoginDataContactUs": "如果您忘记了账号的密码，您可以给我们发送密码重置请求，以修改您的密码\n",
+    "writeToVk": "通过VK联系我们",
+    "writeToEmail": "通过电子邮件联系我们",
+    "backToLogin": "返回登录页面",
+    "userIdShouldBeInt": "\"用户 ID\" 必须是整数",
+    "successDescriptionLogin": "登录成功! <br>请关闭该页面。",
+    "invalidLoginOrPass": "用户名或密码错误",
+    "mailNotExists": "该邮件地址不存在",
+    "mailSendingError": "发送邮件出现错误，请重试或联系管理员",
+    "passwordResetSuccess": "新密码已发送至您的邮箱",
+    "confirmationCodeInvalidFormat": "\"验证码\" 无效",
+    "mailSuccess": "验证码已发送到您的邮箱",
+    "confirmationCode": "验证码",
+    "confirmationCodeNotExists": "验证码过期，请返回重新请求验证码",
+    "confirmationCodeNotMatch": "验证码错误",
+    "invalidUserIdOrMail": "用户ID或邮箱错误"
+  },
+  "login-startup": {
+    "nickname": "昵称",
+    "password": "密码",
+    "email": "邮箱",
+    "repeatPassword": "确认密码",
+    "send": "发送",
+    "openInBrowser": "使用浏览器打开",
+    "nicknameIncorrect": "用户名必须包含0到18个字母",
+    "mailIncorrect": "电子邮箱错误，请重试",
+    "passwordIncorrect": "密码必须包含1到32个字母和数字",
+    "passwordsNotMatch": "两次输入的密码不一致",
+    "success": "成功!",
+    "checkMail": "请查收邮件。 <br>如果收件箱里没有，请检查垃圾箱。<br>",
+    "successDescription": "Account #{{userId}} is succeed! Keep this number to successful login. <br>{{checkMail}}Close this window to proceed.",
+    "emailExists": "该邮箱已注册过"
+  },
+  "settings-index": {
+    "generalSettings": "Основные настройки",
+    "handoverNotice": "Handover ID это пароль от вашего аккаунта.<br>Никому его не сообщайте, а в случае компроментации, измените.",
+    "save": "Сохранить",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль",
+    "nicknameChanged": "Никнейм успешно изменён",
+    "emailChanged": "E-mail успешно изменён",
+    "passwordChanged": "Пароль успешно измнён",
+    "modificators": {
+      "title": "Модификаторы",
+      "description": "",
+      "random": "Random",
+      "randomTip": "",
+      "random-0": "禁用",
+      "random-1": "启用",
+      "vanish": "Vanish",
+      "vanishTip": "",
+      "vanish-0": "禁用",
+      "vanish-1": "Hidden Note",
+      "vanish-2": "Sudden Note",
+      "mirror": "镜像",
+      "mirrorTip": "",
+      "mirror-0": "禁用",
+      "mirror-1": "启用",
+      "hp": "HP",
+      "hpTip": "",
+      "hp-0": "默认",
+      "hp-1": "锁血",
+      "hp-2": "Sudden Death",
+      "event": "Использовать модификаторы в ивентах?",
+      "eventTip": "",
+      "event-0": "Нет",
+      "event-1": "Да",
+      "cardSign": "Использовать версии карт с подписью?",
+      "cardSignTip": "",
+      "cardSign-0": "Нет",
+      "cardSign-1": "Да"
+    },
+    "bulkCardDeletion": {
+      "title": "Массовое удаление карт",
+      "description": "С помощью этой функции Вы можете удалить за один раз карты, которые не состоят в командах, не выбраны в качестве партнёра и не помечены замочком.",
+      "enterYourPasswordToConfirm": "Введите пароль/Handover ID для подтверждения действия.",
+      "delayNotice": "Выполнение запроса может занять до двух минут."
+    },
+    "rarity": "Редкость:",
+    "delete": "Удалить!",
+    "areYouSure": "Вы уверены?",
+    "confirm": "Подтвердить"
+  },
+  "static": {
+    "maintenance": {
+      "title": "维护中",
+      "notice": "服务器正在维护",
+      "period": "维护时间",
+      "periodCanBeChanged": "请注意，维护时间可能在不提前通知的情况下会小范围修改",
+      "apologize": "感谢您的配合。"
+    },
+    "update": {
+      "title": "需要更新",
+      "notice": "请更新客户端以启用全部特性",
+      "currentVersion": "当前版本:",
+      "userVersion": "您的版本:",
+      "youCanDownloadANewVersionBellow": "你可以在这里下载到最新版客户端:",
+      "downloadFrom": "Download from",
+      "loginIntoYourAccountToDownload": "<a href=login>请先登录</a>以下载新版客户端"
+    },
+    "banned": {
+      "title": "账号封禁",
+      "notice": "您的账号由于违反<a href=tos>服务器使用规则</a>而被封禁。",
+      "messageFromAdmin": "管理员的消息:",
+      "temporaryBanned": "该封禁是暂时性的，并且会在{{time}}后解封"
+    }
+  },
+  "personalnotice": {
+    "tooManyCards": {
+      "title": "社员已满!",
+      "content": "\n\n\n\n您所持的卡片已超过1万张，\n您可能会因为超过社员上限而无法登陆。\n您可能需要劝退一部分社员。"
+    }
+  },
+  "notice": {
+    "SEND_FRIEND_REQUEST": "{{affectorName}} 向您发送了好友请求",
+    "ACCEPTED_FRIEND_REQUEST": "{{affectorName}} 接受了您的好友请求"
+  },
+  "mailer": {
+    "welcome": {
+      "subject": "欢迎!",
+      "body": "您好, {{userName}}!\n\n您收到这条消息是因为您在Love Live! 学园偶像祭!的私服中输入了该邮箱。\n\n以后您会使用该邮箱接受账号相关动向。"
+    },
+    "passwordChange": {
+      "subject": "修改密码",
+      "body": "您好, {{userName}}!\n\n您的密码已被修改。\n\n如果该操作不是由您本人进行，请立即联系管理员。\n{{supportMail}}"
+    },
+    "passwordRecovery": {
+      "subject": "密码重置",
+      "verifyCode": "您好, {{userName}}!\n\n您申请了对您账号的密码重置。\n如果该操作不是您本人进行的，请无视并删除该邮件。\n您的密码会在您输入以下验证码后修改。\n\n如果您多次收到了重置密码的验证码，请输入最新的邮件中的验证码。\n\n要重置密码，请输入以下验证码: {{code}}\n该验证码有效期为10分钟({{sendTime}})\n\n您的IP： {{ip}}",
+      "newPassword": "密码修改成功!\n\n请使用该凭据登录:\n用户 ID: {{userId}}\n密码: {{password}}\n\n建议在登录后立即修改密码."
+    },
+    "mailChange": {
+      "subject": "邮箱修改",
+      "body": "您好, {{userName}}!\n\n您账号关联的邮箱已修改。\n\n如果该操作不是由您本人进行，请立即联系管理员。\n{{supportMail}}"
+    }
+  }
+}

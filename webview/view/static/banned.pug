@@ -13,7 +13,7 @@ block body
           p(style="color: red") !{i18n.banned.messageFromAdmin} !{message}
 
           if permanent == false
-            p(style="color: blue") !{i18n.banned.temporaryBanned} !{expirationDateHuman} (!{expirationDate})
+            p(style="color: blue") !{i18n.banned.temporaryBanned}
           if supportMail.length > 0
             hr
             center !{supportMail}

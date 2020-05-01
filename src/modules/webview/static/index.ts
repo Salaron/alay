@@ -74,10 +74,14 @@ export default class extends WebViewAction {
           user: this.user_id
         })
         if (!data) throw new ErrorAPI("you want to be banned?")
+        const expirationHumanTime = data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").locale(languageCode).humanize() : null
+        const expirationDate = moment(data.expiration_date).locale(languageCode).format("LLL")
+        // TODO: do this directly in i18n?
+        i18n.banned.temporaryBanned = Utils.prepareTemplate(i18n.banned.temporaryBanned, {
+          time: `${expirationHumanTime} (${expirationDate})`
+        })
         const locals = {
           permanent: data.expiration_date === null,
-          expirationDate: moment(data.expiration_date).locale(languageCode).format("LLL"),
-          expirationDateHuman: data.expiration_date ? moment.duration(moment().diff(data.expiration_date, "second"), "seconds").locale(languageCode).humanize() : null,
           message: data.message,
           supportMail: Config.mailer.supportMail,
           pageTitle: i18n.banned.title,

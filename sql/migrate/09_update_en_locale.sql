@@ -1,0 +1,1 @@
+UPDATE `users` SET `language` = "en-gb" WHERE `language` = "en";
