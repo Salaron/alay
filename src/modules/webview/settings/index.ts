@@ -35,10 +35,11 @@ export default class extends WebViewAction {
         states.push({
           name: i18n.modificators[name + "-" + i],
           value: i,
-          checked: params[name] && params[name] === i
+          checked: params[name] !== undefined && params[name] === i
         })
       }
       return {
+        name,
         title: i18n.modificators[name],
         tip: i18n.modificators[name + "Tip"],
         states
