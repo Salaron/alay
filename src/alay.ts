@@ -20,7 +20,6 @@ import http from "http"
 import requestHandler from "./handlers/request"
 import * as modules from "./common"
 import { AddressInfo } from "net"
-import { Gris } from "./core/gris"
 
 // Entry point
 (async () => {
@@ -43,19 +42,6 @@ import { Gris } from "./core/gris"
   server.listen(Config.server.port, Config.server.host, async () => {
     const address = server.address() as AddressInfo
     logger.info(`Listening on ${address.address}:${address.port}`)
-
-    if (Config.gris.enabled) {
-      // Connect to the official server
-      try {
-        const gris = new Gris()
-        await gris.prepare()
-        await gris.executeQueue()
-      } catch (err) {
-        logger.error(err.message, "Gris")
-      }
-    } else {
-      logger.warn("Gris module is disabled. 'download/*' actions may not work properly")
-    }
   })
   server.on("error", async (err) => {
     logger.fatal(err)

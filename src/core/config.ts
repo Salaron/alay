@@ -9,7 +9,6 @@ import Modules from "../config/modules"
 import I18n from "../config/i18n"
 import Maintenance from "../config/maintenance"
 import Mailer from "../config/mailer"
-import Gris from "../config/gris"
 
 export class config {
   public lbonus: typeof LBonus
@@ -20,7 +19,6 @@ export class config {
   public i18n: typeof I18n
   public maintenance: typeof Maintenance
   public mailer: typeof Mailer
-  public gris: typeof Gris
 
   public specialKey: string | Buffer = ""
   constructor() {
@@ -32,7 +30,6 @@ export class config {
     this.i18n = I18n
     this.maintenance = Maintenance
     this.mailer = Mailer
-    this.gris = Gris
   }
 
   public async prepareConfig(): Promise<void> {
@@ -79,7 +76,6 @@ export class config {
     this.i18n = <typeof I18n><unknown>(await import("../config/i18n")).default
     this.maintenance = <typeof Maintenance><unknown>(await import("../config/maintenance")).default
     this.mailer = <typeof Mailer><unknown>(await import("../config/mailer")).default
-    this.gris = <typeof Gris><unknown>(await import("../config/gris")).default
 
     await this.prepareConfig()
     await sqlite3.decryptReleaseInfo()

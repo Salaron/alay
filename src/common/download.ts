@@ -1,4 +1,3 @@
-import { Gris } from "../core/gris"
 import { Logger } from "../core/logger"
 import { Utils } from "./utils"
 
@@ -25,33 +24,6 @@ export enum PACKAGE_TYPE {
 
 let additionalUrls: urlObject[] = []
 let batchUrls: urlObject[] = []
-
-export async function init() {
-  Gris.executeOnReady(async (gris: Gris) => {
-    async function execute() {
-      const ad = await gris.APIRequest("download/additional", {
-        package_id: 0,
-        target_os: "Android",
-        package_type: 0,
-        region: "392"
-      })
-      const bth = await gris.APIRequest("download/batch", {
-        client_version: gris.session.clientVersion,
-        os: "Android",
-        package_type: 0,
-        excluded_package_ids: []
-      })
-      additionalUrls = ad.response_data
-      batchUrls = bth.response_data
-    }
-    await execute()
-    setInterval(() => {
-      execute().catch(err => {
-        logger.error(err)
-      })
-    }, 43200000) // every 12 hours
-  })
-}
 
 export class Download {
   public static TYPE = PACKAGE_TYPE
