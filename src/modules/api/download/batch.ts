@@ -2,6 +2,7 @@ import RequestData from "../../../core/requestData"
 import { REQUEST_TYPE, PERMISSION, AUTH_LEVEL } from "../../../models/constant"
 import { Download } from "../../../common/download"
 import { TYPE } from "../../../common/type"
+import { ErrorAPI } from "../../../models/error"
 
 export default class extends ApiAction {
   public requestType: REQUEST_TYPE = REQUEST_TYPE.SINGLE
@@ -25,18 +26,16 @@ export default class extends ApiAction {
 
   public async execute() {
     this.params.excluded_package_ids.map((id: number) => {
-      if (isNaN(Number(id))) throw new Error(`Invalid type provided`)
+      if (isNaN(Number(id))) throw new ErrorAPI("Invalid type provided")
     })
-    if (this.params.os !== "Android" && this.params.os !== "iOS") throw new Error(`Invalid os`)
-
-    if (this.requestData.params.package_type === Download.TYPE.BOOTSTRAP) return {
-      status: 200,
-      result: Download.getBatch()
-    }
-
+    if (this.params.os !== "Android" && this.params.os !== "iOS") throw new ErrorAPI("Invalid os")
     return {
       status: 200,
-      result: await Download.getPackagesByType(this.params.os, this.requestData.params.package_type, this.params.excluded_package_ids)
+      result: await Download.getPackagesByType(
+        this.params.os,
+        this.params.package_type,
+        this.params.excluded_package_ids
+      )
     }
   }
 }
