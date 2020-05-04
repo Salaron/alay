@@ -1,6 +1,6 @@
 import { existsSync } from "fs"
 import * as sqliteDB from "sqlite3"
-import { formatQuery } from "./query"
+import { formatQuery } from "./mysql"
 import { Utils } from "../../common/utils"
 import { Logger } from "../logger"
 

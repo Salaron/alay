@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise"
+import { escape } from "mysql2"
 import { promisify } from "util"
 import { Logger } from "../logger"
 
@@ -128,4 +129,22 @@ export async function Connect() {
   } finally {
     if (connection) connection.release()
   }
+}
+
+export function formatQuery(query: string, values: any = {}) {
+  if (!values) return query
+  if (Array.isArray(values)) {
+    return query.replace(/\?/g, (txt: any, key: any) => {
+      if (values.length > 0) {
+        return escape(values.shift())
+      }
+      return txt
+    })
+  }
+  return query.replace(/\:(\w+)/g, (txt: any, key: any) => {
+    if (values.hasOwnProperty(key)) {
+      return escape(values[key])
+    }
+    return txt
+  })
 }

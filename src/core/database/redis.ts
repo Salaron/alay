@@ -11,7 +11,5 @@ export async function Connect() {
     logger.error(err)
   })
   await Redis.set("checkConnection", "ok", "ex", 10)
-  const result = await Redis.get("checkConnection")
-  if (result !== "ok") throw new Error("Unable to connect to the Redis database")
   await Redis.del("checkConnection")
 }
