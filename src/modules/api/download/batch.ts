@@ -29,6 +29,11 @@ export default class extends ApiAction {
       if (isNaN(Number(id))) throw new ErrorAPI("Invalid type provided")
     })
     if (this.params.os !== "Android" && this.params.os !== "iOS") throw new ErrorAPI("Invalid os")
+    // to fix Klab's bug/mistake
+    if (this.params.package_type === 0) return {
+      status: 200,
+      result: []
+    }
     return {
       status: 200,
       result: await Download.getPackagesByType(
