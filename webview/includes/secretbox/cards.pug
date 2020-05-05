@@ -1,0 +1,23 @@
+h3(class="uk-text-bold") ■ Scouting Rates by Rarity
+ul
+  each rarity in rarityList
+    li  !{rarity.name}: !{rarity.rate}%
+
+-
+  var totalCards = 0
+  for (const rarity of rarityList) totalCards += rarity.limitedRateUnits.length + rarity.units.length 
+h3(class="uk-text-bold") ■ Cards available in total: !{totalCards}
+
+each rarity in rarityList
+  ul(id="sb-rarity-" + rarity.name uk-accordion)
+    li
+      h4(a class="uk-accordion-title uk-text-bold" href="#") &lt;!{rarity.name}&gt; (!{rarity.units.length + rarity.limitedRateUnits.length} cards)
+      div(class="uk-accordion-content")
+        if rarity.limitedRateUnits.length > 0
+          h4(style="color: red;") [!{rarity.name} cards with increased appearance rate]
+          - var units = rarity.limitedRateUnits
+          include ./table.pug
+        
+        h4(style="color: blue;") [!{rarity.name} cards]
+        - var units = rarity.units
+        include ./table.pug

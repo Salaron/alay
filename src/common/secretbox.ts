@@ -178,7 +178,7 @@ export class Secretbox extends CommonModule {
       item.amount = Math.floor(totalGaugePoint / 100) * item.amount
       await this.action.item.addItemToUser(this.userId, {
         type: item.add_type,
-      id: item.item_id
+        id: item.item_id
       }, item.amount)
       return item
     }))
@@ -265,22 +265,59 @@ export class Secretbox extends CommonModule {
         rarity: unitGroup.unit_group_id
       })
 
-      let unitLineUp: number[] = []
+      // exclude unit ids with limited rate from general pool now
+      // it will be added later
+      let limitedRateUnitIds: number[] = []
+      let unitLineUp: number[] = [] // used to show cards in game
+      const limitedRateList = await secretboxSVDB.all("SELECT * FROM secret_box_unit_limited_rate_m WHERE secret_box_id = :secretboxId AND unit_group_id = :rarity", {
+        secretboxId,
+        rarity: unitGroup.unit_group_id
+      })
+      for (const limitedRate of limitedRateList) {
+        const unitIds = (await unitDB.all(`SELECT unit_id FROM unit_m WHERE ${limitedRate.query} ORDER BY unit_id DESC`)).map(unit => unit.unit_id)
+        limitedRateUnitIds.push(...unitIds)
+        unitLineUp = Utils.mergeArrayDedupe([unitLineUp, limitedRateUnitIds])
+      }
+
+      // general pool is here
       let unitIds: number[] = []
       for (const unitFamily of unitFamilyList) {
         unitFamily.query = Utils.prepareTemplate(unitFamily.query, {
           eventCards: this.action.unit.getEventUnitList().join(",")
         })
-        const familyUnitIds = (await unitDB.all(`SELECT unit_id FROM unit_m WHERE ${unitFamily.query} ORDER BY unit_id DESC`)).map(unit => unit.unit_id)
+        if (limitedRateUnitIds.length === 0) limitedRateUnitIds.push(-1)  // -1 because array must not be empty
+        const familyUnitIds = (await unitDB.all(`SELECT unit_id FROM unit_m WHERE (${unitFamily.query}) AND unit_id NOT IN (${limitedRateUnitIds.join(",")}) ORDER BY unit_id DESC`)).map(unit => unit.unit_id)
         unitIds.push(...new Array(unitFamily.weight).fill(familyUnitIds).flat())
-        unitLineUp.push(...familyUnitIds)
+        unitLineUp = Utils.mergeArrayDedupe([unitLineUp, familyUnitIds])
       }
-      // TODO: limited rate support
+
+      // this is used to show data in webview details
+      let limitedRateUnits = []
+      for (const limitedRate of limitedRateList) {
+        const limitedUnitIds = (await unitDB.all(`SELECT unit_id FROM unit_m WHERE ${limitedRate.query} ORDER BY unit_id DESC`)).map(unit => unit.unit_id)
+        // js allows to divide some number to zero
+        // prevent it here
+        if (limitedUnitIds.length === 0) throw new Error("limitedUnitIds is empty!!!")
+        if (!Type.isFloat(limitedRate.rate)) throw new Error("Rate should be float!")
+
+        // i can't describe why we multiply it by 2 but it's needed
+        const weight = Math.round(unitIds.length * ((limitedRate.rate * 2) / limitedUnitIds.length))
+        for (const unitId of limitedUnitIds) {
+          limitedRateUnits.push({
+            unitId,
+            rate: (limitedRate.rate / limitedUnitIds.length * 100).toFixed(3),
+            weight
+          })
+        }
+        unitIds.push(...new Array(weight).fill(limitedUnitIds).flat())
+      }
+
       return {
         id: unitGroup.unit_group_id,
         weight: unitGroup.weight,
         unitIds,
-        unitLineUp
+        unitLineUp,
+        limitedRateUnits
       }
     }))
     let redisKey = `Secretbox:UnitInfo:${secretboxId}`
@@ -337,25 +374,25 @@ export class Secretbox extends CommonModule {
       case secretboxType.STEP_UP: {
         // seems like klab removed step boxes...
         // for now it will be incomplete until it shows on official
-/*         const [userPonCount, stepBase] = await Promise.all([
-          this.getUserPonCount(id),
-          secretboxSVDB.get("SELECT * FROM secret_box_step_up_base_m WHERE secret_box_id = :id", { id })
-        ])
-        if (!stepBase) throw new Error(`Step base data for secretbox #${id} is missing`)
+        /*         const [userPonCount, stepBase] = await Promise.all([
+                  this.getUserPonCount(id),
+                  secretboxSVDB.get("SELECT * FROM secret_box_step_up_base_m WHERE secret_box_id = :id", { id })
+                ])
+                if (!stepBase) throw new Error(`Step base data for secretbox #${id} is missing`)
 
-        const currentStep = userPonCount + 1 % stepBase.number_of_steps
-        const stepItemBonus = await secretboxSVDB.all("SELECT add_type, item_id, amount FROM secret_box_step_up_bonus_item_m WHERE secret_box_id = :id AND step = :currentStep", {
-          id,
-          currentStep
-        })
-        return <IStepAdditionalInfo>{
-          secret_box_type: secretboxType.STEP_UP,
-          step: 1,
-          show_step: 1,
-          end_step: stepBase.default_end_step,
-          term_count: 0,
-          step_up_bonus_bonus_item_list: stepItemBonus
-        } */
+                const currentStep = userPonCount + 1 % stepBase.number_of_steps
+                const stepItemBonus = await secretboxSVDB.all("SELECT add_type, item_id, amount FROM secret_box_step_up_bonus_item_m WHERE secret_box_id = :id AND step = :currentStep", {
+                  id,
+                  currentStep
+                })
+                return <IStepAdditionalInfo>{
+                  secret_box_type: secretboxType.STEP_UP,
+                  step: 1,
+                  show_step: 1,
+                  end_step: stepBase.default_end_step,
+                  term_count: 0,
+                  step_up_bonus_bonus_item_list: stepItemBonus
+                } */
       }
       default: return undefined
     }
@@ -387,7 +424,7 @@ export class Secretbox extends CommonModule {
 
   private async getButtons(id: number, type: number): Promise<ISecretboxButton[]> {
     await this.updateUserItems() // TODO: move it to some other place
-    const [buttonList, secretboxM]: [any[], ISecretboxM]= await Promise.all([
+    const [buttonList, secretboxM]: [any[], ISecretboxM] = await Promise.all([
       secretboxSVDB.all("SELECT * FROM secret_box_button_m WHERE secret_box_id = :id", { id }),
       secretboxSVDB.get("SELECT always_display_flag from secret_box_m WHERE secret_box_id = :id", { id })
     ])
@@ -488,7 +525,7 @@ export class Secretbox extends CommonModule {
   }
 
   private isCostPayable(itemType: number, itemId: number | null, amount: number): boolean {
-    if (!this.userItems) throw new Error("You need to update user items first")
+    if (!this.userItems) return false
     switch (itemType) {
       case costType.NON_COST: {
         return true

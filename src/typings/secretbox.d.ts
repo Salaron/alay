@@ -83,5 +83,10 @@ export interface ISecretboxUnitInfo {
     weight: number
     unitIds: number[]
     unitLineUp: number[]
+    limitedRateUnits: Array<{
+      unitId: number
+      rate: string // float with 3 fixed digits
+      weight: number
+    }>
   }>
 }

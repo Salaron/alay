@@ -1,0 +1,14 @@
+table(class="uk-table uk-table-striped")
+  thead
+    tr
+      th NO.
+      th Name & Skill
+      th Attribute
+      th Rate
+  tbody
+    each unit in units
+      tr
+        td(class="uk-text-bold") !{unit.unitNumber}
+        td !{unit.name}  [!{unit.skillName}]
+        td !{unit.attribute}
+        td !{unit.rate}%

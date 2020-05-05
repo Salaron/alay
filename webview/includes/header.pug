@@ -1,7 +1,7 @@
 nav(class="uk-navbar-container sl-navbar-container uk-position-z-index" uk-navbar)
   .uk-navbar-left
-    if backButtonLink || backButtonOnClick
-      a(id="backButton" href=backButtonLink onlick=backButtonOnClick class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5" hidden)
+    if backButtonLink
+      a(id="backButton" href=backButtonLink class="uk-icon uk-icon-button sl-icon" uk-icon="icon: arrow-left; ratio: 1.5" hidden)
     else if languageButton
       ul(class="uk-navbar-nav")
         li
@@ -13,10 +13,13 @@ nav(class="uk-navbar-container sl-navbar-container uk-position-z-index" uk-navba
   .uk-navbar-center
     ul(class="uk-navbar-nav")
       li(class="uk-active")
-        a(class="uk-text-bold uk-text-uppercase no-hover") #{pageTitle}
+        - var upperCaseClass = "uk-text-uppercase"
+        if headerLowerCase
+          - upperCaseClass = ""
+        a(class="uk-text-bold no-hover " + upperCaseClass) #{pageTitle}
 
   .uk-navbar-right
-    if (backButtonLink || backButtonOnClick) && languageButton
+    if backButtonLink && languageButton
       ul(class="uk-navbar-nav")
         li
           a(id="changeLanguageButton")

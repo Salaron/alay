@@ -1,0 +1,42 @@
+extends ../../includes/head.pug
+
+block body
+  style.
+    .uk-table td {
+      padding: 5px 10px;
+      vertical-align: middle;
+    }
+    li {
+      font-size: 16px;
+    }
+  #outer
+    #inner
+      if !noTitle
+        #header
+          - var languageButton = true
+          - var headerLowerCase = true
+          include ../../includes/header.pug
+      
+      #body
+        div(class="uk-container uk-container-large uk-margin")
+          if noTitle
+            //- add language button if header is hidden
+            button(id="changeLanguageButton" type="button" class="uk-button uk-button-primary uk-float-left") Change Language
+          h3(class="uk-text-bold") ■ Note
+          ul
+            li Loading this page can take some time. Please wait a bit.
+            li Rates are rounded to three decimal places, so there may by cases when the total does not add up to exactly 100%
+            li A player may Scout the same Member more than once.
+            li When scouting, the rarity is decided first based on the "Scouting rates by rarity", then a club member
+             | within that rarity is selected according to the rates as shown in the list of available members.
+          
+          if buttonType.length > 0
+            each button in buttonType
+              h3(id="sb-button-" + button.id class="uk-text-bold uk-text-center") !{button.name}
+              - var rarityList = button.rarityList
+              include ../../includes/secretbox/cards.pug
+
+          else if rarityList.length > 0
+            include ../../includes/secretbox/cards.pug
+
+  include ../../includes/changeLanguage.pug
