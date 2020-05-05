@@ -38,7 +38,7 @@ export class Download {
   }
 
   public static async getPackagesByType(os: os, type: number, excludedIds: number[] = []) {
-    if (excludedIds.length === 0) excludedIds.push(0)
+    if (excludedIds.length === 0) excludedIds.push(-1)
     return await downloadDB.all(`SELECT size, url FROM packages WHERE type = :type AND id NOT IN (${excludedIds.join(",")}) AND os = :os`, {
       os,
       type
@@ -46,7 +46,7 @@ export class Download {
   }
 
   public static async getPackageById(os: os, type: number, id: number, excludedIds: number[] = []) {
-    if (excludedIds.length === 0) excludedIds.push(0)
+    if (excludedIds.length === 0) excludedIds.push(-1)
     return await downloadDB.all(`SELECT size, url FROM packages WHERE type = :type AND id NOT IN (${excludedIds.join(",")}) AND os = :os AND id = :id`, {
       os,
       type,
