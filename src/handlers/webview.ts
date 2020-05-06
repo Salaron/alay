@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http"
+import { Utils } from "../common/utils"
 import RequestData from "../core/requestData"
 import { AUTH_LEVEL, HANDLER_TYPE } from "../models/constant"
 import { IAPIResult } from "../models/handlers"
@@ -17,6 +18,7 @@ export default async function webviewHandler(request: IncomingMessage, response:
         direct: true
       })
     }
+
     if (
       requestData.auth_level === AUTH_LEVEL.BANNED &&
       !request.url!.includes("webview.php/static/index?id=") &&
@@ -34,6 +36,18 @@ export default async function webviewHandler(request: IncomingMessage, response:
     const moduleName = urlSplit[2].replace(/[^a-z]/g, "")
     const actionName = urlSplit[3].replace(/[^a-z]/g, "")
 
+    if (
+      Utils.isUnderMaintenance() &&
+      ![
+        "static/index",
+        "admin/index"
+      ].includes(`${moduleName}/${actionName}`) && 
+      !Utils.canBypassMaintenance(requestData.user_id)
+    ) {
+      response.statusCode = 302
+      response.setHeader("Location", "../../webview.php/static/index?id=10") // custom maintenance page
+      return response.end()
+    }
     const action: IAPIResult = await executeAction(moduleName, actionName, requestData)
 
     response.setHeader("Content-Type", "text/html; charset=utf-8")

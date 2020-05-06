@@ -86,16 +86,6 @@ export default async function requestHandler(request: IncomingMessage, response:
             request.method === "GET"
           )
         ) throw new RequestError("Bad request", 400)
-
-        if (
-          Utils.isUnderMaintenance() &&
-          !Utils.canBypassMaintenance(parseInt(<string>request.headers["user-id"])) &&
-          !request.url!.includes("webview.php/static/index")
-        ) {
-          response.statusCode = 302
-          response.setHeader("Location", "../../webview.php/static/index?id=10") // custom maintenance page
-          return response.end()
-        }
         return await webviewHandler(request, response)
       }
       case "webapi": {
