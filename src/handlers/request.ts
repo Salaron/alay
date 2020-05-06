@@ -67,7 +67,13 @@ export default async function requestHandler(request: IncomingMessage, response:
         }
 
         // Bundle version is out of date
-        if (Utils.versionCompare(<string>request.headers["bundle-version"], Config.client.application_version) === -1) {
+        if (
+          Utils.versionCompare(<string>request.headers["bundle-version"], Config.client.application_version) === -1 &&
+          ![
+            "login/authkey",
+            "login/login"
+          ].includes(`${urlSplit[2]}/${urlSplit[3]}`)
+        ) {
           return writeJsonResponse(response, { clientUpdateFlag: true })
         }
 
