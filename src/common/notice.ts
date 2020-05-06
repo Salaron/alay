@@ -2,9 +2,10 @@ import { BaseAction } from "../models/actions"
 import { Utils } from "./utils"
 import { CommonModule } from "../models/common"
 
+// DON'T CHANGE TYPE ID
 enum noticeType {
-  SEND_FRIEND_REQUEST,
-  ACCEPTED_FRIEND_REQUEST
+  SEND_FRIEND_REQUEST = 2,
+  ACCEPTED_FRIEND_REQUEST = 4
 }
 enum filter {
   ALL = 0,

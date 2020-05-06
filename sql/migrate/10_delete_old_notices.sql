@@ -1,0 +1,1 @@
+DELETE FROM `user_notice` WHERE `type_id` IN (1, 3);
