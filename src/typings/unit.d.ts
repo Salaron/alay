@@ -41,6 +41,7 @@ interface detailUnitData {
   is_skill_level_max: boolean
   is_removable_skill_capacity_max: boolean
   is_support_member: boolean
+  is_signed: boolean
   removable_skill_ids: number[]
   insert_date: string
   total_smile: number

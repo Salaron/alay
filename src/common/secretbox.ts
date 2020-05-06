@@ -161,7 +161,6 @@ export class Secretbox extends CommonModule {
     const unitResult = await Promise.all(gainedUnit.map(async unit => {
       const unitData: any = await this.action.unit.addUnit(this.userId, unit.unitId)
       unitData.is_hit = unitData.unit_rarity_id === 4
-      unitData.is_signed = false
       return unitData
     }))
 

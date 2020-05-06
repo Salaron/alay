@@ -306,6 +306,7 @@ export class Unit extends CommonModule {
       is_support_member: supportUnitList.includes(data.unit_id),
       removable_skill_ids: data.removable_skill_ids,
       insert_date: Utils.parseDate(data.insert_date),
+      is_signed: this.isSignUnit(data.unit_id), // TODO: make sign optional
       total_smile: data.stat_smile, // TODO?
       total_cute: data.stat_pure,
       total_cool: data.stat_cool,

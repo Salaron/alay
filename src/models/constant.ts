@@ -52,7 +52,7 @@ export enum LiveMods {
 }
 
 // warning: name order affects to the settings page
-export const modificatorNames = ["random", "vanish", "mirror", "hp", "event", "cardSign"]
+export const modificatorNames = ["random", "vanish", "mirror", "hp", "event"] // "card_sign"
 export const modificatorMaxValue: { [name: string]: number } = {
   event: 1,
   hp: 2,
