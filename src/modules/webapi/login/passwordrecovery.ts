@@ -35,13 +35,6 @@ export default class extends WebApiAction {
 
     const code = Utils.randomString(10, "upper")
     await Redis.set(`recoveryConfirmationCode:${this.requestData.auth_token}`, `${code}:${userData.mail}`, "ex", expireTime)
-    await this.connection.execute(`
-    INSERT INTO auth_recovery_codes (token, code, mail, expire) VALUES (:token, :code, :mail, DATE_ADD(NOW(), INTERVAL 10 MINUTE))
-    ON DUPLICATE KEY UPDATE code = :code, expire = DATE_ADD(NOW(), INTERVAL 10 MINUTE)`, {
-      token: this.requestData.auth_token,
-      code,
-      mail: userData.mail
-    })
 
     const result = await Utils.sendMail(userData.mail, i18n.passwordRecovery.subject, Utils.prepareTemplate(i18n.passwordRecovery.verifyCode, {
       userName: userData.name,
