@@ -177,6 +177,7 @@ export default class RequestData {
       xmc = Utils.hmacSHA1(this.raw_request_data, customKey)
     } else if (this.auth_level === AUTH_LEVEL.PRE_LOGIN) {
       const authToken = new AuthToken(this.auth_token)
+      await authToken.get()
       if (!authToken.sessionKey) return false
       xmc = Utils.hmacSHA1(this.raw_request_data, authToken.sessionKey)
     } else if (this.auth_level >= AUTH_LEVEL.UPDATE) {
