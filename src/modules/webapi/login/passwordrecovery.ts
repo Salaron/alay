@@ -45,7 +45,7 @@ export default class extends WebApiAction {
     if (!result) throw new ErrorWebAPI(i18n.mailSendingError)
     return {
       status: 200,
-      result: true
+      result: []
     }
   }
 }

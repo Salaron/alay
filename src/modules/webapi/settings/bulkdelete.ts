@@ -22,16 +22,16 @@ export default class extends WebApiAction {
   }
 
   public async execute() {
-    const strings = await this.i18n.getStrings("login-startup", "settings-index")
+    const i18n = await this.i18n.getStrings("login-startup", "settings-index")
 
     const password = Utils.xor(Buffer.from(Utils.RSADecrypt(this.params.password), "base64").toString(), this.requestData.auth_token).toString()
-    if (!Utils.checkPasswordFormat(password)) throw new ErrorWebAPI(strings.passwordIncorrect)
+    if (!Utils.checkPasswordFormat(password)) throw new ErrorWebAPI(i18n.passwordIncorrect)
 
     const userData = await this.connection.first("SELECT user_id FROM users WHERE user_id = :user AND password = :pass", {
       user: this.user_id,
       pass: password
     })
-    if (!userData) throw new ErrorWebAPI(strings.passwordNotValid)
+    if (!userData) throw new ErrorWebAPI(i18n.passwordNotValid)
 
     let deckData = (await this.connection.query(`
     SELECT
@@ -69,9 +69,11 @@ export default class extends WebApiAction {
 
     return {
       status: 200,
-      result: Utils.prepareTemplate(strings.sealPointsGained, {
-        points: res.affectedRows
-      })
+      result: {
+        message: Utils.prepareTemplate(i18n.bulkCardDeletion.sealPointsGained, {
+          points: res.affectedRows
+        })
+      }
     }
   }
 }
