@@ -247,6 +247,9 @@ export default class extends ApiAction {
       this.unit.getUnitDetail(baseUnitData.unit_owning_user_id),
       this.user.getRemovableSkillInfo(this.user_id, true)
     ])
+    // fix game crash
+    // @ts-ignore
+    beforeUnitInfo.removable_skill_ids = afterUnitInfo.removable_skill_ids = undefined
     return {
       status: 200,
       result: {
@@ -257,7 +260,8 @@ export default class extends ApiAction {
         use_game_coin: coinCost,
         evolution_bonus_type: expMultiplier == 2 ? 3 : (expMultiplier == 1.5 ? 2 : 1),
         bonus_value: expMultiplier,
-        open_subscenario_id: null,
+        unlocked_multi_unit_scenario_ids: [],
+        unlocked_subscenario_ids: [],
         get_exchange_point_list: pointList,
         unit_removable_skill: removableSkillInfo
       }
