@@ -42,9 +42,14 @@ export class User extends CommonModule {
     return data
   }
   public async getSupportUnits(userId: number) {
-    return await this.connection.query("SELECT unit_id, amount FROM user_support_unit WHERE user_id=:user AND amount > 0", {
+    const units = await this.connection.query("SELECT unit_id, amount FROM user_support_unit WHERE user_id=:user AND amount > 0", {
       user: userId
     })
+    for (const unit of units) {
+      // fix crash
+      if (unit.amount > 999) unit.amount = 999
+    }
+    return units
   }
   public async getRemovableSkillInfo(userId: number, onlyInfo = false) {
     const skills = await this.connection.query("SELECT unit_removable_skill_id, total_amount, equipped_amount, insert_date FROM user_unit_removable_skill_owning WHERE user_id = :user", { user: userId })
