@@ -16,7 +16,7 @@ block body
           if loggedIn
             h5(class="uk-margin-remove") !{i18n.update.youCanDownloadANewVersionBellow}
             each source in downloadSources
-              a(href=source.url class="external-link") !{i18n.update.downloadFrom} !{source.name}
+              a(href=source.url class="external-link") !{i18n.update.downloadFrom} !{source.name} <br>
           else
             h5(class="uk-margin-remove") !{replaceHref(i18n.update.loginIntoYourAccountToDownload, "login", "'../login/login?type=0'")}
               

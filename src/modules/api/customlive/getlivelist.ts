@@ -30,7 +30,9 @@ export default class extends ApiAction {
       return {
         custom_live_id: live.custom_live_id,
         name: live.name,
-        additional: live.additional,
+        artist: live.artist,
+        mapper: live.mapper,
+        source: live.source,
         version: live.version,
         assets: {
           background: live.background,
