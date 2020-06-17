@@ -20,6 +20,7 @@ export default class extends ApiAction {
     const response: any = {
       event_list: [],
       live_list: [],
+      limited_bonus_common_list: [],
       limited_bonus_list: [],
       random_live_list: [
         {

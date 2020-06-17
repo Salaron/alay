@@ -67,7 +67,8 @@ export default class extends ApiAction {
         day_of_the_week: day.day_of_week,
         special_day: !!day.special_flag,
         special_image_asset: !!day.special_flag == true ? "assets/image/ui/login_bonus/loge_icon_01.png" : null,
-        received: receivedList.indexOf(parseInt(day.day_of_month, 10)) != -1,
+        received: receivedList.indexOf(parseInt(day.day_of_month, 10)) !== -1,
+        ad_received: false,
         item: {
           unit_id: day.item_type === 1001 ? day.item_id : undefined,
           item_id: day.item_type === 1000 ? day.item_id : undefined,
@@ -85,6 +86,7 @@ export default class extends ApiAction {
         special_day: !!day.special_flag,
         special_image_asset: !!day.special_flag == true ? "assets/image/ui/login_bonus/loge_icon_01.png" : null,
         received: false,
+        ad_received: false,
         item: {
           unit_id: day.item_type === 1001 ? day.item_id : undefined,
           item_id: day.item_type === 1000 ? day.item_id : undefined,

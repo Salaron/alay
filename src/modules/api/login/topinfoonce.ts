@@ -14,7 +14,6 @@ export default class extends ApiAction {
     const response = {
       new_achievement_cnt: 0,
       unaccomplished_achievement_cnt: 0,
-      handover_expire_status: 0,
       live_daily_reward_exist: false,
       training_energy: 5,
       training_energy_max: 5,

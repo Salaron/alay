@@ -61,6 +61,14 @@ export default class RequestData {
     this.response = response
     this.handlerType = hType
 
+    if (this.headers.authorize && Type.isString(this.headers.authorize)) {
+      this.auth_header = <any>querystring.parse(this.headers.authorize)
+      if (this.auth_header.token && (<string>this.auth_header.token).match(/^[a-z0-9]{70,90}$/gi)) {
+        this.auth_token = this.auth_header.token
+      }
+    }
+    if (this.headers["user-id"] && Type.isString(this.headers["user-id"])) this.user_id = parseInt(this.headers["user-id"]) || 0
+
     if (hType === HANDLER_TYPE.WEBVIEW) {
       this.params = querystring.parse(this.request.url!.split(/[?]+/)[1])
 
@@ -92,16 +100,7 @@ export default class RequestData {
         !this.headers["os"] ||
         !this.headers["os-version"]
       ) this.requestFromBrowser = true
-    } else {
-      if (this.headers.authorize && Type.isString(this.headers.authorize)) {
-        this.auth_header = <any>querystring.parse(this.headers.authorize)
-        if (this.auth_header.token && (<string>this.auth_header.token).match(/^[a-z0-9]{70,90}$/gi)) {
-          this.auth_token = this.auth_header.token
-        }
-      }
     }
-
-    if (this.headers["user-id"] && Type.isString(this.headers["user-id"])) this.user_id = parseInt(this.headers["user-id"]) || 0
 
     if (formData && formData.request_data && hType === HANDLER_TYPE.API) {
       try {
@@ -145,7 +144,6 @@ export default class RequestData {
         user: this.user_id,
         token: this.auth_token
       })
-      console.log(check)
       if (!check) return this.auth_level = AUTH_LEVEL.REJECTED // token is no longer valid
       const banCheck = await this.connection.first("SELECT * FROM user_banned WHERE user_id = :user", {
         user: this.user_id

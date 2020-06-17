@@ -67,7 +67,7 @@ export default class extends ApiAction {
       friend_variety_cnt: notification.count || 0,
       friend_new_cnt: friendRequest.count + friendApproval.count,
       friends_request_cnt: friendRequest.count,
-      firends_approval_wait_cnt: friendApproval.count,
+      friends_approval_wait_cnt: friendApproval.count,
       present_cnt: present.count,
       server_datetime: currentDatetime,
       server_timestamp: Utils.timeStamp(),
@@ -82,6 +82,7 @@ export default class extends ApiAction {
       klab_id_task_can_sync: false,
       is_klab_id_task_flag: false,
       has_unread_announce: false,
+      has_ad_reward: true,
       secret_box_id_list: [
         [], // μ's
         []  // Aqours
