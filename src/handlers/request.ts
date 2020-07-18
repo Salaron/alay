@@ -10,7 +10,7 @@ import webapiHandler from "./webapi"
 import webviewHandler from "./webview"
 import publicHandler from "./public"
 import { AssertionError } from "assert"
-import { RequestError } from "../models/error"
+import { RequestError, ErrorAPI } from "../models/error"
 
 const log = new Logger("Request Handler")
 
@@ -145,6 +145,14 @@ export default async function requestHandler(request: IncomingMessage, response:
         },
         direct: true,
         httpStatusCode: err.statusCode
+      })
+      return
+    }
+
+    if (err instanceof ErrorAPI) {
+      await writeJsonResponse(response, {
+        responseData: err.response,
+        httpStatusCode: 600
       })
       return
     }

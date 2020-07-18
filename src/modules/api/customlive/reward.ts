@@ -61,7 +61,7 @@ export default class extends ApiAction {
     const maxKizuna = this.live.calculateMaxKizuna(liveData.s_rank_combo)
     if (this.params.love_cnt > maxKizuna)
       throw new Error(`Too much kizuna (max: ${maxKizuna}, provided: ${this.params.love_cnt})`)
-    await this.live.applyKizunaBonusToDeck(this.user_id, deck.deck, this.params.love_cnt)
+    await this.live.applyKizunaBonusToDeck(this.user_id, deck.deck!, this.params.love_cnt)
 
     const units = deck.deck
     const hiScore = Math.max(totalScore, liveStatus.hi_score)

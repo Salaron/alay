@@ -65,7 +65,6 @@ export class config {
     delete require.cache[require.resolve("../config/i18n")]
     delete require.cache[require.resolve("../config/maintenance")]
     delete require.cache[require.resolve("../config/mailer")]
-    delete require.cache[require.resolve("../config/gris")]
 
     // and import again
     this.server = <typeof Server><unknown>(await import("../config/server")).default
