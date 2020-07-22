@@ -82,7 +82,7 @@ export default class extends ApiAction {
       klab_id_task_can_sync: false,
       is_klab_id_task_flag: false,
       has_unread_announce: false,
-      has_ad_reward: true,
+      has_ad_reward: false,
       secret_box_id_list: [
         [], // μ's
         []  // Aqours

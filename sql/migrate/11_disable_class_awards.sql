@@ -1,0 +1,1 @@
+UPDATE `users` SET `setting_award_id` = 1 WHERE `setting_award_id` >= 10000 AND `setting_award_id` <= 19999;

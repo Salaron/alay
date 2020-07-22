@@ -7,7 +7,8 @@ const itemDB = sqlite3.getItemDB()
 const awardList = [1, 23]
 
 export async function init(): Promise<void> {
-  const awards = await itemDB.all(`SELECT award_id as id FROM award_m WHERE award_id NOT IN (${awardList.join(",")})`)
+  // exclude class system awards
+  const awards = await itemDB.all(`SELECT award_id as id FROM award_m WHERE award_id NOT IN (${awardList.join(",")}) AND (award_id < 10000 OR award_id > 19999)`)
   for (const award of awards) awardList.push(award.id)
 }
 
