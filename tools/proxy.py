@@ -27,8 +27,10 @@ def getDifficultyStringById(diffId):
 def getGroupName(memberCategory):
   if memberCategory == 1: 
     return "µ's"
-  else: 
+  if memberCategory == 2: 
     return "Aqours"
+  if memberCategory == 3:
+    return "Nijigasaki"
 
 class ProxyHandler(BaseHTTPRequestHandler):
   def log_message(self, format, *args):
@@ -38,9 +40,9 @@ class ProxyHandler(BaseHTTPRequestHandler):
   def parse_headers(self):
     heqHeaders = {}
     for line in self.headers._headers:
-      if line[0] == "Host":
-        line = ("Host", HOST) # rewrite host header
       if len(line) == 2:
+        if line[0] == "Host":
+          line = ("Host", HOST) # rewrite host header
         heqHeaders[line[0]] = line[1]
     return heqHeaders
 
@@ -66,18 +68,21 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
       serverResponse = json.loads(zlib.decompress(resp.raw.data, zlib.MAX_WBITS + 32))
       if self.path.find("/main.php/live/play") == 0:
-        self._handleLiveResponse()
+        self._handleLiveResponse(serverResponse)
+      if self.path.find("/main.php/api") == 0:
+        self._handleAPIResponse(serverResponse)
     except:
       self.send_error(500)
       print(traceback.format_exc())
 
-  def _handleBulkResponse(self, serverResponse):
+  def _handleAPIResponse(self, serverResponse):
     # TODO: parse API response that contains available lives
     pass
 
   def _handleLiveResponse(self, serverResponse):
     if serverResponse["status_code"] != 200:
       raise "Status code is not 200"
+    liveInfo = serverResponse["response_data"]["live_list"][0]["live_info"]
     notesCur = liveNotesDB.cursor()
     liveCur = liveDB.cursor()
 
@@ -98,15 +103,15 @@ class ProxyHandler(BaseHTTPRequestHandler):
             c_rank_complete, b_rank_complete, a_rank_complete, s_rank_complete
           FROM normal_live_m
         ) as difficulty ON setting.live_setting_id = difficulty.live_setting_id
-    WHERE live_difficulty_id = {serverResponse["response_data"]["live_list"][0]["live_info"]["live_difficulty_id"]}""")
+    WHERE live_difficulty_id = {liveInfo["live_difficulty_id"]}""")
     data = liveCur.fetchone()
     if data != None:
       notesCur.execute(f"""DELETE FROM live_notes WHERE notes_setting_asset = '{data["notes_setting_asset"]}'""")
       notesCur.execute("INSERT INTO live_notes (notes_setting_asset, json) VALUES (?, ?)", (
         data["notes_setting_asset"],
-        json.dumps(serverResponse["response_data"]["live_list"][0]["live_info"]["notes_list"], separators=(',',':'), indent=None)
+        json.dumps(liveInfo["notes_list"], separators=(',',':'), indent=None)
       ))
-      print(f"""{getGroupName(data["member_category"])} — {data["name"]} ({getDifficultyStringById(data["difficulty"])}) was written to the database.""")
+      print(f"""{getGroupName(data["member_category"])} — {data["name"]} ({getDifficultyStringById(data["difficulty"])}) was saved to the database.""")
       liveNotesDB.commit()
 
 if __name__ == "__main__":
