@@ -133,9 +133,10 @@ export class Unit extends CommonModule {
         unit_id, attribute_id, disable_rank_up, after_love_max,
         before_love_max, after_level_max, before_level_max, default_unit_skill_id,
         max_removable_skill_capacity, default_removable_skill_capacity, unit_level_up_pattern_id,
-        smile_max, pure_max, cool_max, hp_max, unit_skill_m.max_level as max_skill_level, rarity
+        smile_max, pure_max, cool_max, hp_max, unit_skill_m.max_level as max_skill_level, unit_m.rarity
       FROM
         unit_m
+      LEFT JOIN unit_rarity_m ON unit_m.rarity = unit_rarity_m.rarity
       LEFT JOIN unit_skill_m ON unit_m.default_unit_skill_id = unit_skill_m.unit_skill_id
       WHERE unit_id = :unit`, { unit: unitId })
       if (!unitData) throw new Error(`Unit Id "${unitId} does not exist`)

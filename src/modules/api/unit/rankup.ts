@@ -37,7 +37,13 @@ export default class extends ApiAction {
     if (sacrificeUnit[0].unit_id != baseUnit.unit_id) throw new Error("Not Same Unit")
     if (baseUnit.rank >= baseUnit.max_rank && baseUnit.is_removable_skill_capacity_max) throw new ErrorAPI(1313, "ERROR_CODE_UNIT_LEVEL_AND_SKILL_LEVEL_MAX")
 
-    const baseUnitData = await unitDB.get("SELECT rank_up_cost, disable_rank_up, after_love_max, after_level_max FROM unit_m WHERE unit_id = :id", {
+    const baseUnitData = await unitDB.get(`
+    SELECT
+      rank_up_cost, disable_rank_up, after_love_max, after_level_max
+    FROM
+      unit_m
+    LEFT JOIN unit_rarity_m ON unit_m.rarity = unit_rarity_m.rarity
+    WHERE unit_id = :id`, {
       id: baseUnit.unit_id
     })
     assert(baseUnitData, `Failed to find unit data [${baseUnit.unit_id}]`)

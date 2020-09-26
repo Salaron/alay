@@ -3,7 +3,7 @@ import { Utils } from "./utils"
 const downloadDB = sqlite3.getDownloadSVDB()
 
 type os = "Android" | "iOS"
-export interface urlObject {
+export interface IUrlObject {
   size: number
   url: string
 }

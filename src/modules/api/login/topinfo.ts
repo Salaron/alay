@@ -69,6 +69,8 @@ export default class extends ApiAction {
       friends_request_cnt: friendRequest.count,
       friends_approval_wait_cnt: friendApproval.count,
       present_cnt: present.count,
+      secret_box_muse_badge_flag: false,
+      secret_box_aqours_badge_flag: false,
       server_datetime: currentDatetime,
       server_timestamp: Utils.timeStamp(),
       notice_friend_datetime: currentDatetime,
@@ -92,9 +94,7 @@ export default class extends ApiAction {
         0  // point shop
       ],
       limit_bonus_ur_info: [],
-      free_ticket_list: [],
-      free_muse_gacha_flag: false,
-      free_aqours_gacha_flag: false
+      free_ticket_list: []
     }
 
     return {
