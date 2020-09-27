@@ -66,15 +66,16 @@ export default class extends ApiAction {
         day: day.day_of_month,
         day_of_the_week: day.day_of_week,
         special_day: !!day.special_flag,
-        special_image_asset: !!day.special_flag == true ? "assets/image/ui/login_bonus/loge_icon_01.png" : null,
+        special_image_asset: !!day.special_flag == true ? "assets/image/ui/login_bonus/loge_icon_01.png" : "",
         received: receivedList.indexOf(parseInt(day.day_of_month, 10)) !== -1,
         ad_received: false,
         item: {
           unit_id: day.item_type === 1001 ? day.item_id : undefined,
-          item_id: day.item_type === 1000 ? day.item_id : undefined,
+          item_id: day.item_type !== 1001 && day.item_id ? day.item_id : undefined,
           add_type: day.item_type,
           amount: day.amount,
-          is_rank_max: day.unit_id === null ? undefined : false
+          is_rank_max: day.unit_id === null ? undefined : false,
+          is_signed: day.unit_id === null ? undefined : false
         }
       })
     }
@@ -84,15 +85,16 @@ export default class extends ApiAction {
         day: day.day_of_month,
         day_of_the_week: day.day_of_week,
         special_day: !!day.special_flag,
-        special_image_asset: !!day.special_flag == true ? "assets/image/ui/login_bonus/loge_icon_01.png" : null,
+        special_image_asset: !!day.special_flag == true ? "assets/image/ui/login_bonus/loge_icon_01.png" : "",
         received: false,
         ad_received: false,
         item: {
           unit_id: day.item_type === 1001 ? day.item_id : undefined,
-          item_id: day.item_type === 1000 ? day.item_id : undefined,
+          item_id: day.item_type !== 1001 && day.item_id ? day.item_id : undefined,
           add_type: day.item_type,
           amount: day.amount,
-          is_rank_max: day.unit_id === null ? undefined : false
+          is_rank_max: day.unit_id === null ? undefined : false,
+          is_signed: day.unit_id === null ? undefined : false
         }
       })
     }
@@ -135,20 +137,21 @@ export default class extends ApiAction {
     }, `Login Bonus Reward! [${currentDay}.${currentMonth}.${currentYear}]`, reward.amount)
 
     // Total Login Bonus
-    await Object.keys(Config.lbonus.total_login_bonus).forEachAsync(async (day: string) => {
-      if (response.total_login_info.login_count >= day) {
+
+    for (let day of Object.keys(Config.lbonus.total_login_bonus)) {
+      if (response.total_login_info.login_count >= parseInt(day)) {
         const check = await this.connection.first(`SELECT * FROM login_bonus_total WHERE user_id = :user AND days = :days`, {
           user: this.user_id,
           days: day
         })
-        if (check) return
+        if (check) continue
 
         await this.connection.query(`INSERT INTO login_bonus_total (user_id, days) VALUES (:user, :day)`, { user: this.user_id, day })
         await this.item.addPresent(this.user_id, {
           name: Config.lbonus.total_login_bonus[day].name,
           id: Config.lbonus.total_login_bonus[day].item_id
-        }, `Total Login Bonus Reward! [${day} day(s)]`, Config.lbonus.total_login_bonus[day].amount)
-      } else if (response.total_login_info.remaining_count == 0) {
+        }, `Total Login Bonus Reward [${day} day(s)]`, Config.lbonus.total_login_bonus[day].amount)
+      } else {
         const itemInfo = this.item.nameToType(Config.lbonus.total_login_bonus[day].name)
         response.total_login_info.remaining_count = parseInt(day) - response.total_login_info.login_count
         response.total_login_info.reward.push({
@@ -156,8 +159,9 @@ export default class extends ApiAction {
           add_type: itemInfo.itemType,
           amount: Config.lbonus.total_login_bonus[day].amount
         })
-      } else return
-    })
+        break
+      }
+    }
 
     return {
       status: 200,
