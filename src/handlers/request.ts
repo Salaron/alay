@@ -112,10 +112,6 @@ export default async function requestHandler(request: IncomingMessage, response:
           response.statusCode = 302
           response.setHeader("Location", "../../webview.php/static/index?id=10") // custom maintenance page
           return response.end()
-        } else if (request.url!.includes("maintenace/maintenance.php") && Config.modules.login.webview_login) {
-          response.statusCode = 302
-          response.setHeader("Location", "../../webview.php/login/hello") // Webview login
-          return response.end()
         }
         throw new RequestError("Bad Request", 400)
       }
