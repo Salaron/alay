@@ -52,13 +52,6 @@ export default class extends ApiAction {
         throw new ErrorAPI(407)
       }
 
-      if (Config.modules.login.webview_login) return {
-        status: 200,
-        result: {},
-        headers: {
-          maintenance: 1 // redirect to webview fake maintenance page
-        }
-      }
       throw new ErrorAPI(407)
     }
     await this.connection.query("UPDATE user_login SET login_token = :token, session_key = :key WHERE user_id = :user", {

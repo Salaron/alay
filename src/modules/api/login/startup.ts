@@ -23,12 +23,6 @@ export default class extends ApiAction {
 
   public async execute() {
     if (this.requestData.auth_level > AUTH_LEVEL.UPDATE) throw new ErrorAPI(`You're already logged in`)
-    if (Config.modules.login.webview_login) return {
-      status: 200,
-      result: {
-        user_id: 0
-      }
-    }
     if (Config.modules.login.enable_registration === false) throw new ErrorAPI("Registration is disabled!")
     const authToken = new AuthToken(this.requestData.auth_token)
     await authToken.get()

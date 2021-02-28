@@ -17,9 +17,8 @@ context.keys().forEach(context)
 try {
   const urlSplit = location.pathname.toLowerCase().split("/")
   require(`./${urlSplit[2]}/${urlSplit[3]}`) // tslint:disable-line
-} catch {
-  // script not exist
-  // just ignore that
+} catch (err) {
+  console.log(err)
 }
 
 // Do init stuff
@@ -51,6 +50,7 @@ window.onerror = (message, url, lineNo, columnNo, error) => {
 // fix compilation
 // /global variables was a bad idea/
 import { Type as type } from "../../common/type"
+import { url } from "inspector"
 declare global {
   const Type: typeof type
 }

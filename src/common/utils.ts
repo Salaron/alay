@@ -2,9 +2,7 @@ import crypto from "crypto"
 import { IncomingMessage } from "http"
 import moment from "moment"
 import nodemailer from "nodemailer"
-import superagent from "superagent"
 import { Logger } from "../core/logger"
-import { ErrorAPI } from "../models/error"
 
 const log = new Logger("Utils")
 const mailTransport = nodemailer.createTransport(Config.mailer.transportSettings)
@@ -163,24 +161,6 @@ export class Utils {
       admins.includes(userId) ||
       bypassList.includes(userId)
     )
-  }
-
-  public static async recaptchaTest(response: string): Promise<boolean> {
-    if (Config.modules.login.enable_recaptcha) {
-      if (!Type.isString(response) || response.length === 0) throw new ErrorAPI("reCAPTCHA result is missing")
-
-      const result = await superagent.post("https://www.google.com/recaptcha/api/siteverify").type("form").send({
-        secret: Config.modules.login.recaptcha_private_key,
-        response
-      })
-      const jsonResult = JSON.parse(result.text)
-      if (jsonResult.success !== true) {
-        log.error(`reCAPTCHA test Failed;\nError-codes: ${jsonResult["error-codes"].join(", ")}`)
-        return false
-      }
-      return true
-    }
-    return true
   }
 
   public static async sendMail(receivers: string, subject: string, text: string) {
