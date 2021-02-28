@@ -39,7 +39,7 @@ const config: webpack.Configuration = {
     ]
   },
   output: {
-    filename: "js/bundle-[hash].js",
+    filename: "js/[name]-[fullhash].js",
     path: pathResolve(__dirname, "public"),
     publicPath: "/public"
   },
@@ -50,7 +50,7 @@ const config: webpack.Configuration = {
     new CleanWebpackPlugin(),
     new AssetsWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: "styles/[name]-[hash].css"
+      filename: "styles/[name]-[fullhash].css"
     })
   ]
 }

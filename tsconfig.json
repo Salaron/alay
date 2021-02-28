@@ -11,7 +11,8 @@
     "alwaysStrict": true,
     "strictPropertyInitialization": false,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "src/webpack",
