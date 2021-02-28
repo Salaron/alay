@@ -44,7 +44,7 @@ export default class extends ApiAction {
         response.live_list.push({
           live_difficulty_id: live,
           start_date: "2018-01-01 00:00:00",
-          end_date: "2021-01-01 06:00:00",
+          end_date: "2022-01-01 06:00:00",
           is_random: false
         })
       }
