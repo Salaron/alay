@@ -41,7 +41,7 @@ export default class extends ApiAction {
 
       const xorBase = Utils.xor(Buffer.from(Config.client.XMC_base), Buffer.from(Config.client.application_key))
       const signKey = Utils.xor(xorBase, Buffer.from(clientKey, "base64"))
-      const xmcStatus = this.requestData.checkXMessageCode(false, signKey)
+      const xmcStatus = await this.requestData.checkXMessageCode(false, signKey)
 
       const xmcVerifyEnabled = this.requestData.auth_level === AUTH_LEVEL.NONE && Config.server.XMC_check === true
       if (!xmcStatus && xmcVerifyEnabled) { // do the trick if it's incorrect
