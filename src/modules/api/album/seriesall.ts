@@ -29,7 +29,7 @@ interface IOwningAlbumSeiresUnitIdMap {
 const albumSeriesUnitIdMap: IAlbumSeriesUnitIdMap = {}
 const owningAlbumSeriesTemplate: IOwningAlbumSeiresUnitIdMap = {}
 export async function init() {
-  (await unitDB.all("SELECT * FROM unit_m")).map(unitSeries => {
+  (await unitDB.all("SELECT * FROM unit_m WHERE release_tag IS NULL")).map(unitSeries => {
     albumSeriesUnitIdMap[unitSeries.unit_id] = unitSeries.album_series_id
     owningAlbumSeriesTemplate[unitSeries.album_series_id] = []
   })
