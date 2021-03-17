@@ -13,14 +13,12 @@ export default class extends ApiAction {
 
   public paramTypes() {
     return {
-      mgd: TYPE.INT,
       unit_initial_set_id: TYPE.INT
     }
   }
 
   public paramCheck() {
-    if (![1, 2].includes(this.params.mgd)) throw new Error(`Invalid mgd`)
-    if (this.params.unit_initial_set_id % 10 < 0 || this.params.unit_initial_set_id % 10 > 9) throw new Error(`Invalid set id`)
+    if (this.params.unit_initial_set_id % 10 < 0 || this.params.unit_initial_set_id % 10 >= 9) throw new Error(`Invalid set id`)
   }
 
   public async execute() {
@@ -29,7 +27,7 @@ export default class extends ApiAction {
 
     let titleId = 1
     let leader = Config.modules.unitSelect.museCenterUnits[this.params.unit_initial_set_id % 10]
-    if (this.params.mgd === 2) {
+    if (this.params.unit_initial_set_id >= 20) {
       titleId = 23
       leader = Config.modules.unitSelect.aqoursCenterUnits[this.params.unit_initial_set_id % 10]
     }

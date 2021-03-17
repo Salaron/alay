@@ -30,7 +30,8 @@ export default class extends ApiAction {
         aqours_event: false,
         aqours_secretbox: false,
         aqours_birthday: false
-      }
+      },
+      open_arena: false
     }
 
     return {

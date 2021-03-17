@@ -15,17 +15,7 @@ export default class extends ApiAction {
   }
 
   public async execute() {
-    return {
-      status: 200,
-      result: {
-        time_limit: moment(new Date()).utcOffset("+0900").add(1, "h").format("YYYY-MM-DD HH:mm:ss"),
-        member_category_list: [await this.getBannerList(1), await this.getBannerList(2)]
-      }
-    }
-  }
-
-  private async getBannerList(memberCategory: memberCategory) {
-    const list = (await bannerDB.all(`SELECT * FROM banner WHERE date(start_date) <= date(:now) AND date(end_date) > date(:now) ORDER BY member_category ${memberCategory === 1 ? "ASC" : "DESC"}`, {
+    let bannerList = (await bannerDB.all(`SELECT * FROM banner WHERE date(start_date) <= date(:now) AND date(end_date) > date(:now)`, {
       now: Utils.toSpecificTimezone(9)
     })).map(banner => {
       return {
@@ -42,10 +32,12 @@ export default class extends ApiAction {
         add_unit_start_date: banner.add_unit_start_date ? banner.add_unit_start_date : undefined
       }
     })
-
     return {
-      member_category: memberCategory,
-      banner_list: list
+      status: 200,
+      result: {
+        time_limit: moment(new Date()).utcOffset("+0900").add(1, "h").format("YYYY-MM-DD HH:mm:ss"),
+        banner_list: bannerList
+      }
     }
   }
 }

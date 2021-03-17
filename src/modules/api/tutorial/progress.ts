@@ -43,8 +43,7 @@ export default class extends ApiAction {
 
   public paramTypes() {
     return {
-      tutorial_state: TYPE.INT,
-      mgd: TYPE.INT
+      tutorial_state: TYPE.INT
     }
   }
 

@@ -69,8 +69,7 @@ export default class extends ApiAction {
       friends_request_cnt: friendRequest.count,
       friends_approval_wait_cnt: friendApproval.count,
       present_cnt: present.count,
-      secret_box_muse_badge_flag: false,
-      secret_box_aqours_badge_flag: false,
+      secret_box_badge_flag: false,
       server_datetime: currentDatetime,
       server_timestamp: Utils.timeStamp(),
       notice_friend_datetime: currentDatetime,
@@ -84,17 +83,13 @@ export default class extends ApiAction {
       klab_id_task_can_sync: false,
       is_klab_id_task_flag: false,
       has_unread_announce: false,
+      ad_reward: false,
       has_ad_reward: false,
-      secret_box_id_list: [
-        [], // μ's
-        []  // Aqours
-      ],
       exchange_badge_cnt: [
         0, // seal shop
-        0  // point shop
-      ],
-      limit_bonus_ur_info: [],
-      free_ticket_list: []
+        0, // point shop
+        0  // live arena
+      ]
     }
 
     return {

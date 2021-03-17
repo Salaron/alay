@@ -58,6 +58,16 @@ export default class extends ApiAction {
         reset_exchange_rate: false,
         unite_info: []
       },
+      effort_point: [
+        {
+          live_effort_point_box_spec_id: 1,
+          capacity: 1,
+          before: 0,
+          after: 0,
+          rewards: []
+        }
+      ],
+      limited_effort_box: [],
       class_system: User.getClassSystemStatus(this.user_id)
     }
 
