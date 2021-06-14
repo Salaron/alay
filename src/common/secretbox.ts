@@ -357,7 +357,7 @@ export class Secretbox extends CommonModule {
 
       secretboxPage = {
         menu_asset: animationAssets.menu_asset,
-        menu_se_asset: animationAssets.menu_se_asset,
+        page_order: secretboxM.page_order,
         animation_assets: animationAssets,
         button_list: buttonList,
         secret_box_info: secretboxInfo

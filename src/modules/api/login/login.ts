@@ -65,7 +65,8 @@ export default class extends ApiAction {
       status: 200,
       result: {
         authorize_token: newToken,
-        user_id: userData.user_id
+        user_id: userData.user_id,
+        skip_login_news: false
       }
     }
   }

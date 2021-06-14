@@ -12,6 +12,7 @@ export interface ISecretboxM {
   end_date: string
   always_display_flag: 0 | 1
   show_end_date_flag: null | 1
+  page_order: number
 }
 
 export interface ISecretboxInfo {
@@ -40,7 +41,7 @@ export interface ISecretboxAnimationAssets {
 
 export interface ISecretboxPage {
   menu_asset: string
-  menu_se_asset: string
+  page_order: number
   animation_assets: ISecretboxAnimationAssets
   button_list: ISecretboxButton[]
   secret_box_info: ISecretboxInfo
