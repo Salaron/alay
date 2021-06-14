@@ -47,8 +47,8 @@ const config: webpack.Configuration = {
     extensions: [".ts", ".js"]
   },
   plugins: [
-    new CleanWebpackPlugin(),
-    new AssetsWebpackPlugin(),
+    new CleanWebpackPlugin() as any,
+    new AssetsWebpackPlugin() as any,
     new MiniCssExtractPlugin({
       filename: "styles/[name]-[fullhash].css"
     })
