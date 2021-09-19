@@ -1,0 +1,10 @@
+{
+  "name": "@alay/shared",
+  "version": "1.0.0",
+  "description": "Various common components",
+  "author": "Salaron",
+  "license": "MIT",
+  "private": true,
+  "main": "dist/index",
+  "types": "dist/index"
+}

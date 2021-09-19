@@ -1,0 +1,8 @@
+{
+  "name": "@alay/web",
+  "version": "1.0.0",
+  "description": "Front-end",
+  "author": "Salaron",
+  "license": "MIT",
+  "private": true
+}

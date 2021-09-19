@@ -1,0 +1,20 @@
+{
+  "name": "@alay/server",
+  "version": "3.0.0",
+  "description": "The next generation of SunLight Project",
+  "private": true,
+  "main": "src/alay.ts",
+  "author": "Salaron",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.9.2",
+    "mysql-migrations": "^1.0.7"
+  },
+  "dependencies": {
+    "@alay/shared": "^1.0.0",
+    "express": "^4.17.1",
+    "mysql2": "^2.3.0",
+    "ts-node": "^10.2.1"
+  }
+}
