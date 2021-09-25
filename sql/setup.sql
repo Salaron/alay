@@ -1,12 +1,17 @@
 -- Tables creation
 -- WIP
 
-/* Brain table */
+-- All users info
 CREATE TABLE `user` (
 	`user_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT "No name",
 	`introduction` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT "Hello!",
   `partner_unit` INT UNSIGNED NOT NULL,
+
+  `setting_award_id` INT UNSIGNED NOT NULL DEFAULT 1,
+  `setting_background_id` INT UNSIGNED NOT NULL DEFAULT 1,
+  `tutorial_state` TINYINT(2) NOT NULL DEFAULT 0,
+
 	`login_key` VARCHAR(36) NULL, -- TODO: hashing
 	`login_passwd` VARCHAR(128) NULL,
 	`email` VARCHAR(100) NULL,
@@ -19,22 +24,23 @@ CREATE TABLE `user` (
 	`update_date` TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `last_activity_date` TIMESTAMP NOT NULL DEFAULT current_timestamp(), -- update on request
   PRIMARY KEY (`user_id`),
-  KEY (`login_key`, `login_passwd`, `email`, `password`)
+  UNIQUE KEY (`login_key`, `login_passwd`),
+  KEY (`email`, `password`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* There will be every attempt to log in */
+-- There will be every attempt to log in
 CREATE TABLE `auth_log` (
   `user_id` BIGINT NOT NULL DEFAULT -1 COMMENT 'Not same as user_id in user table',
   `app_version` VARCHAR(10) NOT NULL,
   `client_version` VARCHAR(10) NOT NULL,
   `ip` VARCHAR(15) NOT NULL,
-  /* `platform` VARCHAR NOT NULL, */
+--`platform` VARCHAR NOT NULL,
   `device_info` TEXT NOT NULL,
   `insert_date` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
   KEY (`user_id`, `ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* Unlocked awards (not used yet) */
+-- Unlocked awards (not used yet)
 CREATE TABLE `award` (
   `user_id` INT UNSIGNED NOT NULL,
   `award_id` INT UNSIGNED NOT NULL,
@@ -43,7 +49,7 @@ CREATE TABLE `award` (
   KEY (`award_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* Unlocked backgrounds (not used yet) */
+-- Unlocked backgrounds (not used yet)
 CREATE TABLE `background` (
   `user_id` INT UNSIGNED NOT NULL,
   `background_id` INT UNSIGNED NOT NULL,
@@ -52,7 +58,7 @@ CREATE TABLE `background` (
   KEY (`background_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* Owned removable skills by user */
+-- Owned removable skills by user
 CREATE TABLE `removable_skill` (
   `user_id` INT UNSIGNED NOT NULL,
   `unit_removable_skill_id` INT UNSIGNED NOT NULL,
@@ -64,16 +70,16 @@ CREATE TABLE `removable_skill` (
   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* Equipment removable skills to units */
+-- Equipment removable skills to units
 CREATE TABLE `removable_skill_equipment` (
   `user_id` INT UNSIGNED NOT NULL,
   `unit_removable_skill_id` INT UNSIGNED NOT NULL,
-  `unit_id` INT UNSIGNED NOT NULL,
+  `unit_owning_user_id` INT UNSIGNED NOT NULL,
   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY (`unit_removable_skill_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* a.k.a. items in reward box */
+-- a.k.a. items in reward box
 CREATE TABLE `incentive` (
   `incentive_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` INT UNSIGNED NOT NULL,
@@ -87,7 +93,7 @@ CREATE TABLE `incentive` (
   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* Banned users */
+-- Banned users
 CREATE TABLE `user_ban` (
   `user_id` INT UNSIGNED NOT NULL,
   `message` TEXT NULL,
@@ -96,7 +102,7 @@ CREATE TABLE `user_ban` (
   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* Relationships between users */
+-- Friend relationships between users
 CREATE TABLE `friend` (
   `initiator_id` INT UNSIGNED NOT NULL,
   `recipient_id` INT UNSIGNED NOT NULL,
@@ -108,7 +114,7 @@ CREATE TABLE `friend` (
   FOREIGN KEY (`recipient_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* Messages between users in-game */
+-- Messages between users
 CREATE TABLE `message` (
   `notice_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `affector_id` INT UNSIGNED NOT NULL,
@@ -125,36 +131,37 @@ CREATE TABLE `message` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `unit_deck` (
+  `unit_deck_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` INT UNSIGNED NOT NULL,
-  `unit_deck_id` TINYINT(2) UNSIGNED NOT NULL,
+  `deck_id` TINYINT(2) UNSIGNED NOT NULL COMMENT "Local user id",
   `deck_name` VARCHAR(10) NOT NULL,
+  `is_active` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`unit_deck_id`),
   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `unit_deck_slot` (
-  `unit_deck_id` TINYINT(2) UNSIGNED NOT NULL,
-  `user_id` INT UNSIGNED NOT NULL,
+  `unit_deck_id` INT UNSIGNED NOT NULL,
   `slot_id` TINYINT(2) NOT NULL,
-  `unit_owning_user_id` VARCHAR(10) NOT NULL,
-  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  KEY (`unit_deck_id`)
+  `unit_owning_user_id` INT UNSIGNED NOT NULL,
+  FOREIGN KEY (`unit_deck_id`) REFERENCES `unit_deck` (`unit_deck_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `stamp_deck` (
+  `stamp_deck_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` INT UNSIGNED NOT NULL,
   `stamp_type` TINYINT(1) UNSIGNED NOT NULL,
   `stamp_setting_id` TINYINT(1) UNSIGNED NOT NULL,
   `main_flag` TINYINT(1) NOT NULL,
+  PRIMARY KEY (`stamp_deck_id`),
   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `stamp_deck_slot` (
-  `user_id` INT UNSIGNED NOT NULL,
-  `stamp_type` TINYINT(1) UNSIGNED NOT NULL,
-  `stamp_setting_id` TINYINT(1) UNSIGNED NOT NULL,
+  `stamp_deck_id` INT UNSIGNED NOT NULL,
   `position` TINYINT(1) UNSIGNED NOT NULL,
   `stamp_id` SMALLINT(5) UNSIGNED DEFAULT NULL,
-  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (`stamp_deck_id`) REFERENCES `stamp_deck` (`stamp_deck_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `random_live` (
@@ -168,6 +175,7 @@ CREATE TABLE `random_live` (
   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- To track gained live rewards
 CREATE TABLE `live_goal` (
   `user_id` INT UNSIGNED NOT NULL,
   `live_goal_reward_id` INT NOT NULL,
@@ -175,11 +183,13 @@ CREATE TABLE `live_goal` (
   KEY (`live_goal_reward_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `support_unit` (
+-- Support units owned by user
+CREATE TABLE `unit_support` (
   `user_id` INT UNSIGNED NOT NULL,
   `unit_id` SMALLINT(5) UNSIGNED NOT NULL,
   `amount` INT UNSIGNED NOT NULL,
-  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  KEY (`unit_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `webview_news` (
@@ -192,6 +202,56 @@ CREATE TABLE `webview_news` (
   PRIMARY KEY (`announce_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- WIP
+CREATE TABLE `tos` (
+  `tos_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `tos_type` SMALLINT NOT NULL,
+  `inset_date` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`tos_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `tos_log` (
+  `user_id` INT UNSIGNED NOT NULL,
+  `tos_id` INT UNSIGNED NOT NULL,
+  `agreed_date` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`tos_id`) REFERENCES `tos` (`tos_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- received items by user from lbonus
+-- TODO
+CREATE TABLE `login_bonus_log` (
+  `user_id` INT UNSIGNED NOT NULL,
+  `insert_date` TIMESTAMP NOT NULL DEFAULT current_timestamp(), -- ?
+  KEY (`user_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Rewards by log in by some amount of days
+-- TODO
+CREATE TABLE `login_bonus_total` (
+  `login_bonus_total_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`login_bonus_total_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Received items by user from total lbonus
+CREATE TABLE `login_bonus_total_log` (
+  `user_id` INT UNSIGNED NOT NULL,
+  `login_bonus_total_id` INT UNSIGNED NOT NULL,
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`login_bonus_total_id`) REFERENCES `login_bonus_total` (`login_bonus_total_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `personal_notice` (
+  `notice_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NOT NULL,
+  `type_id` SMALLINT UNSIGNED NOT NULL,
+  `title` VARCHAR(100) NOT NULL,
+  `contents` TEXT NOT NULL,
+  `agreed` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`notice_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /* TODO
 -- banners on the home page
@@ -214,53 +274,24 @@ CREATE TABLE `login_bonus` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- received items
-CREATE TABLE `login_bonus_log` (
-  `user_id` INT UNSIGNED NOT NULL,
-  `insert_date` TIMESTAMP NOT NULL DEFAULT current_timestamp() -- ?
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `login_bonus_total` (
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE `login_bonus_total_received` (
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- special list
+-- special login bonus
 CREATE TABLE `login_bonus_special` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- items in special lbonus
 CREATE TABLE `login_bonus_special_item` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE `login_bonus_special_item_received` (
+-- what items user got
+CREATE TABLE `login_bonus_special_log` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- the server will create special lbonus based on this table
 CREATE TABLE `login_bonus_birthday` (
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE `personal_notice` (
-  `notice_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` INT UNSIGNED NOT NULL,
-  `type_id` SMALLINT UNSIGNED NOT NULL,
-  `title` VARCHAR(100) NOT NULL,
-  `contents` TEXT NOT NULL,
-  `agreed` TINYINT(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`notice_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE `tos` (
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE `tos_log` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -272,10 +303,12 @@ CREATE TABLE `unit_album` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- exchange items
 CREATE TABLE `exchange` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- cost for items
 CREATE TABLE `exchange_cost` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -288,6 +321,7 @@ CREATE TABLE `live_log` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- information about started live show
 CREATE TABLE `live_progress` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
