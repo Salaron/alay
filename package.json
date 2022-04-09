@@ -32,7 +32,7 @@
     "handlebars": "^4.7.3",
     "ioredis": "^4.16.1",
     "mime": "^2.4.4",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "mysql2": "^2.1.0",
     "nodemailer": "^4.7.0",
     "querystring": "^0.2.0",
